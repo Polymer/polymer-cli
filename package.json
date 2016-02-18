@@ -15,7 +15,8 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "command-line-commands": "^0.1.2",
-    "polyserve": "^0.7.1"
+    "polyserve": "^0.7.1",
+    "web-component-tester": "^4.2.0"
   },
   "devDependencies": {
     "typescript": "^1.8.0"
