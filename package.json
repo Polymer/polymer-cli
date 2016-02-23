@@ -15,6 +15,7 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "command-line-commands": "^0.1.2",
+    "polylint": "^2.10.0",
     "polyserve": "^0.7.1",
     "web-component-tester": "^4.2.0"
   },
