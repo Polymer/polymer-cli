@@ -15,3 +15,7 @@ A command-line tool for Polymer projects
 ### Start the development server
 
     $ polytool serve
+
+### Run web-component-tester tests
+
+    $ polytool test

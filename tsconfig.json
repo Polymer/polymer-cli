@@ -15,20 +15,22 @@
     "outDir": "lib"
   },
   "filesGlob": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
     "!node_modules/**",
     "custom_typings/*.d.ts",
-    "typings/**/*.d.ts"
+    "typings/main/*.d.ts",
+    "typings/main.d.ts"
   ],
   "files": [
-    "custom_typings/command-line-args.d.ts",
-    "custom_typings/command-line-commands.d.ts",
     "src/commands/command.ts",
     "src/commands/help.ts",
     "src/commands/serve.ts",
+    "src/commands/test.ts",
     "src/polytool.ts",
-    "typings/node/node.d.ts"
+    "custom_typings/command-line-args.d.ts",
+    "custom_typings/command-line-commands.d.ts",
+    "custom_typings/web-component-tester.d.ts",
+    "typings/main.d.ts"
   ],
   "atom": {
     "rewriteTsconfig": true
