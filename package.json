@@ -1,0 +1,23 @@
+{
+  "name": "polytool",
+  "version": "0.0.1",
+  "description": "A commandline tool for Polymer projects",
+  "main": "lib/polytool.js",
+  "bin": "bin/polytool.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Polymer/polytool.git"
+  },
+  "author": "The Polymer Project Authors",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "command-line-commands": "^0.1.2",
+    "polyserve": "^0.7.1"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.0"
+  }
+}
