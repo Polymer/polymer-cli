@@ -24,6 +24,7 @@
   "files": [
     "src/commands/command.ts",
     "src/commands/help.ts",
+    "src/commands/lint.ts",
     "src/commands/serve.ts",
     "src/commands/test.ts",
     "src/polytool.ts",
