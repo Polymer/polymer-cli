@@ -15,10 +15,11 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "command-line-commands": "^0.1.2",
+    "generator-polymer-init": "^0.0.1",
     "polylint": "^2.10.0",
     "polyserve": "^0.7.1",
     "web-component-tester": "^4.2.0",
-    "yeoman-environment": "^1.5.2",
+    "yeoman-environment": "^1.5.2"
   },
   "devDependencies": {
     "typescript": "^1.8.0"
