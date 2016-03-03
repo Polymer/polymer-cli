@@ -2,6 +2,7 @@
 
 import * as commandLineCommands from 'command-line-commands';
 import {HelpCommand} from './commands/help';
+import {InitCommand} from './commands/init';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
@@ -15,6 +16,7 @@ export class Polytool {
 
   constructor() {
     this.addCommand(new HelpCommand(this.commands));
+    this.addCommand(new InitCommand());
     this.addCommand(new LintCommand());
     this.addCommand(new ServeCommand());
     this.addCommand(new TestCommand());
