@@ -8,23 +8,30 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import {ArgDescriptor} from 'command-line-args';
+import {CLI} from 'command-line-commands';
+
 import {Command} from './command';
+import {build} from '../build/build';
 
-// not ES modules compatible
-const YeomanEnvironment = require('yeoman-environment');
+export class BuildCommand implements Command {
+  name = 'build';
 
-export class InitCommand implements Command {
-  name = 'init';
+  description = 'Builds an application-style project';
 
-  description = 'Initializes a Polymer project';
-
-  args = [];
+  args = [
+    {
+      name: 'entrypoint',
+      description: 'The entrypoint file to build',
+      defaultOption: true,
+    },
+    {
+      name: 'sources',
+      description: 'The sources file to build',
+    }
+  ];
 
   run(options): Promise<any> {
-    return new Promise((resolve, reject) => {
-      let env = new YeomanEnvironment();
-      env.register(require.resolve('generator-polymer-init'), 'polymer-init:app');
-      env.run('polymer-init', {}, () => resolve());
-    });
+    return build(options.entrypoint, options.sources);
   }
 }
