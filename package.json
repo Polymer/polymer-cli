@@ -1,11 +1,12 @@
 {
   "name": "polytool",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polytool.js",
   "bin": "bin/polytool.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "init": "typings install",
+    "build": "if [ ! -f typings/main.d.ts ]; then npm run init; fi; tsc"
   },
   "repository": {
     "type": "git",
@@ -16,6 +17,7 @@
   "dependencies": {
     "command-line-commands": "^0.1.2",
     "generator-polymer-init": "^0.0.1",
+    "gulp": "^3.9.1",
     "gulp-crisper": "^1.0.0",
     "gulp-if": "^2.0.0",
     "gulp-vulcanize": "^6.1.0",
