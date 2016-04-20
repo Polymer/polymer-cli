@@ -16,8 +16,15 @@
   "dependencies": {
     "command-line-commands": "^0.1.2",
     "generator-polymer-init": "^0.0.1",
+    "gulp-crisper": "^1.0.0",
+    "gulp-if": "^2.0.0",
+    "gulp-vulcanize": "^6.1.0",
+    "hydrolysis": "^1.23.3",
+    "liftoff": "^2.2.1",
     "polylint": "^2.10.0",
     "polyserve": "^0.7.1",
+    "uglify-js": "^2.6.2",
+    "vinyl-fs": "^2.4.3",
     "web-component-tester": "^4.2.0",
     "yeoman-environment": "^1.5.2"
   },
