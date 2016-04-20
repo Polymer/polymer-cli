@@ -17,6 +17,7 @@
   "dependencies": {
     "command-line-commands": "^0.1.2",
     "generator-polymer-init": "^0.0.1",
+    "gulp": "^3.9.1",
     "gulp-crisper": "^1.0.0",
     "gulp-if": "^2.0.0",
     "gulp-vulcanize": "^6.1.0",
