@@ -8,9 +8,8 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import {startServer} from 'polyserve';
 import {Command} from './command';
-
-const startServer = require('polyserve').startServer;
 
 export class ServeCommand implements Command {
   name = 'serve';
