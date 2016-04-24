@@ -8,7 +8,8 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {startServer} from 'polyserve';
+import {startServer, args as polyserveArgs} from 'polyserve';
+import {ServerOptions} from 'polyserve/lib/start_server';
 import {Command} from './command';
 
 export class ServeCommand implements Command {
@@ -16,56 +17,19 @@ export class ServeCommand implements Command {
 
   description = 'Runs the polyserve development server';
 
-  args = [
-    {
-      name: 'port',
-      alias: 'p',
-      description: 'The port to serve files from. Defaults to 8080',
-      type: Number,
-    },
-    {
-      name: 'hostname',
-      alias: 'h',
-      description: 'The hostname to serve. Defaults to localhost',
-      type: String,
-    },
-    {
-      name: 'component-dir',
-      alias: 'c',
-      description: 'The component directory to use. Defaults to reading from' +
-          ' the Bower config (usually bower_components/)',
-      type: String,
-    },
-    {
-      name: 'package-name',
-      alias: 'n',
-      description: 'Package name. Defaults to reading from bower.json',
-      type: String,
-    },
-    {
-      name: 'open',
-      alias: 'o',
-      description: 'Open page in default browser on startup.' +
-          ' Defaults to index.html',
-      type: String,
-    },
-    {
-      name: 'browser',
-      alias: 'b',
-      description: 'The browser to open when using the --open option.' +
-          ' Defaults to chrome',
-      type: String,
-    },
-  ];
+  args = polyserveArgs;
 
   run(options): Promise<any> {
-    return startServer({
-      port: options['port'],
+    var serverOptions: ServerOptions = {
+      root: options.root,
+      port: options.port,
+      hostname: options.hostname,
+      open: options.open,
+      browser: options.browser,
       componentDir: options['component-dir'],
       packageName: options['package-name'],
-      page: options['open'],
-      host: options['hostname'],
-      browser: options['browser'],
-    });
+    }
+
+    return startServer(serverOptions);
   }
 }
