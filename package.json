@@ -33,6 +33,7 @@
     "yeoman-environment": "^1.5.2"
   },
   "devDependencies": {
-    "typescript": "^1.8.10"
+    "typescript": "^1.8.10",
+    "typings": "^0.8.1"
   }
 }
