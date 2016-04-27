@@ -1,6 +1,6 @@
 {
   "name": "polytool",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polytool.js",
   "bin": "bin/polytool.js",
@@ -23,6 +23,7 @@
     "gulp-vulcanize": "^6.1.0",
     "hydrolysis": "^1.23.3",
     "liftoff": "^2.2.1",
+    "minimatch": "^3.0.0",
     "polylint": "^2.10.0",
     "polyserve": "^0.10.0",
     "resolve": "^1.1.7",
