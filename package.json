@@ -1,6 +1,6 @@
 {
   "name": "polytool",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polytool.js",
   "bin": "bin/polytool.js",
