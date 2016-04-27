@@ -6,7 +6,8 @@
   "bin": "bin/polytool.js",
   "scripts": {
     "init": "typings install",
-    "build": "if [ ! -f typings/main.d.ts ]; then npm run init; fi; tsc"
+    "build": "if [ ! -f typings/main.d.ts ]; then npm run init; fi; tsc",
+    "test": "depcheck ."
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "yeoman-environment": "^1.5.2"
   },
   "devDependencies": {
+    "depcheck": "^0.6.3",
     "typescript": "^1.8.10",
     "typings": "^0.8.1"
   }

@@ -3,8 +3,8 @@ node_js:
   - "5"
 sudo: false
 before_script:
-  - npm install -g typescript typings
   - npm install
   - npm run init
-script:
   - npm run build
+script:
+  - npm run test
