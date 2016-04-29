@@ -12,6 +12,7 @@ import {Command} from './command';
 
 // not ES modules compatible
 const YeomanEnvironment = require('yeoman-environment');
+const polymerGenerator = require('generator-polymer-init');
 
 export class InitCommand implements Command {
   name = 'init';
@@ -23,7 +24,7 @@ export class InitCommand implements Command {
   run(options): Promise<any> {
     return new Promise((resolve, reject) => {
       let env = new YeomanEnvironment();
-      env.register(require.resolve('generator-polymer-init'), 'polymer-init:app');
+      env.registerStub(polymerGenerator, 'polymer-init:app');
       env.run('polymer-init', {}, () => resolve());
     });
   }
