@@ -24,7 +24,9 @@ export class InitCommand implements Command {
   run(options): Promise<any> {
     return new Promise((resolve, reject) => {
       let env = new YeomanEnvironment();
-      env.registerStub(polymerGenerator, 'polymer-init:app');
+      // Can't use registerStub here because Yeoman sets the wrong template path
+      // inside the generator.
+      env.register(require.resolve('generator-polymer-init'), 'polymer-init:app');
       env.run('polymer-init', {}, () => resolve());
     });
   }
