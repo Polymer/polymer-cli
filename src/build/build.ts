@@ -14,6 +14,7 @@ import * as gutil from 'gulp-util';
 import * as minimatch from 'minimatch';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
+import {UglifyStream} from './uglify-stream';
 
 import {HtmlProject} from './html-project';
 import {StreamResolver} from './stream-resolver';
@@ -54,6 +55,10 @@ export function build(entrypoint, sources): Promise<any> {
         redirect: 'bower_components/',
       });
     let joinPhase = userPhase
+      .pipe(gulpif(file =>
+        minimatch(file.path, '*.js', {matchBase: true}),
+        new UglifyStream()
+      ))
       .pipe(project.rejoin)
       .pipe(streamResolver)
       .pipe(gulpif((file) => minimatch(file.path, entrypoint, {

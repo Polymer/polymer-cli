@@ -27,6 +27,7 @@
     "src/build/html-project.ts",
     "src/build/stream-resolver.ts",
     "src/build/util.ts",
+    "src/build/uglify-stream.ts",
     "src/commands/build.ts",
     "src/commands/command.ts",
     "src/commands/help.ts",
