@@ -47,6 +47,7 @@ export function build(entrypoint, sources): Promise<any> {
       }
     }
     let streamResolver = new StreamResolver({
+        sources: sources,
         entrypoint: entrypoint,
         basePath: process.cwd(),
         root: process.cwd(),
