@@ -9,6 +9,9 @@
  */
 
 import {Command} from './command';
+import {ArgDescriptor} from 'command-line-args';
+
+import {PolykartGenerator} from '../templates/polykart';
 
 // not ES modules compatible
 const YeomanEnvironment = require('yeoman-environment');
@@ -23,13 +26,22 @@ export class InitCommand implements Command {
 
   description = 'Initializes a Polymer project';
 
-  args = [];
+  args: ArgDescriptor[] = [
+    {
+      name: 'name',
+      description: 'The template name',
+      type: String,
+      defaultOption: true,
+    },
+  ];
 
   run(options): Promise<any> {
     return new Promise((resolve, reject) => {
+      let templateName = options['name'] || 'polymer-init';
       let env = new YeomanEnvironment();
       env.register(require.resolve('generator-polymer-init'), 'polymer-init:app');
-      env.run('polymer-init', {}, () => resolve());
+      env.registerStub(PolykartGenerator, 'polykart:app');
+      env.run(templateName, {}, () => resolve());
     });
   }
 }

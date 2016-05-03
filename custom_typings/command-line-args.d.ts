@@ -10,6 +10,7 @@ declare module 'command-line-args' {
       defaultValue?: any;
       type?: Object;
       multiple?: boolean;
+      defaultOption?: boolean;
     }
     interface UsageOpts {
       title?: string;
