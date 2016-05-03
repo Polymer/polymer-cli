@@ -13,6 +13,7 @@ import File = require('vinyl');
 import * as uglify from 'uglify-js';
 
 const UglifyOptions: uglify.MinifyOptions = {fromString: true};
+
 export class UglifyStream extends Transform {
 
   constructor() {
@@ -27,6 +28,8 @@ export class UglifyStream extends Transform {
         file.contents = new Buffer(contents);
         callback(null, file);
       } catch (err) {
+        console.log(file.path);
+        console.error(err.stack);
         callback(err);
       }
     }

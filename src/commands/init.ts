@@ -9,39 +9,24 @@
  */
 
 import {Command} from './command';
-import {ArgDescriptor} from 'command-line-args';
-
-import {PolykartGenerator} from '../templates/polykart';
 
 // not ES modules compatible
 const YeomanEnvironment = require('yeoman-environment');
-
-// NOTE(fschott) 05-02-2015: Yeoman needs to load our generator in a non-standard way via require.resolve.
-// We include this here so that our dependency-usage-checking test can still pass. If you no longer see
-// generator-polymer-init used in this file, it is safe to remove this code.
-require('generator-polymer-init');
+const polymerGenerator = require('generator-polymer-init');
 
 export class InitCommand implements Command {
   name = 'init';
 
   description = 'Initializes a Polymer project';
 
-  args: ArgDescriptor[] = [
-    {
-      name: 'name',
-      description: 'The template name',
-      type: String,
-      defaultOption: true,
-    },
-  ];
+  args = [];
 
   run(options): Promise<any> {
     return new Promise((resolve, reject) => {
-      let templateName = options['name'] || 'polymer-init';
       let env = new YeomanEnvironment();
+      // env.registerStub(polymerGenerator, 'polymer-init:app');
       env.register(require.resolve('generator-polymer-init'), 'polymer-init:app');
-      env.registerStub(PolykartGenerator, 'polykart:app');
-      env.run(templateName, {}, () => resolve());
+      env.run('polymer-init', {}, () => resolve());
     });
   }
 }
