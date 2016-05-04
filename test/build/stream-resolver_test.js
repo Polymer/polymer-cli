@@ -62,7 +62,7 @@ suite('streamResolver', () => {
       entrypoint: "/foo/bar/entrypoint",
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
-      assert.equal(null, data);
+      assert.equal(f1, data);
       let deferred = new Deferred();
       deferred.promise.then((contents) => {
         assert.equal("abcdefg", contents);
