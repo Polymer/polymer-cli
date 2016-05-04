@@ -26,24 +26,25 @@ export interface OptimizePipeOptions {
    * Options passed to gulp-html-minifier
    */
   html?: {
-    collapseWhitespace?: boolean
-    removeComments?: boolean
+    collapseWhitespace?: boolean;
+    removeComments?: boolean;
   };
   /**
    * Enable CSS minification
    */
   css?: {
-    stripWhitespace?: boolean
+    stripWhitespace?: boolean;
   };
   /**
    * Enable JS minification
    */
   js?: {
-    minify?: boolean
+    minify?: boolean;
   };
 }
 
-export function optimizePipe(stream: stream.Stream, options?: OptimizePipeOptions) {
+export function optimizePipe(stream: stream.Stream,
+  options?: OptimizePipeOptions) {
   let outpipe = stream;
   if (options) {
     if (options.js && options.js.minify) {
@@ -53,7 +54,10 @@ export function optimizePipe(stream: stream.Stream, options?: OptimizePipeOption
       outpipe = outpipe.pipe(cssSlam());
     }
     if (options.html) {
-      outpipe = outpipe.pipe(gulpif((f) => minimatch(f.path, '*.html', {matchBase: true}), htmlmin(options.html)))
+      outpipe = outpipe.pipe(
+        gulpif((f) => minimatch(f.path, '*.html', {matchBase: true}),
+          htmlmin(options.html))
+      )
     }
   }
   return outpipe;
