@@ -8,10 +8,9 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import * as stream from 'stream';
-
 import * as gulpif from 'gulp-if';
 import * as minimatch from 'minimatch';
+import * as stream from 'stream';
 
 import {UglifyTransform} from './uglify-transform';
 

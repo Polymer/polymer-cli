@@ -10,10 +10,11 @@
 
 'use strict';
 
-const StreamResolver = require('../../lib/build/stream-resolver').StreamResolver;
 const assert = require('chai').assert;
-const File = require('vinyl');
 const Deferred = require('hydrolysis/lib/loader/resolver').Deferred;
+const File = require('vinyl');
+
+const StreamResolver = require('../../lib/build/stream-resolver').StreamResolver;
 
 suite('streamResolver', () => {
 

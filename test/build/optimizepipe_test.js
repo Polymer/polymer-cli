@@ -10,12 +10,13 @@
 
 'use strict';
 
-const optimizePipe = require('../../lib/build/optimize-pipe').optimizePipe;
 const assert = require('chai').assert;
 const File = require('vinyl');
-const vfs = require('vinyl-fs-fake');
 const PassThrough = require('stream').PassThrough;
+const vfs = require('vinyl-fs-fake');
+
 const HtmlProject = require('../../lib/build/html-project').HtmlProject;
+const optimizePipe = require('../../lib/build/optimize-pipe').optimizePipe;
 
 suite('Optimize Pipe', () => {
   function testStream(stream, cb) {

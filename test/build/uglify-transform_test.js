@@ -10,8 +10,9 @@
 
 'use strict';
 const assert = require('chai').assert;
-const File = require('vinyl');
 const UglifyTransform = require('../../lib/build/uglify-transform').UglifyTransform;
+const File = require('vinyl');
+
 suite('Uglify Transform', () => {
   let ut;
   setup(() => {

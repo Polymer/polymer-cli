@@ -8,13 +8,12 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import * as path from 'path';
-
 import * as gulp from 'gulp';
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
 import mergeStream = require('merge-stream');
 import * as minimatch from 'minimatch';
+import * as path from 'path';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
 
@@ -59,7 +58,7 @@ export function build(entrypoint, sources): Promise<any> {
         minify: true
       }
     };
-    
+
     userPhase = optimizePipe(userPhase, optimizeOptions)
       .pipe(project.rejoin);
 
