@@ -8,24 +8,29 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as path from 'path';
+
 import * as gulp from 'gulp';
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
+import mergeStream = require('merge-stream');
 import * as minimatch from 'minimatch';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
 
 import {HtmlProject} from './html-project';
+import {optimizePipe} from './optimize-pipe';
 import {StreamResolver} from './stream-resolver';
 
+// non-ES compatible modules
 const findConfig = require('liftoff/lib/find_config');
 const vulcanize = require('gulp-vulcanize');
 
 export function build(entrypoint, sources): Promise<any> {
   return new Promise<any>((resolve, _) => {
 
-    entrypoint = entrypoint || 'index.html';
-    sources = sources || ['{src,test}/**/*'];
+    entrypoint = entrypoint || path.resolve('index.html');
+    sources = sources || ['src/**/*'];
     let e = [entrypoint];
     sources = e.concat.apply(e, sources);
 
@@ -37,7 +42,7 @@ export function build(entrypoint, sources): Promise<any> {
     let userTransformers = gulpfile && gulpfile.transformers;
 
     let project = new HtmlProject();
-    let splitPhase = vfs.src(sources)
+    let splitPhase = vfs.src(sources, {cwdbase: true})
       .pipe(project.split);
 
     let userPhase = splitPhase;
@@ -46,15 +51,24 @@ export function build(entrypoint, sources): Promise<any> {
         userPhase = userPhase.pipe(transformer);
       }
     }
+    userPhase = optimizePipe(userPhase).pipe(project.rejoin);
+
+    let depsProject = new HtmlProject();
+    let depsPipe =
+      vfs.src('bower_components/**/*', {cwdbase: true})
+      .pipe(depsProject.split);
+
+    depsPipe = optimizePipe(depsPipe)
+      .pipe(depsProject.rejoin);
+
     let streamResolver = new StreamResolver({
-        sources: sources,
         entrypoint: entrypoint,
         basePath: process.cwd(),
         root: process.cwd(),
         redirect: 'bower_components/',
       });
-    let joinPhase = userPhase
-      .pipe(project.rejoin)
+
+    let joinPhase = mergeStream(userPhase, depsPipe)
       .pipe(streamResolver)
       .pipe(gulpif((file) => minimatch(file.path, entrypoint, {
           matchBase: true,

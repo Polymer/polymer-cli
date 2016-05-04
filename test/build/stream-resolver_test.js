@@ -33,7 +33,7 @@ suite('streamResolver', () => {
     });
   });
 
-  test('non-entrypoint is not passed through', (done) => {
+  test('non-entrypoint is passed through', (done) => {
     let f1 = new File({
       cwd: "/foo/bar",
       base: "/foo/bar",
@@ -44,7 +44,7 @@ suite('streamResolver', () => {
       entrypoint: "/foo/bar/entrypoint",
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
-      assert.equal(null, data);
+      assert.equal(f1, data);
       done();
     });
   });
@@ -58,12 +58,11 @@ suite('streamResolver', () => {
     });
     let resolver = new StreamResolver({
       root: "/foo/bar",
-      basePath: "/foo/bar",
+      base: "/foo/bar",
       entrypoint: "/foo/bar/entrypoint",
-      sources: ['**/*'],
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
-      assert.equal(null, data);
+      assert.equal(f1, data);
       let deferred = new Deferred();
       deferred.promise.then((contents) => {
         assert.equal("abcdefg", contents);
@@ -71,26 +70,6 @@ suite('streamResolver', () => {
       });
       let accepted = resolver.accept('/baz.qux', deferred);
     });
-  });
-
-  test('dependencies not in sources are resolved', (done) => {
-    let getFile = (path, deferred) => {
-      if (path == '/foo/bar/dep.txt') {
-        deferred.resolve('abcdefg');
-      }
-    }
-    let resolver = new StreamResolver({
-      root: "/foo/bar",
-      basePath: "/foo/bar",
-      entrypoint: "/foo/bar/entrypoint",
-      getFile: getFile,
-    });
-    let deferred = new Deferred();
-    deferred.promise.then((contents) => {
-      assert.equal("abcdefg", contents);
-      done();
-    });
-    let accepted = resolver.accept('/foo/bar/dep.txt', deferred);
   });
 
 });

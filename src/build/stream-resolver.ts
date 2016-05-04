@@ -43,8 +43,6 @@ export interface Config {
    * Where to redirect lookups to siblings.
    */
   redirect?: string;
-  sources?: string[];
-  getFile?: FileGetter;
 }
 
 export class StreamResolver extends Transform /* implements Resolver*/ {
@@ -59,8 +57,6 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
   root: string;
   redirect: string;
   entrypoint: string;
-  sources: string[];
-  getFile: FileGetter;
 
   constructor(config: Config) {
     super({objectMode: true});
@@ -72,8 +68,6 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
       throw new Error('entrypoint must be specified');
     }
     this.entrypoint = config.entrypoint;
-    this.sources = config.sources || [];
-    this.getFile = config.getFile || getFile;
   }
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
@@ -95,13 +89,11 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
       // ... if so, resolve the request
       deferred.resolve(file.contents.toString());
       this._deferreds.delete(file.path);
-    } else {
-      // ... if not, store the file for a future request
-      this._files.set(file.path, file);
     }
-    // Never pass on non-entrypoints
-    // TODO(justinfagnani): possibly change this after more testing
-    callback(null, null);
+    // ... if not, store the file for a future request
+    this._files.set(file.path, file);
+
+    callback(null, file);
   }
 
   accept(uri: string, deferred: Deferred<string>): boolean {
@@ -126,15 +118,6 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
         local = path.join(this.root, local);
       }
 
-      let isInSources = this.sources.some(s => minimatch(local, path.join(this.root, s)));
-
-      // If the requested file is not in source, it will not be streamed into
-      // the resolver, so load it from disk
-      if (!isInSources) {
-        this.getFile(local, deferred);
-        return true;
-      }
-
       let file: File = this._files.get(local);
       if (file) {
         // If we have a file from the stream already, resolve it...
@@ -155,17 +138,6 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
       deferred.reject(null);
     }
   }
-}
-
-function getFile(filePath: string, deferred: Deferred<string>) {
-  fs.readFile(filePath, 'utf-8', function(err, content) {
-    if (err) {
-      console.log("ERROR finding " + filePath);
-      deferred.reject(err);
-    } else {
-      deferred.resolve(content);
-    }
-  });
 }
 
 /**
