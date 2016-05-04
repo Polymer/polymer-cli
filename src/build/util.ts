@@ -10,7 +10,7 @@
 
 import File = require('vinyl')
 import * as stream from 'stream';
-import {UglifyTransform} from './uglify-stream';
+import {UglifyTransform} from './uglify-transform';
 import * as gulpif from 'gulp-if';
 import * as minimatch from 'minimatch';
 
