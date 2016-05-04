@@ -27,6 +27,6 @@ export class Logger extends stream.Transform {
 }
 
 export function optimizePipe(stream: stream.Stream) {
-  return stream.pipe(new Logger('optimize'))
+  return stream
     .pipe(new UglifyTransform())
 }

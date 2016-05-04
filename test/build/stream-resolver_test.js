@@ -33,7 +33,7 @@ suite('streamResolver', () => {
     });
   });
 
-  test('non-entrypoint is not passed through', (done) => {
+  test('non-entrypoint is passed through', (done) => {
     let f1 = new File({
       cwd: "/foo/bar",
       base: "/foo/bar",
@@ -44,7 +44,7 @@ suite('streamResolver', () => {
       entrypoint: "/foo/bar/entrypoint",
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
-      assert.equal(null, data);
+      assert.equal(f1, data);
       done();
     });
   });
