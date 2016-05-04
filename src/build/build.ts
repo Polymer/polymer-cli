@@ -19,8 +19,8 @@ import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
 
 import {HtmlProject} from './html-project';
+import {optimizePipe} from './optimize-pipe';
 import {StreamResolver} from './stream-resolver';
-import {optimizePipe} from './util';
 
 // non-ES compatible modules
 const findConfig = require('liftoff/lib/find_config');

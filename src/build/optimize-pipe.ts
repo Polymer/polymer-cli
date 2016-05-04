@@ -8,23 +8,9 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import File = require('vinyl')
 import * as stream from 'stream';
-import {UglifyTransform} from './uglify-transform';
-import * as gulpif from 'gulp-if';
-import * as minimatch from 'minimatch';
 
-export class Logger extends stream.Transform {
-  prefix: String;
-  constructor(prefix: string) {
-    super({objectMode: true});
-    this.prefix = prefix || '';
-  }
-  _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    console.log(this.prefix, file.path);
-    callback(null, file);
-  }
-}
+import {UglifyTransform} from './uglify-transform';
 
 export function optimizePipe(stream: stream.Stream) {
   return stream

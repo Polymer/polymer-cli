@@ -25,9 +25,10 @@
   "files": [
     "src/build/build.ts",
     "src/build/html-project.ts",
+    "src/build/logger.ts",
+    "src/build/optimize-pipe.ts",
     "src/build/stream-resolver.ts",
     "src/build/uglify-transform.ts",
-    "src/build/util.ts",
     "src/commands/build.ts",
     "src/commands/command.ts",
     "src/commands/help.ts",
