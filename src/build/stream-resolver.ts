@@ -16,12 +16,14 @@ import {Transform} from 'stream';
 import File = require('vinyl');
 import * as url from 'url';
 
+const minimatchAll = require('minimatch-all');
+
 export interface FileGetter {
   (filePath: string, deferred: Deferred<string>): void;
 }
 
-export interface Config {
-  entrypoint?: string;
+export interface StreamResolverOptions {
+  entrypoints?: string[];
 
   /**
    * Hostname to match for absolute urls.
@@ -45,9 +47,10 @@ export interface Config {
   redirect?: string;
 }
 
-export class StreamResolver extends Transform /* implements Resolver*/ {
+export class StreamResolver extends Transform /* implements Resolver */ {
 
   _files = new Map<string, File>();
+  requestedUrls = new Set<string>();
 
   // filename -> Hydrolysis Deferred request for file
   _deferreds = new Map<string, Deferred<string>>();
@@ -56,25 +59,24 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
   base: string;
   root: string;
   redirect: string;
-  entrypoint: string;
+  entrypoints: string[];
 
-  constructor(config: Config) {
+  constructor(options: StreamResolverOptions) {
     super({objectMode: true});
-    this.host = config.host;
-    this.base = config.basePath && decodeURIComponent(config.basePath);
-    this.root = config.root && path.normalize(config.root);
-    this.redirect = config.redirect;
-    if (!config.entrypoint) {
-      throw new Error('entrypoint must be specified');
+    this.host = options.host;
+    this.base = options.basePath && decodeURIComponent(options.basePath);
+    this.root = options.root && path.normalize(options.root);
+    this.redirect = options.redirect;
+    if (!options.entrypoints || options.entrypoints.length < 1) {
+      throw new Error('entrypoints must be specified');
     }
-    this.entrypoint = config.entrypoint;
+    this.entrypoints = options.entrypoints;
   }
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    let isEntrypoint = minimatch(file.path, this.entrypoint, {
+    let isEntrypoint = minimatchAll(file.path, this.entrypoints, {
       matchBase: true,
     });
-
 
     // If this is the entrypoint, pass the file on
     if (isEntrypoint) {
@@ -104,6 +106,8 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
       local = parsed.pathname;
     }
 
+    this.requestedUrls.add(local);
+
     if (local) {
       // un-escape HTML escapes
       local = decodeURIComponent(local);
@@ -123,6 +127,9 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
         // If we have a file from the stream already, resolve it...
         deferred.resolve(file.contents.toString());
       } else {
+        if (this._deferreds.has(local)) {
+          console.warn(`${local} already requested`);
+        }
         // Otherwise save the deffered to resolve later
         this._deferreds.set(local, deferred);
       }
@@ -137,6 +144,7 @@ export class StreamResolver extends Transform /* implements Resolver*/ {
     for (let deferred of this._deferreds.values()) {
       deferred.reject(null);
     }
+    super.end();
   }
 }
 

@@ -8,49 +8,63 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
 import mergeStream = require('merge-stream');
 import * as minimatch from 'minimatch';
 import * as path from 'path';
+import {PassThrough, Readable} from 'stream';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
 
+import {Bundler} from './bundle';
 import {HtmlProject} from './html-project';
-import {optimizePipe, OptimizePipeOptions} from './optimize-pipe';
+import {Logger} from './logger';
+import {optimize, OptimizeOptions} from './optimize';
+import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {StreamResolver} from './stream-resolver';
+import {generateServiceWorker} from './sw-precache';
+import {VulcanizeTransform} from './vulcanize';
 
 // non-ES compatible modules
 const findConfig = require('liftoff/lib/find_config');
-const vulcanize = require('gulp-vulcanize');
+const minimatchAll = require('minimatch-all');
 
-export function build(entrypoint, sources): Promise<any> {
+export interface BuildOptions {
+  main?: string;
+  shell?: string;
+  entrypoints?: string[];
+  sources?: string[];
+  dependencies?: string[];
+}
+
+process.on('uncaughtException', (err) => {
+  console.log(`Caught exception: ${err}`);
+  console.error(err.stack);
+});
+
+export function build(options?: BuildOptions): Promise<any> {
   return new Promise<any>((resolve, _) => {
+    let root = process.cwd();
+    let main = path.resolve(root, options && options.main || 'index.html');
+    let shell = path.resolve(root, options && options.shell);
+    let entrypoints = (options && options.entrypoints || []).map((p) => path.resolve(root, p));
+    let sources = (options && options.sources || ['src/**/*']).map((p) => path.resolve(root, p));;
+    let dependencies = (options && options.sources || ['bower_components/**/*']).map((p) => path.resolve(root, p));
 
-    entrypoint = entrypoint || path.resolve('index.html');
-    sources = sources || ['src/**/*'];
-    let e = [entrypoint];
-    sources = e.concat.apply(e, sources);
+    let allSources = [];
+    allSources.push(main);
+    if (shell) allSources.push(shell);
+    allSources = Array.prototype.concat.apply(allSources, entrypoints);
+    allSources = Array.prototype.concat.apply(allSources, sources);
 
-    let gulpfilePath = findConfig({
-      searchPaths: [process.cwd()],
-      configNameSearch: 'gulpfile.js',
-    });
-    let gulpfile = gulpfilePath && require(gulpfilePath);
-    let userTransformers = gulpfile && gulpfile.transformers;
+    let allEntrypoints = [];
+    if (shell) allEntrypoints.push(shell);
+    allEntrypoints = Array.prototype.concat.apply(allEntrypoints, entrypoints);
 
-    let project = new HtmlProject();
-    let splitPhase = vfs.src(sources, {cwdbase: true})
-      .pipe(project.split);
-
-    let userPhase = splitPhase;
-    if (userTransformers) {
-      for (let transformer of userTransformers) {
-        userPhase = userPhase.pipe(transformer);
-      }
-    }
-    let optimizeOptions: OptimizePipeOptions = {
+    let optimizeOptions: OptimizeOptions = {
       css: {
         stripWhitespace: true
       },
@@ -59,38 +73,51 @@ export function build(entrypoint, sources): Promise<any> {
       }
     };
 
-    userPhase = optimizePipe(userPhase, optimizeOptions)
-      .pipe(project.rejoin);
+    let gulpfile = getGulpfile();
+    let userTransformers = gulpfile && gulpfile.transformers;
 
+    let sourcesProject = new HtmlProject();
     let depsProject = new HtmlProject();
-    let depsPipe =
-      vfs.src('bower_components/**/*', {cwdbase: true})
-      .pipe(depsProject.split);
+    let bundler = new Bundler(root, shell, entrypoints);
 
-    depsPipe = optimizePipe(depsPipe, optimizeOptions)
-      .pipe(depsProject.rejoin);
+    let sourcesStream =
+      vfs.src(allSources, {cwdbase: true})
+        .pipe(sourcesProject.split)
+        .pipe(compose((userTransformers)))
+        .pipe(optimize(optimizeOptions))
+        .pipe(sourcesProject.rejoin);
 
-    let streamResolver = new StreamResolver({
-        entrypoint: entrypoint,
-        basePath: process.cwd(),
-        root: process.cwd(),
-        redirect: 'bower_components/',
-      });
+    let depsStream =
+      vfs.src(dependencies, {cwdbase: true})
+        .pipe(depsProject.split)
+        .pipe(optimize(optimizeOptions))
+        .pipe(depsProject.rejoin);
 
-    let joinPhase = mergeStream(userPhase, depsPipe)
-      .pipe(streamResolver)
-      .pipe(gulpif((file) => minimatch(file.path, entrypoint, {
-          matchBase: true,
-        }), vulcanize({
-          fsResolver: streamResolver,
-          inlineScripts: true,
-          inlineCss: true,
-          stripComments: true
-        })
-      ))
-      .pipe(gulp.dest('build'))
-      .on('finish', () => {
-        resolve(null);
-      });
+    let allFiles = mergeStream(sourcesStream, depsStream);
+
+    let unbundledPhase = new ForkedVinylStream(allFiles)
+      .pipe(vfs.dest('build/unbundled'))
+
+    let bundledPhase = new ForkedVinylStream(allFiles)
+      .pipe(bundler.bundle)
+      .pipe(vfs.dest('build/bundled'));
+
+    waitForAll([unbundledPhase, bundledPhase])
+      .then((_) => {
+        console.log('all done!');
+        let deps = Array.from(bundler.streamResolver.requestedUrls.values());
+        return generateServiceWorker(root, main, deps);
+      }).then((workerContent) => {
+        fs.writeFileSync(path.join('build/bundled', 'service-worker.js'),
+          workerContent);
+      }).then(resolve);
   });
+}
+
+function getGulpfile(): any {
+  let gulpfilePath = findConfig({
+    searchPaths: [process.cwd()], // TODO: root?
+    configNameSearch: 'gulpfile.js',
+  });
+  return gulpfilePath && require(gulpfilePath);
 }

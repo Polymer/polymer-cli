@@ -21,9 +21,17 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'entrypoint',
-      description: 'The entrypoint file to build',
+      name: 'main',
+      description: 'The main HTML file',
       defaultOption: true,
+    },
+    {
+      name: 'shell',
+      description: 'The app shell',
+    },
+    {
+      name: 'entrypoint',
+      multiple: true,
     },
     {
       name: 'sources',
@@ -32,6 +40,11 @@ export class BuildCommand implements Command {
   ];
 
   run(options): Promise<any> {
-    return build(options.entrypoint, options.sources);
+    return build({
+      main: options.main,
+      shell: options.shell,
+      entrypoints: options.entrypoint,
+      sources: options.sources,
+    });
   }
 }

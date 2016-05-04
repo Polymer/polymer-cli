@@ -17,7 +17,7 @@ export class Logger extends stream.Transform {
     this.prefix = prefix || '';
   }
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    console.log(this.prefix, file.path, file.contents);
+    console.log(this.prefix, file.path);
     callback(null, file);
   }
 }
