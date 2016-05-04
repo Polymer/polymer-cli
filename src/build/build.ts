@@ -19,7 +19,7 @@ import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
 
 import {HtmlProject} from './html-project';
-import {optimizePipe} from './optimize-pipe';
+import {optimizePipe, OptimizePipeOptions} from './optimize-pipe';
 import {StreamResolver} from './stream-resolver';
 
 // non-ES compatible modules
@@ -51,14 +51,24 @@ export function build(entrypoint, sources): Promise<any> {
         userPhase = userPhase.pipe(transformer);
       }
     }
-    userPhase = optimizePipe(userPhase).pipe(project.rejoin);
+    let optimizeOptions: OptimizePipeOptions = {
+      css: {
+        stripWhitespace: true
+      },
+      js: {
+        minify: true
+      }
+    };
+    
+    userPhase = optimizePipe(userPhase, optimizeOptions)
+      .pipe(project.rejoin);
 
     let depsProject = new HtmlProject();
     let depsPipe =
       vfs.src('bower_components/**/*', {cwdbase: true})
       .pipe(depsProject.split);
 
-    depsPipe = optimizePipe(depsPipe)
+    depsPipe = optimizePipe(depsPipe, optimizeOptions)
       .pipe(depsProject.rejoin);
 
     let streamResolver = new StreamResolver({
