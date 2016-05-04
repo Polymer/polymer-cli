@@ -8,9 +8,12 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as path from 'path';
+
 import * as gulp from 'gulp';
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
+import mergeStream = require('merge-stream');
 import * as minimatch from 'minimatch';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
@@ -18,10 +21,8 @@ import * as vfs from 'vinyl-fs';
 import {HtmlProject} from './html-project';
 import {StreamResolver} from './stream-resolver';
 import {optimizePipe} from './util';
-import * as path from 'path';
 
-import mergeStream = require('merge-stream');
-
+// non-ES compatible modules
 const findConfig = require('liftoff/lib/find_config');
 const vulcanize = require('gulp-vulcanize');
 
