@@ -9,12 +9,12 @@
  */
 
 import {Transform} from 'stream';
-import File = require('vinyl');
 import * as uglify from 'uglify-js';
+import File = require('vinyl');
 
 const UglifyOptions: uglify.MinifyOptions = {fromString: true};
 
-export class UglifyStream extends Transform {
+export class UglifyTransform extends Transform {
 
   constructor() {
     super({objectMode: true});
@@ -23,15 +23,17 @@ export class UglifyStream extends Transform {
   _transform(file: File, encoding: string, callback:(error?, data?) => void): void {
     if (file.contents && file.path.endsWith('.js')) {
       try {
-        let contents = String(file.contents);
+        let contents = file.contents.toString();
         contents = uglify.minify(contents, UglifyOptions).code;
         file.contents = new Buffer(contents);
         callback(null, file);
       } catch (err) {
         console.log(file.path);
         console.error(err.stack);
-        callback(err);
+        callback(null, file);
       }
+    } else {
+      callback(null, file);
     }
   }
 };

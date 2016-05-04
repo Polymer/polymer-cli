@@ -14,53 +14,22 @@ import * as gutil from 'gulp-util';
 import * as minimatch from 'minimatch';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
-import {UglifyStream} from './uglify-stream';
 
 import {HtmlProject} from './html-project';
 import {StreamResolver} from './stream-resolver';
+import {optimizePipe} from './util';
+import * as path from 'path';
 
-const print = require('gulp-print');
+import mergeStream = require('merge-stream');
 
 const findConfig = require('liftoff/lib/find_config');
 const vulcanize = require('gulp-vulcanize');
 
-import {Transform} from 'stream';
-class StripPrefixStream extends Transform {
-  base: string;
-  constructor(base: string){
-    super({objectMode: true});
-    this.base = base;
-  }
-  _transform(file: File, encoding: string, callback:(error?, data?) => void): void {
-    if (file.path.startsWith(this.base)) {
-      console.log('path:', file.path, 'base:', file.path, 'cwd:', file.cwd);
-      file.path = file.path.substring(this.base.length);
-      file.cwd = '/';
-      file.base = '/';
-      console.log('path:', file.path, 'base:', file.path, 'cwd:', file.cwd);
-    } else {
-      console.error('weird base', file.path);
-    }
-    callback(null, file);
-  }
-}
-class Logger extends Transform {
-  base: string;
-  constructor(base: string){
-    super({objectMode: true});
-    this.base = base;
-  }
-  _transform(file: File, encoding: string, callback:(error?, data?) => void): void {
-    console.log(this.base, file.path);
-    callback(null, file);
-  }
-}
-
 export function build(entrypoint, sources): Promise<any> {
   return new Promise<any>((resolve, _) => {
 
-    entrypoint = entrypoint || 'index.html';
-    sources = sources || ['{src,test}/**/*'];
+    entrypoint = entrypoint || path.resolve('index.html');
+    sources = sources || ['src/**/*'];
     let e = [entrypoint];
     sources = e.concat.apply(e, sources);
 
@@ -72,9 +41,7 @@ export function build(entrypoint, sources): Promise<any> {
     let userTransformers = gulpfile && gulpfile.transformers;
 
     let project = new HtmlProject();
-    let uglifyPipe = new UglifyStream();
-    let splitPhase = vfs.src(sources)
-      .pipe(new StripPrefixStream(process.cwd()))
+    let splitPhase = vfs.src(sources, {cwdbase: true})
       .pipe(project.split);
 
     let userPhase = splitPhase;
@@ -83,21 +50,25 @@ export function build(entrypoint, sources): Promise<any> {
         userPhase = userPhase.pipe(transformer);
       }
     }
+    userPhase = optimizePipe(userPhase).pipe(project.rejoin);
+
+    let depsProject = new HtmlProject();
+    let depsPipe =
+      vfs.src('bower_components/**/*', {cwdbase: true})
+      .pipe(depsProject.split);
+
+    depsPipe = optimizePipe(depsPipe)
+      .pipe(depsProject.rejoin);
+
     let streamResolver = new StreamResolver({
-        sources: sources,
         entrypoint: entrypoint,
+        basePath: process.cwd(),
         root: process.cwd(),
         redirect: 'bower_components/',
       });
-    let joinPhase = userPhase
-      .pipe(gulpif(file =>
-        minimatch(file.path, '*.js', {matchBase: true}),
-        uglifyPipe
-      ))
-      .pipe(new Logger('pre-stream'))
-      .pipe(project.rejoin)
+
+    let joinPhase = mergeStream(userPhase, depsPipe)
       .pipe(streamResolver)
-      .pipe(print((fn) => `post-stream ${fn}`))
       .pipe(gulpif((file) => minimatch(file.path, entrypoint, {
           matchBase: true,
         }), vulcanize({
@@ -107,8 +78,7 @@ export function build(entrypoint, sources): Promise<any> {
           stripComments: true
         })
       ))
-      .pipe(print((fn) => `post-vulc ${fn}`))
-      // .pipe(gulp.dest('build'))
+      .pipe(gulp.dest('build'))
       .on('finish', () => {
         resolve(null);
       });

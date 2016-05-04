@@ -9,11 +9,14 @@
  */
 
 import File = require('vinyl')
-import {Transform} from 'stream';
+import * as stream from 'stream';
+import {UglifyTransform} from './uglify-stream';
+import * as gulpif from 'gulp-if';
+import * as minimatch from 'minimatch';
 
-export class Logger extends Transform {
+export class Logger extends stream.Transform {
   prefix: String;
-  constructor(prefix:string) {
+  constructor(prefix: string) {
     super({objectMode: true});
     this.prefix = prefix || '';
   }
@@ -21,4 +24,9 @@ export class Logger extends Transform {
     console.log(this.prefix, file.path);
     callback(null, file);
   }
+}
+
+export function optimizePipe(stream: stream.Stream) {
+  return stream.pipe(new Logger('optimize'))
+    .pipe(new UglifyTransform())
 }

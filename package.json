@@ -26,6 +26,7 @@
     "gulp-vulcanize": "^6.1.0",
     "gunzip-maybe": "^1.3.1",
     "liftoff": "^2.2.1",
+    "merge-stream": "^1.0.0",
     "minimatch": "^3.0.0",
     "polylint": "^2.10.0",
     "polyserve": "^0.10.0",

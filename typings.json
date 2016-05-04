@@ -7,6 +7,7 @@
     "gulp": "registry:dt/gulp#3.8.0+20160316155526",
     "gulp-if": "registry:dt/gulp-if#0.0.0+20160316155526",
     "gulp-util": "registry:dt/gulp-util#0.0.0+20160316155526",
+    "merge-stream": "registry:dt/merge-stream#1.0.0+20160313224417",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "minimatch": "registry:dt/minimatch#2.0.8+20160317120654",
     "node": "registry:dt/node#4.0.0+20160412142033",
