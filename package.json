@@ -49,6 +49,7 @@
     "gulp-mocha": "^2.2.0",
     "typescript": "^1.8.10",
     "typings": "^0.8.1",
+    "vinyl-fs-fake": "^1.1.0",
     "yeoman-assert": "^2.2.1",
     "yeoman-test": "^1.1.0"
   }
