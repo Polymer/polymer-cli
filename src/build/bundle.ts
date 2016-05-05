@@ -37,8 +37,6 @@ export class Bundler {
     this.allEntrypoints =
         Array.prototype.concat.apply(allEntrypoints, entrypoints);
 
-    console.log('allEntrypoints', this.allEntrypoints);
-
     this.streamResolver = new StreamResolver({
         entrypoints: this.allEntrypoints,
         basePath: root,
@@ -54,13 +52,7 @@ export class Bundler {
 
     this.bundle = compose([
       this.streamResolver,
-      gulpif((file) => this.isEntryPoint(file.path),
-        compose([
-          new Logger('pre-vulcanize'),
-          this.vulcanize,
-          new Logger('post-vulcanize'),
-        ])
-      )
+      gulpif((file) => this.isEntryPoint(file.path), this.vulcanize)
     ]);
   }
 

@@ -62,7 +62,7 @@ export class ForkedVinylStream extends Readable {
   }
 
   _read(size: number) {
-    // apparently no-op is fine
-    // this.input._read(size);
+    // apparently no-op is fine, but this method is required,
+    // see: https://nodejs.org/api/stream.html#stream_readable_read_size_1
   }
 }

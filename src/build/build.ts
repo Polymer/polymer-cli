@@ -105,6 +105,7 @@ export function build(options?: BuildOptions): Promise<any> {
     waitForAll([unbundledPhase, bundledPhase])
       .then((_) => {
         console.log('all done!');
+        // TODO(justinfagnani): better abstraction for tracking dependencies
         let deps = Array.from(bundler.streamResolver.requestedUrls.values());
         return generateServiceWorker(root, main, deps);
       }).then((workerContent) => {

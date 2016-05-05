@@ -28,7 +28,6 @@ export class UglifyTransform extends Transform {
         file.contents = new Buffer(contents);
       } catch (err) {
         console.error('Could not uglify',file.path);
-        // console.error(err.stack);
       }
     }
     callback(null, file);

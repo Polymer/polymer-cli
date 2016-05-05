@@ -26,10 +26,12 @@ export function generateServiceWorker(
   let precacheFiles = new Set<string>();
   deps.forEach((p) => precacheFiles.add(p));
   precacheFiles.add(mainHtml);
+  // TODO: make this more configurable
   precacheFiles.add('/manifest.json');
   precacheFiles.add('/bower_components/webcomponentsjs/webcomponents-lite.min.js');
   precacheFiles.add('/images/*'); //TODO: pull from user precache config
 
+  //TODO: pull from user precache config
   let buildRoot = 'build/bundled';
 
   let precacheList = Array.from(precacheFiles.values());
@@ -39,7 +41,8 @@ export function generateServiceWorker(
   return swPrecache.generate({
     staticFileGlobs: precacheList,
     navigateFallback: mainHtml,
-    navigateFallbackWhitelist: [/\/data\/.*json/], //TODO: pull from user precache config
+    //TODO: pull from user precache config
+    navigateFallbackWhitelist: [/\/data\/.*json/],
     stripPrefix: buildRoot,
     // verbose: true,
   });

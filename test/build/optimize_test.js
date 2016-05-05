@@ -27,12 +27,6 @@ suite('optimize()', () => {
     stream.on('error', (err) => cb(err));
   }
 
-  test('no options', () => {
-    let stream = new PassThrough();
-    let op = stream.pipe(optimize());
-    // assert.equal(stream, op, 'stream should be identical if no options given');
-  });
-
   test('css', (done) => {
     let stream = vfs.src([
       {

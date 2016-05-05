@@ -16,22 +16,15 @@ const Vulcanize = require('vulcanize');
 export class VulcanizeTransform extends Transform {
 
   opts: any;
-  count: number = 0;
 
   constructor(opts) {
     super({objectMode: true});
-    this.opts = opts;
   }
 
   _transform(file: File, enc: string, cb: (error?, data?) => void): void {
-    if (this.count++ > 0) {
-      cb(null, file);
-      return;
-    }
-
     if (file.isNull()) {
       cb(null, file);
-			return;
+      return;
 		}
 
 		if (file.isStream()) {
