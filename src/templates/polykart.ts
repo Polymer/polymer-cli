@@ -23,12 +23,16 @@ export function getGenerator(options?) {
   return class PolykartGenerator extends Base {
 
     _github: Github;
-    _githubToken: string;
 
     constructor(args: string | string[], options: any) {
       super(args, options);
-      this._githubToken = this._getGitHubToken();
-      this._github = new Github('PolymerLabs', 'polykart', this._githubToken, githubApi, requestApi);
+      this._github = new Github(
+        'PolymerLabs',
+        'polykart',
+        githubToken,
+        githubApi,
+        requestApi
+      );
     }
 
     writing() {
@@ -48,22 +52,5 @@ export function getGenerator(options?) {
     install() {
       (<any>this).bowerInstall();
     }
-
-    _getGitHubToken() {
-      if (githubToken) {
-        return githubToken;
-      }
-      try {
-        return Github.tokenFromFile('token');
-      } catch (e) {
-        console.error(`
-  You need to create a github token and place it in a file named 'token'.
-  The token only needs the 'public repos' permission.
-  Generate a token here: https://github.com/settings/tokens
-  This restriction will be removed soon!
-  `);
-      }
-    }
-
   }
 }

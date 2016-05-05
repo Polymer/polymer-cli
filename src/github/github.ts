@@ -30,11 +30,11 @@ export class Github {
   constructor(
     owner: string,
     repo: string,
-    token: string,
+    githubToken?: string,
     githubApi?,
     requestApi?
   ) {
-    this._token = token;
+    this._token = githubToken || Github.tokenFromFile('token');
     this._owner = owner;
     this._repo = repo;
     this._github = githubApi || new GitHubApi({
@@ -43,7 +43,7 @@ export class Github {
     });
     this._github.authenticate({
       type: 'oauth',
-      token
+      token: githubToken
     });
     this._request = requestApi || request;
   }
