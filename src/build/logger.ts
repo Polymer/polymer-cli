@@ -17,7 +17,19 @@ export class Logger extends stream.Transform {
     this.prefix = prefix || '';
   }
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    console.log(this.prefix, file.path);
+    console.log(this.prefix, file.path, file.contents);
     callback(null, file);
+  }
+}
+
+// NOTE: this broke tar-fs streams, don't know why
+export class StreamLogger extends stream.Transform {
+  prefix: string;
+  constructor(prefix: string) {
+    super();
+    this.prefix = prefix || '';
+  }
+  _transform(buffer: Buffer, encoding: string, callback: (error?, data?) => void): void {
+    console.log(this.prefix, buffer.toString('base64'));
   }
 }
