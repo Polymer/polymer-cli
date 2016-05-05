@@ -16,6 +16,14 @@ const gunzip = require('gunzip-maybe');
 const request = require('request');
 const tar = require('tar-fs');
 
+export interface GithubOpts {
+  owner: string,
+  repo: string,
+  githubToken?: string,
+  githubApi?,
+  requestApi?
+}
+
 export class Github {
   private _token: string;
   private _github: GitHubApi;
@@ -27,25 +35,20 @@ export class Github {
     return fs.readFileSync(filename, 'utf8').trim();
   }
 
-  constructor(
-    owner: string,
-    repo: string,
-    githubToken?: string,
-    githubApi?,
-    requestApi?
-  ) {
-    this._token = githubToken || Github.tokenFromFile('token');
-    this._owner = owner;
-    this._repo = repo;
-    this._github = githubApi || new GitHubApi({
+
+  constructor(opts: GithubOpts) {
+    this._token = opts.githubToken || Github.tokenFromFile('token');
+    this._owner = opts.owner;
+    this._repo = opts.repo;
+    this._github = opts.githubApi || new GitHubApi({
       version: '3.0.0',
       protocol: 'https'
     });
     this._github.authenticate({
       type: 'oauth',
-      token: githubToken
+      token: opts.githubToken
     });
-    this._request = requestApi || request;
+    this._request = opts.requestApi || request;
   }
 
   extractLatestRelease(outDir: string): Promise<void> {

@@ -26,13 +26,13 @@ export function getGenerator(options?) {
 
     constructor(args: string | string[], options: any) {
       super(args, options);
-      this._github = new Github(
-        'PolymerLabs',
-        'polykart',
+      this._github = new Github({
+        owner: 'PolymerLabs',
+        repo: 'polykart',
         githubToken,
         githubApi,
         requestApi
-      );
+      });
     }
 
     writing() {
