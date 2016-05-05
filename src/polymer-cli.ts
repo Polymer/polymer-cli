@@ -16,13 +16,20 @@ import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
+import {Environment} from './environment/environment'
+import {buildEnvironment} from './environments/environments'
 
 export class PolymerCli {
 
   commandDescriptors = [];
   commands : Map<String, Command> = new Map();
   cli : commandLineCommands.CLI;
-
+  globalArguments = [{
+    name: 'env',
+    type: function(value): Environment {
+      return buildEnvironment(value);
+    }
+  }];
   constructor() {
     this.addCommand(new BuildCommand());
     this.addCommand(new HelpCommand(this.commands));
@@ -36,7 +43,7 @@ export class PolymerCli {
     this.commands.set(command.name, command);
     this.commandDescriptors.push({
       name: command.name,
-      definitions: command.args,
+      definitions: this.globalArguments.concat(command.args),
       description: command.description,
     });
   }

@@ -11,6 +11,7 @@
 import {startServer, args as polyserveArgs} from 'polyserve';
 import {ServerOptions} from 'polyserve/lib/start_server';
 import {Command} from './command';
+import {Environment} from '../environment/environment';
 
 export class ServeCommand implements Command {
   name = 'serve';
@@ -28,6 +29,12 @@ export class ServeCommand implements Command {
       browser: options.browser,
       componentDir: options['component-dir'],
       packageName: options['package-name'],
+    };
+
+    const env: Environment = options.env;
+
+    if (env && env.serve) {
+        return env.serve(serverOptions);
     }
 
     return startServer(serverOptions);
