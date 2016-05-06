@@ -19,30 +19,31 @@ export class VulcanizeTransform extends Transform {
 
   constructor(opts) {
     super({objectMode: true});
+    this.opts = opts;
   }
 
   _transform(file: File, enc: string, cb: (error?, data?) => void): void {
     if (file.isNull()) {
       cb(null, file);
       return;
-		}
+    }
 
-		if (file.isStream()) {
+    if (file.isStream()) {
       console.error('Streaming not supported');
       cb(null, file);
-			return;
-		}
+      return;
+    }
 
     let vulcanize = new Vulcanize(this.opts);
     console.log('vulcanizing', file.path);
-		vulcanize.process(file.path, (err, inlinedHtml) => {
-			if (err) {
+    vulcanize.process(file.path, (err, inlinedHtml) => {
+      if (err) {
         console.error('Vulcanize error', err);
         cb(err, null);
-				return;
-			}
-			file.contents = new Buffer(inlinedHtml);
+        return;
+      }
+      file.contents = new Buffer(inlinedHtml);
       cb(null, file);
-		});
+    });
   }
 }
