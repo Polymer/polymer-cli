@@ -95,7 +95,8 @@ export interface SWPreCacheTransformOptions {
   /**
    * Promise that returns the list of files to be cached by the service worker.
    *
-   * If not given, all files streamed to SWPreCacheTransform will be put into the precache list, except for the file matching `configFileName`.
+   * If not given, all files streamed to SWPreCacheTransform will be put into
+   * the precache list, except for the file matching `configFileName`.
    */
   deps?: Promise<string[]>;
   /**
