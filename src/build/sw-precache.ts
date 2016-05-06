@@ -120,7 +120,10 @@ export class SWPreCacheTransform extends Transform {
       this.fileSet = new Set<string>();
     }
     if (options.configFileName) {
-      this.fullConfigFilePath = path.resolve(options.root, options.configFileName);
+      this.fullConfigFilePath = path.resolve(
+        options.root,
+        options.configFileName
+      );
     }
   }
 
@@ -154,9 +157,12 @@ export class SWPreCacheTransform extends Transform {
     })
     .then((config) => {
       let file = new File({
-        path: path.resolve(this.options.buildRoot, this.options.serviceWorkerName)
+        path: path.resolve(
+          this.options.buildRoot,
+          this.options.serviceWorkerName
+        ),
+        contents: new Buffer(config)
       });
-      file.contents = new Buffer(config);
       this.push(file);
       super.end();
     });
