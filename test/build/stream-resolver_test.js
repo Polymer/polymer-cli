@@ -26,7 +26,7 @@ suite('streamResolver', () => {
       contents: null,
     });
     let resolver = new StreamResolver({
-      entrypoint: "/foo/bar/baz.qux",
+      entrypoints: ["/foo/bar/baz.qux"],
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
       assert.equal(f1, data);
@@ -42,7 +42,7 @@ suite('streamResolver', () => {
       contents: null,
     });
     let resolver = new StreamResolver({
-      entrypoint: "/foo/bar/entrypoint",
+      entrypoints: ["/foo/bar/entrypoint"],
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
       assert.equal(f1, data);
@@ -60,7 +60,7 @@ suite('streamResolver', () => {
     let resolver = new StreamResolver({
       root: "/foo/bar",
       base: "/foo/bar",
-      entrypoint: "/foo/bar/entrypoint",
+      entrypoints: ["/foo/bar/entrypoint"],
     });
     resolver._transform(f1, 'utf-8', (err, data) => {
       assert.equal(f1, data);

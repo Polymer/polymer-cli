@@ -16,20 +16,16 @@ const PassThrough = require('stream').PassThrough;
 const vfs = require('vinyl-fs-fake');
 
 const HtmlProject = require('../../lib/build/html-project').HtmlProject;
-const optimizePipe = require('../../lib/build/optimize-pipe').optimizePipe;
+const optimize = require('../../lib/build/optimize').optimize;
 
-suite('Optimize Pipe', () => {
+suite('optimize()', () => {
+
   function testStream(stream, cb) {
     stream.on('data', (data) => {
       cb(null, data)
     });
     stream.on('error', (err) => cb(err));
   }
-  test('no options', () => {
-    let stream = new PassThrough();
-    let op = optimizePipe(stream);
-    assert.equal(stream, op, 'stream should be identical if no options given');
-  });
 
   test('css', (done) => {
     let stream = vfs.src([
@@ -38,7 +34,7 @@ suite('Optimize Pipe', () => {
         contents: '/* comment */ selector { property: value; }'
       }
     ]);
-    let op = optimizePipe(stream, {css: {stripWhitespace: true}});
+    let op = stream.pipe(optimize({css: {stripWhitespace: true}}));
     assert.notEqual(stream, op, 'stream should be wrapped');
     testStream(op, (err, f) => {
       if (err) {
@@ -56,7 +52,7 @@ suite('Optimize Pipe', () => {
         contents: 'var foo = 3'
       }
     ]);
-    let op = optimizePipe(stream, {js: {minify: true}});
+    let op = stream.pipe(optimize({js: {minify: true}}));
     assert.notEqual(stream, op);
     testStream(op, (err, f) => {
       if (err) {
@@ -103,7 +99,7 @@ suite('Optimize Pipe', () => {
     };
     let project = new HtmlProject();
     let op = stream.pipe(project.split);
-    op = optimizePipe(op, options).pipe(project.rejoin);
+    op = op.pipe(optimize(options)).pipe(project.rejoin);
     testStream(op, (err, f) => {
       if (err) {
         return done(err);

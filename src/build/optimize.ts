@@ -13,12 +13,13 @@ import * as minimatch from 'minimatch';
 import * as stream from 'stream';
 
 import {UglifyTransform} from './uglify-transform';
+import {compose} from './streams';
 
 // not ES compatible
 const cssSlam = require('css-slam').gulp;
 const htmlmin = require('gulp-html-minifier');
 
-export interface OptimizePipeOptions {
+export interface OptimizeOptions {
   /**
    * Enable HTML minification
    *
@@ -42,22 +43,19 @@ export interface OptimizePipeOptions {
   };
 }
 
-export function optimizePipe(stream: stream.Stream,
-  options?: OptimizePipeOptions) {
-  let outpipe = stream;
+export function optimize(options?: OptimizeOptions) {
+  let transforms = [];
+
   if (options) {
     if (options.js && options.js.minify) {
-      outpipe = outpipe.pipe(new UglifyTransform());
+      transforms.push(new UglifyTransform());
     }
     if (options.css && options.css.stripWhitespace) {
-      outpipe = outpipe.pipe(cssSlam());
+      transforms.push(cssSlam());
     }
     if (options.html) {
-      outpipe = outpipe.pipe(
-        gulpif((f) => minimatch(f.path, '*.html', {matchBase: true}),
-          htmlmin(options.html))
-      )
+      transforms.push(gulpif(/\.html$/, htmlmin(options.html)))
     }
   }
-  return outpipe;
+  return compose(transforms);
 }
