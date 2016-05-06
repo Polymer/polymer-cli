@@ -98,9 +98,16 @@ export function build(options?: BuildOptions): Promise<any> {
     let serviceWorkerName = 'service-worker.js';
 
     let unbundledPhase = new ForkedVinylStream(allFiles)
-      .pipe(new SWPreCacheTransform({root, main, buildRoot: 'build/unbundled', serviceWorkerName}))
+      .pipe(new SWPreCacheTransform({
+        root,
+        main,
+        buildRoot: 'build/unbundled',
+        serviceWorkerName
+      }))
       .pipe(vfs.dest('build/unbundled'))
 
+    // SWPreCacheTransform needs the deps from bundler after bundles are created
+    // therefore, give transform a promise that is resolved when bundler is done
     let depsResolve: (value: string[]) => void;
     let depsPromise = new Promise<string[]>((resolve) => {
       depsResolve = resolve;
@@ -109,10 +116,17 @@ export function build(options?: BuildOptions): Promise<any> {
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
       .on('end', () => {
+        // bundler has seen all files, give them to the precache transform
         let depsSet = bundler.streamResolver.requestedUrls;
         depsResolve(Array.from(depsSet));
       })
-      .pipe(new SWPreCacheTransform({root, main, buildRoot: 'build/bundled', deps: depsPromise, serviceWorkerName}))
+      .pipe(new SWPreCacheTransform({
+        root,
+        main,
+        buildRoot: 'build/bundled',
+        deps: depsPromise,
+        serviceWorkerName
+      }))
       .pipe(vfs.dest('build/bundled'));
   });
 }
