@@ -83,7 +83,7 @@ export function build(options?: BuildOptions): Promise<any> {
     let sourcesStream =
       vfs.src(allSources, {cwdbase: true})
         .pipe(sourcesProject.split)
-        .pipe(compose((userTransformers)))
+        .pipe(compose(userTransformers))
         .pipe(optimize(optimizeOptions))
         .pipe(sourcesProject.rejoin);
 
