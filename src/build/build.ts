@@ -81,14 +81,14 @@ export function build(options?: BuildOptions): Promise<any> {
     let bundler = new Bundler(root, shell, entrypoints);
 
     let sourcesStream =
-      vfs.src(allSources, {cwdbase: true})
+      vfs.src(allSources, {cwdbase: true, allowEmpty: true})
         .pipe(sourcesProject.split)
         .pipe(compose(userTransformers))
         .pipe(optimize(optimizeOptions))
         .pipe(sourcesProject.rejoin);
 
     let depsStream =
-      vfs.src(dependencies, {cwdbase: true})
+      vfs.src(dependencies, {cwdbase: true, allowEmpty: true})
         .pipe(depsProject.split)
         .pipe(optimize(optimizeOptions))
         .pipe(depsProject.rejoin);
