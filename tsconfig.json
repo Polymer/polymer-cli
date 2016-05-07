@@ -49,6 +49,7 @@
     "custom_typings/github.d.ts",
     "custom_typings/hydrolysis.d.ts",
     "custom_typings/node.d.ts",
+    "custom_typings/vinyl-fs.d.ts",
     "custom_typings/web-component-tester.d.ts",
     "custom_typings/yeoman-environment.d.ts",
     "typings/main.d.ts",
