@@ -132,7 +132,7 @@ export class SWPreCacheTransform extends Transform {
     }
   }
 
-  _transform(file: File, encoding: string, callback:(error?, data?) => void): void {
+  _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
     if (file.path === this.fullConfigFilePath) {
       console.log('Found sw-precache config!')
       try {
