@@ -15,6 +15,7 @@ import File = require('vinyl');
 
 // non-ES compatible modules
 const swPrecache = require('sw-precache');
+const Module = require('module');
 
 interface SWConfig {
   cacheId?: string,
@@ -53,10 +54,14 @@ function generateServiceWorker(
     buildRoot: string,
     swConfig?: SWConfig
   ): Promise<string> {
+  console.log(buildRoot, swConfig);
   swConfig = swConfig || <SWConfig>{};
+  // strip root prefix, so buildRoot prefix can be added safely
   deps = deps.map((p) => {
-    console.assert(p.startsWith(root));
-    return p.substring(root.length);
+    if (p.startsWith(root)) {
+      return p.substring(root.length);
+    }
+    return p;
   });
   let mainHtml = main.substring(root.length);
   let precacheFiles = new Set(swConfig.staticFileGlobs);
@@ -65,12 +70,11 @@ function generateServiceWorker(
 
   let precacheList = Array.from(precacheFiles);
   precacheList = precacheList.map((p) => path.join(buildRoot, p));
-  console.log('precacheList' , precacheList);
 
+  // swPrecache will determine the right urls by stripping buildRoot
   swConfig.stripPrefix = buildRoot;
+  // static files will be pre-cached
   swConfig.staticFileGlobs = precacheList;
-  // TODO: determine if this is a good default, or pull from user precache config
-  swConfig.navigateFallback = mainHtml;
 
   return swPrecache.generate(swConfig);
 }
@@ -130,8 +134,26 @@ export class SWPreCacheTransform extends Transform {
 
   _transform(file: File, encoding: string, callback:(error?, data?) => void): void {
     if (file.path === this.fullConfigFilePath) {
-      this.swConfig = JSON.parse(file.contents.toString());
-      callback(null, null);
+      console.log('Found sw-precache config!')
+      try {
+        if (file.path.endsWith('js')) {
+          // `module._compile` is the heart of `require`
+          // http://fredkschott.com/post/2014/06/require-and-the-module-system/
+          let m = new Module(file.path);
+          m._compile(
+            file.contents.toString(),
+            file.path
+          );
+          this.swConfig = m.exports;
+        } else if (file.path.endsWith('json')) {
+          this.swConfig = JSON.parse(file.contents.toString());
+        }
+      } catch(e) {
+        let cfn = this.options.configFileName;
+        console.error(`Could not load service worker config from ${cfn}`);
+        console.error(e);
+      }
+      callback();
     } else {
       if (this.fileSet) {
         this.fileSet.add(file.path);
@@ -140,7 +162,7 @@ export class SWPreCacheTransform extends Transform {
     }
   }
 
-  end() {
+  _flush() {
     let promise: Promise<string[]>;
     if (this.fileSet) {
       promise = Promise.resolve(Array.from(this.fileSet));
@@ -148,6 +170,7 @@ export class SWPreCacheTransform extends Transform {
       promise = this.options.deps;
     }
     promise.then((deps) => {
+      console.log(this.options.buildRoot, 'deps found', deps.length);
       return generateServiceWorker(
         this.options.root,
         this.options.main,
@@ -159,13 +182,12 @@ export class SWPreCacheTransform extends Transform {
     .then((config) => {
       let file = new File({
         path: path.resolve(
-          this.options.buildRoot,
+          this.options.root,
           this.options.serviceWorkerName
         ),
         contents: new Buffer(config)
       });
       this.push(file);
-      super.end();
     });
   }
 }
