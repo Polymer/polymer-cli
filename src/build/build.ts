@@ -25,7 +25,7 @@ import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {StreamResolver} from './stream-resolver';
-import {generateServiceWorker} from './sw-precache';
+import {SWPreCacheTransform} from './sw-precache';
 import {VulcanizeTransform} from './vulcanize';
 
 // non-ES compatible modules
@@ -49,10 +49,10 @@ export function build(options?: BuildOptions): Promise<any> {
   return new Promise<any>((resolve, _) => {
     let root = process.cwd();
     let main = path.resolve(root, options && options.main || 'index.html');
-    let shell = path.resolve(root, options && options.shell);
+    let shell = options && options.shell && path.resolve(root, options.shell);
     let entrypoints = (options && options.entrypoints || []).map((p) => path.resolve(root, p));
     let sources = (options && options.sources || ['src/**/*']).map((p) => path.resolve(root, p));;
-    let dependencies = (options && options.sources || ['bower_components/**/*']).map((p) => path.resolve(root, p));
+    let dependencies = (options && options.sources || ['bower_components/**/*', 'sw-precache-config.js']).map((p) => path.resolve(root, p));
 
     let allSources = [];
     allSources.push(main);
@@ -95,23 +95,43 @@ export function build(options?: BuildOptions): Promise<any> {
 
     let allFiles = mergeStream(sourcesStream, depsStream);
 
+    let serviceWorkerName = 'service-worker.js';
+    let configFileName = 'sw-precache-config.js';
+
     let unbundledPhase = new ForkedVinylStream(allFiles)
+      .pipe(new SWPreCacheTransform({
+        root,
+        main,
+        buildRoot: 'build/unbundled',
+        serviceWorkerName,
+        configFileName
+      }))
       .pipe(vfs.dest('build/unbundled'))
+
+    // SWPreCacheTransform needs the deps from bundler after bundles are created
+    // therefore, give transform a promise that is resolved when bundler is done
+    let depsResolve: (value: string[]) => void;
+    let depsPromise = new Promise<string[]>((resolve) => {
+      depsResolve = resolve;
+    });
 
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
+      .on('end', () => {
+        console.log('fulfilling deps')
+        // bundler has seen all files, give them to the precache transform
+        let depsList = Array.from(bundler.streamResolver.requestedUrls);
+        depsResolve(depsList);
+      })
+      .pipe(new SWPreCacheTransform({
+        root,
+        main,
+        buildRoot: 'build/bundled',
+        deps: depsPromise,
+        serviceWorkerName,
+        configFileName
+      }))
       .pipe(vfs.dest('build/bundled'));
-
-    waitForAll([unbundledPhase, bundledPhase])
-      .then((_) => {
-        console.log('all done!');
-        // TODO(justinfagnani): better abstraction for tracking dependencies
-        let deps = Array.from(bundler.streamResolver.requestedUrls.values());
-        return generateServiceWorker(root, main, deps);
-      }).then((workerContent) => {
-        fs.writeFileSync(path.join('build/bundled', 'service-worker.js'),
-          workerContent);
-      }).then(resolve);
   });
 }
 
