@@ -12,12 +12,81 @@ declare module 'hydrolysis' {
     contentHref: string;
     desc?: string;
   }
+
+  /**
+   * The metadata for all features and elements defined in one document
+   */
+  interface DocumentDescriptor {
+    /**
+     * The elements from the document.
+     */
+    elements: ElementDescriptor[];
+
+    /**
+     * The features from the document
+     */
+    features: FeatureDescriptor[];
+
+    /**
+     * The behaviors from the document
+     */
+    behaviors: BehaviorDescriptor[];
+
+    href?: string;
+
+    imports?: DocumentDescriptor[];
+
+    parsedScript?: estree.Program;
+
+    html?: ParsedImport;
+  }
+
+  /**
+   * The metadata of an entire HTML document, in promises.
+   */
+  interface AnalyzedDocument {
+    /**
+     * The url of the document.
+     */
+    href: string;
+    /**
+     * The parsed representation of the doc. Use the `ast` property to get
+     * the full `parse5` ast.
+     */
+    htmlLoaded: Promise<ParsedImport>;
+
+    /**
+     * Resolves to the list of this Document's transitive import dependencies.
+     */
+    depsLoaded: Promise<string[]>;
+
+    /**
+     * The direct dependencies of the document.
+     */
+    depHrefs: string[];
+    /**
+     * Resolves to the list of this Document's import dependencies
+     */
+    metadataLoaded: Promise<DocumentDescriptor>;
+  }
+
   export class Analyzer {
     static analyze(path: string, options: Options): Promise<Analyzer>;
+
+    constructor(attachAST: boolean, loader: Loader);
+
     metadataTree(path: string): Promise<void>;
     annotate(): void;
     elements: Element[];
     behaviors: Behavior[];
+
+    load(href: string):Promise<AnalyzedDocument>;
+
+    _getDependencies(
+        href: string,
+        found?: {[url:string]: boolean},
+        transitive?: boolean)
+      : Promise<string[]>
   }
 // }
 // declare module 'hydrolysis/loader/resolver' {
@@ -37,7 +106,15 @@ declare module 'hydrolysis' {
      */
     accept(path:string, deferred:Deferred<string>):boolean;
   }
-  class FSResolver {
+
+  class FSResolver implements Resolver {
     constructor(options: any);
+    accept(path:string, deferred:Deferred<string>):boolean;
+  }
+
+  export class Loader {
+    resolvers: Resolver[];
+    addResolver(resolver:Resolver): void;
+    request(uri:string): Promise<string>;
   }
 }
