@@ -54,7 +54,7 @@ export class ForkedVinylStream extends Readable {
       this.push(file.clone({deep: true, contents: true}));
     });
     input.on('end', () => {
-      this.emit('end');
+      this.push(null);
     });
     input.on('error', (e) => {
       this.emit('error', e);
