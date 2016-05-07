@@ -22,7 +22,6 @@ export class Logger extends stream.Transform {
   }
 }
 
-// NOTE: this broke tar-fs streams, don't know why
 export class StreamLogger extends stream.Transform {
   prefix: string;
   constructor(prefix: string) {
@@ -31,5 +30,6 @@ export class StreamLogger extends stream.Transform {
   }
   _transform(buffer: Buffer, encoding: string, callback: (error?, data?) => void): void {
     console.log(this.prefix, buffer.toString('base64'));
+    callback(null, buffer);
   }
 }
