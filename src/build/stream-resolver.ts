@@ -141,10 +141,21 @@ export class StreamResolver extends Transform /* implements Resolver */ {
 
   end() {
     // When the stream is done, reject all non-resolved requests for files
-    for (let deferred of this._deferreds.values()) {
-      deferred.reject(null);
+    for (let url of this._deferreds.keys()) {
+      let deferred = this._deferreds.get(url);
+      deferred.reject(`file not included in stream: ${url}`);
     }
     super.end();
+  }
+
+  /**
+   * A side-channel to add files to the resolver that did not come throgh the
+   * stream transformation. This is for generated files, like
+   * shared-bundle.html. This should probably be refactored so that the files
+   * can be injected into the stream.
+   */
+  addFile(file) {
+    this._files.set(file.path, file);
   }
 }
 
