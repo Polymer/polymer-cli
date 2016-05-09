@@ -74,35 +74,37 @@ export class Bundler {
 
     this.entrypointFiles = new Map();
 
+    let throughStream = through((file, enc, cb) => {
+      if (this.isEntryPoint(file.path)) {
+        // don't pass on any entrypoints until the stream has ended
+        this.entrypointFiles.set(file.path, file);
+        cb();
+      } else {
+        cb(null, file);
+      }
+    },
+    (done) => {
+      this._buildBundles().then((bundles: Map<string, string>) => {
+        for (let entrypoint of this.entrypointFiles.keys()) {
+          let file = this.entrypointFiles.get(entrypoint);
+          let contents = bundles.get(entrypoint);
+          file.contents = new Buffer(contents);
+          throughStream.push(file);
+        }
+        let sharedBundle = bundles.get(this.sharedBundleUrl);
+        if (sharedBundle) {
+          let contents = bundles.get(this.sharedBundleUrl);
+          this.sharedFile.contents = new Buffer(contents);
+          throughStream.push(this.sharedFile);
+        }
+        // end the stream
+        done();
+      });
+    });
+
     this.bundle = compose([
       this.streamResolver,
-      through((file, enc, cb) => {
-        if (this.isEntryPoint(file.path)) {
-          // don't pass on any entrypoints until the stream has ended
-          this.entrypointFiles.set(file.path, file);
-          cb(null, null);
-        } else {
-          cb(null, file);
-        }
-      },
-      (done) => {
-        this._buildBundles().then((bundles: Map<string, string>) => {
-          for (let entrypoint of this.entrypointFiles.keys()) {
-            let file = this.entrypointFiles.get(entrypoint);
-            let contents = bundles.get(entrypoint);
-            file.contents = new Buffer(contents);
-            this.bundle.push(file);
-          }
-          let sharedBundle = bundles.get(this.sharedBundleUrl);
-          if (sharedBundle) {
-            let contents = bundles.get(this.sharedBundleUrl);
-            this.sharedFile.contents = new Buffer(contents);
-            this.bundle.push(this.sharedFile);
-          }
-          // end the stream
-          done();
-        });
-      })
+      throughStream
     ]);
   }
 
