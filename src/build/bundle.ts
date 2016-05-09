@@ -267,7 +267,10 @@ export class Bundler {
     let depsPromises = <Promise<string[]>[]>this.allEntrypoints.map(
         (e) => this._getDependencies(e));
 
-    return Promise.all(depsPromises).then((allDeps: string[][]) => {
+    return Promise.all(depsPromises).then((value: any) => {
+      // tsc was giving a spurious error with `allDeps` as the parameter
+      let allDeps: string[][] = <string[][]>value;
+
       // An index of dependency -> entrypoints that depend on it
       let depsToEntrypoints = new Map<string, string[]>();
 
