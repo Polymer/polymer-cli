@@ -20,25 +20,25 @@ declare module 'hydrolysis' {
     /**
      * The elements from the document.
      */
-    elements: ElementDescriptor[];
+    // elements: ElementDescriptor[];
 
     /**
      * The features from the document
      */
-    features: FeatureDescriptor[];
+    // features: FeatureDescriptor[];
 
     /**
      * The behaviors from the document
      */
-    behaviors: BehaviorDescriptor[];
+    // behaviors: BehaviorDescriptor[];
 
     href?: string;
 
     imports?: DocumentDescriptor[];
 
-    parsedScript?: estree.Program;
+    // parsedScript?: estree.Program;
 
-    html?: ParsedImport;
+    // html?: ParsedImport;
   }
 
   /**
@@ -53,7 +53,7 @@ declare module 'hydrolysis' {
      * The parsed representation of the doc. Use the `ast` property to get
      * the full `parse5` ast.
      */
-    htmlLoaded: Promise<ParsedImport>;
+    // htmlLoaded: Promise<ParsedImport>;
 
     /**
      * Resolves to the list of this Document's transitive import dependencies.
