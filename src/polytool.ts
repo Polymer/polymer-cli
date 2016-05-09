@@ -44,18 +44,9 @@ export class Polytool {
   run(args) {
     this.cli = commandLineCommands(this.commandDescriptors);
     let cliCommand = this.cli.parse(args);
+    let polytoolCommand = this.commands.get(cliCommand.name || 'help');
 
-    if (!cliCommand.name) {
-      if (args[0]) {
-        console.error('unknown command', args[0]);
-      } else {
-        console.error('must specify a command');
-      }
-      process.exit(1);
-    }
-
-    const command = this.commands.get(cliCommand.name);
-    command.run(cliCommand.options).then((result) => {
+    polytoolCommand.run(cliCommand.options).then((result) => {
       // success
     }, (err) => {
       console.error('error', err);
