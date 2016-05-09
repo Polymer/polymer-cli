@@ -9,7 +9,6 @@
  */
 
 import * as gulpif from 'gulp-if';
-import * as minimatch from 'minimatch';
 import * as stream from 'stream';
 
 import {UglifyTransform} from './uglify-transform';

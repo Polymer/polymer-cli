@@ -13,7 +13,6 @@ import * as gulp from 'gulp';
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
 import mergeStream = require('merge-stream');
-import * as minimatch from 'minimatch';
 import * as path from 'path';
 import {PassThrough, Readable} from 'stream';
 import File = require('vinyl');
