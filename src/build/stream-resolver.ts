@@ -10,7 +10,6 @@
 
 import * as fs from 'fs';
 import {Resolver, Deferred, FSResolver} from 'hydrolysis';
-import * as minimatch from 'minimatch';
 import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');

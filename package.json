@@ -29,7 +29,6 @@
     "hydrolysis": "^1.23.3",
     "liftoff": "^2.2.1",
     "merge-stream": "^1.0.0",
-    "minimatch": "^3.0.0",
     "minimatch-all": "^1.0.2",
     "multipipe": "^0.3.0",
     "polylint": "^2.10.0",
