@@ -162,7 +162,7 @@ export class SWPreCacheTransform extends Transform {
     }
   }
 
-  _flush() {
+  _flush(callback: (error?) => void) {
     let promise: Promise<string[]>;
     if (this.fileSet) {
       promise = Promise.resolve(Array.from(this.fileSet));
@@ -187,6 +187,7 @@ export class SWPreCacheTransform extends Transform {
         contents: new Buffer(config)
       });
       this.push(file);
+      callback();
     });
   }
 }
