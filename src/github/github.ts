@@ -42,11 +42,11 @@ export class Github {
     this._repo = opts.repo;
     this._github = opts.githubApi || new GitHubApi({
       version: '3.0.0',
-      protocol: 'https'
+      protocol: 'https',
     });
     this._github.authenticate({
       type: 'oauth',
-      token: opts.githubToken
+      token: this._token,
     });
     this._request = opts.requestApi || request;
   }
