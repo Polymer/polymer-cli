@@ -48,23 +48,35 @@ process.on('uncaughtException', (err) => {
 
 export function build(options?: BuildOptions): Promise<any> {
   return new Promise<any>((resolve, _) => {
+    options = options || {};
     let root = process.cwd();
-    let main = path.resolve(root, options && options.main || 'index.html');
-    let shell = options && options.shell && path.resolve(root, options.shell);
-    let entrypoints = (options && options.entrypoints || []).map((p) => path.resolve(root, p));
-    let sources = (options && options.sources || ['src/**/*']).map((p) => path.resolve(root, p));;
-    let dependencies = (options && options.sources || ['bower_components/**/*']).map((p) => path.resolve(root, p));
-    let swPrecacheConfig = path.resolve(root, options && options.swPrecacheConfig || 'sw-precache-config.js');
+    let main = path.resolve(root, options.main || 'index.html');
+    let shell = options.shell && path.resolve(root, options.shell);
+    let entrypoints = (options.entrypoints || [])
+        .map((p) => path.resolve(root, p));
+    let swPrecacheConfig = path.resolve(
+        root, options.swPrecacheConfig || 'sw-precache-config.js');
+    let sources = (options.sources || ['**/*'])
+        .map((p) => path.resolve(root, p));
+    let dependencies = (options.dependencies || ['bower_components/**/*'])
+        .map((p) => path.resolve(root, p));
+    let sourceExcludes = [
+      '!build',
+      '!build/**/*',
+      '!bower_components',
+      '!bower_components/**/*',
+      '!node_modules',
+      '!node_modules/**/*',
+    ];
 
     let allSources = [];
     allSources.push(main);
     if (shell) allSources.push(shell);
-    allSources = Array.prototype.concat.apply(allSources, entrypoints);
-    allSources = Array.prototype.concat.apply(allSources, sources);
+    allSources = allSources.concat(entrypoints, sources, sourceExcludes);
 
     let allEntrypoints = [];
     if (shell) allEntrypoints.push(shell);
-    allEntrypoints = Array.prototype.concat.apply(allEntrypoints, entrypoints);
+    allEntrypoints = allEntrypoints.concat(entrypoints);
 
     let optimizeOptions: OptimizeOptions = {
       css: {
