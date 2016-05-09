@@ -72,13 +72,11 @@ export function build(options?: BuildOptions): Promise<any> {
     let allSources = [];
     allSources.push(main);
     if (shell) allSources.push(shell);
-    allSources = Array.prototype.concat.apply(allSources, entrypoints);
-    allSources = Array.prototype.concat.apply(allSources, sources);
-    allSources = Array.prototype.concat.apply(allSources, sourceExcludes);
+    allSources = allSources.concat(entrypoints, sources, sourceExcludes);
 
     let allEntrypoints = [];
     if (shell) allEntrypoints.push(shell);
-    allEntrypoints = Array.prototype.concat.apply(allEntrypoints, entrypoints);
+    allEntrypoints = allEntrypoints.concat(entrypoints);
 
     let optimizeOptions: OptimizeOptions = {
       css: {
