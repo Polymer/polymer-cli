@@ -1,9 +1,11 @@
 {
-  "name": "polytool",
+  "name": "polymer-cli",
   "version": "0.0.6",
   "description": "A commandline tool for Polymer projects",
-  "main": "lib/polytool.js",
-  "bin": "bin/polytool.js",
+  "main": "lib/polymer-cli.js",
+  "bin": {
+    "polymer": "bin/polymer.js"
+  },
   "scripts": {
     "init": "typings install",
     "build": "if [ ! -f typings/main.d.ts ]; then npm run init; fi; tsc",
@@ -11,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Polymer/polytool.git"
+    "url": "git+https://github.com/Polymer/polymer-cli.git"
   },
   "author": "The Polymer Project Authors",
   "license": "BSD-3-Clause",

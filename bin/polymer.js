@@ -13,10 +13,10 @@
  */
 var resolve = require('resolve');
 
-process.title = 'polytool';
+process.title = 'polymer';
 
-resolve('polytool', {basedir: process.cwd()}, function(error, path) {
+resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
   let lib = path ? require(path) : require('..');
-  let polytool = new lib.Polytool();
-  polytool.run(process.argv.slice(2));
+  let cli = new lib.PolymerCli();
+  cli.run(process.argv.slice(2));
 });

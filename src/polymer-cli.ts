@@ -17,7 +17,7 @@ import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
 
-export class Polytool {
+export class PolymerCli {
 
   commandDescriptors = [];
   commands : Map<String, Command> = new Map();
@@ -44,12 +44,10 @@ export class Polytool {
   run(args) {
     this.cli = commandLineCommands(this.commandDescriptors);
     let cliCommand = this.cli.parse(args);
-    let polytoolCommand = this.commands.get(cliCommand.name || 'help');
+    let command = this.commands.get(cliCommand.name || 'help');
 
-    polytoolCommand.run(cliCommand.options).then((result) => {
-      // success
-    }, (err) => {
-      console.error('error', err);
+    command.run(cliCommand.options).catch((error) => {
+      console.error('error', error);
     });
   }
 }
