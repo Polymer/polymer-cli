@@ -1,21 +1,33 @@
-# polytool
+# polymer-cli
 
 A command-line tool for Polymer projects
 
 ## Installation
 
-    $ npm install -g polytool
+    $ npm install -g polymer-cli
 
 ## Usage
 
 ### Display help:
 
-    $ polytool help
+    $ polymer help
 
-### Start the development server
+### Initialize a project folders
 
-    $ polytool serve
+    $ polymer init
+
+### List a project
+
+    $ polymer lint index.html
 
 ### Run web-component-tester tests
 
-    $ polytool test
+    $ polymer test
+
+### Build a project
+
+    $ polymer build --main index.html --shell src/my-app/my-app.html
+
+### Start the development server
+
+    $ polymer serve

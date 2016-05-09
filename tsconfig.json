@@ -41,7 +41,7 @@
     "src/commands/serve.ts",
     "src/commands/test.ts",
     "src/github/github.ts",
-    "src/polytool.ts",
+    "src/polymer-cli.ts",
     "src/templates/polykart.ts",
     "custom_typings/command-line-args.d.ts",
     "custom_typings/command-line-commands.d.ts",

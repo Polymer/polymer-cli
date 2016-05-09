@@ -11,34 +11,34 @@
 'use strict';
 
 const assert = require('chai').assert;
-const Polytool = require('../../lib/polytool').Polytool;
+const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
 const sinon = require('sinon');
 
 suite('help', () => {
 
   test('displays general help when the help command is called with no arguments', () => {
-    let polytool = new Polytool();
-    let helpCommand = polytool.commands.get('help');
+    let cli = new PolymerCli();
+    let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    polytool.run(['help']);
+    cli.run(['help']);
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args, [{}]);
   });
 
   test('displays general help when no command is called', () => {
-    let polytool = new Polytool();
-    let helpCommand = polytool.commands.get('help');
+    let cli = new PolymerCli();
+    let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    polytool.run([]);
+    cli.run([]);
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args, [undefined]);
   });
 
   test('displays general help when unknown command is called', () => {
-    let polytool = new Polytool();
-    let helpCommand = polytool.commands.get('help');
+    let cli = new PolymerCli();
+    let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    polytool.run(['THIS_IS_SOME_UNKNOWN_COMMAND']);
+    cli.run(['THIS_IS_SOME_UNKNOWN_COMMAND']);
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args, [undefined]);
   });

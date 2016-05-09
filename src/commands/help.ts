@@ -20,12 +20,12 @@ export class HelpCommand implements Command {
   }
 
   printGeneralUsage() {
-    console.log(`\nUsage: polytool <command>\n`);
-    console.log(`polytool supports the following commands:`);
+    console.log(`\nUsage: polymer <command>\n`);
+    console.log(`polymer supports the following commands:`);
     for (let command of this.commands.values()) {
       console.log(`  ${command.name}\t\t${command.description}`);
     }
-    console.log(`\nRun \`polytool help <command>\` for help with a specific command.\n`);
+    console.log(`\nRun \`polymer help <command>\` for help with a specific command.\n`);
   }
 
   run(options): Promise<any> {
@@ -45,7 +45,7 @@ export class HelpCommand implements Command {
 
       let argsCli = commandLineArgs(command.args);
       console.log(argsCli.getUsage({
-        title: `polytool ${command.name}`,
+        title: `polymer ${command.name}`,
         description: command.description,
       }));
       resolve(null);
