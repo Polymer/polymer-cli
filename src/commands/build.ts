@@ -42,7 +42,7 @@ export class BuildCommand implements Command {
     {
       name: 'sw-precache-config',
       defaultValue: 'sw-precache-config.js',
-      description: 'Path to an service worker precache configuration to be ' +
+      description: 'Path to an sw-precache configuration to be ' +
         'used for service worker generation.'
     }
   ];
