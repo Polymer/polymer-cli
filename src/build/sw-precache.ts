@@ -54,7 +54,6 @@ function generateServiceWorker(
     buildRoot: string,
     swConfig?: SWConfig
   ): Promise<string> {
-  console.log(buildRoot, swConfig);
   swConfig = swConfig || <SWConfig>{};
   // strip root prefix, so buildRoot prefix can be added safely
   deps = deps.map((p) => {
@@ -75,6 +74,8 @@ function generateServiceWorker(
   swConfig.stripPrefix = buildRoot;
   // static files will be pre-cached
   swConfig.staticFileGlobs = precacheList;
+
+  console.log(`Generating service worker for ${buildRoot}`);
 
   return swPrecache.generate(swConfig);
 }
@@ -134,7 +135,6 @@ export class SWPreCacheTransform extends Transform {
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
     if (file.path === this.fullConfigFilePath) {
-      console.log('Found sw-precache config!')
       try {
         if (file.path.endsWith('js')) {
           // `module._compile` is the heart of `require`
@@ -170,7 +170,6 @@ export class SWPreCacheTransform extends Transform {
       promise = this.options.deps;
     }
     promise.then((deps) => {
-      console.log(this.options.buildRoot, 'deps found', deps.length);
       return generateServiceWorker(
         this.options.root,
         this.options.main,
