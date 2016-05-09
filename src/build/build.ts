@@ -38,6 +38,7 @@ export interface BuildOptions {
   entrypoints?: string[];
   sources?: string[];
   dependencies?: string[];
+  swPrecacheConfig?: string;
 }
 
 process.on('uncaughtException', (err) => {
@@ -52,7 +53,8 @@ export function build(options?: BuildOptions): Promise<any> {
     let shell = options && options.shell && path.resolve(root, options.shell);
     let entrypoints = (options && options.entrypoints || []).map((p) => path.resolve(root, p));
     let sources = (options && options.sources || ['src/**/*']).map((p) => path.resolve(root, p));;
-    let dependencies = (options && options.sources || ['bower_components/**/*', 'sw-precache-config.js']).map((p) => path.resolve(root, p));
+    let dependencies = (options && options.sources || ['bower_components/**/*']).map((p) => path.resolve(root, p));
+    let swPrecacheConfig = path.resolve(root, options && options.swPrecacheConfig || 'sw-precache-config.js');
 
     let allSources = [];
     allSources.push(main);
@@ -91,12 +93,16 @@ export function build(options?: BuildOptions): Promise<any> {
       vfs.src(dependencies, {cwdbase: true, allowEmpty: true})
         .pipe(depsProject.split)
         .pipe(optimize(optimizeOptions))
-        .pipe(depsProject.rejoin);
+        .pipe(depsProject.rejoin)
+        .pipe(vfs.src(swPrecacheConfig, {
+          cwdbase: true,
+          allowEmpty: true,
+          passthrough: true
+        }));
 
     let allFiles = mergeStream(sourcesStream, depsStream);
 
     let serviceWorkerName = 'service-worker.js';
-    let configFileName = 'sw-precache-config.js';
 
     let unbundledPhase = new ForkedVinylStream(allFiles)
       .pipe(new SWPreCacheTransform({
@@ -104,7 +110,7 @@ export function build(options?: BuildOptions): Promise<any> {
         main,
         buildRoot: 'build/unbundled',
         serviceWorkerName,
-        configFileName
+        configFileName: swPrecacheConfig
       }))
       .pipe(vfs.dest('build/unbundled'))
 
@@ -118,7 +124,6 @@ export function build(options?: BuildOptions): Promise<any> {
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
       .on('end', () => {
-        console.log('fulfilling deps')
         // bundler has seen all files, give them to the precache transform
         let depsList = Array.from(bundler.streamResolver.requestedUrls);
         depsResolve(depsList);
@@ -129,7 +134,7 @@ export function build(options?: BuildOptions): Promise<any> {
         buildRoot: 'build/bundled',
         deps: depsPromise,
         serviceWorkerName,
-        configFileName
+        configFileName: swPrecacheConfig
       }))
       .pipe(vfs.dest('build/bundled'));
   });

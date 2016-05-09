@@ -24,6 +24,7 @@ export class BuildCommand implements Command {
       name: 'main',
       description: 'The main HTML file',
       defaultOption: true,
+      defaultValue: 'index.html'
     },
     {
       name: 'shell',
@@ -35,7 +36,14 @@ export class BuildCommand implements Command {
     },
     {
       name: 'sources',
+      multiple: true,
       description: 'The sources file to build',
+    },
+    {
+      name: 'sw-precache-config',
+      defaultValue: 'sw-precache-config.js',
+      description: 'Path to an service worker precache configuration to be ' +
+        'used for service worker generation.'
     }
   ];
 
@@ -45,6 +53,7 @@ export class BuildCommand implements Command {
       shell: options.shell,
       entrypoints: options.entrypoint,
       sources: options.sources,
+      swPrecacheConfig: options['sw-precache-config']
     });
   }
 }
