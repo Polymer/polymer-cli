@@ -28,6 +28,7 @@ export class Bundler {
 
   root: string;
   shell: string;
+  sharedBundlePath: string;
   sharedBundleUrl: string;
   allEntrypoints: string[];
 
@@ -44,7 +45,8 @@ export class Bundler {
   constructor(root: string, shell: string, entrypoints?: string[]) {
     this.root = root;
     this.shell = shell;
-    this.sharedBundleUrl = path.resolve(root, 'shared-bundle.html');
+    this.sharedBundlePath = 'shared-bundle.html';
+    this.sharedBundleUrl = path.resolve(root, this.sharedBundlePath);
 
     let _allEntrypoints = [];
     // It's important that shell is first for document-ordering of imports
@@ -130,11 +132,12 @@ export class Bundler {
       let promises = [];
 
       for (let entrypoint of this.allEntrypoints) {
+        let relativeSharedImportUrl = path.relative(entrypoint, this.sharedBundlePath);
         promises.push(new Promise((resolve, reject) => {
           var vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.streamResolver,
-            addedImports: [this.sharedBundleUrl],
+            addedImports: [relativeSharedImportUrl],
             stripExcludes: excludes,
             inlineScripts: true,
             inlineCss: true,
@@ -174,8 +177,16 @@ export class Bundler {
   _generateSharedBundle(sharedDeps: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
       let contents = sharedDeps
-          .map((d) => `<link rel="import" href="${d}">`)
+          .map((d) => {
+            console.assert(d.startsWith(this.root));
+            let url = d.substring(this.root.length);
+            return `<link rel="import" href="${url}">`;
+          })
           .join('\n');
+
+      if (this._verboseLogging) {
+        console.log('shared-bundle.html:\n', contents);
+      }
 
       this.sharedFile = new File({
         cwd: this.root,
