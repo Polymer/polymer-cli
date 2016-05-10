@@ -55,7 +55,7 @@
     "eslint": "^2.9.0",
     "gulp-mocha": "^2.2.0",
     "sinon": "^1.17.4",
-    "tmp": "0.0.28",
+    "temp": "^0.8.3",
     "typescript": "^1.8.10",
     "typings": "^0.8.1",
     "vinyl-fs-fake": "^1.1.0",

@@ -10,7 +10,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import {Transform, PassThrough} from 'stream';
+import {PassThrough} from 'stream';
 import File = require('vinyl');
 
 // non-ES compatible modules

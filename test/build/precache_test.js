@@ -13,7 +13,7 @@
 const assert = require('chai').assert;
 const fs = require('fs');
 const path = require('path');
-const tmp = require('tmp');
+const temp = require('temp').track();
 const vfs = require('vinyl-fs-fake');
 
 const precache = require('../../lib/build/sw-precache');
@@ -32,15 +32,12 @@ suite('sw-precache', () => {
 
   suite('generation', () => {
     let buildRoot;
-    let tmpCleanup;
     setup((done) => {
-      tmp.dir({unsafeCleanup: true},
-        (err, dir, cleanup) => {
+      temp.mkdir('polymer-cli', (err, dir) => {
           if (err) {
             return done(err);
           }
           buildRoot = dir;
-          tmpCleanup = cleanup;
           vfs.src(path.join(__dirname, 'precache/static/*'))
           .pipe(vfs.dest(dir))
           .on('finish', () => done());
@@ -48,7 +45,9 @@ suite('sw-precache', () => {
       );
     });
 
-    teardown(() => tmpCleanup());
+    teardown((done) => {
+      temp.cleanup(done)
+    });
 
     test('without config', (done) => {
       precache.generateServiceWorker({
