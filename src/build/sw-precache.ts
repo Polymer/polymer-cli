@@ -72,7 +72,6 @@ export function generateServiceWorker(options: generateServiceWorkerOptions)
 
   console.log(`Generating service worker for ${options.buildRoot}`);
 
-  console.log(swConfig);
   return swPrecache.write(options.serviceWorkerPath, swConfig);
 }
 

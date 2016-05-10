@@ -46,6 +46,11 @@ process.on('uncaughtException', (err) => {
   console.error(err.stack);
 });
 
+process.on('unhandledRejection', (err, p) => {
+  console.log(`Promise rejection: ${err}`);
+  console.error(p);
+});
+
 export function build(options?: BuildOptions): Promise<any> {
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
