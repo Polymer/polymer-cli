@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polymer-cli.js",
+  "engines" : {
+    "node" : ">=4.0"
+  },
   "bin": {
     "polymer": "bin/polymer.js"
   },
