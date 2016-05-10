@@ -8,6 +8,7 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import clone = require('clone');
 import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as gulpif from 'gulp-if';
@@ -24,7 +25,7 @@ import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {StreamResolver} from './stream-resolver';
-import {SWPreCacheTransform} from './sw-precache';
+import {generateServiceWorker, parsePreCacheConfig} from './sw-precache';
 import {VulcanizeTransform} from './vulcanize';
 
 // non-ES compatible modules
@@ -46,7 +47,7 @@ process.on('uncaughtException', (err) => {
 });
 
 export function build(options?: BuildOptions): Promise<any> {
-  return new Promise<any>((resolve, _) => {
+  return new Promise<any>((buildResolve, _) => {
     options = options || {};
     let root = process.cwd();
     let main = path.resolve(root, options.main || 'index.html');
@@ -108,50 +109,49 @@ export function build(options?: BuildOptions): Promise<any> {
         .pipe(depsProject.split)
         .pipe(optimize(optimizeOptions))
         .pipe(depsProject.rejoin)
-        .pipe(vfs.src(swPrecacheConfig, {
-          cwdbase: true,
-          allowEmpty: true,
-          passthrough: true
-        }));
 
     let allFiles = mergeStream(sourcesStream, depsStream);
 
     let serviceWorkerName = 'service-worker.js';
 
     let unbundledPhase = new ForkedVinylStream(allFiles)
-      .pipe(new SWPreCacheTransform({
-        root,
-        main,
-        buildRoot: 'build/unbundled',
-        serviceWorkerName,
-        configFileName: swPrecacheConfig
-      }))
       .pipe(vfs.dest('build/unbundled'))
-
-    // SWPreCacheTransform needs the deps from bundler after bundles are created
-    // therefore, give transform a promise that is resolved when bundler is done
-    let depsResolve: (value: string[]) => void;
-    let depsPromise = new Promise<string[]>((resolve) => {
-      depsResolve = resolve;
-    });
 
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
-      .on('end', () => {
-        // give the entry points and shared bundle to SWPreCacheTransform
-        let depsList = Array.from(bundler.entrypointFiles.keys());
-        depsList.push(bundler.sharedBundleUrl);
-        depsResolve(depsList);
-      })
-      .pipe(new SWPreCacheTransform({
-        root,
-        main,
-        buildRoot: 'build/bundled',
-        deps: depsPromise,
-        serviceWorkerName,
-        configFileName: swPrecacheConfig
-      }))
       .pipe(vfs.dest('build/bundled'));
+
+    waitForAll([unbundledPhase, bundledPhase]).then(() => {
+      let unbundledDeps = Array.from(bundler.streamResolver.requestedUrls);
+
+      let bundledDeps = Array.from(bundler.entrypointFiles.keys());
+      bundledDeps.push(bundler.sharedBundleUrl);
+
+      parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
+        let unbundledConfig = clone(swConfig);
+        let bundledConfig = clone(swConfig);
+        Promise.all([
+          generateServiceWorker({
+            root,
+            main,
+            deps: unbundledDeps,
+            buildRoot: 'build/unbundled',
+            swConfig: unbundledConfig,
+            serviceWorkerPath: path.join(root, 'build/unbundled', serviceWorkerName)
+          }),
+          generateServiceWorker({
+            root,
+            main,
+            deps: bundledDeps,
+            buildRoot: 'build/bundled',
+            swConfig: bundledConfig,
+            serviceWorkerPath: path.join(root, 'build/bundled', serviceWorkerName)
+          })
+        ]).then(() => {
+          buildResolve();
+        });
+      })
+    });
   });
 }
 

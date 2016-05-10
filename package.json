@@ -18,6 +18,7 @@
   "author": "The Polymer Project Authors",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "clone": "^1.0.2",
     "command-line-args": "^2.1.6",
     "command-line-commands": "^0.1.2",
     "css-slam": "^1.1.0",
