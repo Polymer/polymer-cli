@@ -21,6 +21,7 @@
   "author": "The Polymer Project Authors",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "clone": "^1.0.2",
     "command-line-args": "^2.1.6",
     "command-line-commands": "^0.1.2",
     "css-slam": "^1.1.0",
@@ -57,6 +58,7 @@
     "eslint": "^2.9.0",
     "gulp-mocha": "^2.2.0",
     "sinon": "^1.17.4",
+    "temp": "^0.8.3",
     "typescript": "^1.8.10",
     "typings": "^0.8.1",
     "vinyl-fs-fake": "^1.1.0",
