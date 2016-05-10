@@ -1,10 +1,10 @@
 {
   "name": "polymer-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polymer-cli.js",
-  "engines" : {
-    "node" : ">=4.0"
+  "engines": {
+    "node": ">=4.0"
   },
   "bin": {
     "polymer": "bin/polymer.js"
