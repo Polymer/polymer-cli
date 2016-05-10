@@ -90,9 +90,8 @@ suite('Bundler', () => {
     assert.isFalse(hasImport(doc, '/root/framework.html'));
   }));
 
-  test('shell and 1 entrypoint', () => setupTest({
-    shell: '/root/shell.html',
-    entrypoints: ['/root/entrypointA.html'],
+  test('two entrypoints', () => setupTest({
+    entrypoints: ['/root/shell.html', '/root/entrypointA.html'],
     files: [framework(), shell(), entrypointA()],
   }).then((files) => {
     // shell doesn't have framework
@@ -105,10 +104,29 @@ suite('Bundler', () => {
     assert.isFalse(hasMarker(entrypointDoc, 'framework'));
     assert.isFalse(hasImport(entrypointDoc, '/root/framework.html'));
 
-    // shared-bundle has framework
+    // No shared-bundle has framework
     let sharedDoc = dom5.parse(getFile('shared-bundle.html'));
     assert.isTrue(hasMarker(sharedDoc, 'framework'));
     assert.isFalse(hasImport(sharedDoc, '/root/framework.html'));
+  }));
+
+  test('shell and entrypoint', () => setupTest({
+    shell: '/root/shell.html',
+    entrypoints: ['/root/entrypointA.html'],
+    files: [framework(), shell(), entrypointA()],
+  }).then((files) => {
+    // shell doesn't have framework
+    let shellDoc = dom5.parse(getFile('shell.html'));
+    assert.isTrue(hasMarker(shellDoc, 'framework'));
+    assert.isFalse(hasImport(shellDoc, '/root/framework.html'));
+
+    // entrypoint doesn't have framework
+    let entrypointDoc = dom5.parse(getFile('entrypointA.html'));
+    assert.isFalse(hasMarker(entrypointDoc, 'framework'));
+    assert.isFalse(hasImport(entrypointDoc, '/root/framework.html'));
+
+    // No shared-bundle with a shell
+    assert.isNotOk(getFile('shared-bundle.html'));
   }));
 
 });

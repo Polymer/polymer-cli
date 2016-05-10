@@ -129,17 +129,19 @@ export class Bundler {
         }
       }
 
-      let sharedDeps = bundles.get(this.sharedBundleUrl);
-      let excludes = sharedDeps ? sharedDeps.concat(this.sharedBundleUrl) : [];
+      let sharedDepsBundle = this.shell || this.sharedBundleUrl;
+      let sharedDeps = bundles.get(sharedDepsBundle);
       let promises = [];
 
       for (let entrypoint of this.allEntrypoints) {
-        let relativeSharedImportUrl = path.relative(entrypoint, this.sharedBundlePath);
+        let addedImports = [];
+        let excludes = (entrypoint != this.shell) && sharedDeps
+            ? sharedDeps.concat(sharedDepsBundle)
+            : [];
         promises.push(new Promise((resolve, reject) => {
           var vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.streamResolver,
-            addedImports: [relativeSharedImportUrl],
             stripExcludes: excludes,
             inlineScripts: true,
             inlineCss: true,
@@ -161,7 +163,7 @@ export class Bundler {
         }));
       }
       // vulcanize the shared bundle
-      if (sharedDeps) {
+      if (!this.shell && sharedDeps) {
         promises.push(this._generateSharedBundle(sharedDeps));
       }
 
@@ -248,13 +250,19 @@ export class Bundler {
       // This assumes an ordering between entrypoints, since they could have
       // conflicting orders between their top level imports. The shell should
       // always come first.
+      console.log('generating bundles', this.shell);
       for (let entrypoint of entrypointToDeps.keys()) {
         let dependencies = entrypointToDeps.get(entrypoint);
         for (let dep of dependencies) {
           let entrypointCount = depsToEntrypoints.get(dep).length;
           if (entrypointCount > 1) {
-            addImport(this.sharedBundleUrl, dep);
-            addImport(entrypoint, this.sharedBundleUrl);
+            if (this.shell) {
+              addImport(this.shell, dep);
+              addImport(entrypoint, this.shell);
+            } else {
+              addImport(this.sharedBundleUrl, dep);
+              addImport(entrypoint, this.sharedBundleUrl);
+            }
           } else {
             addImport(entrypoint, dep);
           }
