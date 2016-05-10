@@ -8,6 +8,7 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as dom5 from 'dom5';
 import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import {Transform} from 'stream';
@@ -133,15 +134,26 @@ export class Bundler {
       let sharedDeps = bundles.get(sharedDepsBundle);
       let promises = [];
 
+      if (this.shell) {
+        let shellFile = this.streamResolver._files.get(this.shell);
+        console.assert(shellFile != null);
+        let newShellContent = this._addSharedImportsToShell(bundles);
+        shellFile.contents = new Buffer(newShellContent);
+      }
+
       for (let entrypoint of this.allEntrypoints) {
-        let addedImports = [];
-        let excludes = (entrypoint != this.shell) && sharedDeps
-            ? sharedDeps.concat(sharedDepsBundle)
-            : [];
+        let addedImports = (entrypoint == this.shell || !this.shell)
+            ? []
+            : [path.relative(path.dirname(entrypoint), sharedDepsBundle)]
+        let excludes = (entrypoint == this.shell)
+            ? []
+            : sharedDeps.concat(sharedDepsBundle);
+
         promises.push(new Promise((resolve, reject) => {
           var vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.streamResolver,
+            addedImports: addedImports,
             stripExcludes: excludes,
             inlineScripts: true,
             inlineCss: true,
@@ -176,6 +188,42 @@ export class Bundler {
         return contentsMap;
       });
     });
+  }
+
+  _addSharedImportsToShell(bundles: Map<string, string[]>): string {
+    console.assert(this.shell != null);
+    let shellDeps = bundles.get(this.shell)
+        .map((d) => path.relative(path.dirname(this.shell), d));
+    
+    let file = this.streamResolver._files.get(this.shell);
+    console.assert(file != null);
+    let contents = file.contents.toString();
+    let doc = dom5.parse(contents);
+    let imports = dom5.queryAll(doc, dom5.predicates.AND(
+      dom5.predicates.hasTagName('link'),
+      dom5.predicates.hasAttrValue('rel', 'import')
+    ));
+
+    // Remove all imports that are in the shared deps list so that we prefer
+    // the ordering or shared deps. Any imports left should be independent of
+    // ordering of shared deps.
+    let shellDepsSet = new Set(shellDeps);
+    for (let _import of imports) {
+      if (shellDepsSet.has(dom5.getAttribute(_import, 'href'))) {
+        dom5.remove(_import);
+      }
+    }
+
+    // Append all shared imports to the end of <head>
+    let head = dom5.query(doc, dom5.predicates.hasTagName('head'));
+    for (let dep of shellDeps) {
+      let newImport = dom5.constructors.element('link');
+      dom5.setAttribute(newImport, 'rel', 'import');
+      dom5.setAttribute(newImport, 'href', dep);
+      dom5.append(head, newImport);
+    }
+    let newContents = dom5.serialize(doc);
+    return newContents;
   }
 
   _generateSharedBundle(sharedDeps: string[]): Promise<any> {
@@ -250,7 +298,6 @@ export class Bundler {
       // This assumes an ordering between entrypoints, since they could have
       // conflicting orders between their top level imports. The shell should
       // always come first.
-      console.log('generating bundles', this.shell);
       for (let entrypoint of entrypointToDeps.keys()) {
         let dependencies = entrypointToDeps.get(entrypoint);
         for (let dep of dependencies) {
@@ -258,7 +305,7 @@ export class Bundler {
           if (entrypointCount > 1) {
             if (this.shell) {
               addImport(this.shell, dep);
-              addImport(entrypoint, this.shell);
+              // addImport(entrypoint, this.shell);
             } else {
               addImport(this.sharedBundleUrl, dep);
               addImport(entrypoint, this.sharedBundleUrl);
