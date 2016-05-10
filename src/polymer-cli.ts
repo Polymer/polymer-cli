@@ -42,6 +42,21 @@ export class PolymerCli {
   }
 
   run(args) {
+    // If the "--version"/"-v" flag is ever present, just print
+    // the current version. Useful for globally installed CLIs.
+    if (args.indexOf('--version') > -1 || args.indexOf('-v') > -1) {
+      console.log(require('../package.json').version);
+      return;
+    }
+
+    // Alias the "--help"/"-h" flag to run the help command for the given
+    // command. This gets us around some limitations in our arguments
+    // parsers and keeps us from having to implement additional help logic
+    // inside of each command.
+    if (args.indexOf('--help') > -1 || args.indexOf('-h') > -1) {
+      args = ['help', args[0]];
+    }
+
     this.cli = commandLineCommands(this.commandDescriptors);
     let cliCommand = this.cli.parse(args);
     let command = this.commands.get(cliCommand.name || 'help');
