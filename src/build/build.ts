@@ -78,6 +78,9 @@ export function build(options?: BuildOptions): Promise<any> {
     allEntrypoints = allEntrypoints.concat(entrypoints);
 
     let optimizeOptions: OptimizeOptions = {
+      html: {
+        removeComments: true
+      },
       css: {
         stripWhitespace: true
       },
