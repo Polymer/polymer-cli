@@ -25,7 +25,7 @@ import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {StreamResolver} from './stream-resolver';
-import {generateServiceWorker, parsePreCacheConfig} from './sw-precache';
+import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
 import {VulcanizeTransform} from './vulcanize';
 
 // non-ES compatible modules
@@ -41,14 +41,14 @@ export interface BuildOptions {
   swPrecacheConfig?: string;
 }
 
-process.on('uncaughtException', (err) => {
-  console.log(`Caught exception: ${err}`);
-  console.error(err.stack);
+process.on('uncaughtException', (error) => {
+  console.log(`Caught exception: ${error}`);
+  console.error(error.stack);
 });
 
-process.on('unhandledRejection', (err, p) => {
-  console.log(`Promise rejection: ${err}`);
-  console.error(p);
+process.on('unhandledRejection', (error) => {
+  console.log(`Promise rejection: ${error}`);
+  console.error(error.stack);
 });
 
 export function build(options?: BuildOptions): Promise<any> {
@@ -126,6 +126,17 @@ export function build(options?: BuildOptions): Promise<any> {
       .pipe(bundler.bundle)
       .pipe(vfs.dest('build/bundled'));
 
+    let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
+      return generateServiceWorker({
+        root,
+        main,
+        deps,
+        buildRoot,
+        swConfig: clone(swConfig),
+        serviceWorkerPath: path.join(root, buildRoot, serviceWorkerName)
+      });
+    };
+
     waitForAll([unbundledPhase, bundledPhase]).then(() => {
       let unbundledDeps = Array.from(bundler.streamResolver.requestedUrls);
 
@@ -133,25 +144,9 @@ export function build(options?: BuildOptions): Promise<any> {
       bundledDeps.push(bundler.sharedBundleUrl);
 
       parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
-        let unbundledConfig = clone(swConfig);
-        let bundledConfig = clone(swConfig);
         Promise.all([
-          generateServiceWorker({
-            root,
-            main,
-            deps: unbundledDeps,
-            buildRoot: 'build/unbundled',
-            swConfig: unbundledConfig,
-            serviceWorkerPath: path.join(root, 'build/unbundled', serviceWorkerName)
-          }),
-          generateServiceWorker({
-            root,
-            main,
-            deps: bundledDeps,
-            buildRoot: 'build/bundled',
-            swConfig: bundledConfig,
-            serviceWorkerPath: path.join(root, 'build/bundled', serviceWorkerName)
-          })
+          genSW('build/unbundled', unbundledDeps, swConfig),
+          genSW('build/bundled', bundledDeps, swConfig)
         ]).then(() => {
           buildResolve();
         });

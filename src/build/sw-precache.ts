@@ -17,7 +17,7 @@ import File = require('vinyl');
 const swPrecache = require('sw-precache');
 const Module = require('module');
 
-interface SWConfig {
+export interface SWConfig {
   cacheId?: string,
   directoryIndex?: string;
   dynamicUrlToDependencies?: {
@@ -48,7 +48,7 @@ interface SWConfig {
 }
 
 export function generateServiceWorker(options: generateServiceWorkerOptions)
-: Promise<string> {
+: Promise<void> {
   let swConfig = options.swConfig || <SWConfig>{};
   // strip root prefix, so buildRoot prefix can be added safely
   let deps = options.deps.map((p) => {
