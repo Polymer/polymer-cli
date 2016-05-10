@@ -135,8 +135,9 @@ export function build(options?: BuildOptions): Promise<any> {
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
       .on('end', () => {
-        // bundler has seen all files, give them to the precache transform
-        let depsList = Array.from(bundler.streamResolver.requestedUrls);
+        // give the entry points and shared bundle to SWPreCacheTransform
+        let depsList = Array.from(bundler.entrypointFiles.keys());
+        depsList.push(bundler.sharedBundleUrl);
         depsResolve(depsList);
       })
       .pipe(new SWPreCacheTransform({
