@@ -358,8 +358,6 @@ export class Bundler {
             entrypointList = depsToEntrypoints.get(dep);
           }
           entrypointList.push(entrypoint);
-          // ensure we can compare lists in the future
-          entrypointList.sort();
         }
       }
 
@@ -380,30 +378,24 @@ export class Bundler {
 
     // async depth-first traversal: waits for document load, then async iterates
     // on dependencies. No return values are used, writes to visited and list.
-    let _getDeps = (url: string) => {
-      if (visited.has(url)) {
-        return Promise.resolve();
-      }
-      visited.add(url);
-      // document.depHrefs is _probably_ document order, if all html imports are
-      // at the same level in the tree.
-      // See: https://github.com/Polymer/hydrolysis/issues/240
-      return this.analyzer.load(url)
-          .then((document) => {
-            return _iterate(document.depHrefs.values());
-          })
-          .then((_) => {
-            list.push(url);
-          });
-    };
+    //
+    // document.depHrefs is _probably_ document order, if all html imports are
+    // at the same level in the tree.
+    // See: https://github.com/Polymer/hydrolysis/issues/240
+    let _getDeps = (url: string) =>
+      this.analyzer.load(url).then((d) => _iterate(d.depHrefs.values()));
 
     // async iteration: waits for _getDeps on a value to return before recursing
     // to call _getDeps on the next value.
     let _iterate = (iterator: Iterator<string>) => {
       let next = iterator.next();
-      return (next.done)
-        ? Promise.resolve()
-        : _getDeps(next.value).then((_) => _iterate(iterator));
+      if (next.done || visited.has(next.value)) {
+        return Promise.resolve();
+      } else {
+        list.push(next.value);
+        visited.add(url);
+        return _getDeps(next.value).then((_) => _iterate(iterator));
+      }
     }
 
     // kick off the traversal from root, then resolve the list of dependencies
