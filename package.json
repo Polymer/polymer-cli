@@ -12,7 +12,7 @@
   "scripts": {
     "init": "typings install",
     "build": "if [ ! -f typings/main.d.ts ]; then npm run init; fi; tsc",
-    "test": "depcheck . && gulp test"
+    "test": "depcheck . --ignores 'generator-polymer-init' && gulp test"
   },
   "repository": {
     "type": "git",
