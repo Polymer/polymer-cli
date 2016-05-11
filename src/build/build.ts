@@ -33,6 +33,7 @@ const findConfig = require('liftoff/lib/find_config');
 const minimatchAll = require('minimatch-all');
 
 export interface BuildOptions {
+  root?: string;
   main?: string;
   shell?: string;
   entrypoints?: string[];
@@ -54,7 +55,7 @@ process.on('unhandledRejection', (error) => {
 export function build(options?: BuildOptions): Promise<any> {
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
-    let root = process.cwd();
+    let root = path.resolve(options.root || process.cwd());
     let main = path.resolve(root, options.main || 'index.html');
     let shell = options.shell && path.resolve(root, options.shell);
     let entrypoints = (options.entrypoints || [])

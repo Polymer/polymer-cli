@@ -27,7 +27,7 @@ export class BuildCommand implements Command {
     },
     {
       name: 'shell',
-      description: 'The app shell',
+      description: 'The app shell.',
     },
     {
       name: 'entrypoint',
@@ -43,6 +43,11 @@ export class BuildCommand implements Command {
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
         'used for service worker generation.'
+    },
+    {
+      name: 'root',
+      description: 'The root directory to find sources and place build. ' +
+          'Defaults to current working directory'
     }
   ];
 
@@ -50,12 +55,16 @@ export class BuildCommand implements Command {
     // Defer dependency loading until this specific command is run
     var build = require('../build/build').build;
 
-    return build({
+    let buildOptions = {
       main: options.main,
       shell: options.shell,
       entrypoints: options.entrypoint,
       sources: options.sources,
       swPrecacheConfig: options['sw-precache-config']
-    });
+    };
+    if (options.env && options.env.build) {
+      return options.env.build(buildOptions);
+    }
+    return build(buildOptions);
   }
 }
