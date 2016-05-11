@@ -12,11 +12,11 @@ A command-line tool for Polymer projects
 
     $ polymer help
 
-### Initialize a project folders
+### Initialize a project folder
 
     $ polymer init
 
-### List a project
+### Lint a project
 
     $ polymer lint index.html
 
