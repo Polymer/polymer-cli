@@ -16,11 +16,6 @@ import {PolykartGenerator} from '../templates/polykart';
 // not ES modules compatible
 const YeomanEnvironment = require('yeoman-environment');
 
-// NOTE(fschott) 05-02-2015: Yeoman needs to load our generator in a non-standard way via require.resolve.
-// We include this here so that our dependency-usage-checking test can still pass. If you no longer see
-// generator-polymer-init used in this file, it is safe to remove this code.
-require('generator-polymer-init');
-
 export class InitCommand implements Command {
   name = 'init';
 
