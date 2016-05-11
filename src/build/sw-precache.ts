@@ -77,24 +77,18 @@ export function generateServiceWorker(options: generateServiceWorkerOptions)
 
 export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
   return new Promise<SWConfig>((resolve, reject) => {
-    let exists = false;
-    try {
-      fs.readFileSync(configFile)
-      exists = true;
-    } catch (_) {
-    }
-    if (exists) {
-      try {
-        let config: SWConfig = require(configFile);
-        return resolve(config);
-      } catch(e) {
-        if (exists) {
+    fs.stat(configFile, (err) => {
+      let config: SWConfig;
+      if (!err) {
+        try {
+          config = require(configFile);
+        } catch(e) {
           console.error(`Could not load sw-precache config from ${configFile}`);
           console.error(e);
         }
       }
-    }
-    resolve();
+      resolve(config);
+    });
   });
 }
 
