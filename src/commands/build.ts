@@ -12,7 +12,6 @@ import {ArgDescriptor} from 'command-line-args';
 import {CLI} from 'command-line-commands';
 
 import {Command} from './command';
-import {build} from '../build/build';
 
 export class BuildCommand implements Command {
   name = 'build';
@@ -48,6 +47,9 @@ export class BuildCommand implements Command {
   ];
 
   run(options): Promise<any> {
+    // Defer dependency loading until this specific command is run
+    var build = require('../build/build').build;
+
     return build({
       main: options.main,
       shell: options.shell,
