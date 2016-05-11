@@ -21,9 +21,25 @@ export class PrefetchTransform extends Transform {
   dependencyMapPromise: Promise<Map<string, string[]>>;
 
   constructor(
+    /**
+     * Root of the dependencies.
+     * Will be stripped when making links
+     */
     root: string,
+    /**
+     * List of files that will have dependencies flattened with
+     * `<link rel="prefetch">`
+     */
     prefetchTargets: string[],
+    /**
+     * List of files that will have dependencies flattened with
+     * `<link rel="import">`
+     */
     importTargets: string[],
+    /**
+     * Promise that resolves to a mapping of files in `prefetchTargets` and
+     * `importTargets` to the flattend list of dependencies
+     */
     dependencyMapPromise: Promise<Map<string, string[]>>
   ) {
     super({objectMode: true});
@@ -38,10 +54,10 @@ export class PrefetchTransform extends Transform {
     file: File,
     deps: string[],
     type: 'import' | 'prefetch'
-  ){
+  ) {
     let contents = file.contents.toString();
     let ast = dom5.parse(contents);
-    const head = dom5.query(ast, dom5.predicates.hasTagName('head'));
+    let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
     for (let dep of deps) {
       dep = path.relative(file.dirname, dep);
       let link = dom5.constructors.element('link');
@@ -73,7 +89,6 @@ export class PrefetchTransform extends Transform {
       for (let prefetch of this.prefetchTargets) {
         let file = this.fileMap.get(prefetch);
         let deps = map.get(prefetch);
-        // console.log('prefetch', file.path, deps);
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
@@ -83,7 +98,6 @@ export class PrefetchTransform extends Transform {
       for (let im of this.importTargets) {
         let file = this.fileMap.get(im);
         let deps = map.get(im);
-        // console.log('import', file.path, deps);
         if (deps) {
           this.pullUpDeps(file, deps, 'import');
         }
@@ -91,9 +105,13 @@ export class PrefetchTransform extends Transform {
         this.fileMap.delete(im);
       }
       for (let leftover of this.fileMap.keys()) {
-        console.log('unused', leftover);
+        console.log(
+          'Warning: File was listed in entrypoints but not found in stream:',
+          leftover
+        );
+        this.push(this.fileMap.get(leftover));
+        this.fileMap.delete(leftover);
       }
-      this.fileMap.clear();
       done();
     });
   }

@@ -134,8 +134,7 @@ export function build(options?: BuildOptions): Promise<any> {
       .pipe(bundler.bundle)
       .on('finish', () => {
         bundler._entrypointToDeps.then((map) => {
-          // let shellDeps = map.get(shell).map((p) => path.relative(root, p));
-          // map.set(main, shellDeps);
+          // forward shell's dependencies to main to be prefetched
           map.set(main, map.get(shell));
           prefetchDepsResolve(map);
         });
