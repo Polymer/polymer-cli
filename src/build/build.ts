@@ -23,6 +23,7 @@ import {Bundler} from './bundle';
 import {HtmlProject} from './html-project';
 import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
+import {PrefetchTransform} from './prefetch';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {StreamResolver} from './stream-resolver';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
@@ -120,11 +121,25 @@ export function build(options?: BuildOptions): Promise<any> {
 
     let serviceWorkerName = 'service-worker.js';
 
+    let prefetchDepsResolve: (value: Map<string, string[]>) => void;
+    let prefetchDepsPromise = new Promise<Map<string, string[]>>((resolve) => {
+      prefetchDepsResolve = resolve;
+    });
+
+    let prefetchTransform = new PrefetchTransform(root, [main], entrypoints, prefetchDepsPromise);
     let unbundledPhase = new ForkedVinylStream(allFiles)
+      .pipe(prefetchTransform)
       .pipe(vfs.dest('build/unbundled'))
 
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
+      .on('finish', () => {
+        bundler._entrypointToDeps.then((map) => {
+          // forward shell's dependencies to main to be prefetched
+          map.set(main, map.get(shell));
+          prefetchDepsResolve(map);
+        });
+      })
       .pipe(vfs.dest('build/bundled'));
 
     let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
