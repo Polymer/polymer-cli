@@ -43,9 +43,15 @@ export class Bundler {
 
   _verboseLogging = false;
 
+  _entrypointToDepsResolve: (value: Map<string, string[]>) => void;
+  _entrypointToDeps: Promise<Map<string, string[]>>;
+
   constructor(root: string, shell: string, entrypoints?: string[]) {
     this.root = root;
     this.shell = shell;
+    this._entrypointToDeps = new Promise<Map<string, string[]>>((resolve) => {
+      this._entrypointToDepsResolve = resolve;
+    })
     this.sharedBundlePath = 'shared-bundle.html';
     this.sharedBundleUrl = path.resolve(root, this.sharedBundlePath);
 
@@ -194,7 +200,7 @@ export class Bundler {
     console.assert(this.shell != null);
     let shellDeps = bundles.get(this.shell)
         .map((d) => path.relative(path.dirname(this.shell), d));
-    
+
     let file = this.streamResolver._files.get(this.shell);
     console.assert(file != null);
     let contents = file.contents.toString();
@@ -356,6 +362,8 @@ export class Bundler {
           entrypointList.sort();
         }
       }
+
+      this._entrypointToDepsResolve(entrypointToDeps);
       return {
         depsToEntrypoints,
         entrypointToDeps,
