@@ -79,6 +79,7 @@ export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
   return new Promise<SWConfig>((resolve, reject) => {
     fs.stat(configFile, (err) => {
       let config: SWConfig;
+      // only log if the config file exists at all
       if (!err) {
         try {
           config = require(configFile);
