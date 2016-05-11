@@ -1,6 +1,4 @@
 import {Command} from './command';
-import * as wct from 'web-component-tester';
-// import * as process from 'process';
 
 export class TestCommand implements Command {
   name = 'test';
@@ -119,6 +117,9 @@ export class TestCommand implements Command {
   ];
 
   run(options): Promise<void> {
+    // Defer dependency loading until this specific command is run
+    var wct = require('web-component-tester');
+
     return new Promise<void>((resolve, reject) => {
       wct.cli.run(process.env, process.argv.slice(3), process.stdout,
         (error) => {

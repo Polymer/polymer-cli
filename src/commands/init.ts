@@ -11,11 +11,6 @@
 import {Command} from './command';
 import {ArgDescriptor} from 'command-line-args';
 
-import {PolykartGenerator} from '../templates/polykart';
-
-// not ES modules compatible
-const YeomanEnvironment = require('yeoman-environment');
-
 export class InitCommand implements Command {
   name = 'init';
 
@@ -31,6 +26,10 @@ export class InitCommand implements Command {
   ];
 
   run(options): Promise<any> {
+    // Defer dependency loading until this specific command is run
+    const PolykartGenerator = require('../templates/polykart').PolykartGenerator;
+    const YeomanEnvironment = require('yeoman-environment');
+
     return new Promise((resolve, reject) => {
       let templateName = options['name'] || 'polymer-init';
       let env = new YeomanEnvironment();
