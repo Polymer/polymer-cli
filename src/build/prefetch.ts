@@ -13,12 +13,16 @@ import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 
+import {StreamAnalyzer, DepsIndex} from './analyzer';
+
 export class PrefetchTransform extends Transform {
   root: string;
-  prefetchTargets: string[];
-  importTargets: string[];
+  main: string;
+  shell: string;
+  entrypoints: string[];
+  allEntrypoints: string[];
   fileMap: Map<string, File>;
-  dependencyMapPromise: Promise<Map<string, string[]>>;
+  analyzer: StreamAnalyzer;
 
   constructor(
     /**
@@ -26,27 +30,38 @@ export class PrefetchTransform extends Transform {
      * Will be stripped when making links
      */
     root: string,
+
     /**
-     * List of files that will have dependencies flattened with
-     * `<link rel="prefetch">`
+     * The main HTML file. This will have link rel=prefetches added to it.
      */
-    prefetchTargets: string[],
+    main: string,
+
+    /**
+     * The app shell. This will have link rel=imports added to it.
+     */
+    shell: string,
+
     /**
      * List of files that will have dependencies flattened with
      * `<link rel="import">`
      */
-    importTargets: string[],
+    entrypoints: string[],
+
     /**
-     * Promise that resolves to a mapping of files in `prefetchTargets` and
-     * `importTargets` to the flattend list of dependencies
+     * The analyzer to retreive dependency information from.
      */
-    dependencyMapPromise: Promise<Map<string, string[]>>
+    analyzer: StreamAnalyzer
   ) {
     super({objectMode: true});
     this.root = root;
-    this.prefetchTargets = prefetchTargets;
-    this.importTargets = importTargets;
-    this.dependencyMapPromise = dependencyMapPromise;
+    this.main = main;
+    this.shell = shell;
+    this.entrypoints = entrypoints;
+    this.allEntrypoints = entrypoints;
+    if (shell) {
+      this.allEntrypoints = this.allEntrypoints.concat(shell);
+    }
+    this.analyzer = analyzer;
     this.fileMap = new Map<string, File>();
   }
 
@@ -60,6 +75,7 @@ export class PrefetchTransform extends Transform {
     let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
     for (let dep of deps) {
       dep = path.relative(file.dirname, dep);
+      // prefetched deps should be absolute, as they will be in the main file
       if (type === 'prefetch') {
         dep = path.join('/', dep);
       }
@@ -72,42 +88,49 @@ export class PrefetchTransform extends Transform {
     file.contents = new Buffer(contents);
   }
 
-  _transform(file: File, enc: string, cb: (err?, file?) => void) {
-    if (
-      this.prefetchTargets.indexOf(file.path) > -1 ||
-      this.importTargets.indexOf(file.path) > -1
-    ) {
+  _transform(file: File, enc: string, callback: (err?, file?) => void) {
+    if (this.isImportantFile(file)) {
+      // hold on to the file for safe keeping
       this.fileMap.set(file.path, file);
-      cb();
+      callback(null, null);
     } else {
-      cb(null, file);
+      callback(null, file);
     }
+  }
+
+  isImportantFile(file) {
+    return file.path == this.main ||
+        this.allEntrypoints.indexOf(file.path) > -1;
   }
 
   _flush(done: (err?) => void) {
     if (this.fileMap.size === 0) {
       return done();
     }
-    this.dependencyMapPromise.then((map) => {
-      for (let prefetch of this.prefetchTargets) {
-        let file = this.fileMap.get(prefetch);
-        let deps = map.get(prefetch);
-        // prefetched deps should be absolute, as they will be in the main file
+    this.analyzer.analyze.then((depsIndex: DepsIndex) => {
+      let entrypointToDeps = new Map(depsIndex.entrypointToDeps);
+
+      if (this.main && this.shell) {
+        let file = this.fileMap.get(this.main);
+        // forward shell's dependencies to main to be prefetched
+        let deps = entrypointToDeps.get(this.shell);
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
         this.push(file);
-        this.fileMap.delete(prefetch);
+        this.fileMap.delete(this.main);
       }
-      for (let im of this.importTargets) {
+
+      for (let im of this.allEntrypoints) {
         let file = this.fileMap.get(im);
-        let deps = map.get(im);
+        let deps = entrypointToDeps.get(im);
         if (deps) {
           this.pullUpDeps(file, deps, 'import');
         }
         this.push(file);
         this.fileMap.delete(im);
       }
+
       for (let leftover of this.fileMap.keys()) {
         console.log(
           'Warning: File was listed in entrypoints but not found in stream:',
@@ -116,6 +139,7 @@ export class PrefetchTransform extends Transform {
         this.push(this.fileMap.get(leftover));
         this.fileMap.delete(leftover);
       }
+
       done();
     });
   }
