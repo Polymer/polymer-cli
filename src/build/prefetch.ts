@@ -73,7 +73,7 @@ export class PrefetchTransform extends Transform {
       for (let prefetch of this.prefetchTargets) {
         let file = this.fileMap.get(prefetch);
         let deps = map.get(prefetch);
-        console.log('prefetch', file.path, deps);
+        // console.log('prefetch', file.path, deps);
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
@@ -83,7 +83,7 @@ export class PrefetchTransform extends Transform {
       for (let im of this.importTargets) {
         let file = this.fileMap.get(im);
         let deps = map.get(im);
-        console.log('import', file.path, deps);
+        // console.log('import', file.path, deps);
         if (deps) {
           this.pullUpDeps(file, deps, 'import');
         }
