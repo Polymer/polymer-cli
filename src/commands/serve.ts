@@ -20,9 +20,9 @@ export class ServeCommand implements Command {
 
   args = polyserveArgs;
 
-  run(options): Promise<any> {
+  run(options, config): Promise<any> {
     var serverOptions: ServerOptions = {
-      root: options.root,
+      root: config.root,
       port: options.port,
       hostname: options.hostname,
       open: options.open,

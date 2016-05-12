@@ -19,7 +19,7 @@ export class LintCommand implements Command {
 
   args = polylint.argumentDefinitions;
 
-  run(options): Promise<any> {
+  run(options, config): Promise<any> {
     return polylint.runWithOptions(options)
         .then(() => null);
   }

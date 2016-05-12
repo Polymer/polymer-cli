@@ -1,19 +1,12 @@
 import {ArgDescriptor} from 'command-line-args';
 
+import {ProjectConfig} from '../project-config';
+
 export interface Command {
   name: string;
   description: string;
   args: ArgDescriptor[];
-  run(options: {[name: string]: string}): Promise<any>;
+  run(options: {[name: string]: string}, config: ProjectConfig): Promise<any>;
 }
 
-// TODO(justinfagnani): how do I re-export an interface?
-export interface ArgDescriptor extends ArgDescriptor {
-//   // name: string;
-//   // alias?: string;
-//   // description: string;
-//   // defaultValue?: any;
-//   // type?: Object;
-//   // multiple?: boolean;
-//   // defaultOption?: boolean;
-}
+export {ArgDescriptor} from 'command-line-args';

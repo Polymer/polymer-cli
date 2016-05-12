@@ -20,20 +20,6 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'main',
-      description: 'The main HTML file',
-      defaultOption: true,
-      defaultValue: 'index.html'
-    },
-    {
-      name: 'shell',
-      description: 'The app shell.',
-    },
-    {
-      name: 'entrypoint',
-      multiple: true,
-    },
-    {
       name: 'sources',
       multiple: true,
       description: 'The sources file to build',
@@ -43,28 +29,20 @@ export class BuildCommand implements Command {
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
         'used for service worker generation.'
-    },
-    {
-      name: 'root',
-      description: 'The root directory to find sources and place build. ' +
-          'Defaults to current working directory'
     }
   ];
 
-  run(options): Promise<any> {
+  run(options, config): Promise<any> {
     // Defer dependency loading until this specific command is run
-    var build = require('../build/build').build;
+    const build = require('../build/build').build;
 
     let buildOptions = {
-      main: options.main,
-      shell: options.shell,
-      entrypoints: options.entrypoint,
       sources: options.sources,
       swPrecacheConfig: options['sw-precache-config']
     };
     if (options.env && options.env.build) {
-      return options.env.build(buildOptions);
+      return options.env.build(buildOptions, config);
     }
-    return build(buildOptions);
+    return build(buildOptions, config);
   }
 }

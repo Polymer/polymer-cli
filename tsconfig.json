@@ -46,6 +46,7 @@
     "src/environments/reyserve.ts",
     "src/github/github.ts",
     "src/polymer-cli.ts",
+    "src/project-config.ts",
     "src/templates/polykart.ts",
     "custom_typings/command-line-args.d.ts",
     "custom_typings/command-line-commands.d.ts",

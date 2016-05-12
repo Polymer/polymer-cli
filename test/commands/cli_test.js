@@ -10,6 +10,7 @@
 
 'use strict';
 
+const Config = require('../../lib/project-config').ProjectConfig;
 const packageJSON = require('../../package.json');
 const assert = require('chai').assert;
 const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
@@ -17,13 +18,15 @@ const sinon = require('sinon');
 
 suite('The general CLI', () => {
 
+  const defaultConfig = new Config();
+
   test('displays general help when no command is called', () => {
     let cli = new PolymerCli();
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run([]);
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [undefined]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [undefined, defaultConfig]);
   });
 
   test('displays general help when unknown command is called', () => {
@@ -32,7 +35,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run(['THIS_IS_SOME_UNKNOWN_COMMAND']);
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [undefined]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [undefined, defaultConfig]);
   });
 
   test('displays command help when called with the --help flag', () => {
@@ -41,7 +44,10 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run(['build', '--help']);
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'build'}]);
+    assert.deepEqual(
+      helpCommandSpy.firstCall.args,
+      [{command: 'build'}, defaultConfig]
+    );
   });
 
   test('displays command help when called with the -h flag', () => {
@@ -50,7 +56,10 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run(['init', '-h']);
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'init'}]);
+    assert.deepEqual(
+      helpCommandSpy.firstCall.args,
+      [{command: 'init'}, defaultConfig]
+    );
   });
 
   test('displays version information when called with the --version flag', () => {

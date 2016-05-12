@@ -9,6 +9,7 @@
  */
 
 import * as commandLineCommands from 'command-line-commands';
+
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
@@ -16,6 +17,7 @@ import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
+import {ProjectConfig, ProjectConfigOptions} from './project-config';
 import {Environment} from './environment/environment'
 import {buildEnvironment} from './environments/environments'
 
@@ -24,12 +26,36 @@ export class PolymerCli {
   commandDescriptors = [];
   commands : Map<String, Command> = new Map();
   cli : commandLineCommands.CLI;
-  globalArguments = [{
-    name: 'env',
-    type: function(value): Environment {
-      return buildEnvironment(value);
+  globalArguments = [
+    {
+      name: 'env',
+      type: function(value): Environment {
+        return buildEnvironment(value);
+      },
+    },
+    {
+      name: 'main',
+      description: 'The main HTML file',
+    },
+    {
+      name: 'shell',
+      type: String,
+      description: 'The app shell.',
+    },
+    {
+      name: 'entrypoint',
+      type: String,
+      multiple: true,
+      description:
+        'Pages that can be navigated to other than the main HTML file.'
+    },
+    {
+      name: 'root',
+      type: String,
+      description: 'The root directory to find sources and place build. ' +
+          'Defaults to current working directory'
     }
-  }];
+  ];
   constructor() {
     this.addCommand(new BuildCommand());
     this.addCommand(new HelpCommand(this.commands));
@@ -68,7 +94,9 @@ export class PolymerCli {
     let cliCommand = this.cli.parse(args);
     let command = this.commands.get(cliCommand.name || 'help');
 
-    command.run(cliCommand.options).catch((error) => {
+    let config = new ProjectConfig(cliCommand.options);
+
+    command.run(cliCommand.options, config).catch((error) => {
       console.error('error', error);
     });
   }

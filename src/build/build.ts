@@ -21,6 +21,7 @@ import * as vfs from 'vinyl-fs';
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Bundler} from './bundle';
+import {ProjectConfig} from '../project-config';
 import {HtmlProject} from './html-project';
 import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
@@ -33,10 +34,6 @@ const findConfig = require('liftoff/lib/find_config');
 const minimatchAll = require('minimatch-all');
 
 export interface BuildOptions {
-  root?: string;
-  main?: string;
-  shell?: string;
-  entrypoints?: string[];
   sources?: string[];
   dependencies?: string[];
   swPrecacheConfig?: string;
@@ -52,14 +49,13 @@ process.on('unhandledRejection', (error) => {
   console.error(error.stack);
 });
 
-export function build(options?: BuildOptions): Promise<any> {
+export function build(options?: BuildOptions, config?: ProjectConfig): Promise<any> {
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
-    let root = path.resolve(options.root || process.cwd());
-    let main = path.resolve(root, options.main || 'index.html');
-    let shell = options.shell && path.resolve(root, options.shell);
-    let entrypoints = (options.entrypoints || [])
-        .map((p) => path.resolve(root, p));
+    let root = config.root;
+    let main = config.main;
+    let shell = config.shell;
+    let entrypoints = config.entrypoints;
     let swPrecacheConfig = path.resolve(
         root, options.swPrecacheConfig || 'sw-precache-config.js');
     let sources = (options.sources || ['**/*'])

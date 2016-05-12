@@ -33,7 +33,7 @@ export class InitCommand implements Command {
     },
   ];
 
-  run(options): Promise<any> {
+  run(options, config): Promise<any> {
     // Defer dependency loading until this specific command is run
     const PolykartGenerator = require('../templates/polykart').PolykartGenerator;
     const YeomanEnvironment = require('yeoman-environment');
