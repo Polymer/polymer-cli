@@ -39,10 +39,14 @@ export class StreamAnalyzer extends Transform {
     this.shell = shell;
     this.entrypoints = entrypoints;
 
-    let _allEntrypoints = [];
+    this.allEntrypoints = [];
     // It's important that shell is first for document-ordering of imports
-    if (shell) _allEntrypoints.push(shell);
-    this.allEntrypoints = _allEntrypoints.concat(entrypoints);
+    if (shell) {
+      this.allEntrypoints.push(shell);
+    }
+    if (entrypoints) {
+      this.allEntrypoints = this.allEntrypoints.concat(entrypoints);
+    }
 
     this.resolver = new StreamResolver(this);
     this.loader = new Loader();
@@ -84,7 +88,17 @@ export class StreamAnalyzer extends Transform {
     });
   }
 
-  isEntrypoint(file) {
+  /**
+   * A side-channel to add files to the resolver that did not come throgh the
+   * stream transformation. This is for generated files, like
+   * shared-bundle.html. This should probably be refactored so that the files
+   * can be injected into the stream.
+   */
+  addFile(file) {
+    this.files.set(file.path, file);
+  }
+
+  isEntrypoint(file): boolean {
     return this.allEntrypoints.indexOf(file.path) !== -1;
   }
 
