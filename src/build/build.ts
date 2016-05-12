@@ -19,13 +19,13 @@ import {PassThrough, Readable} from 'stream';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
 
+import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Bundler} from './bundle';
 import {HtmlProject} from './html-project';
 import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
 import {PrefetchTransform} from './prefetch';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
-import {StreamResolver} from './stream-resolver';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
 import {VulcanizeTransform} from './vulcanize';
 
@@ -102,6 +102,7 @@ export function build(options?: BuildOptions): Promise<any> {
 
     let sourcesProject = new HtmlProject();
     let depsProject = new HtmlProject();
+    let analyzer = new StreamAnalyzer(root, shell, entrypoints);
     let bundler = new Bundler(root, shell, entrypoints);
 
     let sourcesStream =
@@ -117,29 +118,17 @@ export function build(options?: BuildOptions): Promise<any> {
         .pipe(optimize(optimizeOptions))
         .pipe(depsProject.rejoin)
 
-    let allFiles = mergeStream(sourcesStream, depsStream);
+    let allFiles = mergeStream(sourcesStream, depsStream)
+        .pipe(analyzer);
 
     let serviceWorkerName = 'service-worker.js';
 
-    let prefetchDepsResolve: (value: Map<string, string[]>) => void;
-    let prefetchDepsPromise = new Promise<Map<string, string[]>>((resolve) => {
-      prefetchDepsResolve = resolve;
-    });
-
-    let prefetchTransform = new PrefetchTransform(root, [main], entrypoints, prefetchDepsPromise);
     let unbundledPhase = new ForkedVinylStream(allFiles)
-      .pipe(prefetchTransform)
-      .pipe(vfs.dest('build/unbundled'))
+      .pipe(new PrefetchTransform(root, main, shell, entrypoints, analyzer))
+      .pipe(vfs.dest('build/unbundled'));
 
     let bundledPhase = new ForkedVinylStream(allFiles)
       .pipe(bundler.bundle)
-      .on('finish', () => {
-        bundler._entrypointToDeps.then((map) => {
-          // forward shell's dependencies to main to be prefetched
-          map.set(main, map.get(shell));
-          prefetchDepsResolve(map);
-        });
-      })
       .pipe(vfs.dest('build/bundled'));
 
     let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
