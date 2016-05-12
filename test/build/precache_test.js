@@ -50,17 +50,20 @@ suite('sw-precache', () => {
     });
 
     test('without config', (done) => {
-      precache.generateServiceWorker({
-        root: path.resolve(__dirname, 'precache/static'),
-        main: path.resolve(__dirname, 'precache/static/fizz.html'),
-        buildRoot,
-        deps: [],
-        serviceWorkerPath: path.join(buildRoot, 'service-worker.js')
-      }).then(() => {
-        let content = fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
-        assert.include(content, '/fizz.html', 'main file should be present');
-        done();
-      });
+      precache.parsePreCacheConfig(path.join(__dirname, 'nope')).then(() => {
+        precache.generateServiceWorker({
+          root: path.resolve(__dirname, 'precache/static'),
+          main: path.resolve(__dirname, 'precache/static/fizz.html'),
+          buildRoot,
+          deps: [],
+          serviceWorkerPath: path.join(buildRoot, 'service-worker.js')
+        }).then(() => {
+          let content =
+            fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
+          assert.include(content, '/fizz.html', 'main file should be present');
+          done();
+        });
+      }).catch((err) => done(err));
     });
 
     test('with config', (done) => {
