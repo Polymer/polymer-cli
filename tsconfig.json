@@ -55,6 +55,7 @@
     "custom_typings/github.d.ts",
     "custom_typings/hydrolysis.d.ts",
     "custom_typings/node.d.ts",
+    "custom_typings/plylog.d.ts",
     "custom_typings/temp.d.ts",
     "custom_typings/vinyl-fs.d.ts",
     "custom_typings/web-component-tester.d.ts",

@@ -12,6 +12,7 @@ import {Command} from './command';
 import {ArgDescriptor} from 'command-line-args';
 import {PolykartGenerator} from '../templates/polykart';
 
+import * as logging from 'plylog';
 import *  as YeomanEnvironment from 'yeoman-environment';
 
 // NOTE(fschott) 05-02-2015: Yeoman needs to load our generator in a non-standard way via require.resolve.
@@ -30,7 +31,7 @@ export class InitCommand implements Command {
       description: 'The template name',
       type: String,
       defaultOption: true,
-    },
+    }
   ];
 
   run(options, config): Promise<any> {
@@ -39,10 +40,15 @@ export class InitCommand implements Command {
     const YeomanEnvironment = require('yeoman-environment');
 
     return new Promise((resolve, reject) => {
+      let logger = logging.getLogger('cli.init');
       let templateName = options['name'] || 'polymer-init';
+
+      logger.debug('creating yeoman environment...');
       let env = new YeomanEnvironment();
       env.register(require.resolve('generator-polymer-init'), 'polymer-init:app');
       env.registerStub(PolykartGenerator, 'polykart:app');
+
+      logger.debug('running template...', templateName);
       env.run(templateName, {}, () => resolve());
     });
   }

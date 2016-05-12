@@ -9,7 +9,7 @@
  */
 
 import * as commandLineCommands from 'command-line-commands';
-
+import * as logging from 'plylog';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
@@ -25,7 +25,9 @@ export class PolymerCli {
 
   commandDescriptors = [];
   commands : Map<String, Command> = new Map();
-  cli : commandLineCommands.CLI;
+  logger: logging.PolymerLogger;
+  cli: commandLineCommands.CLI;
+  args: string[];
   globalArguments = [
     {
       name: 'env',
@@ -54,8 +56,37 @@ export class PolymerCli {
       description: 'The directory in which to find sources and place build. ' +
           'Defaults to current working directory',
     },
+    {
+      name: 'verbose',
+      description: 'turn on debugging output',
+      type: Boolean,
+      alias: 'v',
+    },
+    {
+      name: 'quiet',
+      description: 'silence output',
+      type: Boolean,
+      alias: 'q',
+    },
   ];
-  constructor() {
+
+  constructor(args) {
+    // If the "--quiet"/"-q" flag is ever present, set our global logging
+    // to quiet mode. Also set the level on the logger we've already created.
+    if (args.indexOf('--quiet') > -1 || args.indexOf('-q') > -1) {
+      logging.setQuiet();
+    }
+
+    // If the "--verbose"/"-v" flag is ever present, set our global logging
+    // to verbose mode. Also set the level on the logger we've already created.
+    if (args.indexOf('--verbose') > -1 || args.indexOf('-v') > -1) {
+      logging.setVerbose();
+    }
+
+    this.logger = logging.getLogger('cli.main');
+    this.logger.debug('got args:', { args: args });
+    this.args = args;
+
     this.addCommand(new BuildCommand());
     this.addCommand(new HelpCommand(this.commands));
     this.addCommand(new InitCommand());
@@ -65,6 +96,7 @@ export class PolymerCli {
   }
 
   addCommand(command) {
+    this.logger.debug('adding command', command.name);
     this.commands.set(command.name, command);
     this.commandDescriptors.push({
       name: command.name,
@@ -73,10 +105,12 @@ export class PolymerCli {
     });
   }
 
-  run(args) {
-    // If the "--version"/"-v" flag is ever present, just print
+  run() {
+    this.logger.debug('running...');
+
+    // If the "--version" flag is ever present, just print
     // the current version. Useful for globally installed CLIs.
-    if (args.indexOf('--version') > -1 || args.indexOf('-v') > -1) {
+    if (this.args.indexOf('--version') > -1) {
       console.log(require('../package.json').version);
       return;
     }
@@ -85,16 +119,17 @@ export class PolymerCli {
     // command. This gets us around some limitations in our arguments
     // parsers and keeps us from having to implement additional help logic
     // inside of each command.
-    if (args.indexOf('--help') > -1 || args.indexOf('-h') > -1) {
-      args = ['help', args[0]];
+    if (this.args.indexOf('--help') > -1 || this.args.indexOf('-h') > -1) {
+      this.args = ['help', this.args[0]];
     }
 
     this.cli = commandLineCommands(this.commandDescriptors);
-    let cliCommand = this.cli.parse(args);
+    let cliCommand = this.cli.parse(this.args);
+    this.logger.debug('command parsed', cliCommand);
     let command = this.commands.get(cliCommand.name || 'help');
-
     let config = new ProjectConfig('polymer.json', cliCommand.options);
 
+    this.logger.debug('Running command...');
     command.run(cliCommand.options, config).catch((error) => {
       console.error('error', error);
     });
