@@ -28,7 +28,7 @@ export class HelpCommand implements Command {
     console.log(`\nRun \`polymer help <command>\` for help with a specific command.\n`);
   }
 
-  run(options): Promise<any> {
+  run(options, config): Promise<any> {
     return new Promise<any>((resolve, _) => {
       if (!options || !options.command) {
         this.printGeneralUsage();

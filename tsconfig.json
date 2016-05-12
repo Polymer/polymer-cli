@@ -41,6 +41,7 @@
     "src/commands/lint.ts",
     "src/commands/serve.ts",
     "src/commands/test.ts",
+    "src/config.ts",
     "src/environment/environment.ts",
     "src/environments/environments.ts",
     "src/environments/reyserve.ts",

@@ -11,10 +11,12 @@
 'use strict';
 
 const assert = require('chai').assert;
+const Config = require('../../lib/config').Config;
 const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
 const sinon = require('sinon');
 
 suite('help', () => {
+  const defaultConfig = new Config();
 
   test('displays help for a specific command when called with that command', () => {
     let cli = new PolymerCli();
@@ -22,7 +24,10 @@ suite('help', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run(['help', 'build']);
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'build'}]);
+    assert.deepEqual(
+      helpCommandSpy.firstCall.args,
+      [{command: 'build'}, defaultConfig]
+    );
   });
 
   test('displays general help when the help command is called with no arguments', () => {
@@ -31,7 +36,7 @@ suite('help', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run(['help']);
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{}]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
   });
 
 });
