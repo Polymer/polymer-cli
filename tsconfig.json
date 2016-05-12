@@ -34,7 +34,6 @@
     "src/build/streams.ts",
     "src/build/sw-precache.ts",
     "src/build/uglify-transform.ts",
-    "src/build/vulcanize.ts",
     "src/commands/build.ts",
     "src/commands/command.ts",
     "src/commands/help.ts",

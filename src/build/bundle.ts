@@ -17,7 +17,6 @@ import File = require('vinyl');
 import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Logger} from './logger';
 import {compose} from './streams';
-import {VulcanizeTransform} from './vulcanize';
 
 // non-ES module
 const minimatchAll = require('minimatch-all');
