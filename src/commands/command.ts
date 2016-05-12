@@ -1,12 +1,12 @@
 import {ArgDescriptor} from 'command-line-args';
 
-import {Config} from '../config';
+import {ProjectConfig} from '../project-config';
 
 export interface Command {
   name: string;
   description: string;
   args: ArgDescriptor[];
-  run(options: {[name: string]: string}, config: Config): Promise<any>;
+  run(options: {[name: string]: string}, config: ProjectConfig): Promise<any>;
 }
 
 export {ArgDescriptor} from 'command-line-args';

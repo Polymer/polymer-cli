@@ -17,7 +17,7 @@ import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
-import {Config, ConfigOptions} from './config';
+import {ProjectConfig, ProjectConfigOptions} from './project-config';
 import {Environment} from './environment/environment'
 import {buildEnvironment} from './environments/environments'
 
@@ -94,7 +94,7 @@ export class PolymerCli {
     let cliCommand = this.cli.parse(args);
     let command = this.commands.get(cliCommand.name || 'help');
 
-    let config = new Config(cliCommand.options);
+    let config = new ProjectConfig(cliCommand.options);
 
     command.run(cliCommand.options, config).catch((error) => {
       console.error('error', error);

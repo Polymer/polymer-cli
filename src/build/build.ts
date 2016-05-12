@@ -21,7 +21,7 @@ import * as vfs from 'vinyl-fs';
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Bundler} from './bundle';
-import {Config} from '../config';
+import {ProjectConfig} from '../project-config';
 import {HtmlProject} from './html-project';
 import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
@@ -49,7 +49,7 @@ process.on('unhandledRejection', (error) => {
   console.error(error.stack);
 });
 
-export function build(options?: BuildOptions, config?: Config): Promise<any> {
+export function build(options?: BuildOptions, config?: ProjectConfig): Promise<any> {
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
     let root = config.root;

@@ -20,12 +20,6 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'main',
-      description: 'The main HTML file',
-      defaultValue: 'index.html',
-      defaultOption: true
-    },
-    {
       name: 'sources',
       multiple: true,
       description: 'The sources file to build',

@@ -8,25 +8,41 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as fs from 'fs';
 import * as path from 'path';
 
-export interface ConfigOptions {
+export interface ProjectConfigOptions {
   root?: string;
   main?: string;
   shell?: string;
   entrypoints?: string[];
 }
 
-export class Config {
+export class ProjectConfig {
   root: string;
   main: string;
   shell: string;
   entrypoints: string[];
 
-  constructor(options: ConfigOptions) {
+  constructor(options: ProjectConfigOptions) {
     options = options || {};
     this.root = options.root || process.cwd();
-    this.main = path.resolve(this.root, options.main || 'index.html');
+    if (options.main) {
+      this.main = path.resolve(this.root, options.main);
+    } else {
+      try {
+        let bowerConfigContent =
+          fs.readFileSync(path.resolve(this.root, 'bower.json'), 'utf-8');
+        let bowerConfig = JSON.parse(bowerConfigContent);
+        if (bowerConfig.main && typeof bowerConfig.main === 'string') {
+          this.main = path.resolve(this.root, bowerConfig.main);
+        } else {
+          throw new Error("NO!");
+        }
+      } catch(_) {
+        console.error(_);
+      }
+    }
     if (options.shell) {
       this.shell = path.resolve(this.root, options.shell);
     }
