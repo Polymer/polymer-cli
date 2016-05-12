@@ -10,7 +10,7 @@
 
 'use strict';
 
-const Config = require('../../lib/config').Config;
+const Config = require('../../lib/project-config').ProjectConfig;
 const packageJSON = require('../../package.json');
 const assert = require('chai').assert;
 const PolymerCli = require('../../lib/polymer-cli').PolymerCli;

@@ -36,11 +36,9 @@ export class ProjectConfig {
         let bowerConfig = JSON.parse(bowerConfigContent);
         if (bowerConfig.main && typeof bowerConfig.main === 'string') {
           this.main = path.resolve(this.root, bowerConfig.main);
-        } else {
-          throw new Error("NO!");
         }
       } catch(_) {
-        console.error(_);
+        this.main = path.resolve(this.root, 'index.html');
       }
     }
     if (options.shell) {
