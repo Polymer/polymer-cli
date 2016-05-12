@@ -103,7 +103,7 @@ export function build(options?: BuildOptions): Promise<any> {
     let sourcesProject = new HtmlProject();
     let depsProject = new HtmlProject();
     let analyzer = new StreamAnalyzer(root, shell, entrypoints);
-    let bundler = new Bundler(root, shell, entrypoints);
+    let bundler = new Bundler(root, shell, entrypoints, analyzer);
 
     let sourcesStream =
       vfs.src(allSources, {cwdbase: true, allowEmpty: true})
@@ -128,7 +128,7 @@ export function build(options?: BuildOptions): Promise<any> {
       .pipe(vfs.dest('build/unbundled'));
 
     let bundledPhase = new ForkedVinylStream(allFiles)
-      .pipe(bundler.bundle)
+      .pipe(bundler)
       .pipe(vfs.dest('build/bundled'));
 
     let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
@@ -142,21 +142,22 @@ export function build(options?: BuildOptions): Promise<any> {
       });
     };
 
-    waitForAll([unbundledPhase, bundledPhase]).then(() => {
-      let unbundledDeps = Array.from(bundler.streamResolver.requestedUrls);
+    waitForAll([unbundledPhase, bundledPhase])
+      .then(() => analyzer.analyze)
+      .then((depsIndex) => {
+        let unbundledDeps = Array.from(depsIndex.depsToEntrypoints.keys());
+        let bundledDeps = analyzer.allEntrypoints
+            .concat(bundler.sharedBundleUrl);
 
-      let bundledDeps = Array.from(bundler.entrypointFiles.keys());
-      bundledDeps.push(bundler.sharedBundleUrl);
-
-      parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
-        Promise.all([
-          genSW('build/unbundled', unbundledDeps, swConfig),
-          genSW('build/bundled', bundledDeps, swConfig)
-        ]).then(() => {
-          buildResolve();
-        });
-      })
-    });
+        parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
+          Promise.all([
+            genSW('build/unbundled', unbundledDeps, swConfig),
+            genSW('build/bundled', bundledDeps, swConfig)
+          ]).then(() => {
+            buildResolve();
+          });
+        })
+      });
   });
 }
 

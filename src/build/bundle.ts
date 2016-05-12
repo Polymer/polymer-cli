@@ -14,109 +14,89 @@ import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 
+import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Logger} from './logger';
 import {compose} from './streams';
-import {StreamResolver} from './stream-resolver';
 import {VulcanizeTransform} from './vulcanize';
-import {Analyzer, Loader} from 'hydrolysis';
 
 // non-ES module
 const minimatchAll = require('minimatch-all');
 const through = require('through2').obj;
 const Vulcanize = require('vulcanize');
 
-export class Bundler {
+export class Bundler extends Transform {
 
   root: string;
   shell: string;
-  sharedBundlePath: string;
-  sharedBundleUrl: string;
+  entrypoints: string[];
   allEntrypoints: string[];
 
-  streamResolver: StreamResolver;
-  loader: Loader;
-  bundle: Transform;
-  vulcanize: Transform;
-  analyzer: Analyzer;
-  entrypointFiles: Map<string, File>;
+  sharedBundlePath: string;
+  sharedBundleUrl: string;
+
+  analyzer: StreamAnalyzer;
   sharedFile: File;
 
   _verboseLogging = false;
 
-  _entrypointToDepsResolve: (value: Map<string, string[]>) => void;
-  _entrypointToDeps: Promise<Map<string, string[]>>;
-
-  constructor(root: string, shell: string, entrypoints?: string[]) {
+  constructor(root: string, shell: string, entrypoints: string[],
+      analyzer: StreamAnalyzer) {
+    super({objectMode: true});
     this.root = root;
     this.shell = shell;
-    this._entrypointToDeps = new Promise<Map<string, string[]>>((resolve) => {
-      this._entrypointToDepsResolve = resolve;
-    })
+    this.entrypoints = entrypoints;
+
+    this.allEntrypoints = [];
+    // It's important that shell is first for document-ordering of imports
+    if (shell) {
+      this.allEntrypoints.push(shell);
+    }
+    if (entrypoints) {
+      this.allEntrypoints = this.allEntrypoints.concat(entrypoints);
+    }
+    this.analyzer = analyzer;
+
     this.sharedBundlePath = 'shared-bundle.html';
     this.sharedBundleUrl = path.resolve(root, this.sharedBundlePath);
-
-    let _allEntrypoints = [];
-    // It's important that shell is first for document-ordering of imports
-    if (shell) _allEntrypoints.push(shell);
-    this.allEntrypoints =
-        Array.prototype.concat.apply(_allEntrypoints, entrypoints);
-
-    this.streamResolver = new StreamResolver({
-        entrypoints: this.allEntrypoints,
-        basePath: root,
-        root: root,
-        redirect: 'bower_components/',
-      });
-
-    this.loader = new Loader();
-    this.loader.addResolver(this.streamResolver);
-    this.analyzer = new Analyzer(false, this.loader);
-
-    this.vulcanize = new VulcanizeTransform({
-      fsResolver: this.streamResolver,
-      inlineScripts: true,
-      inlineCss: true,
-      stripComments: true,
-    });
-
-    this.entrypointFiles = new Map();
-
-    let throughStream = through((file, enc, cb) => {
-      if (this.isEntryPoint(file.path)) {
-        // don't pass on any entrypoints until the stream has ended
-        this.entrypointFiles.set(file.path, file);
-        cb();
-      } else {
-        cb(null, file);
-      }
-    },
-    (done) => {
-      this._buildBundles().then((bundles: Map<string, string>) => {
-        for (let entrypoint of this.entrypointFiles.keys()) {
-          let file = this.entrypointFiles.get(entrypoint);
-          let contents = bundles.get(entrypoint);
-          file.contents = new Buffer(contents);
-          throughStream.push(file);
-        }
-        let sharedBundle = bundles.get(this.sharedBundleUrl);
-        if (sharedBundle) {
-          let contents = bundles.get(this.sharedBundleUrl);
-          this.sharedFile.contents = new Buffer(contents);
-          throughStream.push(this.sharedFile);
-        }
-        // end the stream
-        done();
-      });
-    });
-
-    this.bundle = compose([
-      this.streamResolver,
-      throughStream
-    ]);
   }
 
-  isEntryPoint(url: string): boolean {
-    return minimatchAll(url, this.allEntrypoints, {matchBase: true});
+  _transform(
+      file: File,
+      encoding: string,
+      callback: (error?, data?: File) => void
+    ) : void {
+
+    // If this is the entrypoint, hold on to the file, so that it's fully
+    // analyzed by the time down-stream transforms see it.
+    if (this.isEntrypoint(file)) {
+      callback(null, null);
+    } else {
+      callback(null, file);
+    }
+
+  }
+
+  _flush(done: (error?) => void) {
+    this._buildBundles().then((bundles: Map<string, string>) => {
+      for (let entrypoint of this.allEntrypoints) {
+        let file = this.analyzer.files.get(entrypoint);
+        let contents = bundles.get(entrypoint);
+        file.contents = new Buffer(contents);
+        this.push(file);
+      }
+      let sharedBundle = bundles.get(this.sharedBundleUrl);
+      if (sharedBundle) {
+        let contents = bundles.get(this.sharedBundleUrl);
+        this.sharedFile.contents = new Buffer(contents);
+        this.push(this.sharedFile);
+      }
+      // end the stream
+      done();
+    });
+  }
+
+  isEntrypoint(file): boolean {
+    return this.allEntrypoints.indexOf(file.path) !== -1;
   }
 
   _buildBundles(): Promise<Map<string, string>> {
@@ -141,7 +121,7 @@ export class Bundler {
       let promises = [];
 
       if (this.shell) {
-        let shellFile = this.streamResolver._files.get(this.shell);
+        let shellFile = this.analyzer.files.get(this.shell);
         console.assert(shellFile != null);
         let newShellContent = this._addSharedImportsToShell(bundles);
         shellFile.contents = new Buffer(newShellContent);
@@ -158,7 +138,7 @@ export class Bundler {
         promises.push(new Promise((resolve, reject) => {
           var vulcanize = new Vulcanize({
             abspath: null,
-            fsResolver: this.streamResolver,
+            fsResolver: this.analyzer.resolver,
             addedImports: addedImports,
             stripExcludes: excludes,
             inlineScripts: true,
@@ -201,7 +181,7 @@ export class Bundler {
     let shellDeps = bundles.get(this.shell)
         .map((d) => path.relative(path.dirname(this.shell), d));
 
-    let file = this.streamResolver._files.get(this.shell);
+    let file = this.analyzer.files.get(this.shell);
     console.assert(file != null);
     let contents = file.contents.toString();
     let doc = dom5.parse(contents);
@@ -254,11 +234,11 @@ export class Bundler {
       });
 
       // make the shared bundle visible to vulcanize
-      this.streamResolver.addFile(this.sharedFile);
+      this.analyzer.addFile(this.sharedFile);
 
       var vulcanize = new Vulcanize({
         abspath: null,
-        fsResolver: this.streamResolver,
+        fsResolver: this.analyzer.resolver,
         inlineScripts: true,
         inlineCss: true,
         inputUrl: this.sharedBundleUrl,
@@ -277,7 +257,7 @@ export class Bundler {
   }
 
   _getBundles() {
-    return this._getDepsToEntrypointIndex().then((indexes) => {
+    return this.analyzer.analyze.then((indexes) => {
       let depsToEntrypoints = indexes.depsToEntrypoints;
       let entrypointToDeps = indexes.entrypointToDeps;
       let bundles = new Map<string, string[]>();
@@ -324,84 +304,5 @@ export class Bundler {
       return bundles;
     });
   }
-
-  _getDepsToEntrypointIndex() {
-    // TODO: tsc is being really weird here...
-    let depsPromises = <Promise<string[]>[]>this.allEntrypoints.map(
-        (e) => this._getDependencies(e));
-
-    return Promise.all(depsPromises).then((value: any) => {
-      // tsc was giving a spurious error with `allDeps` as the parameter
-      let allDeps: string[][] = <string[][]>value;
-
-      // An index of dependency -> entrypoints that depend on it
-      let depsToEntrypoints = new Map<string, string[]>();
-
-      // An index of entrypoints -> dependencies
-      let entrypointToDeps = new Map<string, string[]>();
-
-      console.assert(this.allEntrypoints.length === allDeps.length);
-
-      for (let i = 0; i < allDeps.length; i++) {
-        let entrypoint = this.allEntrypoints[i];
-        let deps: string[] = allDeps[i];
-        console.assert(deps != null, `deps is null for ${entrypoint}`);
-
-        entrypointToDeps.set(entrypoint, deps);
-
-        for (let dep of deps) {
-          let entrypointList;
-          if (!depsToEntrypoints.has(dep)) {
-            entrypointList = [];
-            depsToEntrypoints.set(dep, entrypointList);
-          } else {
-            entrypointList = depsToEntrypoints.get(dep);
-          }
-          entrypointList.push(entrypoint);
-        }
-      }
-
-      this._entrypointToDepsResolve(entrypointToDeps);
-      return {
-        depsToEntrypoints,
-        entrypointToDeps,
-      };
-    });
-  }
-
-  /**
-   * Attempts to retreive document-order transitive dependencies for `url`.
-   */
-  _getDependencies(url: string): Promise<string[]> {
-    let visited = new Set();
-    let list = [];
-
-    // async depth-first traversal: waits for document load, then async iterates
-    // on dependencies. No return values are used, writes to visited and list.
-    //
-    // document.depHrefs is _probably_ document order, if all html imports are
-    // at the same level in the tree.
-    // See: https://github.com/Polymer/hydrolysis/issues/240
-    let _getDeps = (url: string) =>
-      this.analyzer.load(url).then((d) => _iterate(d.depHrefs.values()));
-
-    // async iteration: waits for _getDeps on a value to return before recursing
-    // to call _getDeps on the next value.
-    let _iterate = (iterator: Iterator<string>) => {
-      let next = iterator.next();
-      if (next.done || visited.has(next.value)) {
-        return Promise.resolve();
-      } else {
-        list.push(next.value);
-        visited.add(url);
-        return _getDeps(next.value).then((_) => _iterate(iterator));
-      }
-    }
-
-    // kick off the traversal from root, then resolve the list of dependencies
-    return _getDeps(url).then((_) => {
-      return list;
-    });
-  };
 
 }

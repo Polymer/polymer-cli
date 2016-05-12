@@ -16,9 +16,11 @@ const File = require('vinyl');
 const path = require('path');
 const stream = require('stream');
 
+const analyzer = require('../../lib/build/analyzer');
 const bundle = require('../../lib/build/bundle');
 
 const Bundler = bundle.Bundler;
+const StreamAnalyzer = analyzer.StreamAnalyzer;
 
 const root = '/root';
 
@@ -30,11 +32,14 @@ suite('Bundler', () => {
   let files;
 
   let setupTest = (options) => new Promise((resolve, reject) => {
-    bundler = new Bundler(root, options.shell, options.entrypoints);
+    let analyzer = new StreamAnalyzer(root, options.shell, options.entrypoints);
+    bundler = new Bundler(root, options.shell, options.entrypoints, analyzer);
     sourceStream = new stream.Readable({
       objectMode: true,
     });
-    bundledStream = sourceStream.pipe(bundler.bundle);
+    bundledStream = sourceStream
+        .pipe(analyzer)
+        .pipe(bundler);
     files = new Map();
     bundledStream.on('data', (file) => {
       files.set(file.path, file);
