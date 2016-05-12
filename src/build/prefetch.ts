@@ -60,6 +60,9 @@ export class PrefetchTransform extends Transform {
     let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
     for (let dep of deps) {
       dep = path.relative(file.dirname, dep);
+      if (type === 'prefetch') {
+        dep = path.join('/', dep);
+      }
       let link = dom5.constructors.element('link');
       dom5.setAttribute(link, 'rel', type);
       dom5.setAttribute(link, 'href', dep);
@@ -89,6 +92,7 @@ export class PrefetchTransform extends Transform {
       for (let prefetch of this.prefetchTargets) {
         let file = this.fileMap.get(prefetch);
         let deps = map.get(prefetch);
+        // prefetched deps should be absolute, as they will be in the main file
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
