@@ -94,7 +94,7 @@ export class PolymerCli {
     let cliCommand = this.cli.parse(args);
     let command = this.commands.get(cliCommand.name || 'help');
 
-    let config = new ProjectConfig(cliCommand.options);
+    let config = new ProjectConfig('polymer.json', cliCommand.options);
 
     command.run(cliCommand.options, config).catch((error) => {
       console.error('error', error);
