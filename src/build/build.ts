@@ -27,7 +27,6 @@ import {optimize, OptimizeOptions} from './optimize';
 import {PrefetchTransform} from './prefetch';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
-import {VulcanizeTransform} from './vulcanize';
 
 // non-ES compatible modules
 const findConfig = require('liftoff/lib/find_config');
