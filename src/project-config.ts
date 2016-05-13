@@ -13,16 +13,16 @@ import * as path from 'path';
 
 export interface ProjectConfigOptions {
   root?: string;
-  main?: string;
+  entrypoint?: string;
   shell?: string;
-  entrypoints?: string[];
+  fragments?: string[];
 }
 
 export class ProjectConfig {
   root: string;
-  main: string;
+  entrypoint: string;
   shell: string;
-  entrypoints: string[];
+  fragments: string[];
 
   static fromConfigFile(filepath: string): ProjectConfig {
     try {
@@ -52,26 +52,26 @@ export class ProjectConfig {
       }
     }
     this.root = options.root || process.cwd();
-    if (options.main) {
-      this.main = path.resolve(this.root, options.main);
+    if (options.entrypoint) {
+      this.entrypoint = path.resolve(this.root, options.entrypoint);
     } else {
       try {
         let bowerConfigContent =
           fs.readFileSync(path.resolve(this.root, 'bower.json'), 'utf-8');
         let bowerConfig = JSON.parse(bowerConfigContent);
         if (bowerConfig.main && typeof bowerConfig.main === 'string') {
-          this.main = path.resolve(this.root, bowerConfig.main);
+          this.entrypoint = path.resolve(this.root, bowerConfig.main);
         }
       } catch(_) {
-        this.main = path.resolve(this.root, 'index.html');
+        this.entrypoint = path.resolve(this.root, 'index.html');
       }
     }
     if (options.shell) {
       this.shell = path.resolve(this.root, options.shell);
     }
-    this.entrypoints = [];
-    if (options.entrypoints) {
-      this.entrypoints = options.entrypoints.map(
+    this.fragments = [];
+    if (options.fragments) {
+      this.fragments = options.fragments.map(
         (e) => path.resolve(this.root, e)
       );
     }

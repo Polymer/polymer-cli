@@ -32,8 +32,8 @@ suite('Bundler', () => {
   let files;
 
   let setupTest = (options) => new Promise((resolve, reject) => {
-    let analyzer = new StreamAnalyzer(root, options.shell, options.entrypoints);
-    bundler = new Bundler(root, options.shell, options.entrypoints, analyzer);
+    let analyzer = new StreamAnalyzer(root, options.shell, options.fragments);
+    bundler = new Bundler(root, options.shell, options.fragments, analyzer);
     sourceStream = new stream.Readable({
       objectMode: true,
     });
@@ -95,8 +95,8 @@ suite('Bundler', () => {
     assert.isFalse(hasImport(doc, '/root/framework.html'));
   }));
 
-  test('two entrypoints', () => setupTest({
-    entrypoints: ['/root/shell.html', '/root/entrypointA.html'],
+  test('two fragments', () => setupTest({
+    fragments: ['/root/shell.html', '/root/entrypointA.html'],
     files: [framework(), shell(), entrypointA()],
   }).then((files) => {
     // shell doesn't import framework
@@ -117,7 +117,7 @@ suite('Bundler', () => {
 
   test('shell and entrypoint', () => setupTest({
     shell: '/root/shell.html',
-    entrypoints: ['/root/entrypointA.html'],
+    fragments: ['/root/entrypointA.html'],
     files: [framework(), shell(), entrypointA()],
   }).then((files) => {
     // shell bundles framework
@@ -134,9 +134,9 @@ suite('Bundler', () => {
     assert.isNotOk(getFile('shared-bundle.html'));
   }));
 
-  test('shell and entrypoints with shared dependency', () => setupTest({
+  test('shell and fragments with shared dependency', () => setupTest({
     shell: '/root/shell.html',
-    entrypoints: ['/root/entrypointB.html', '/root/entrypointC.html'],
+    fragments: ['/root/entrypointB.html', '/root/entrypointC.html'],
     files: [framework(), shell(), entrypointB(), entrypointC(), commonDep()],
   }).then((files) => {
     // shell bundles framework

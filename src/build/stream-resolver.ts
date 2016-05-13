@@ -22,7 +22,7 @@ export interface FileGetter {
 }
 
 export interface StreamResolverOptions {
-  entrypoints?: string[];
+  fragments?: string[];
 
   /**
    * Hostname to match for absolute urls.
@@ -58,7 +58,7 @@ export class StreamResolver extends Transform /* implements Resolver */ {
   base: string;
   root: string;
   redirect: string;
-  entrypoints: string[];
+  fragments: string[];
 
   constructor(options: StreamResolverOptions) {
     super({objectMode: true});
@@ -66,19 +66,19 @@ export class StreamResolver extends Transform /* implements Resolver */ {
     this.base = options.basePath && decodeURIComponent(options.basePath);
     this.root = options.root && path.normalize(options.root);
     this.redirect = options.redirect;
-    if (!options.entrypoints || options.entrypoints.length < 1) {
-      throw new Error('entrypoints must be specified');
+    if (!options.fragments || options.fragments.length < 1) {
+      throw new Error('fragments must be specified');
     }
-    this.entrypoints = options.entrypoints;
+    this.fragments = options.fragments;
   }
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    let isEntrypoint = minimatchAll(file.path, this.entrypoints, {
+    let isFragment = minimatchAll(file.path, this.fragments, {
       matchBase: true,
     });
 
     // If this is the entrypoint, pass the file on
-    if (isEntrypoint) {
+    if (isFragment) {
       this._files.set(file.path, file);
       callback(null, file);
       return;

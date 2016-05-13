@@ -17,38 +17,38 @@ suite('Project Config', () => {
   test('sane defaults', () => {
     let config = new ProjectConfig();
     assert.equal(config.root, process.cwd());
-    assert.equal(config.main, path.resolve('index.html'));
+    assert.equal(config.entrypoint, path.resolve('index.html'));
     assert.equal(config.shell, undefined);
-    assert.deepEqual(config.entrypoints, []);
+    assert.deepEqual(config.fragments, []);
   });
 
   test('read from flags', () => {
     let config = new ProjectConfig(null, {
-      main: 'index.html',
-      entrypoints: ['foo.html'],
+      entrypoint: 'index.html',
+      fragments: ['foo.html'],
       shell: 'bar.html'
     });
     assert.equal(config.root, process.cwd());
-    assert.equal(config.main, path.resolve('index.html'));
+    assert.equal(config.entrypoint, path.resolve('index.html'));
     assert.equal(config.shell, path.resolve('bar.html'));
-    assert.deepEqual(config.entrypoints, [path.resolve('foo.html')]);
+    assert.deepEqual(config.fragments, [path.resolve('foo.html')]);
   });
 
   test('inits from config file', () => {
     let config = new ProjectConfig(path.join(__dirname, 'polymer.json'));
     assert.equal(config.root, process.cwd());
-    assert.equal(config.main, path.resolve('foo.html'));
-    assert.deepEqual(config.entrypoints, [path.resolve('bar.html')])
+    assert.equal(config.entrypoint, path.resolve('foo.html'));
+    assert.deepEqual(config.fragments, [path.resolve('bar.html')])
   });
 
   test('flags override config file', () => {
     let config = new ProjectConfig(path.join(__dirname, 'polymer.json'), {
-      main: 'bar.html',
-      entrypoints: [],
+      entrypoint: 'bar.html',
+      fragments: [],
       shell: 'zizz.html'
     });
-    assert.equal(config.main, path.resolve('bar.html'));
-    assert.deepEqual(config.entrypoints, []);
+    assert.equal(config.entrypoint, path.resolve('bar.html'));
+    assert.deepEqual(config.fragments, []);
     assert.equal(config.shell, path.resolve('zizz.html'));
   });
 
@@ -56,6 +56,6 @@ suite('Project Config', () => {
     let config = new ProjectConfig(null, {
       root: path.resolve(__dirname, 'bower')
     });
-    assert.equal(config.main, path.resolve(__dirname, 'bower', 'foo.html'));
+    assert.equal(config.entrypoint, path.resolve(__dirname, 'bower', 'foo.html'));
   });
 });

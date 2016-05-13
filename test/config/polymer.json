@@ -1,6 +1,6 @@
 {
-  "main": "foo.html",
-  "entrypoints": [
+  "entrypoint": "foo.html",
+  "fragments": [
     "bar.html"
   ]
 }

@@ -47,7 +47,7 @@ export interface SWConfig {
   verbose?: boolean;
 }
 
-export function generateServiceWorker(options: generateServiceWorkerOptions)
+export function generateServiceWorker(options: GenerateServiceWorkerOptions)
 : Promise<void> {
   let swConfig = options.swConfig || <SWConfig>{};
   // strip root prefix, so buildRoot prefix can be added safely
@@ -57,7 +57,7 @@ export function generateServiceWorker(options: generateServiceWorkerOptions)
     }
     return p;
   });
-  let mainHtml = options.main.substring(options.root.length);
+  let mainHtml = options.entrypoint.substring(options.root.length);
   let precacheFiles = new Set(swConfig.staticFileGlobs);
   deps.forEach((p) => precacheFiles.add(p));
   precacheFiles.add(mainHtml);
@@ -93,7 +93,7 @@ export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
   });
 }
 
-export interface generateServiceWorkerOptions {
+export interface GenerateServiceWorkerOptions {
   /**
    * folder containing files to be served by the service worker.
    */
@@ -101,7 +101,7 @@ export interface generateServiceWorkerOptions {
   /**
    * Main file to serve from service worker.
    */
-  main: string;
+  entrypoint: string;
   /**
    * Output folder for the service worker bundle
    */

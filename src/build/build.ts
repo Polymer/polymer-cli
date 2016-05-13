@@ -53,9 +53,9 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
     let root = config.root;
-    let main = config.main;
+    let entrypoint = config.entrypoint;
     let shell = config.shell;
-    let entrypoints = config.entrypoints;
+    let fragments = config.fragments;
     let swPrecacheConfig = path.resolve(
         root, options.swPrecacheConfig || 'sw-precache-config.js');
     let sources = (options.sources || ['**/*'])
@@ -72,13 +72,13 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     ];
 
     let allSources = [];
-    allSources.push(main);
+    allSources.push(entrypoint);
     if (shell) allSources.push(shell);
-    allSources = allSources.concat(entrypoints, sources, sourceExcludes);
+    allSources = allSources.concat(fragments, sources, sourceExcludes);
 
-    let allEntrypoints = [];
-    if (shell) allEntrypoints.push(shell);
-    allEntrypoints = allEntrypoints.concat(entrypoints);
+    let allFragments = [];
+    if (shell) allFragments.push(shell);
+    allFragments = allFragments.concat(fragments);
 
     let optimizeOptions: OptimizeOptions = {
       html: {
@@ -97,8 +97,8 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
 
     let sourcesProject = new HtmlProject();
     let depsProject = new HtmlProject();
-    let analyzer = new StreamAnalyzer(root, shell, entrypoints);
-    let bundler = new Bundler(root, shell, entrypoints, analyzer);
+    let analyzer = new StreamAnalyzer(root, shell, fragments);
+    let bundler = new Bundler(root, shell, fragments, analyzer);
 
     let sourcesStream =
       vfs.src(allSources, {cwdbase: true, allowEmpty: true})
@@ -119,7 +119,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     let serviceWorkerName = 'service-worker.js';
 
     let unbundledPhase = new ForkedVinylStream(allFiles)
-      .pipe(new PrefetchTransform(root, main, shell, entrypoints, analyzer))
+      .pipe(new PrefetchTransform(root, entrypoint, shell, fragments, analyzer))
       .pipe(vfs.dest('build/unbundled'));
 
     let bundledPhase = new ForkedVinylStream(allFiles)
@@ -129,7 +129,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
       return generateServiceWorker({
         root,
-        main,
+        entrypoint,
         deps,
         buildRoot,
         swConfig: clone(swConfig),
@@ -140,8 +140,8 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     waitForAll([unbundledPhase, bundledPhase])
       .then(() => analyzer.analyze)
       .then((depsIndex) => {
-        let unbundledDeps = Array.from(depsIndex.depsToEntrypoints.keys());
-        let bundledDeps = analyzer.allEntrypoints
+        let unbundledDeps = Array.from(depsIndex.depsToFragments.keys());
+        let bundledDeps = analyzer.allFragments
             .concat(bundler.sharedBundleUrl);
 
         parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
