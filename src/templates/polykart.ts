@@ -50,7 +50,7 @@ export function getGenerator(options?) {
     }
 
     install() {
-      (<any>this).bowerInstall();
+      this.installDependencies();
     }
   }
 }
