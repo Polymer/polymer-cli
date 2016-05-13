@@ -8,6 +8,9 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as commandLineArgs from 'command-line-args';
+import * as logging from 'plylog';
+
 import {Command} from './command';
 
 const polylint = require('polylint/lib/cli');
@@ -52,7 +55,30 @@ export class LintCommand implements Command {
   ];
 
   run(options, config): Promise<any> {
-    return polylint.runWithOptions(options)
-        .then(() => null);
+    let logger = logging.getLogger('cli.lint');
+
+    if (config.inputs.length === 0) {
+      let argsCli = commandLineArgs(this.args);
+
+      logger.warn('No inputs specified. Please use the --entrypoint, --shell ' +
+          'or --fragment flags');
+
+      console.info(argsCli.getUsage({
+        title: `polymer ${this.name}`,
+        description: this.description,
+      }));
+      return Promise.resolve();
+    }
+
+    return polylint.runWithOptions({
+      input: config.inputs.map((i) => i.substring(config.root.length)),
+      root: config.root,
+      // TODO: read into config
+      bowerdir: 'bower_components',
+      policy: options.policy,
+      'config-file': options['config-file'],
+      'config-field': options['config-field'],
+      'no-recursion': options['no-recursion'],
+    }).then(() => null);
   }
 }

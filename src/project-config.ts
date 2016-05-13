@@ -23,6 +23,7 @@ export class ProjectConfig {
   entrypoint: string;
   shell: string;
   fragments: string[];
+  inputs: string[];
 
   static fromConfigFile(filepath: string): ProjectConfig {
     try {
@@ -38,10 +39,10 @@ export class ProjectConfig {
   }
 
   constructor(configFile?: string, options?: ProjectConfigOptions) {
-    this.init(configFile, options);
+    this._init(configFile, options);
   }
 
-  init(configFile?: string, options?: ProjectConfigOptions) {
+  _init(configFile?: string, options?: ProjectConfigOptions) {
     options = options || {};
     if (configFile) {
       // config file is default, options will override
@@ -75,5 +76,10 @@ export class ProjectConfig {
         (e) => path.resolve(this.root, e)
       );
     }
+
+    this.inputs = [];
+    if (this.entrypoint) this.inputs.push(this.entrypoint);
+    if (this.shell) this.inputs.push(this.shell);
+    this.inputs = this.inputs.concat(this.fragments);
   }
 }

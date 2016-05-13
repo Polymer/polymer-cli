@@ -39,16 +39,6 @@ export interface BuildOptions {
   swPrecacheConfig?: string;
 }
 
-process.on('uncaughtException', (error) => {
-  console.log(`Caught exception: ${error}`);
-  console.error(error.stack);
-});
-
-process.on('unhandledRejection', (error) => {
-  console.log(`Promise rejection: ${error}`);
-  console.error(error.stack);
-});
-
 export function build(options?: BuildOptions, config?: ProjectConfig): Promise<any> {
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
