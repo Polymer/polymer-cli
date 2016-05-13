@@ -18,12 +18,12 @@ const vfs = require('vinyl-fs-fake');
 suite('Analzyer', () => {
   suite('DepsIndex', () => {
     test('fragment to deps list has only uniques', (done) => {
-      let entrypoint = path.resolve('test/build/analyzer');
-      let analyzer = new StreamAnalyzer(entrypoint, null, [
+      let root = path.resolve('test/build/analyzer');
+      let analyzer = new StreamAnalyzer(root, null, null, [
         'a.html',
         'b.html',
       ]);
-      vfs.src(entrypoint + '/**', {cwdbase: true})
+      vfs.src(root + '/**', {cwdbase: true})
       .pipe(analyzer)
       .on('finish', () => {
         analyzer.analyze.then((depsIndex) => {

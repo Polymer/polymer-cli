@@ -27,6 +27,7 @@ let logger = logging.getLogger('cli.build.bundle');
 
 export class Bundler extends Transform {
 
+  entrypoint: string;
   root: string;
   shell: string;
   fragments: string[];
@@ -40,10 +41,11 @@ export class Bundler extends Transform {
 
   _verboseLogging = false;
 
-  constructor(root: string, shell: string, fragments: string[],
-      analyzer: StreamAnalyzer) {
+  constructor(root: string, entrypoint: string,
+      shell: string, fragments: string[], analyzer: StreamAnalyzer) {
     super({objectMode: true});
     this.root = root;
+    this.entrypoint = entrypoint;
     this.shell = shell;
     this.fragments = fragments;
 
@@ -52,6 +54,11 @@ export class Bundler extends Transform {
     if (shell) {
       this.allFragments.push(shell);
     }
+
+    if (entrypoint) {
+      this.allFragments.push(entrypoint);
+    }
+
     if (fragments) {
       this.allFragments = this.allFragments.concat(fragments);
     }
@@ -118,7 +125,7 @@ export class Bundler extends Transform {
       }
 
       let sharedDepsBundle = this.shell || this.sharedBundleUrl;
-      let sharedDeps = bundles.get(sharedDepsBundle);
+      let sharedDeps = bundles.get(sharedDepsBundle) || [];
       let promises = [];
 
       if (this.shell) {
@@ -129,10 +136,10 @@ export class Bundler extends Transform {
       }
 
       for (let fragment of this.allFragments) {
-        let addedImports = (fragment == this.shell || !this.shell)
+        let addedImports = (fragment == this.shell && this.shell)
             ? []
             : [path.relative(path.dirname(fragment), sharedDepsBundle)]
-        let excludes = (fragment == this.shell)
+        let excludes = (fragment == this.shell && this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
 

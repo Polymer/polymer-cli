@@ -15,6 +15,7 @@ export interface ProjectConfigOptions {
   root?: string;
   entrypoint?: string;
   shell?: string;
+  fragment?: string[];
   fragments?: string[];
 }
 
@@ -71,10 +72,10 @@ export class ProjectConfig {
       this.shell = path.resolve(this.root, options.shell);
     }
     this.fragments = [];
-    if (options.fragments) {
-      this.fragments = options.fragments.map(
-        (e) => path.resolve(this.root, e)
-      );
+    // fragment comes from command-line-args `--fragment`
+    let frag = options.fragment || options.fragments;
+    if (frag) {
+      this.fragments = frag.map((e) => path.resolve(this.root, e));
     }
 
     this.inputs = [];

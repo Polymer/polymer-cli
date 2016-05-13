@@ -21,6 +21,7 @@ let logger = logging.getLogger('cli.build.analyzer');
 
 export class StreamAnalyzer extends Transform {
 
+  root: string;
   entrypoint: string;
   shell: string;
   fragments: string[];
@@ -35,8 +36,9 @@ export class StreamAnalyzer extends Transform {
   _analyzeResolve: (DepsIndex) => void;
   analyze: Promise<DepsIndex>;
 
-  constructor(entrypoint: string, shell: string, fragments?: string[]) {
+  constructor(root: string, entrypoint: string, shell: string, fragments: string[]) {
     super({objectMode: true});
+    this.root = root;
     this.entrypoint = entrypoint;
     this.shell = shell;
     this.fragments = fragments;
@@ -46,6 +48,11 @@ export class StreamAnalyzer extends Transform {
     if (shell) {
       this.allFragments.push(shell);
     }
+
+    if (entrypoint) {
+      this.allFragments.push(entrypoint);
+    }
+
     if (fragments) {
       this.allFragments = this.allFragments.concat(fragments);
     }
@@ -207,8 +214,8 @@ class StreamResolver implements Resolver {
 
       // If the file path is not already under root, such as /bower_components/...,
       // prefix it with root
-      if (!filepath.startsWith(this.analyzer.entrypoint)) {
-        filepath = path.join(this.analyzer.entrypoint, filepath);
+      if (!filepath.startsWith(this.analyzer.root)) {
+        filepath = path.join(this.analyzer.root, filepath);
       }
 
       let file = this.analyzer.files.get(filepath);
