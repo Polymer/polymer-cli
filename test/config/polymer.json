@@ -1,0 +1,6 @@
+{
+  "main": "foo.html",
+  "entrypoints": [
+    "bar.html"
+  ]
+}

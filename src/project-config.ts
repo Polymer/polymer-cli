@@ -24,8 +24,33 @@ export class ProjectConfig {
   shell: string;
   entrypoints: string[];
 
-  constructor(options: ProjectConfigOptions) {
+  static fromConfigFile(filepath: string): ProjectConfig {
+    try {
+      let configContent = fs.readFileSync(filepath, 'utf-8');
+      return JSON.parse(configContent);
+    } catch(error) {
+      // don't log if error is just "file not found"
+      if (error.code !== 'ENOENT') {
+        console.log('Could not load config file');
+        console.error(error);
+      }
+    }
+  }
+
+  constructor(configFile?: string, options?: ProjectConfigOptions) {
+    this.init(configFile, options);
+  }
+
+  init(configFile?: string, options?: ProjectConfigOptions) {
     options = options || {};
+    if (configFile) {
+      // config file is default, options will override
+      let fromFile = ProjectConfig.fromConfigFile(configFile);
+      if (fromFile) {
+        Object.assign(fromFile, options);
+        options = fromFile;
+      }
+    }
     this.root = options.root || process.cwd();
     if (options.main) {
       this.main = path.resolve(this.root, options.main);
