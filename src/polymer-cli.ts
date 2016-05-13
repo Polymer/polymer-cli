@@ -10,6 +10,7 @@
 
 import * as commandLineCommands from 'command-line-commands';
 import * as logging from 'plylog';
+import {ArgDescriptor} from './commands/command';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
@@ -28,9 +29,11 @@ export class PolymerCli {
   logger: logging.PolymerLogger;
   cli: commandLineCommands.CLI;
   args: string[];
-  globalArguments = [
+  globalArguments: ArgDescriptor[] = [
     {
       name: 'env',
+      description: 'The environment to use to specialize certain commands, '
+          + 'like build',
       type: function(value): Environment {
         return buildEnvironment(value);
       },
@@ -95,14 +98,39 @@ export class PolymerCli {
     this.addCommand(new TestCommand());
   }
 
-  addCommand(command) {
+  addCommand(command: Command) {
     this.logger.debug('adding command', command.name);
     this.commands.set(command.name, command);
     this.commandDescriptors.push({
       name: command.name,
-      definitions: this.globalArguments.concat(command.args),
+      definitions: this.mergeDefinitions(command, this.globalArguments),
       description: command.description,
     });
+  }
+
+  mergeDefinitions(command: Command, globals: ArgDescriptor[]) {
+    let mergedArgs = new Map();
+    let defaultOption = null;
+
+    let addAll = (args: ArgDescriptor[]) => {
+      for (let definition of args) {
+        let name = definition.name;
+        mergedArgs.set(definition, definition);
+        if (mergedArgs.has(name)) {
+          throw new Error(`Duplicate argument definition in ${command.name}: ` +
+              `${name}`);
+        }
+        if (defaultOption && definition.defaultOption) {
+          throw new Error(`Multiple default arguments in ${command.name}: ` +
+              `${defaultOption} and ${name}`);
+        }
+        defaultOption = name;
+      }
+    }
+
+    if (command.args) addAll(command.args);
+    if (globals) addAll(globals);
+    return Array.from(mergedArgs.values());
   }
 
   run() {
