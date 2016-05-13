@@ -17,7 +17,39 @@ export class LintCommand implements Command {
 
   description = 'Lints the project';
 
-  args = polylint.argumentDefinitions;
+  args = [
+    {
+      name: "policy",
+      type: String,
+      alias: "p",
+      description: "Your jsconf.json policy file.",
+      defaultValue: null
+    },
+    {
+      name: "config-file",
+      type: String,
+      defaultValue: "bower.json",
+      description: (
+        "If inputs are specified, look for `config-field` in this JSON file."
+      )
+    },
+    {
+      name: "config-field",
+      type: String,
+      defaultValue: "main",
+      description: (
+        "If config-file is used for inputs, this field determines which " +
+        "file(s) are linted."
+      )
+    },
+    {
+      name: "no-recursion",
+      type: Boolean,
+      description: (
+        "Only report errors on specified input files, not from their dependencies."
+      )
+    }
+  ];
 
   run(options, config): Promise<any> {
     return polylint.runWithOptions(options)
