@@ -17,10 +17,10 @@ import {StreamAnalyzer, DepsIndex} from './analyzer';
 
 export class PrefetchTransform extends Transform {
   root: string;
-  main: string;
+  entrypoint: string;
   shell: string;
-  entrypoints: string[];
-  allEntrypoints: string[];
+  fragments: string[];
+  allFragments: string[];
   fileMap: Map<string, File>;
   analyzer: StreamAnalyzer;
 
@@ -34,7 +34,7 @@ export class PrefetchTransform extends Transform {
     /**
      * The main HTML file. This will have link rel=prefetches added to it.
      */
-    main: string,
+    entrypoint: string,
 
     /**
      * The app shell. This will have link rel=imports added to it.
@@ -45,7 +45,7 @@ export class PrefetchTransform extends Transform {
      * List of files that will have dependencies flattened with
      * `<link rel="import">`
      */
-    entrypoints: string[],
+    fragments: string[],
 
     /**
      * The analyzer to retreive dependency information from.
@@ -54,12 +54,12 @@ export class PrefetchTransform extends Transform {
   ) {
     super({objectMode: true});
     this.root = root;
-    this.main = main;
+    this.entrypoint = entrypoint;
     this.shell = shell;
-    this.entrypoints = entrypoints;
-    this.allEntrypoints = entrypoints;
+    this.fragments = fragments;
+    this.allFragments = fragments;
     if (shell) {
-      this.allEntrypoints = this.allEntrypoints.concat(shell);
+      this.allFragments = this.allFragments.concat(shell);
     }
     this.analyzer = analyzer;
     this.fileMap = new Map<string, File>();
@@ -99,8 +99,8 @@ export class PrefetchTransform extends Transform {
   }
 
   isImportantFile(file) {
-    return file.path == this.main ||
-        this.allEntrypoints.indexOf(file.path) > -1;
+    return file.path == this.entrypoint ||
+        this.allFragments.indexOf(file.path) > -1;
   }
 
   _flush(done: (err?) => void) {
@@ -108,22 +108,22 @@ export class PrefetchTransform extends Transform {
       return done();
     }
     this.analyzer.analyze.then((depsIndex: DepsIndex) => {
-      let entrypointToDeps = new Map(depsIndex.entrypointToDeps);
+      let fragmentToDeps = new Map(depsIndex.fragmentToDeps);
 
-      if (this.main && this.shell) {
-        let file = this.fileMap.get(this.main);
+      if (this.entrypoint && this.shell) {
+        let file = this.fileMap.get(this.entrypoint);
         // forward shell's dependencies to main to be prefetched
-        let deps = entrypointToDeps.get(this.shell);
+        let deps = fragmentToDeps.get(this.shell);
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
         this.push(file);
-        this.fileMap.delete(this.main);
+        this.fileMap.delete(this.entrypoint);
       }
 
-      for (let im of this.allEntrypoints) {
+      for (let im of this.allFragments) {
         let file = this.fileMap.get(im);
-        let deps = entrypointToDeps.get(im);
+        let deps = fragmentToDeps.get(im);
         if (deps) {
           this.pullUpDeps(file, deps, 'import');
         }
@@ -133,7 +133,7 @@ export class PrefetchTransform extends Transform {
 
       for (let leftover of this.fileMap.keys()) {
         console.log(
-          'Warning: File was listed in entrypoints but not found in stream:',
+          'Warning: File was listed in fragments but not found in stream:',
           leftover
         );
         this.push(this.fileMap.get(leftover));

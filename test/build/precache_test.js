@@ -53,14 +53,14 @@ suite('sw-precache', () => {
       precache.parsePreCacheConfig(path.join(__dirname, 'nope')).then(() => {
         precache.generateServiceWorker({
           root: path.resolve(__dirname, 'precache/static'),
-          main: path.resolve(__dirname, 'precache/static/fizz.html'),
+          entrypoint: path.resolve(__dirname, 'precache/static/fizz.html'),
           buildRoot,
           deps: [],
           serviceWorkerPath: path.join(buildRoot, 'service-worker.js')
         }).then(() => {
           let content =
             fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
-          assert.include(content, '/fizz.html', 'main file should be present');
+          assert.include(content, '/fizz.html', 'entrypoint file should be present');
           done();
         });
       }).catch((err) => done(err));
@@ -70,7 +70,7 @@ suite('sw-precache', () => {
       precache.parsePreCacheConfig(configFile).then((config) => {
         return precache.generateServiceWorker({
           root: path.resolve(__dirname, 'precache/static'),
-          main: path.resolve(__dirname, 'precache/static/fizz.html'),
+          entrypoint: path.resolve(__dirname, 'precache/static/fizz.html'),
           buildRoot,
           deps: [],
           swConfig: config,
@@ -78,7 +78,7 @@ suite('sw-precache', () => {
         });
       }).then(() => {
         let content = fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
-        assert.include(content, '/fizz.html', 'main file should be present');
+        assert.include(content, '/fizz.html', 'entrypoint file should be present');
         assert.include(content, '/foo.js', 'staticFileGlobs should match foo.js');
         done();
       });

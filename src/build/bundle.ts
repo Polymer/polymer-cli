@@ -27,8 +27,8 @@ export class Bundler extends Transform {
 
   root: string;
   shell: string;
-  entrypoints: string[];
-  allEntrypoints: string[];
+  fragments: string[];
+  allFragments: string[];
 
   sharedBundlePath: string;
   sharedBundleUrl: string;
@@ -38,20 +38,20 @@ export class Bundler extends Transform {
 
   _verboseLogging = false;
 
-  constructor(root: string, shell: string, entrypoints: string[],
+  constructor(root: string, shell: string, fragments: string[],
       analyzer: StreamAnalyzer) {
     super({objectMode: true});
     this.root = root;
     this.shell = shell;
-    this.entrypoints = entrypoints;
+    this.fragments = fragments;
 
-    this.allEntrypoints = [];
+    this.allFragments = [];
     // It's important that shell is first for document-ordering of imports
     if (shell) {
-      this.allEntrypoints.push(shell);
+      this.allFragments.push(shell);
     }
-    if (entrypoints) {
-      this.allEntrypoints = this.allEntrypoints.concat(entrypoints);
+    if (fragments) {
+      this.allFragments = this.allFragments.concat(fragments);
     }
     this.analyzer = analyzer;
 
@@ -77,9 +77,9 @@ export class Bundler extends Transform {
 
   _flush(done: (error?) => void) {
     this._buildBundles().then((bundles: Map<string, string>) => {
-      for (let entrypoint of this.allEntrypoints) {
-        let file = this.analyzer.files.get(entrypoint);
-        let contents = bundles.get(entrypoint);
+      for (let fragment of this.allFragments) {
+        let file = this.analyzer.files.get(fragment);
+        let contents = bundles.get(fragment);
         file.contents = new Buffer(contents);
         this.push(file);
       }
@@ -95,7 +95,7 @@ export class Bundler extends Transform {
   }
 
   isEntrypoint(file): boolean {
-    return this.allEntrypoints.indexOf(file.path) !== -1;
+    return this.allFragments.indexOf(file.path) !== -1;
   }
 
   _buildBundles(): Promise<Map<string, string>> {
@@ -126,11 +126,11 @@ export class Bundler extends Transform {
         shellFile.contents = new Buffer(newShellContent);
       }
 
-      for (let entrypoint of this.allEntrypoints) {
-        let addedImports = (entrypoint == this.shell || !this.shell)
+      for (let fragment of this.allFragments) {
+        let addedImports = (fragment == this.shell || !this.shell)
             ? []
-            : [path.relative(path.dirname(entrypoint), sharedDepsBundle)]
-        let excludes = (entrypoint == this.shell)
+            : [path.relative(path.dirname(fragment), sharedDepsBundle)]
+        let excludes = (fragment == this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
 
@@ -142,17 +142,17 @@ export class Bundler extends Transform {
             stripExcludes: excludes,
             inlineScripts: true,
             inlineCss: true,
-            inputUrl: entrypoint,
+            inputUrl: fragment,
           });
           vulcanize.process(null, (err, doc) => {
             if (err) {
               reject(err);
             } else {
               if (this._verboseLogging) {
-                console.log(`vulcanized doc for ${entrypoint}: ${doc.length}`);
+                console.log(`vulcanized doc for ${fragment}: ${doc.length}`);
               }
               resolve({
-                url: entrypoint,
+                url: fragment,
                 contents: doc,
               });
             }
@@ -257,8 +257,8 @@ export class Bundler extends Transform {
 
   _getBundles() {
     return this.analyzer.analyze.then((indexes) => {
-      let depsToEntrypoints = indexes.depsToEntrypoints;
-      let entrypointToDeps = indexes.entrypointToDeps;
+      let depsToEntrypoints = indexes.depsToFragments;
+      let fragmentToDeps = indexes.fragmentToDeps;
       let bundles = new Map<string, string[]>();
 
       let addImport = (from: string, to: string) => {
@@ -277,26 +277,26 @@ export class Bundler extends Transform {
       // We want to collect dependencies that appear in > 1 entrypoint, but
       // we need to collect them in document order, so rather than iterate
       // directly through each dependency in depsToEntrypoints, we iterate
-      // through entrypoints in entrypointToDeps, which has dependencies in
-      // order for each entrypoint. Then we iterate through dependencies for
-      // each entrypoint and look up how many entrypoints depend on it.
-      // This assumes an ordering between entrypoints, since they could have
+      // through fragments in fragmentToDeps, which has dependencies in
+      // order for each fragment. Then we iterate through dependencies for
+      // each fragment and look up how many fragments depend on it.
+      // This assumes an ordering between fragments, since they could have
       // conflicting orders between their top level imports. The shell should
       // always come first.
-      for (let entrypoint of entrypointToDeps.keys()) {
-        let dependencies = entrypointToDeps.get(entrypoint);
+      for (let fragment of fragmentToDeps.keys()) {
+        let dependencies = fragmentToDeps.get(fragment);
         for (let dep of dependencies) {
-          let entrypointCount = depsToEntrypoints.get(dep).length;
-          if (entrypointCount > 1) {
+          let fragmentCount = depsToEntrypoints.get(dep).length;
+          if (fragmentCount > 1) {
             if (this.shell) {
               addImport(this.shell, dep);
               // addImport(entrypoint, this.shell);
             } else {
               addImport(this.sharedBundleUrl, dep);
-              addImport(entrypoint, this.sharedBundleUrl);
+              addImport(fragment, this.sharedBundleUrl);
             }
           } else {
-            addImport(entrypoint, dep);
+            addImport(fragment, dep);
           }
         }
       }

@@ -34,27 +34,26 @@ export class PolymerCli {
       },
     },
     {
-      name: 'main',
-      description: 'The main HTML file',
+      name: 'entrypoint',
+      description: 'The main HTML file that will requested for all routes.',
     },
     {
       name: 'shell',
       type: String,
-      description: 'The app shell.',
+      description: 'The app shell HTML import',
     },
     {
-      name: 'entrypoint',
+      name: 'fragment',
       type: String,
       multiple: true,
-      description:
-        'Pages that can be navigated to other than the main HTML file.'
+      description: 'HTML imports that are loaded on-demand.',
     },
     {
       name: 'root',
       type: String,
-      description: 'The root directory to find sources and place build. ' +
-          'Defaults to current working directory'
-    }
+      description: 'The directory in which to find sources and place build. ' +
+          'Defaults to current working directory',
+    },
   ];
   constructor() {
     this.addCommand(new BuildCommand());

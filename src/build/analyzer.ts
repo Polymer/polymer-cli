@@ -19,10 +19,10 @@ const minimatchAll = require('minimatch-all');
 
 export class StreamAnalyzer extends Transform {
 
-  root: string;
+  entrypoint: string;
   shell: string;
-  entrypoints: string[];
-  allEntrypoints: string[];
+  fragments: string[];
+  allFragments: string[];
 
   resolver: StreamResolver;
   loader: Loader;
@@ -33,19 +33,19 @@ export class StreamAnalyzer extends Transform {
   _analyzeResolve: (DepsIndex) => void;
   analyze: Promise<DepsIndex>;
 
-  constructor(root: string, shell: string, entrypoints?: string[]) {
+  constructor(entrypoint: string, shell: string, fragments?: string[]) {
     super({objectMode: true});
-    this.root = root;
+    this.entrypoint = entrypoint;
     this.shell = shell;
-    this.entrypoints = entrypoints;
+    this.fragments = fragments;
 
-    this.allEntrypoints = [];
+    this.allFragments = [];
     // It's important that shell is first for document-ordering of imports
     if (shell) {
-      this.allEntrypoints.push(shell);
+      this.allFragments.push(shell);
     }
-    if (entrypoints) {
-      this.allEntrypoints = this.allEntrypoints.concat(entrypoints);
+    if (fragments) {
+      this.allFragments = this.allFragments.concat(fragments);
     }
 
     this.resolver = new StreamResolver(this);
@@ -68,7 +68,7 @@ export class StreamAnalyzer extends Transform {
 
     // If this is the entrypoint, hold on to the file, so that it's fully
     // analyzed by the time down-stream transforms see it.
-    if (this.isEntrypoint(file)) {
+    if (this.isFragment(file)) {
       callback(null, null);
     } else {
       callback(null, file);
@@ -79,7 +79,7 @@ export class StreamAnalyzer extends Transform {
   _flush(done: (error?) => void) {
     this._getDepsToEntrypointIndex().then((depsIndex) => {
       // push held back files
-      for (let entrypoint of this.allEntrypoints) {
+      for (let entrypoint of this.allFragments) {
         let file = this.files.get(entrypoint);
         this.push(file);
       }
@@ -98,13 +98,13 @@ export class StreamAnalyzer extends Transform {
     this.files.set(file.path, file);
   }
 
-  isEntrypoint(file): boolean {
-    return this.allEntrypoints.indexOf(file.path) !== -1;
+  isFragment(file): boolean {
+    return this.allFragments.indexOf(file.path) !== -1;
   }
 
   _getDepsToEntrypointIndex(): Promise<DepsIndex> {
     // TODO: tsc is being really weird here...
-    let depsPromises = <Promise<string[]>[]>this.allEntrypoints.map(
+    let depsPromises = <Promise<string[]>[]>this.allFragments.map(
         (e) => this._getDependencies(e));
 
     return Promise.all(depsPromises).then((value: any) => {
@@ -112,35 +112,35 @@ export class StreamAnalyzer extends Transform {
       // tsc was giving a spurious error with `allDeps` as the parameter
       let allDeps: string[][] = <string[][]>value;
 
-      // An index of dependency -> entrypoints that depend on it
-      let depsToEntrypoints = new Map<string, string[]>();
+      // An index of dependency -> fragments that depend on it
+      let depsToFragments = new Map<string, string[]>();
 
-      // An index of entrypoints -> dependencies
-      let entrypointToDeps = new Map<string, string[]>();
+      // An index of fragments -> dependencies
+      let fragmentToDeps = new Map<string, string[]>();
 
-      console.assert(this.allEntrypoints.length === allDeps.length);
+      console.assert(this.allFragments.length === allDeps.length);
 
       for (let i = 0; i < allDeps.length; i++) {
-        let entrypoint = this.allEntrypoints[i];
+        let fragment = this.allFragments[i];
         let deps: string[] = allDeps[i];
-        console.assert(deps != null, `deps is null for ${entrypoint}`);
+        console.assert(deps != null, `deps is null for ${fragment}`);
 
-        entrypointToDeps.set(entrypoint, deps);
+        fragmentToDeps.set(fragment, deps);
 
         for (let dep of deps) {
           let entrypointList;
-          if (!depsToEntrypoints.has(dep)) {
+          if (!depsToFragments.has(dep)) {
             entrypointList = [];
-            depsToEntrypoints.set(dep, entrypointList);
+            depsToFragments.set(dep, entrypointList);
           } else {
-            entrypointList = depsToEntrypoints.get(dep);
+            entrypointList = depsToFragments.get(dep);
           }
-          entrypointList.push(entrypoint);
+          entrypointList.push(fragment);
         }
       }
       return {
-        depsToEntrypoints,
-        entrypointToDeps,
+        depsToFragments,
+        fragmentToDeps,
       };
     });
   }
@@ -179,8 +179,8 @@ export class StreamAnalyzer extends Transform {
 }
 
 export interface DepsIndex {
-  depsToEntrypoints: Map<string, string[]>;
-  entrypointToDeps: Map<string, string[]>;
+  depsToFragments: Map<string, string[]>;
+  fragmentToDeps: Map<string, string[]>;
 }
 
 class StreamResolver implements Resolver {
@@ -206,8 +206,8 @@ class StreamResolver implements Resolver {
 
       // If the file path is not already under root, such as /bower_components/...,
       // prefix it with root
-      if (!filepath.startsWith(this.analyzer.root)) {
-        filepath = path.join(this.analyzer.root, filepath);
+      if (!filepath.startsWith(this.analyzer.entrypoint)) {
+        filepath = path.join(this.analyzer.entrypoint, filepath);
       }
 
       let file = this.analyzer.files.get(filepath);
