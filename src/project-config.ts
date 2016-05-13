@@ -47,9 +47,7 @@ export class ProjectConfig {
       // config file is default, options will override
       let fromFile = ProjectConfig.fromConfigFile(configFile);
       if (fromFile) {
-        for (let option in options) {
-          fromFile[option] = options[option];
-        }
+        Object.assign(fromFile, options);
         options = fromFile;
       }
     }
