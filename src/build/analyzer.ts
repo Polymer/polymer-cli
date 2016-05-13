@@ -108,7 +108,6 @@ export class StreamAnalyzer extends Transform {
         (e) => this._getDependencies(e));
 
     return Promise.all(depsPromises).then((value: any) => {
-      console.log('analyzer._getDepsToEntrypointIndex B');
       // tsc was giving a spurious error with `allDeps` as the parameter
       let allDeps: string[][] = <string[][]>value;
 
@@ -149,8 +148,8 @@ export class StreamAnalyzer extends Transform {
    * Attempts to retreive document-order transitive dependencies for `url`.
    */
   _getDependencies(url: string): Promise<string[]> {
-    let visited = new Set();
-    let list = [];
+    let visited = new Set<string>();
+    let allDeps = new Set<string>();
     // async depth-first traversal: waits for document load, then async
     // iterates on dependencies. No return values are used, writes to visited
     // and list.
@@ -168,13 +167,13 @@ export class StreamAnalyzer extends Transform {
       if (next.done || visited.has(next.value)) {
         return Promise.resolve();
       } else {
-        list.push(next.value);
+        allDeps.add(next.value);
         visited.add(url);
-        return _getDeps(next.value).then((_) => _iterate(iterator));
+        return _getDeps(next.value).then(() => _iterate(iterator));
       }
     }
     // kick off the traversal from root, then resolve the list of dependencies
-    return _getDeps(url).then((_) => list);
+    return _getDeps(url).then(() => Array.from(allDeps));
   }
 }
 
