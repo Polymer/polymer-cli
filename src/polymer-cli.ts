@@ -22,11 +22,23 @@ import {ProjectConfig, ProjectConfigOptions} from './project-config';
 import {Environment} from './environment/environment'
 import {buildEnvironment} from './environments/environments'
 
+
+const logger = logging.getLogger('cli.main');
+
+process.on('uncaughtException', (error) => {
+  logger.error(`Uncaught exception: ${error}`);
+  if (error.stack) logger.error(error.stack);
+});
+
+process.on('unhandledRejection', (error) => {
+  logger.error(`Promise rejection: ${error}`);
+  if (error.stack) logger.error(error.stack);
+});
+
 export class PolymerCli {
 
   commandDescriptors = [];
   commands : Map<String, Command> = new Map();
-  logger: logging.PolymerLogger;
   cli: commandLineCommands.CLI;
   args: string[];
   globalArguments: ArgDescriptor[] = [
@@ -86,8 +98,7 @@ export class PolymerCli {
       logging.setVerbose();
     }
 
-    this.logger = logging.getLogger('cli.main');
-    this.logger.debug('got args:', { args: args });
+    logger.debug('got args:', { args: args });
     this.args = args;
 
     this.addCommand(new BuildCommand());
@@ -99,7 +110,7 @@ export class PolymerCli {
   }
 
   addCommand(command: Command) {
-    this.logger.debug('adding command', command.name);
+    logger.debug('adding command', command.name);
     this.commands.set(command.name, command);
     this.commandDescriptors.push({
       name: command.name,
@@ -134,7 +145,7 @@ export class PolymerCli {
   }
 
   run() {
-    this.logger.debug('running...');
+    logger.debug('running...');
 
     // If the "--version" flag is ever present, just print
     // the current version. Useful for globally installed CLIs.
@@ -153,13 +164,14 @@ export class PolymerCli {
 
     this.cli = commandLineCommands(this.commandDescriptors);
     let cliCommand = this.cli.parse(this.args);
-    this.logger.debug('command parsed', cliCommand);
+    logger.debug('command parsed', cliCommand);
     let command = this.commands.get(cliCommand.name || 'help');
     let config = new ProjectConfig('polymer.json', cliCommand.options);
 
-    this.logger.debug('Running command...');
+    logger.debug('Running command...');
     command.run(cliCommand.options, config).catch((error) => {
       console.error('error', error);
+      if (error.stack) console.error(error.stack);
     });
   }
 }
