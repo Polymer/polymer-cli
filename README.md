@@ -4,6 +4,14 @@ A command-line tool for Polymer projects
 
 ## Installation
 
+Check your Node.js version. 
+
+    $ node -v
+
+Polymer CLI targets the LTS version (4.x) of Node.js. It should
+work with the current version (6.x) but this is not officially
+supported. Anything below the LTS version is not supported. 
+
     $ npm install -g polymer-cli
 
 ## Usage
