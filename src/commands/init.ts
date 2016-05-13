@@ -14,6 +14,9 @@ import * as fs from 'fs';
 import * as logging from 'plylog';
 import * as chalk from 'chalk';
 
+let logger = logging.getLogger('cli.init');
+
+
 export class InitCommand implements Command {
   name = 'init';
 
@@ -37,8 +40,6 @@ export class InitCommand implements Command {
     const YeomanEnvironment = require('yeoman-environment');
 
     return new Promise((resolve, reject) => {
-      let logger = logging.getLogger('cli.init');
-
       logger.debug('creating yeoman environment...');
 
       let env = new YeomanEnvironment();

@@ -13,7 +13,9 @@ import * as logging from 'plylog';
 
 import {Command} from './command';
 
+let logger = logging.getLogger('cli.lint');
 const polylint = require('polylint/lib/cli');
+
 
 export class LintCommand implements Command {
   name = 'lint';
@@ -55,8 +57,6 @@ export class LintCommand implements Command {
   ];
 
   run(options, config): Promise<any> {
-    let logger = logging.getLogger('cli.lint');
-
     if (config.inputs.length === 0) {
       let argsCli = commandLineArgs(this.args);
 

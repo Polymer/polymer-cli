@@ -3,10 +3,10 @@ declare module 'plylog' {
   class PolymerLogger {
     constructor(options: any)
     setLevel(newLevel: string)
-    error(message: string, metadata?: any)
-    warn(message: string, metadata?: any)
-    info(message: string, metadata?: any)
-    debug(message: string, metadata?: any)
+    error(...data: any[])
+    warn(...data: any[])
+    info(...data: any[])
+    debug(...data: any[])
   }
 
   export function setVerbose();
