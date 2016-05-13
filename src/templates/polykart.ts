@@ -15,6 +15,7 @@ import {Base} from 'yeoman-generator';
 export const PolykartGenerator = getGenerator();
 
 export function getGenerator(options?) {
+  console.log('AJHHHH', options);
   let requestApi = options && options.requestApi;
   let githubApi = options && options.githubApi;
   let githubToken = options && options.githubToken;
@@ -44,13 +45,31 @@ export function getGenerator(options?) {
         })
         .catch((error) => {
           console.error('Could not load polykart template');
-          console.error(error);
-          done();
+          done(error);
         });
     }
 
     install() {
-      (<any>this).bowerInstall();
+      var _this = this;
+      var done = this.async();
+      this.log('\nProject generated!');
+
+      this.prompt({
+        type: 'confirm',
+        name: 'installDeps',
+        message: 'Install bower dependencies now?',
+      }, (props) => {
+        if (props.installDeps) {
+          (<any>this).bowerInstall();
+        }
+        done();
+      });
     }
+
+    end() {
+      this.log('\nSetup Complete!');
+      this.log('Check out the README for information about what to do next.\n');
+    }
+
   }
 }
