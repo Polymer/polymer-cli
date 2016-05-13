@@ -14,8 +14,10 @@ import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import * as url from 'url';
+import * as logging from 'plylog';
 
 const minimatchAll = require('minimatch-all');
+let logger = logging.getLogger('cli.build.stream-resolver');
 
 export interface FileGetter {
   (filePath: string, deferred: Deferred<string>): void;
@@ -127,7 +129,7 @@ export class StreamResolver extends Transform /* implements Resolver */ {
         deferred.resolve(file.contents.toString());
       } else {
         if (this._deferreds.has(local)) {
-          console.warn(`${local} already requested`);
+          logger.warn(`${local} already requested`);
         }
         // Otherwise save the deffered to resolve later
         this._deferreds.set(local, deferred);

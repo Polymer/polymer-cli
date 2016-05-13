@@ -14,8 +14,10 @@ import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import {parse as parseUrl} from 'url';
+import * as logging from 'plylog';
 
 const minimatchAll = require('minimatch-all');
+let logger = logging.getLogger('cli.build.analyzer');
 
 export class StreamAnalyzer extends Transform {
 
@@ -213,7 +215,7 @@ class StreamResolver implements Resolver {
       if (file) {
         deferred.resolve(file.contents.toString());
       } else {
-        console.log('No file found for', filepath);
+        logger.info('No file found for', filepath);
       }
       return true;
     }

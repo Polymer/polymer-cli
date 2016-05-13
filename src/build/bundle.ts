@@ -13,6 +13,7 @@ import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
+import * as logging from 'plylog';
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Logger} from './logger';
@@ -22,6 +23,7 @@ import {compose} from './streams';
 const minimatchAll = require('minimatch-all');
 const through = require('through2').obj;
 const Vulcanize = require('vulcanize');
+let logger = logging.getLogger('cli.build.bundle');
 
 export class Bundler extends Transform {
 
@@ -101,15 +103,15 @@ export class Bundler extends Transform {
   _buildBundles(): Promise<Map<string, string>> {
     return this._getBundles().then((bundles) => {
       if (this._verboseLogging) {
-        console.log('bundles:');
+        logger.info('bundles:');
         for (let url of bundles.keys()) {
           let deps = bundles.get(url);
           if (!deps) {
-            console.log('    no deps?');
+            logger.info('    no deps?');
           } else {
-            console.log(`  ${url} (${deps.length}):`);
+            logger.info(`  ${url} (${deps.length}):`);
             for (let dep of deps) {
-              console.log(`    ${dep}`);
+              logger.info(`    ${dep}`);
             }
           }
         }
@@ -149,7 +151,7 @@ export class Bundler extends Transform {
               reject(err);
             } else {
               if (this._verboseLogging) {
-                console.log(`vulcanized doc for ${fragment}: ${doc.length}`);
+                logger.info(`vulcanized doc for ${fragment}: ${doc.length}`);
               }
               resolve({
                 url: fragment,
@@ -222,7 +224,7 @@ export class Bundler extends Transform {
           .join('\n');
 
       if (this._verboseLogging) {
-        console.log('shared-bundle.html:\n', contents);
+        logger.info('shared-bundle.html:\n', contents);
       }
 
       this.sharedFile = new File({
