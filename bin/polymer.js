@@ -17,6 +17,7 @@ process.title = 'polymer';
 
 resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
   let lib = path ? require(path) : require('..');
-  let cli = new lib.PolymerCli();
-  cli.run(process.argv.slice(2));
+  let args = process.argv.slice(2);
+  let cli = new lib.PolymerCli(args);
+  cli.run();
 });

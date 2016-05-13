@@ -19,10 +19,10 @@ suite('help', () => {
   const defaultConfig = new Config();
 
   test('displays help for a specific command when called with that command', () => {
-    let cli = new PolymerCli();
+    let cli = new PolymerCli(['help', 'build']);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run(['help', 'build']);
+    cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(
       helpCommandSpy.firstCall.args,
@@ -31,10 +31,10 @@ suite('help', () => {
   });
 
   test('displays general help when the help command is called with no arguments', () => {
-    let cli = new PolymerCli();
+    let cli = new PolymerCli(['help']);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run(['help']);
+    cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
   });

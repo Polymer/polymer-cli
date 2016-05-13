@@ -38,6 +38,7 @@
     "merge-stream": "^1.0.0",
     "minimatch-all": "^1.0.2",
     "multipipe": "^0.3.0",
+    "plylog": "^0.2.0",
     "polylint": "^2.10.0",
     "polyserve": "^0.11.0",
     "request": "^2.72.0",
