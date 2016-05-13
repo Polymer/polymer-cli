@@ -4,13 +4,13 @@ A command-line tool for Polymer projects
 
 ## Installation
 
-Check your Node.js version. 
+Check your Node.js version.
 
     $ node -v
 
 Polymer CLI targets the LTS version (4.x) of Node.js. It should
 work with the current version (6.x) but this is not officially
-supported. Anything below the LTS version is not supported. 
+supported. Anything below the LTS version is not supported.
 
     $ npm install -g polymer-cli
 
@@ -39,3 +39,13 @@ supported. Anything below the LTS version is not supported.
 ### Start the development server
 
     $ polymer serve
+
+
+## Templates and Generators
+
+Polymer-CLI helps initialize new projects with the `init` command, and includes
+a couple of built-in templates.
+
+New templates can be distributed and installed via npm. Yeoman generators
+prefixed with `generator-polymer-init` will show up in the `polymer init`
+menu.
