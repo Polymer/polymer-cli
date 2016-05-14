@@ -12,6 +12,7 @@ import {Command} from './command';
 import {ArgDescriptor} from 'command-line-args';
 import * as fs from 'fs';
 import * as logging from 'plylog';
+import * as chalk from 'chalk';
 
 export class InitCommand implements Command {
   name = 'init';
@@ -88,11 +89,11 @@ export class InitCommand implements Command {
             }
 
             return {
-              name: name,
+              name: `${name}: ${chalk.dim(description)}`,
               value: generatorName,
               // inquirer is broken and doesn't print descriptions :(
               // keeping this so things work when it does
-              short: description,
+              short: name,
             };
           });
           inquirer.prompt([{
