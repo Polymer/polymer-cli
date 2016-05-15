@@ -16,9 +16,10 @@ const streamLib = require('stream');
 const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 
-const polykart = require('../../lib/templates/polykart.js');
+const createGithubGenerator =
+    require('../../lib/init/github.js').createGithubGenerator;
 
-suite('templates/polykart', () => {
+suite('init/guithub', () => {
 
   test('untars a release', (done) => {
     let mockRequestApi = (options) => {
@@ -43,10 +44,12 @@ suite('templates/polykart', () => {
       },
     };
 
-    let generator = new polykart.getGenerator({
+    let generator = new createGithubGenerator({
       requestApi: mockRequestApi,
       githubApi: mockGithubApi,
       githubToken: 'token-token',
+      owner: 'PolymerLabs',
+      repo: 'polykart',
     });
 
     helpers.run(generator)

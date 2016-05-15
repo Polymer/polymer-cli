@@ -30,8 +30,8 @@ export class InitCommand implements Command {
 
   run(options, config): Promise<any> {
     // Defer dependency loading until this specific command is run
-    const PolykartGenerator =
-        require('../templates/polykart').PolykartGenerator;
+    const createGithubGenerator =
+        require('../init/github').createGithubGenerator;
     const findup = require('findup');
     const inquirer = require('inquirer');
     const YeomanEnvironment = require('yeoman-environment');
@@ -40,10 +40,27 @@ export class InitCommand implements Command {
       let logger = logging.getLogger('cli.init');
 
       logger.debug('creating yeoman environment...');
+
       let env = new YeomanEnvironment();
+
+      let templateDescriptions = {
+        'basic': "built-in template for basic apps and elements",
+        'shop': "shop demo app",
+        'prpl-demo': "PRPL demo app",
+      };
+
       env.register(
           require.resolve('generator-polymer-init'), 'polymer-init-basic:app');
-      env.registerStub(PolykartGenerator, 'polymer-init-shop:app');
+      let shopGenerator = createGithubGenerator({
+        owner: 'PolymerLabs',
+        repo: 'polykart',
+      });
+      env.registerStub(shopGenerator, 'polymer-init-shop:app');
+      let prplGenerator = createGithubGenerator({
+        owner: 'PolymerLabs',
+        repo: 'prpl-demo',
+      });
+      env.registerStub(prplGenerator, 'polymer-init-prpl-demo:app');
 
       env.lookup(() => {
         let generators = env.getGeneratorsMeta();
@@ -78,8 +95,8 @@ export class InitCommand implements Command {
             let description = 'no description';
             let name = getDisplayName(generatorName);
 
-            if (name === 'basic') {
-              description = "built-in tempalte for basic apps and elements";
+            if (templateDescriptions.hasOwnProperty(name)) {
+              description = templateDescriptions[name];
             } else if (generator.resolved && generator.resolved !== 'unknown') {
               let metapath = findup('package.json', {cwd: generator.resolved});
               if (metapath) {
