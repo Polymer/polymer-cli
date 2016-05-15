@@ -23,6 +23,7 @@
     "node_modules/typescript/lib/lib.core.es6.d.ts"
   ],
   "files": [
+    "src/args.ts",
     "src/build/analyzer.ts",
     "src/build/build.ts",
     "src/build/bundle.ts",

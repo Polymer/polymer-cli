@@ -10,6 +10,8 @@
 
 import * as commandLineCommands from 'command-line-commands';
 import * as logging from 'plylog';
+
+import {globalArguments} from './args';
 import {ArgDescriptor} from './commands/command';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
@@ -41,49 +43,6 @@ export class PolymerCli {
   commands : Map<String, Command> = new Map();
   cli: commandLineCommands.CLI;
   args: string[];
-  globalArguments: ArgDescriptor[] = [
-    {
-      name: 'env',
-      description: 'The environment to use to specialize certain commands, '
-          + 'like build',
-      type: function(value): Environment {
-        return buildEnvironment(value);
-      },
-    },
-    {
-      name: 'entrypoint',
-      description: 'The main HTML file that will requested for all routes.',
-    },
-    {
-      name: 'shell',
-      type: String,
-      description: 'The app shell HTML import',
-    },
-    {
-      name: 'fragment',
-      type: String,
-      multiple: true,
-      description: 'HTML imports that are loaded on-demand.',
-    },
-    {
-      name: 'root',
-      type: String,
-      description: 'The directory in which to find sources and place build. ' +
-          'Defaults to current working directory',
-    },
-    {
-      name: 'verbose',
-      description: 'turn on debugging output',
-      type: Boolean,
-      alias: 'v',
-    },
-    {
-      name: 'quiet',
-      description: 'silence output',
-      type: Boolean,
-      alias: 'q',
-    },
-  ];
 
   constructor(args) {
     // If the "--quiet"/"-q" flag is ever present, set our global logging
@@ -114,7 +73,7 @@ export class PolymerCli {
     this.commands.set(command.name, command);
     this.commandDescriptors.push({
       name: command.name,
-      definitions: this.mergeDefinitions(command, this.globalArguments),
+      definitions: this.mergeDefinitions(command, globalArguments),
       description: command.description,
     });
   }
@@ -166,10 +125,13 @@ export class PolymerCli {
     let cliCommand = this.cli.parse(this.args);
     logger.debug('command parsed', cliCommand);
     let command = this.commands.get(cliCommand.name || 'help');
-    let config = new ProjectConfig('polymer.json', cliCommand.options);
+    let options = <{[name: string]: string}>(cliCommand.options
+        && cliCommand.options['_all']);
+
+    let config = new ProjectConfig('polymer.json', options);
 
     logger.debug('Running command...');
-    command.run(cliCommand.options, config).catch((error) => {
+    command.run(options, config).catch((error) => {
       console.error('error', error);
       if (error.stack) console.error(error.stack);
     });

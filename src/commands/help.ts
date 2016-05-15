@@ -1,6 +1,19 @@
-import {Command} from './command';
+/**
+ * @license
+ * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+ * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * Code distributed by Google as part of the polymer project is also
+ * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ */
+
+import * as chalk from 'chalk';
 import {CLI} from 'command-line-commands';
 import * as commandLineArgs from 'command-line-args';
+
+import {globalArguments} from '../args';
+import {Command} from './command';
 
 export class HelpCommand implements Command {
   name = 'help';
@@ -20,16 +33,28 @@ export class HelpCommand implements Command {
   }
 
   printGeneralUsage() {
-    console.log(`\nUsage: polymer <command>\n`);
-    console.log(`polymer supports the following commands:`);
+    console.log(helpHeader);
+    console.log(chalk.bold.underline(`Available Commands\n`));
     for (let command of this.commands.values()) {
-      console.log(`  ${command.name}\t\t${command.description}`);
+      console.log(`  ${chalk.bold(command.name)}\t\t${command.description}`);
     }
-    console.log(`\nRun \`polymer help <command>\` for help with a specific command.\n`);
+    this.printGlobalOptions();
+    console.log(`\nRun \`polymer help <command>\` for help with a specific ` +
+        `command.\n`);
+  }
+
+  printGlobalOptions() {
+    let globalCli = commandLineArgs(globalArguments);
+    console.log(globalCli.getUsage({
+      groups: {
+        global: 'Global Options',
+      }
+    }));
   }
 
   run(options, config): Promise<any> {
     return new Promise<any>((resolve, _) => {
+
       if (!options || !options.command) {
         this.printGeneralUsage();
         resolve(null);
@@ -37,6 +62,7 @@ export class HelpCommand implements Command {
       }
 
       let command = this.commands.get(options.command);
+
       if (!command) {
         this.printGeneralUsage();
         resolve(null);
@@ -48,7 +74,25 @@ export class HelpCommand implements Command {
         title: `polymer ${command.name}`,
         description: command.description,
       }));
+      this.printGlobalOptions();
       resolve(null);
     });
   }
 }
+
+const h = chalk.bold.underline;
+const b = chalk.blue;
+const m = chalk.magenta;
+const title = h('Polymer-CLI');
+const description = 'The multi-tool for Polymer projects';
+const usage = 'Usage: \`polymer <command> [options ...]\`';
+
+const helpHeader = '\n' +
+    b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
+    b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + title + '\n' +
+    b(' /\\  /   ') + m('/\\  /') + b('\\  /\\ ') + '\n' +
+    b('/__\\/   ') + m('/__\\/  ') + b('\\/__\\') + '  ' + description + '\n' +
+    b('\\  /\\  ') + m('/\\  /   ') + b('/\\  /') + '\n' +
+    b(' \\/__\\') + m('/__\\/   ') + b('/__\\/ ') + '  ' + usage + '\n' +
+    b('  \\  ') + m('/\\  /   ') + b('/\\  /  ') + '\n' +
+    b('   \\') + m('/__\\/   ') + b('/__\\/   ') + '\n';
