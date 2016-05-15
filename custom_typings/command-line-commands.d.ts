@@ -9,7 +9,7 @@ declare module 'command-line-commands' {
 
     interface Command {
       name: string;
-      options: {[name: string]: string};
+      options: {[name: string]: string|{[name: string]: string}};
     }
 
     interface CLI {
