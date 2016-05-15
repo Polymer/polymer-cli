@@ -130,7 +130,9 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     waitForAll([unbundledPhase, bundledPhase])
       .then(() => analyzer.analyze)
       .then((depsIndex) => {
-        let unbundledDeps = Array.from(depsIndex.depsToFragments.keys());
+        let unbundledDeps = analyzer.allFragments
+            .concat(Array.from(depsIndex.depsToFragments.keys()));
+
         let bundledDeps = analyzer.allFragments
             .concat(bundler.sharedBundleUrl);
 
