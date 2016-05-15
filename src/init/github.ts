@@ -12,23 +12,30 @@ import {Github} from '../github/github';
 import * as path from 'path';
 import {Base} from 'yeoman-generator';
 
-export const PolykartGenerator = getGenerator();
+export interface GithubGeneratorOptions {
+  requestApi?;
+  githubApi?;
+  githubToken?;
+  owner: string;
+  repo: string;
+}
 
-export function getGenerator(options?) {
-  let requestApi = options && options.requestApi;
-  let githubApi = options && options.githubApi;
-  let githubToken = options && options.githubToken;
-  // let outDir = options && options.outDir || process.cwd();
+export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
+  let requestApi = githubOptions.requestApi;
+  let githubApi = githubOptions.githubApi;
+  let githubToken = githubOptions.githubToken;
+  let owner = githubOptions.owner;
+  let repo = githubOptions.repo;
 
-  return class PolykartGenerator extends Base {
+  return class GithubGenerator extends Base {
 
     _github: Github;
 
     constructor(args: string | string[], options: any) {
       super(args, options);
       this._github = new Github({
-        owner: 'PolymerLabs',
-        repo: 'polykart',
+        owner,
+        repo,
         githubToken,
         githubApi,
         requestApi
@@ -37,13 +44,13 @@ export function getGenerator(options?) {
 
     writing() {
       let done = this.async();
-      console.log('Finding and extracting latest release of polykart...');
+      console.log(`Downloading latest release of ${owner}/${repo}`);
       return this._github.extractLatestRelease(this.destinationRoot())
         .then(() => {
           done();
         })
         .catch((error) => {
-          console.error('Could not load polykart template');
+          console.error(`Could not download release from ${owner}/${repo}`);
           console.error(error);
           done();
         });
