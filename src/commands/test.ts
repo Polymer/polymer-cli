@@ -13,11 +13,6 @@ export class TestCommand implements Command {
       type: Boolean,
     },
     {
-      name: 'root',
-      description: 'The root directory to serve tests from',
-      type: String,
-    },
-    {
       name: 'plugin',
       description: 'Plugins that should be loaded',
       type: String,
@@ -30,11 +25,6 @@ export class TestCommand implements Command {
     {
       name: 'expanded',
       description: 'Log a status line for each test run',
-      type: String,
-    },
-    {
-      name: 'verbose',
-      description: 'Log all the things',
       type: String,
     },
     {

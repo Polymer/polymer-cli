@@ -78,28 +78,45 @@ export class PolymerCli {
     });
   }
 
-  mergeDefinitions(command: Command, globals: ArgDescriptor[]) {
-    let mergedArgs = new Map();
-    let defaultOption = null;
+  mergeDefinitions(command: Command, globals: ArgDescriptor[])
+      : ArgDescriptor[] {
+    let mergedArgs = new Map<string, ArgDescriptor>();
+    let defaultOption: string = null;
 
     let addAll = (args: ArgDescriptor[]) => {
       for (let definition of args) {
         let name = definition.name;
-        mergedArgs.set(definition, definition);
-        if (mergedArgs.has(name)) {
-          throw new Error(`Duplicate argument definition in ${command.name}: ` +
-              `${name}`);
+        let oldDefinition = mergedArgs.get(name);
+        if (oldDefinition == null) {
+          mergedArgs.set(definition.name, definition);
+        } else {
+          let mergedDefinition = Object.assign({}, oldDefinition);
+          for (let propName of Object.keys(definition)) {
+            if (propName == 'name') continue;
+            let propValue = definition[propName];
+            let oldProp = oldDefinition[propName];
+            if (oldProp == null) {
+              mergedDefinition[propName] = propValue;
+            } else {
+              throw new Error(
+                `duplicate argument definition in ${command.name}: ${name}.${propName}`);
+            }
+          }
+          mergedArgs.set(name, mergedDefinition);
+          definition = mergedDefinition;
         }
-        if (defaultOption && definition.defaultOption) {
-          throw new Error(`Multiple default arguments in ${command.name}: ` +
-              `${defaultOption} and ${name}`);
+        if (definition.defaultOption) {
+          if (defaultOption && defaultOption != name) {
+            throw new Error(`Multiple default arguments in ${command.name}: ` +
+                `${defaultOption} and ${name}`);
+          }
+          defaultOption = name;
         }
-        defaultOption = name;
       }
     }
 
-    if (command.args) addAll(command.args);
     if (globals) addAll(globals);
+    if (command.args) addAll(command.args);
     return Array.from(mergedArgs.values());
   }
 
