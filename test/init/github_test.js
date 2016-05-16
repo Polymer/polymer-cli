@@ -12,7 +12,6 @@
 const assert = require('chai').assert;
 const fs = require('fs');
 const path = require('path');
-const streamLib = require('stream');
 const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 

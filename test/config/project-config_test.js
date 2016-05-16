@@ -26,7 +26,7 @@ suite('Project Config', () => {
     let config = new ProjectConfig(null, {
       entrypoint: 'index.html',
       fragments: ['foo.html'],
-      shell: 'bar.html'
+      shell: 'bar.html',
     });
     assert.equal(config.root, process.cwd());
     assert.equal(config.entrypoint, path.resolve('index.html'));
@@ -45,7 +45,7 @@ suite('Project Config', () => {
     let config = new ProjectConfig(path.join(__dirname, 'polymer.json'), {
       entrypoint: 'bar.html',
       fragments: [],
-      shell: 'zizz.html'
+      shell: 'zizz.html',
     });
     assert.equal(config.entrypoint, path.resolve('bar.html'));
     assert.deepEqual(config.fragments, []);
@@ -54,7 +54,7 @@ suite('Project Config', () => {
 
   test('Read bower.json for "main"', () => {
     let config = new ProjectConfig(null, {
-      root: path.resolve(__dirname, 'bower')
+      root: path.resolve(__dirname, 'bower'),
     });
     assert.equal(config.entrypoint, path.resolve(__dirname, 'bower', 'foo.html'));
   });

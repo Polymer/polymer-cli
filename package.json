@@ -12,7 +12,8 @@
   "scripts": {
     "init": "typings install",
     "build": "if [ ! -f typings/main.d.ts ]; then npm run init; fi; tsc",
-    "test": "depcheck . --ignores 'generator-polymer-init' && gulp test"
+    "lint": "depcheck . --ignores 'generator-polymer-init' && eslint test/",
+    "test": "npm run lint; gulp test"
   },
   "repository": {
     "type": "git",

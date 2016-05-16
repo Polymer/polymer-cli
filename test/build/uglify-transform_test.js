@@ -23,7 +23,7 @@ suite('Uglify Transform', () => {
       cwd: '/foo/bar',
       base: '/foo/bar',
       path: '/foo/bar/baz.zizz',
-      contents: null
+      contents: null,
     })
     ut._transform(f1, 'utf8', (err, data) => {
       if (err) {
@@ -38,7 +38,7 @@ suite('Uglify Transform', () => {
     let b = new Buffer('var foo = 3');
     let f1 = new File({
       path: '/foo/bar/baz.js',
-      contents: b
+      contents: b,
     });
     ut._transform(f1, 'utf8', (err, data) => {
       if (err) {
@@ -54,7 +54,7 @@ suite('Uglify Transform', () => {
     let b = new Buffer('####');
     let f1 = new File({
       path: '/foo.js',
-      contents: b
+      contents: b,
     });
     ut._transform(f1, 'utf8', (err, data) => {
       if (err) {

@@ -31,7 +31,7 @@ suite('Bundler', () => {
   let bundledStream;
   let files;
 
-  let setupTest = (options) => new Promise((resolve, reject) => {
+  let setupTest = (options) => new Promise((resolve, _) => {
     let analyzer = new StreamAnalyzer(root, options.shell, options.fragments);
     bundler = new Bundler(root, options.shell, options.fragments, analyzer);
     sourceStream = new stream.Readable({
