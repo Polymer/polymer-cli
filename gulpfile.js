@@ -7,11 +7,33 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-const fs = require('fs');
-const gulp = require('gulp');
-const mocha = require('gulp-mocha');
 
-gulp.task('test', () =>
+const fs = require('fs-extra');
+const gulp = require('gulp');
+const mergeStream = require('merge-stream');
+const mocha = require('gulp-mocha');
+const path = require('path');
+const typescript = require('gulp-typescript');
+const typings = require('gulp-typings');
+
+var tsProject = typescript.createProject('tsconfig.json');
+
+gulp.task('init', () => gulp.src("./typings.json").pipe(typings()));
+
+gulp.task('build', () =>
+  mergeStream(
+    gulp.src('src/**/*.ts').pipe(typescript(tsProject)),
+    gulp.src(['src/**/*', '!src/**/*.ts'])
+  ).pipe(gulp.dest('lib'))
+);
+
+gulp.task('clean', (done) => {
+  fs.remove(path.join(__dirname, 'lib'), done);
+});
+
+gulp.task('build-all', ['clean', 'init', 'build']);
+
+gulp.task('test', ['build'], () =>
   gulp.src('test/**/*_test.js', {read: false})
       .pipe(mocha({
         ui: 'tdd',
