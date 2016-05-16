@@ -46,6 +46,8 @@
     "src/environments/environments.ts",
     "src/environments/reyserve.ts",
     "src/github/github.ts",
+    "src/init/application/application.ts",
+    "src/init/element/element.ts",
     "src/init/github.ts",
     "src/polymer-cli.ts",
     "src/project-config.ts",
@@ -61,6 +63,7 @@
     "custom_typings/vinyl-fs.d.ts",
     "custom_typings/web-component-tester.d.ts",
     "custom_typings/yeoman-environment.d.ts",
+    "custom_typings/yeoman-generator.d.ts",
     "typings/main.d.ts",
     "node_modules/typescript/lib/lib.core.es6.d.ts"
   ],
