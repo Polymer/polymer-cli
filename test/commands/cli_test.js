@@ -73,9 +73,9 @@ suite('The general CLI', () => {
 
   test('sets the appropriate log levels when the --verbose & --quiet flags are used', () => {
     let logger = logging.getLogger('TEST_LOGGER');
-    let cli = new PolymerCli(['help', '--verbose']);
+    new PolymerCli(['help', '--verbose']);
     assert.equal(logger.level, 'debug');
-    let cli2 = new PolymerCli(['help', '--quiet']);
+    new PolymerCli(['help', '--quiet']);
     assert.equal(logger.level, 'error');
   });
 
