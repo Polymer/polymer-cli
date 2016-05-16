@@ -24,7 +24,6 @@ import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Bundler} from './bundle';
 import {ProjectConfig} from '../project-config';
 import {HtmlProject} from './html-project';
-import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
 import {PrefetchTransform} from './prefetch';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
