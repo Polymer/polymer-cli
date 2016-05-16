@@ -58,4 +58,11 @@ suite('Project Config', () => {
     });
     assert.equal(config.entrypoint, path.resolve(__dirname, 'bower', 'foo.html'));
   });
+
+  test('bower.json, missing main', () => {
+    let config = new ProjectConfig(null, {
+      root: path.resolve(__dirname, 'broken-bower'),
+    });
+    assert.equal(config.entrypoint, path.resolve(__dirname, 'broken-bower', 'index.html'));
+  });
 });
