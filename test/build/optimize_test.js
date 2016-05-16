@@ -11,8 +11,6 @@
 'use strict';
 
 const assert = require('chai').assert;
-const File = require('vinyl');
-const PassThrough = require('stream').PassThrough;
 const vfs = require('vinyl-fs-fake');
 
 const HtmlProject = require('../../lib/build/html-project').HtmlProject;
@@ -31,8 +29,8 @@ suite('optimize()', () => {
     let stream = vfs.src([
       {
         path: 'foo.css',
-        contents: '/* comment */ selector { property: value; }'
-      }
+        contents: '/* comment */ selector { property: value; }',
+      },
     ]);
     let op = stream.pipe(optimize({css: {stripWhitespace: true}}));
     assert.notEqual(stream, op, 'stream should be wrapped');
@@ -49,8 +47,8 @@ suite('optimize()', () => {
     let stream = vfs.src([
       {
         path: 'foo.js',
-        contents: 'var foo = 3'
-      }
+        contents: 'var foo = 3',
+      },
     ]);
     let op = stream.pipe(optimize({js: {minify: true}}));
     assert.notEqual(stream, op);
@@ -82,20 +80,20 @@ suite('optimize()', () => {
         <x-foo>
           bar
         </x-foo>
-        `
-      }
+        `,
+      },
     ], {cwdbase: true});
     let options = {
       html: {
         collapseWhitespace: true,
-        removeComments: true
+        removeComments: true,
       },
       css: {
-        stripWhitespace: true
+        stripWhitespace: true,
       },
       js: {
-        minify: true
-      }
+        minify: true,
+      },
     };
     let project = new HtmlProject();
     let op = stream.pipe(project.split);

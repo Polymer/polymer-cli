@@ -56,7 +56,7 @@ suite('sw-precache', () => {
           entrypoint: path.resolve(__dirname, 'precache/static/fizz.html'),
           buildRoot,
           deps: [],
-          serviceWorkerPath: path.join(buildRoot, 'service-worker.js')
+          serviceWorkerPath: path.join(buildRoot, 'service-worker.js'),
         }).then(() => {
           let content =
             fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
@@ -74,7 +74,7 @@ suite('sw-precache', () => {
           buildRoot,
           deps: [],
           swConfig: config,
-          serviceWorkerPath: path.join(buildRoot, 'service-worker.js')
+          serviceWorkerPath: path.join(buildRoot, 'service-worker.js'),
         });
       }).then(() => {
         let content = fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');

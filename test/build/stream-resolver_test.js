@@ -69,7 +69,7 @@ suite('streamResolver', () => {
         assert.equal("abcdefg", contents);
         done();
       });
-      let accepted = resolver.accept('/baz.qux', deferred);
+      resolver.accept('/baz.qux', deferred);
     });
   });
 

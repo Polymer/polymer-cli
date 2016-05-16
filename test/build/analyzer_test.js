@@ -21,7 +21,7 @@ suite('Analzyer', () => {
       let entrypoint = path.resolve('test/build/analyzer');
       let analyzer = new StreamAnalyzer(entrypoint, null, [
         'a.html',
-        'b.html'
+        'b.html',
       ]);
       vfs.src(entrypoint + '/**', {cwdbase: true})
       .pipe(analyzer)
