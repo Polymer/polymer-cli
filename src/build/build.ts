@@ -26,6 +26,7 @@ import {HtmlProject} from './html-project';
 import {Logger} from './logger';
 import {optimize, OptimizeOptions} from './optimize';
 import {PrefetchTransform} from './prefetch';
+import {generatePushManifest} from './push-manifest';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
 
@@ -134,16 +135,18 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
             .concat(Array.from(depsIndex.depsToFragments.keys()));
 
         let bundledDeps = analyzer.allFragments
-            .concat(bundler.sharedBundleUrl);
+        if (!shell) {
+          bundledDeps.push(bundler.sharedBundleUrl);
+        }
 
-        parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
+        parsePreCacheConfig(swPrecacheConfig).then((swConfig) =>
           Promise.all([
             genSW('build/unbundled', unbundledDeps, swConfig),
-            genSW('build/bundled', bundledDeps, swConfig)
-          ]).then(() => {
-            buildResolve();
-          });
-        })
+            generatePushManifest(root, 'build/unbundled', unbundledDeps),
+            genSW('build/bundled', bundledDeps, swConfig),
+            generatePushManifest(root, 'build/bundled', bundledDeps)
+          ])
+        ).then(() => buildResolve());
       });
   });
 }
