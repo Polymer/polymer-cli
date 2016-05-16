@@ -16,7 +16,6 @@ import File = require('vinyl');
 import * as logging from 'plylog';
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
-import {Logger} from './logger';
 import {compose} from './streams';
 
 // non-ES module

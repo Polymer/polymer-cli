@@ -28,7 +28,6 @@
     "src/build/build.ts",
     "src/build/bundle.ts",
     "src/build/html-project.ts",
-    "src/build/logger.ts",
     "src/build/optimize.ts",
     "src/build/prefetch.ts",
     "src/build/stream-resolver.ts",
