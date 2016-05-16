@@ -14,8 +14,10 @@ import * as fs from 'fs';
 import * as logging from 'plylog';
 import * as chalk from 'chalk';
 
-let logger = logging.getLogger('cli.init');
+import {ApplicationGenerator} from '../init/application/application';
+import {ElementGenerator} from '../init/element/element';
 
+let logger = logging.getLogger('cli.init');
 
 export class InitCommand implements Command {
   name = 'init';
@@ -25,7 +27,7 @@ export class InitCommand implements Command {
   args: ArgDescriptor[] = [
     {
       name: 'name',
-      description: 'The template name',
+      description: 'The template name to use to initialize the project',
       type: String,
       defaultOption: true,
     }
@@ -45,13 +47,14 @@ export class InitCommand implements Command {
       let env = new YeomanEnvironment();
 
       let templateDescriptions = {
-        'basic': "built-in template for basic apps and elements",
+        'application': "Application-style project",
+        'element': "Reusable element-style project",
         'shop': "shop demo app",
         'prpl-demo': "PRPL demo app",
       };
 
-      env.register(
-          require.resolve('generator-polymer-init'), 'polymer-init-basic:app');
+      env.registerStub(ElementGenerator, 'polymer-init-element:app');
+      env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
       let shopGenerator = createGithubGenerator({
         owner: 'PolymerLabs',
         repo: 'polykart',
