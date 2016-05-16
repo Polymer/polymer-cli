@@ -146,6 +146,7 @@ export class PolymerCli {
         && cliCommand.options['_all']);
 
     let config = new ProjectConfig('polymer.json', options);
+    logger.debug('config read', config);
 
     logger.debug('Running command...');
     command.run(options, config).catch((error) => {

@@ -78,8 +78,8 @@ export class InitCommand implements Command {
             logger.debug(`Running generator ${generatorName}`);
             env.run(generatorName, {}, () => resolve());
           } else {
-            logger.warn('Template ${options.name} not found');
-            logger.debug('Yeoman generator ${generatorName} not found');
+            logger.warn(`Template ${options.name} not found`);
+            logger.debug(`Yeoman generator ${generatorName} not found`);
           }
         };
 

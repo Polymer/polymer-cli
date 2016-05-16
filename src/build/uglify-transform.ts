@@ -29,7 +29,8 @@ export class UglifyTransform extends Transform {
         contents = uglify.minify(contents, UglifyOptions).code;
         file.contents = new Buffer(contents);
       } catch (err) {
-        logger.error('Could not uglify', file.path);
+        logger.warn(`Unable to uglify file ${file.path}`);
+        logger.debug(err);
       }
     }
     callback(null, file);

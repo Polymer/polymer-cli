@@ -19,6 +19,11 @@ const swPrecache = require('sw-precache');
 const Module = require('module');
 let logger = logging.getLogger('cli.build.sw-precache');
 
+function writeSWPrecache(destinationPath: string, config: SWConfig): Promise<void> {
+  config.logger = logger.debug;
+  return swPrecache.write(destinationPath, config);
+}
+
 export interface SWConfig {
   cacheId?: string,
   directoryIndex?: string;
@@ -51,6 +56,7 @@ export interface SWConfig {
 
 export function generateServiceWorker(options: GenerateServiceWorkerOptions)
 : Promise<void> {
+  logger.debug(`generateServiceWorker() options:`, options);
   let swConfig = options.swConfig || <SWConfig>{};
   // strip root prefix, so buildRoot prefix can be added safely
   let deps = options.deps.map((p) => {
@@ -72,9 +78,8 @@ export function generateServiceWorker(options: GenerateServiceWorkerOptions)
   // static files will be pre-cached
   swConfig.staticFileGlobs = precacheList;
 
-  logger.info(`Generating service worker for ${options.buildRoot}`);
-
-  return swPrecache.write(options.serviceWorkerPath, swConfig);
+  logger.debug(`writing service worker to ${options.serviceWorkerPath}`, swConfig);
+  return writeSWPrecache(options.serviceWorkerPath, swConfig);
 }
 
 export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
@@ -86,8 +91,7 @@ export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
         try {
           config = require(configFile);
         } catch(e) {
-          logger.error(`Could not load sw-precache config from ${configFile}`);
-          logger.error(e);
+          logger.warn(`${configFile} file was found but could not be loaded`, {err});
         }
       }
       resolve(config);

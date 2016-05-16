@@ -64,14 +64,23 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
       '!node_modules/**/*',
     ];
 
+    logger.debug(`shell: ${shell}`);
+    logger.debug(`entrypoint: ${entrypoint}`);
+    logger.debug(`dependencies: ${dependencies}`);
+    if (options.insertDependencyLinks) {
+      logger.debug(`Additional dependency links will be inserted into application`);
+    }
+
     let allSources = [];
     allSources.push(entrypoint);
     if (shell) allSources.push(shell);
     allSources = allSources.concat(fragments, sources, sourceExcludes);
+    logger.debug(`sources: ${allSources}`);
 
     let allFragments = [];
     if (shell) allFragments.push(shell);
     allFragments = allFragments.concat(fragments);
+    logger.debug(`fragments: ${fragments}`);
 
     let optimizeOptions: OptimizeOptions = {
       html: {
@@ -87,12 +96,17 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
 
     let gulpfile = getGulpfile();
     let userTransformers = gulpfile && gulpfile.transformers;
+    if (userTransformers) {
+      logger.debug(`${userTransformers.length} transformers found in gulpfile`);
+    }
 
     let sourcesProject = new HtmlProject();
     let depsProject = new HtmlProject();
     let analyzer = new StreamAnalyzer(root, entrypoint, shell, fragments);
     let bundler = new Bundler(root, entrypoint, shell, fragments, analyzer);
 
+    logger.info(`Building application...`)
+    logger.debug(`Reading source files...`);
     let sourcesStream =
       vfs.src(allSources, {cwdbase: true, allowEmpty: true})
         .pipe(sourcesProject.split)
@@ -100,6 +114,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
         .pipe(optimize(optimizeOptions))
         .pipe(sourcesProject.rejoin);
 
+    logger.debug(`Reading dependencies...`);
     let depsStream =
       vfs.src(dependencies, {cwdbase: true, allowEmpty: true})
         .pipe(depsProject.split)
@@ -107,11 +122,13 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
         .pipe(depsProject.rejoin)
 
     let allFiles = mergeStream(sourcesStream, depsStream)
-        .pipe(analyzer);
+      .once('data', () => { logger.debug('Analyzing build dependencies...'); })
+      .pipe(analyzer);
 
     let serviceWorkerName = 'service-worker.js';
 
     let unbundledPhase = new ForkedVinylStream(allFiles)
+      .once('data', () => { logger.info('Generating build/unbundled...'); })
       .pipe(
         gulpif(
           options.insertDependencyLinks,
@@ -122,10 +139,12 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
       .pipe(vfs.dest('build/unbundled'));
 
     let bundledPhase = new ForkedVinylStream(allFiles)
+      .once('data', () => { logger.info('Generating build/bundled...'); })
       .pipe(bundler)
       .pipe(vfs.dest('build/bundled'));
 
     let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
+      logger.debug(`Generating service worker for ${buildRoot}...`);
       return generateServiceWorker({
         root,
         entrypoint,
@@ -146,12 +165,21 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
             .concat(bundler.sharedBundleUrl);
 
         parsePreCacheConfig(swPrecacheConfig).then((swConfig) => {
-          Promise.all([
+          if (swConfig) {
+            logger.debug(`Service worker config found`, swConfig);
+          } else {
+            logger.debug(`No service worker configuration found at ${swPrecacheConfig}, continuing with defaults`);
+          }
+
+          logger.info(`Generating service workers...`);
+          return Promise.all([
             genSW('build/unbundled', unbundledDeps, swConfig),
             genSW('build/bundled', bundledDeps, swConfig)
-          ]).then(() => {
-            buildResolve();
-          });
+          ]);
+        })
+        .then(() => {
+          logger.info('Build complete!');
+          buildResolve();
         })
       });
   });
