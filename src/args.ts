@@ -45,7 +45,7 @@ export const globalArguments: ArgDescriptor[] = [
     type: String,
     description: 'The directory in which to find sources and place build. ' +
         'Defaults to current working directory',
-        group: 'global',
+    group: 'global',
   },
   {
     name: 'verbose',
