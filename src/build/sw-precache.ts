@@ -10,12 +10,14 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as logging from 'plylog';
 import {PassThrough} from 'stream';
 import File = require('vinyl');
 
 // non-ES compatible modules
 const swPrecache = require('sw-precache');
 const Module = require('module');
+let logger = logging.getLogger('cli.build.sw-precache');
 
 export interface SWConfig {
   cacheId?: string,
@@ -70,7 +72,7 @@ export function generateServiceWorker(options: GenerateServiceWorkerOptions)
   // static files will be pre-cached
   swConfig.staticFileGlobs = precacheList;
 
-  console.log(`Generating service worker for ${options.buildRoot}`);
+  logger.info(`Generating service worker for ${options.buildRoot}`);
 
   return swPrecache.write(options.serviceWorkerPath, swConfig);
 }
@@ -84,8 +86,8 @@ export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
         try {
           config = require(configFile);
         } catch(e) {
-          console.error(`Could not load sw-precache config from ${configFile}`);
-          console.error(e);
+          logger.error(`Could not load sw-precache config from ${configFile}`);
+          logger.error(e);
         }
       }
       resolve(config);

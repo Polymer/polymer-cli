@@ -11,6 +11,9 @@ import * as fs from 'fs';
 import {Github} from '../github/github';
 import * as path from 'path';
 import {Base} from 'yeoman-generator';
+import * as logging from 'plylog';
+
+let logger = logging.getLogger('cli.init');
 
 export interface GithubGeneratorOptions {
   requestApi?;
@@ -44,15 +47,14 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
 
     writing() {
       let done = this.async();
-      console.log(`Downloading latest release of ${owner}/${repo}`);
+      logger.info(`Downloading latest release of ${owner}/${repo}`);
       return this._github.extractLatestRelease(this.destinationRoot())
         .then(() => {
           done();
         })
         .catch((error) => {
-          console.error(`Could not download release from ${owner}/${repo}`);
-          console.error(error);
-          done();
+          logger.error(`Could not download release from ${owner}/${repo}`);
+          done(error);
         });
     }
 

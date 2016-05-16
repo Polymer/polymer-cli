@@ -18,6 +18,7 @@ import * as path from 'path';
 import {PassThrough, Readable} from 'stream';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
+import * as logging from 'plylog';
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {Bundler} from './bundle';
@@ -29,9 +30,11 @@ import {PrefetchTransform} from './prefetch';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
 
+
 // non-ES compatible modules
 const findConfig = require('liftoff/lib/find_config');
 const minimatchAll = require('minimatch-all');
+let logger = logging.getLogger('cli.build.build');
 
 export interface BuildOptions {
   sources?: string[];

@@ -8,16 +8,19 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 import * as stream from 'stream';
+import * as logging from 'plylog';
 import File = require('vinyl');
 
+let logger = logging.getLogger('cli.build.stream-transform');
+
 export class Logger extends stream.Transform {
-  prefix: String;
+  prefix: string;
   constructor(prefix: string) {
     super({objectMode: true});
     this.prefix = prefix || '';
   }
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    console.log(this.prefix, file.path);
+    logger.info(this.prefix, file.path);
     callback(null, file);
   }
 }
@@ -29,7 +32,7 @@ export class StreamLogger extends stream.Transform {
     this.prefix = prefix || '';
   }
   _transform(buffer: Buffer, encoding: string, callback: (error?, data?) => void): void {
-    console.log(this.prefix, buffer.toString('base64'));
+    logger.info(this.prefix, buffer.toString('base64'));
     callback(null, buffer);
   }
 }

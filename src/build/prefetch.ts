@@ -10,10 +10,13 @@
 
 import * as dom5 from 'dom5';
 import * as path from 'path';
+import * as logging from 'plylog';
 import {Transform} from 'stream';
 import File = require('vinyl');
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
+
+let logger = logging.getLogger('cli.build.prefech');
 
 export class PrefetchTransform extends Transform {
   root: string;
@@ -132,8 +135,8 @@ export class PrefetchTransform extends Transform {
       }
 
       for (let leftover of this.fileMap.keys()) {
-        console.log(
-          'Warning: File was listed in fragments but not found in stream:',
+        logger.warn(
+          'File was listed in fragments but not found in stream:',
           leftover
         );
         this.push(this.fileMap.get(leftover));

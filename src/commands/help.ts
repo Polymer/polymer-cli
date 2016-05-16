@@ -11,6 +11,10 @@
 import * as chalk from 'chalk';
 import {CLI} from 'command-line-commands';
 import * as commandLineArgs from 'command-line-args';
+import * as logging from 'plylog';
+
+let logger = logging.getLogger('cli.help');
+
 
 import {globalArguments} from '../args';
 import {Command} from './command';
@@ -69,6 +73,7 @@ export class HelpCommand implements Command {
         return;
       }
 
+      logger.debug('logging help for command', command.name);
       let argsCli = commandLineArgs(command.args);
       console.log(argsCli.getUsage({
         title: `polymer ${command.name}`,

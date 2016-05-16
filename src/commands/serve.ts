@@ -12,6 +12,10 @@ import {startServer, args as polyserveArgs} from 'polyserve';
 import {ServerOptions} from 'polyserve/lib/start_server';
 import {Command} from './command';
 import {Environment} from '../environment/environment';
+import * as logging from 'plylog';
+
+let logger = logging.getLogger('cli.serve');
+
 
 export class ServeCommand implements Command {
   name = 'serve';
@@ -61,7 +65,7 @@ export class ServeCommand implements Command {
   ];
 
   run(options, config): Promise<any> {
-    var serverOptions: ServerOptions = {
+    let serverOptions: ServerOptions = {
       root: config.root,
       port: options.port,
       hostname: options.hostname,
@@ -71,12 +75,16 @@ export class ServeCommand implements Command {
       packageName: options['package-name'],
     };
 
+    logger.debug('serving with options', serverOptions);
     const env: Environment = options.env;
 
     if (env && env.serve) {
-        return env.serve(serverOptions);
+      logger.debug('env.serve() found in options');
+      logger.debug('serving via env.serve()...');
+      return env.serve(serverOptions);
     }
 
+    logger.debug('serving via startServer()...');
     return startServer(serverOptions);
   }
 }

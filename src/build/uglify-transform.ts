@@ -10,9 +10,11 @@
 
 import {Transform} from 'stream';
 import * as uglify from 'uglify-js';
+import * as logging from 'plylog';
 import File = require('vinyl');
 
-const UglifyOptions: uglify.MinifyOptions = {fromString: true};
+let logger = logging.getLogger('cli.build.uglify');
+const UglifyOptions: uglify.MinifyOptions = { fromString: true };
 
 export class UglifyTransform extends Transform {
 
@@ -27,7 +29,7 @@ export class UglifyTransform extends Transform {
         contents = uglify.minify(contents, UglifyOptions).code;
         file.contents = new Buffer(contents);
       } catch (err) {
-        console.error('Could not uglify',file.path);
+        logger.error('Could not uglify', file.path);
       }
     }
     callback(null, file);

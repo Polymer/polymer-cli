@@ -12,6 +12,10 @@ import {ArgDescriptor} from 'command-line-args';
 import {CLI} from 'command-line-commands';
 
 import {Command} from './command';
+import * as logging from 'plylog';
+
+let logger = logging.getLogger('cli.build');
+
 
 export class BuildCommand implements Command {
   name = 'build';
@@ -40,9 +44,15 @@ export class BuildCommand implements Command {
       sources: options.sources,
       swPrecacheConfig: options['sw-precache-config']
     };
+    logger.debug('building with options', buildOptions);
+
     if (options.env && options.env.build) {
+      logger.debug('env.build() found in options');
+      logger.debug('building via env.build()...');
       return options.env.build(buildOptions, config);
     }
+
+    logger.debug('building via build()...');
     return build(buildOptions, config);
   }
 }
