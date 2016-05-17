@@ -26,7 +26,7 @@ suite('Project Config', () => {
     let config = new ProjectConfig(null, {
       entrypoint: 'index.html',
       fragments: ['foo.html'],
-      shell: 'bar.html',
+      shell: 'bar.html'
     });
     assert.equal(config.root, process.cwd());
     assert.equal(config.entrypoint, path.resolve('index.html'));
