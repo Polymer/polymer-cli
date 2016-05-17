@@ -60,9 +60,15 @@ export class PrefetchTransform extends Transform {
     this.entrypoint = entrypoint;
     this.shell = shell;
     this.fragments = fragments;
-    this.allFragments = fragments;
+    // clone fragments
+    this.allFragments = Array.from(fragments);
     if (shell) {
-      this.allFragments = this.allFragments.concat(shell);
+      this.allFragments.push(shell);
+    }
+    // if entrypoint is specified without a shell, treat it as
+    // any other fragment and pull up dependencies as imports
+    if (!shell && entrypoint) {
+      this.allFragments.push(entrypoint);
     }
     this.analyzer = analyzer;
     this.fileMap = new Map<string, File>();
