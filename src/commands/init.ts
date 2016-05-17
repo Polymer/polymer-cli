@@ -61,11 +61,12 @@ export class InitCommand implements Command {
         repo: 'shop',
       });
       env.registerStub(shopGenerator, 'polymer-init-shop:app');
-      let prplGenerator = createGithubGenerator({
+      let appDrawerGenerator = createGithubGenerator({
         owner: 'Polymer',
         repo: 'app-drawer-template',
       });
-      env.registerStub(prplGenerator, 'polymer-init-app-drawer-template:app');
+      env.registerStub(appDrawerGenerator,
+          'polymer-init-app-drawer-template:app');
 
       env.lookup(() => {
         let generators = env.getGeneratorsMeta();
