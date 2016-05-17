@@ -90,8 +90,8 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
 
     let sourcesProject = new HtmlProject();
     let depsProject = new HtmlProject();
-    let analyzer = new StreamAnalyzer(root, shell, fragments);
-    let bundler = new Bundler(root, shell, fragments, analyzer);
+    let analyzer = new StreamAnalyzer(root, entrypoint, shell, fragments);
+    let bundler = new Bundler(root, entrypoint, shell, fragments, analyzer);
 
     let sourcesStream =
       vfs.src(allSources, {cwdbase: true, allowEmpty: true})

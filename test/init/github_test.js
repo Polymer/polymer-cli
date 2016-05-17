@@ -18,7 +18,7 @@ const helpers = require('yeoman-test');
 const createGithubGenerator =
     require('../../lib/init/github.js').createGithubGenerator;
 
-suite('init/guithub', () => {
+suite('init/github', () => {
 
   test('untars a release', (done) => {
     let mockRequestApi = (options) => {

@@ -15,6 +15,7 @@ export interface ProjectConfigOptions {
   root?: string;
   entrypoint?: string;
   shell?: string;
+  fragment?: string[];
   fragments?: string[];
 }
 
@@ -56,6 +57,8 @@ export class ProjectConfig {
     if (options.entrypoint) {
       this.entrypoint = path.resolve(this.root, options.entrypoint);
     } else {
+      // fallback
+      this.entrypoint = path.resolve(this.root, 'index.html');
       try {
         let bowerConfigContent =
           fs.readFileSync(path.resolve(this.root, 'bower.json'), 'utf-8');
@@ -63,18 +66,16 @@ export class ProjectConfig {
         if (bowerConfig.main && typeof bowerConfig.main === 'string') {
           this.entrypoint = path.resolve(this.root, bowerConfig.main);
         }
-      } catch(_) {
-        this.entrypoint = path.resolve(this.root, 'index.html');
-      }
+      } catch(_) {}
     }
     if (options.shell) {
       this.shell = path.resolve(this.root, options.shell);
     }
     this.fragments = [];
-    if (options.fragments) {
-      this.fragments = options.fragments.map(
-        (e) => path.resolve(this.root, e)
-      );
+    // fragment comes from command-line-args `--fragment`
+    let frag = options.fragment || options.fragments;
+    if (frag) {
+      this.fragments = frag.map((e) => path.resolve(this.root, e));
     }
 
     this.inputs = [];

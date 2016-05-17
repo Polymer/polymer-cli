@@ -60,9 +60,12 @@ export class PrefetchTransform extends Transform {
     this.entrypoint = entrypoint;
     this.shell = shell;
     this.fragments = fragments;
-    this.allFragments = fragments;
+    // clone fragments
+    this.allFragments = Array.from(fragments);
     if (shell) {
-      this.allFragments = this.allFragments.concat(shell);
+      this.allFragments.push(shell);
+    } else {
+      this.allFragments.push(entrypoint);
     }
     this.analyzer = analyzer;
     this.fileMap = new Map<string, File>();
@@ -77,7 +80,9 @@ export class PrefetchTransform extends Transform {
     let ast = dom5.parse(contents);
     let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
     for (let dep of deps) {
-      dep = path.relative(file.dirname, dep);
+      if (dep.startsWith(this.root)) {
+        dep = path.relative(file.dirname, dep);
+      }
       // prefetched deps should be absolute, as they will be in the main file
       if (type === 'prefetch') {
         dep = path.join('/', dep);
