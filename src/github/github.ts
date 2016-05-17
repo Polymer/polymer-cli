@@ -32,9 +32,12 @@ export class Github {
   private _repo: string;
 
   static tokenFromFile(filename: string): string {
-    return fs.readFileSync(filename, 'utf8').trim();
+    try {
+      return fs.readFileSync(filename, 'utf8').trim();
+    } catch (e) {
+      return null;
+    }
   }
-
 
   constructor(opts: GithubOpts) {
     this._token = opts.githubToken || Github.tokenFromFile('token');
@@ -44,10 +47,12 @@ export class Github {
       version: '3.0.0',
       protocol: 'https',
     });
-    this._github.authenticate({
-      type: 'oauth',
-      token: this._token,
-    });
+    if (this._token != null) {
+      this._github.authenticate({
+        type: 'oauth',
+        token: this._token,
+      });
+    }
     this._request = opts.requestApi || request;
   }
 
