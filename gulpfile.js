@@ -13,10 +13,11 @@ const gulp = require('gulp');
 const mergeStream = require('merge-stream');
 const mocha = require('gulp-mocha');
 const path = require('path');
+const runSeq = require('run-sequence');
 const typescript = require('gulp-typescript');
 const typings = require('gulp-typings');
 
-var tsProject = typescript.createProject('tsconfig.json');
+const tsProject = typescript.createProject('tsconfig.json');
 
 gulp.task('init', () => gulp.src("./typings.json").pipe(typings()));
 
@@ -31,7 +32,9 @@ gulp.task('clean', (done) => {
   fs.remove(path.join(__dirname, 'lib'), done);
 });
 
-gulp.task('build-all', ['clean', 'init', 'build']);
+gulp.task('build-all', (done) => {
+  runSeq('clean', 'init', 'build', done);
+});
 
 gulp.task('test', ['build'], () =>
   gulp.src('test/**/*_test.js', {read: false})
