@@ -59,7 +59,11 @@ export function generateServiceWorker(options: GenerateServiceWorkerOptions)
   logger.debug(`generateServiceWorker() options:`, options);
   let swConfig = options.swConfig || <SWConfig>{};
   // strip root prefix, so buildRoot prefix can be added safely
-  let deps = options.deps.map((p) => {
+  let scriptsAndImports = options.deps;
+  if (options.scriptAndStyleDeps) {
+    scriptsAndImports = scriptsAndImports.concat(options.scriptAndStyleDeps);
+  }
+  let deps = scriptsAndImports.map((p) => {
     if (p.startsWith(options.root)) {
       return p.substring(options.root.length);
     }
@@ -121,6 +125,10 @@ export interface GenerateServiceWorkerOptions {
    * in addition to files found in `swConfig.staticFileGlobs`
    */
   deps: string[];
+  /**
+   * List of script and style dependencies.
+   */
+  scriptAndStyleDeps: string[];
   /**
    * Existing config to use as a base for the serivce worker generation.
    */

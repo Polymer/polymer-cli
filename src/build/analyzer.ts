@@ -9,15 +9,22 @@
  */
 
 import * as fs from 'fs';
-import {Analyzer, Deferred, Loader, Resolver} from 'hydrolysis';
+import {Analyzer, Deferred, Loader, Resolver, DocumentDescriptor} from 'hydrolysis';
 import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import {parse as parseUrl} from 'url';
 import * as logging from 'plylog';
+import {Node, queryAll, predicates, getAttribute} from 'dom5';
 
 const minimatchAll = require('minimatch-all');
 let logger = logging.getLogger('cli.build.analyzer');
+
+export interface DocumentDeps{
+  imports?: Array<string>,
+  scripts?: Array<string>,
+  styles?: Array<string>
+}
 
 export class StreamAnalyzer extends Transform {
 
@@ -113,12 +120,12 @@ export class StreamAnalyzer extends Transform {
 
   _getDepsToEntrypointIndex(): Promise<DepsIndex> {
     // TODO: tsc is being really weird here...
-    let depsPromises = <Promise<string[]>[]>this.allFragments.map(
+    let depsPromises = <Promise<DocumentDeps>[]>this.allFragments.map(
         (e) => this._getDependencies(e));
 
     return Promise.all(depsPromises).then((value: any) => {
       // tsc was giving a spurious error with `allDeps` as the parameter
-      let allDeps: string[][] = <string[][]>value;
+      let allDeps: DocumentDeps[] = <DocumentDeps[]>value;
 
       // An index of dependency -> fragments that depend on it
       let depsToFragments = new Map<string, string[]>();
@@ -126,16 +133,19 @@ export class StreamAnalyzer extends Transform {
       // An index of fragments -> dependencies
       let fragmentToDeps = new Map<string, string[]>();
 
+      let fragmentToFullDeps = new Map<string, DocumentDeps>();
+
       console.assert(this.allFragments.length === allDeps.length);
 
       for (let i = 0; i < allDeps.length; i++) {
         let fragment = this.allFragments[i];
-        let deps: string[] = allDeps[i];
+        let deps: DocumentDeps = allDeps[i];
         console.assert(deps != null, `deps is null for ${fragment}`);
 
-        fragmentToDeps.set(fragment, deps);
+        fragmentToDeps.set(fragment, deps.imports);
+        fragmentToFullDeps.set(fragment, deps);
 
-        for (let dep of deps) {
+        for (let dep of deps.imports) {
           let entrypointList;
           if (!depsToFragments.has(dep)) {
             entrypointList = [];
@@ -149,46 +159,78 @@ export class StreamAnalyzer extends Transform {
       return {
         depsToFragments,
         fragmentToDeps,
+        fragmentToFullDeps,
       };
     });
   }
-
   /**
    * Attempts to retreive document-order transitive dependencies for `url`.
    */
-  _getDependencies(url: string): Promise<string[]> {
-    let visited = new Set<string>();
-    let allDeps = new Set<string>();
-    // async depth-first traversal: waits for document load, then async
-    // iterates on dependencies. No return values are used, writes to visited
-    // and list.
-    //
-    // document.depHrefs is _probably_ document order, if all html imports are
-    // at the same level in the tree.
-    // See: https://github.com/Polymer/hydrolysis/issues/240
-    let _getDeps = (url: string) =>
-        this.analyzer.load(url).then((d) => _iterate(d.depHrefs.values()));
+  _getDependencies(url: string): Promise<DocumentDeps> {
+    let documents = this.analyzer.parsedDocuments;
+    let dir = path.dirname(url);
+    return this.analyzer.metadataTree(url)
+        .then((tree) => this._getDependenciesFromDescriptor(tree, dir));
+  }
 
-    // async iteration: waits for _getDeps on a value to return before
-    // recursing to call _getDeps on the next value.
-    let _iterate = (iterator: Iterator<string>) => {
-      let next = iterator.next();
-      if (next.done || visited.has(next.value)) {
-        return Promise.resolve();
-      } else {
-        allDeps.add(next.value);
-        visited.add(url);
-        return _getDeps(next.value).then(() => _iterate(iterator));
+  _getDependenciesFromDescriptor(descriptor: DocumentDescriptor, dir: string): DocumentDeps {
+    let allHtmlDeps = [];
+    let allScriptDeps = new Set<string>();
+    let allStyleDeps = new Set<string>();
+
+    let deps: DocumentDeps = this._collectScriptsAndStyles(descriptor);
+    deps.scripts.forEach((s) => allScriptDeps.add(path.resolve(dir, s)));
+    deps.styles.forEach((s) => allStyleDeps.add(path.resolve(dir, s)));
+    if (descriptor.imports) {
+      let queue = descriptor.imports.slice();
+      while (queue.length > 0) {
+        let next = queue.shift();
+        if (!next.href) {
+          continue;
+        }
+        allHtmlDeps.push(next.href);
+        let childDeps = this._getDependenciesFromDescriptor(next, path.dirname(next.href));
+        allHtmlDeps = allHtmlDeps.concat(childDeps.imports);
+        childDeps.scripts.forEach((s) => allScriptDeps.add(s));
+        childDeps.styles.forEach((s) => allStyleDeps.add(s));
       }
     }
-    // kick off the traversal from root, then resolve the list of dependencies
-    return _getDeps(url).then(() => Array.from(allDeps));
+
+    return {
+      scripts: Array.from(allScriptDeps),
+      styles: Array.from(allStyleDeps),
+      imports: allHtmlDeps,
+    };
+  }
+
+  _collectScriptsAndStyles(tree: DocumentDescriptor): DocumentDeps {
+    let scripts = [];
+    let styles = [];
+    tree.html.script.forEach((script) => {
+      if (script['__hydrolysisInlined']) {
+        scripts.push(script['__hydrolysisInlined']);
+      }
+    });
+    tree.html.style.forEach((style) => {
+      let href = getAttribute(style, 'href');
+      if (href) {
+        styles.push(href);
+      }
+    });
+    return {
+      scripts,
+      styles
+    }
   }
 }
 
 export interface DepsIndex {
   depsToFragments: Map<string, string[]>;
+  // TODO(garlicnation): Remove this map.
+  // A legacy map from framents to html dependencies.
   fragmentToDeps: Map<string, string[]>;
+  // A map from frament urls to html, js, and css dependencies.
+  fragmentToFullDeps: Map<string, DocumentDeps>;
 }
 
 class StreamResolver implements Resolver {
