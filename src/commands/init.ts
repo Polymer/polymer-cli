@@ -49,22 +49,24 @@ export class InitCommand implements Command {
       let templateDescriptions = {
         'application': "Application-style project",
         'element': "Reusable element-style project",
-        'shop': "shop demo app",
-        'prpl-demo': "PRPL demo app",
+        'shop': "The Shop PRPL demo application",
+        'app-drawer-template':
+            "Application template that demonstrates the PRPL pattern",
       };
 
       env.registerStub(ElementGenerator, 'polymer-init-element:app');
       env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
       let shopGenerator = createGithubGenerator({
-        owner: 'PolymerLabs',
-        repo: 'polykart',
+        owner: 'Polymer',
+        repo: 'shop',
       });
       env.registerStub(shopGenerator, 'polymer-init-shop:app');
-      let prplGenerator = createGithubGenerator({
-        owner: 'PolymerLabs',
-        repo: 'prpl-demo',
+      let appDrawerGenerator = createGithubGenerator({
+        owner: 'Polymer',
+        repo: 'app-drawer-template',
       });
-      env.registerStub(prplGenerator, 'polymer-init-prpl-demo:app');
+      env.registerStub(appDrawerGenerator,
+          'polymer-init-app-drawer-template:app');
 
       env.lookup(() => {
         let generators = env.getGeneratorsMeta();

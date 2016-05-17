@@ -59,7 +59,9 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
     }
 
     install() {
-      this.installDependencies();
+      this.installDependencies({
+        npm: false,
+      });
     }
   }
 }
