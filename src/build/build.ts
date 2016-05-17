@@ -35,7 +35,7 @@ const findConfig = require('liftoff/lib/find_config');
 const minimatchAll = require('minimatch-all');
 let logger = logging.getLogger('cli.build.build');
 
-export interface BuildOptions {
+export interface BuildOptions extends OptimizeOptions {
   sources?: string[];
   dependencies?: string[];
   swPrecacheConfig?: string;
@@ -82,9 +82,10 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     allFragments = allFragments.concat(fragments);
     logger.debug(`fragments: ${fragments}`);
 
+    // TODO: let this be set by the user
     let optimizeOptions: OptimizeOptions = {
       html: {
-        removeComments: true
+        removeComments: true,
       },
       css: {
         stripWhitespace: true
@@ -93,6 +94,17 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
         minify: true
       }
     };
+
+    // mix in optimization options from build command
+    if (options.html) {
+      Object.assign(optimizeOptions.html, options.html);
+    }
+    if (options.css) {
+      Object.assign(optimizeOptions.css, options.css);
+    }
+    if (options.js) {
+      Object.assign(optimizeOptions.js, options.js);
+    }
 
     let gulpfile = getGulpfile();
     let userTransformers = gulpfile && gulpfile.transformers;

@@ -11,6 +11,7 @@
 import {ArgDescriptor} from 'command-line-args';
 import {CLI} from 'command-line-commands';
 
+import {BuildOptions} from '../build/build';
 import {Command} from './command';
 import * as logging from 'plylog';
 
@@ -40,6 +41,11 @@ export class BuildCommand implements Command {
       description: 'Flatten dependency tree downloads by inserting ' +
         'additional `<link rel="prefetch">` tags into ' +
         'entrypoint and `<link rel="import">` tags into fragments and shell.'
+    },
+    {
+      name: 'html.collapseWhitespace',
+      type: Boolean,
+      description: 'Collapse whitespace in HTML files'
     }
   ];
 
@@ -47,11 +53,17 @@ export class BuildCommand implements Command {
     // Defer dependency loading until this specific command is run
     const build = require('../build/build').build;
 
-    let buildOptions = {
+    let buildOptions: BuildOptions = {
       sources: options.sources,
       swPrecacheConfig: options['sw-precache-config'],
-      insertDependencyLinks: options['insert-dependency-links']
+      insertDependencyLinks: options['insert-dependency-links'],
+      html: {},
+      css: {},
+      js: {}
     };
+    if (options['html.collapseWhitespace']) {
+      buildOptions.html.collapseWhitespace = true;
+    }
     logger.debug('building with options', buildOptions);
 
     if (options.env && options.env.build) {
