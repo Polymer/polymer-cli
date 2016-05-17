@@ -15,9 +15,10 @@ import {ReyServe} from './reyserve';
 class EnvironmentMap extends Map<string, {new(): Environment}> {
 }
 
-// TODO(garlicnation): Bring tis into polytool.ts
+// TODO(garlicnation): Bring this into polytool.ts
 const environments = new EnvironmentMap()
-environments.set('reyserve', ReyServe);
+// TODO(garlicnation): Re-enable
+// environments.set('reyserve', ReyServe);
 
 /**
  * Builds an environment with the given name.
