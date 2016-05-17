@@ -25,7 +25,8 @@ export interface OptimizeOptions {
    * Options passed to gulp-html-minifier
    */
   html?: {
-    [property: string]: boolean;
+    collapseWhitespace?: boolean;
+    removeComments?: boolean;
   };
   /**
    * Enable CSS minification
