@@ -49,7 +49,7 @@ export class StreamAnalyzer extends Transform {
       this.allFragments.push(shell);
     }
 
-    if (entrypoint) {
+    if (entrypoint && !shell && fragments.length === 0) {
       this.allFragments.push(entrypoint);
     }
 

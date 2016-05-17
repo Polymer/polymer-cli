@@ -16,7 +16,9 @@ const StreamAnalyzer = require('../../lib/build/analyzer').StreamAnalyzer;
 const vfs = require('vinyl-fs-fake');
 
 suite('Analzyer', () => {
+
   suite('DepsIndex', () => {
+
     test('fragment to deps list has only uniques', (done) => {
       let root = path.resolve('test/build/analyzer');
       let analyzer = new StreamAnalyzer(root, null, null, [
@@ -24,16 +26,33 @@ suite('Analzyer', () => {
         'b.html',
       ]);
       vfs.src(root + '/**', {cwdbase: true})
-      .pipe(analyzer)
-      .on('finish', () => {
-        analyzer.analyze.then((depsIndex) => {
-          let ftd = depsIndex.fragmentToDeps;
-          for (let frag of ftd.keys()) {
-            assert.deepEqual(ftd.get(frag), ['shared-1.html', 'shared-2.html']);
-          }
-          done();
-        }).catch((err) => done(err));
+        .pipe(analyzer)
+        .on('finish', () => {
+          analyzer.analyze.then((depsIndex) => {
+            let ftd = depsIndex.fragmentToDeps;
+            for (let frag of ftd.keys()) {
+              assert.deepEqual(ftd.get(frag), ['shared-1.html', 'shared-2.html']);
+            }
+            done();
+          }).catch((err) => done(err));
       });
     });
-  })
+
+    test("analyzing shell and entrypoint doesn't double load files", (done) => {
+      let root = path.resolve('test/build/analyzer');
+      let analyzer = new StreamAnalyzer(root, 'entrypoint.html', 'shell.html');
+      vfs.src(root + '/**', {cwdbase: true})
+        .pipe(analyzer)
+        .on('finish', () => {
+          analyzer.analyze.then((depsIndex) => {
+            assert.isTrue(depsIndex.depsToFragments.has('shared-2.html'));
+            assert.isFalse(depsIndex.depsToFragments.has('/shell.html'));
+            assert.isFalse(depsIndex.depsToFragments.has('/shared-2.html'));
+            done();
+          }).catch((err) => done(err));
+      });
+    });
+
+  });
+
 });
