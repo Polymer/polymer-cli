@@ -11,10 +11,12 @@
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const mergeStream = require('merge-stream');
+const eslint = require('gulp-eslint');
 const mocha = require('gulp-mocha');
 const path = require('path');
 const typescript = require('gulp-typescript');
 const typings = require('gulp-typings');
+const exec = require('child_process').exec;
 
 var tsProject = typescript.createProject('tsconfig.json');
 
@@ -32,6 +34,20 @@ gulp.task('clean', (done) => {
 });
 
 gulp.task('build-all', ['clean', 'init', 'build']);
+
+gulp.task('lint', function (cb) {
+  exec('depcheck . --ignores "generator-polymer-init"', function (err, stdout, stderr) {
+    if (err) {
+      throw err;
+    }
+    console.log(stdout);
+    gulp.src(['test/**/*.js'])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+        .on('finish', cb);
+  });
+});
 
 gulp.task('test', ['build'], () =>
   gulp.src('test/**/*_test.js', {read: false})
