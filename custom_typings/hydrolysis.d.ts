@@ -39,7 +39,11 @@ declare module 'hydrolysis' {
 
     // parsedScript?: estree.Program;
 
-    // html?: ParsedImport;
+    html?: {
+      script: Node[],
+      style: Node[],
+      ast: Node
+    };
   }
 
   /**
@@ -76,7 +80,7 @@ declare module 'hydrolysis' {
 
     constructor(attachAST: boolean, loader: Loader);
 
-    metadataTree(path: string): Promise<void>;
+    metadataTree(path: string): Promise<DocumentDescriptor>;
     annotate(): void;
     elements: Element[];
     behaviors: Behavior[];
