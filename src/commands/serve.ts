@@ -69,11 +69,20 @@ export class ServeCommand implements Command {
   ];
 
   run(options, config): Promise<any> {
+    let openPath;
+    if (config.entrypoint && config.shell) {
+      let rootLength = (config.root && config.root.length) || 0;
+      openPath = config.entrypoint.substring(config.root.length);
+      if (openPath == 'index.html' || openPath == '/index.html') {
+        openPath = '/';
+      }
+    }
     let serverOptions: ServerOptions = {
       root: config.root,
       port: options.port,
       hostname: options.hostname,
       open: options.open,
+      openPath: openPath,
       browser: options.browser,
       componentDir: options['component-dir'],
       packageName: options['package-name'],
