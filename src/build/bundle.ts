@@ -38,8 +38,6 @@ export class Bundler extends Transform {
   analyzer: StreamAnalyzer;
   sharedFile: File;
 
-  _verboseLogging = false;
-
   constructor(root: string, entrypoint: string,
       shell: string, fragments: string[], analyzer: StreamAnalyzer) {
     super({objectMode: true});
@@ -108,20 +106,7 @@ export class Bundler extends Transform {
 
   _buildBundles(): Promise<Map<string, string>> {
     return this._getBundles().then((bundles) => {
-      if (this._verboseLogging) {
-        logger.info('bundles:');
-        for (let url of bundles.keys()) {
-          let deps = bundles.get(url);
-          if (!deps) {
-            logger.info('    no deps?');
-          } else {
-            logger.info(`  ${url} (${deps.length}):`);
-            for (let dep of deps) {
-              logger.info(`    ${dep}`);
-            }
-          }
-        }
-      }
+      logger.debug('calculated bundles', bundles);
 
       let sharedDepsBundle = this.shell || this.sharedBundleUrl;
       let sharedDeps = bundles.get(sharedDepsBundle) || [];
@@ -143,6 +128,7 @@ export class Bundler extends Transform {
             : sharedDeps.concat(sharedDepsBundle);
 
         promises.push(new Promise((resolve, reject) => {
+          logger.debug(`vulcanizing ${fragment}...`);
           var vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.analyzer.resolver,
@@ -156,9 +142,6 @@ export class Bundler extends Transform {
             if (err) {
               reject(err);
             } else {
-              if (this._verboseLogging) {
-                logger.info(`vulcanized doc for ${fragment}: ${doc.length}`);
-              }
               resolve({
                 url: fragment,
                 contents: doc,
@@ -229,9 +212,7 @@ export class Bundler extends Transform {
           })
           .join('\n');
 
-      if (this._verboseLogging) {
-        logger.info('shared-bundle.html:\n', contents);
-      }
+      logger.debug(`shared-bundle.html: ${contents}`);
 
       this.sharedFile = new File({
         cwd: this.root,

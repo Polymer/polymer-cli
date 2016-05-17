@@ -60,7 +60,7 @@ export class BuildCommand implements Command {
       return options.env.build(buildOptions, config);
     }
 
-    logger.debug('building via build()...');
+    logger.debug('building via standard build()...');
     return build(buildOptions, config);
   }
 }
