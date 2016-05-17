@@ -33,6 +33,13 @@ export class BuildCommand implements Command {
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
         'used for service worker generation.'
+    },
+    {
+      name: 'insert-dependency-links',
+      type: Boolean,
+      description: 'Flatten dependency tree downloads by inserting ' +
+        'additional `<link rel="prefetch">` tags into ' +
+        'entrypoint and `<link rel="import">` tags into fragments and shell.'
     }
   ];
 
@@ -42,7 +49,8 @@ export class BuildCommand implements Command {
 
     let buildOptions = {
       sources: options.sources,
-      swPrecacheConfig: options['sw-precache-config']
+      swPrecacheConfig: options['sw-precache-config'],
+      insertDependencyLinks: options['insert-dependency-links']
     };
     logger.debug('building with options', buildOptions);
 

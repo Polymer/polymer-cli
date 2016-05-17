@@ -39,6 +39,7 @@ export interface BuildOptions {
   sources?: string[];
   dependencies?: string[];
   swPrecacheConfig?: string;
+  insertDependencyLinks?: boolean;
 }
 
 export function build(options?: BuildOptions, config?: ProjectConfig): Promise<any> {
@@ -111,7 +112,13 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     let serviceWorkerName = 'service-worker.js';
 
     let unbundledPhase = new ForkedVinylStream(allFiles)
-      .pipe(new PrefetchTransform(root, entrypoint, shell, fragments, analyzer))
+      .pipe(
+        gulpif(
+          options.insertDependencyLinks,
+          new PrefetchTransform(root, entrypoint,
+                shell, fragments, analyzer)
+        )
+      )
       .pipe(vfs.dest('build/unbundled'));
 
     let bundledPhase = new ForkedVinylStream(allFiles)
