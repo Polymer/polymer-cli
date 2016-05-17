@@ -1,4 +1,5 @@
 declare module 'hydrolysis' {
+  import {Node} from 'dom5';
   interface Options {
     filter?: (path: string) => boolean;
   }
@@ -79,6 +80,8 @@ declare module 'hydrolysis' {
     annotate(): void;
     elements: Element[];
     behaviors: Behavior[];
+    html: {[path: string]: AnalyzedDocument};
+    parsedDocuments: {[path: string]: Node};
 
     load(href: string):Promise<AnalyzedDocument>;
 

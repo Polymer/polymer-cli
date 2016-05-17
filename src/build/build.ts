@@ -155,12 +155,14 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
       .pipe(bundler)
       .pipe(vfs.dest('build/bundled'));
 
-    let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig) => {
+    let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig, scriptDeps?: string[]) => {
       logger.debug(`Generating service worker for ${buildRoot}...`);
+      logger.info(`Script deps: ${scriptDeps}`);
       return generateServiceWorker({
         root,
         entrypoint,
         deps,
+        scriptDeps,
         buildRoot,
         swConfig: clone(swConfig),
         serviceWorkerPath: path.join(root, buildRoot, serviceWorkerName)
@@ -172,6 +174,10 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
       .then((depsIndex) => {
         let unbundledDeps = analyzer.allFragments
             .concat(Array.from(depsIndex.depsToFragments.keys()));
+            
+        let fullDeps = Array.from(depsIndex.fragmentToFullDeps.values());
+        let scriptDeps = new Set<string>();
+        fullDeps.forEach(d => d.scripts.forEach(s => scriptDeps.add(s)));
 
         let bundledDeps = analyzer.allFragments
             .concat(bundler.sharedBundleUrl);
@@ -185,7 +191,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
 
           logger.info(`Generating service workers...`);
           return Promise.all([
-            genSW('build/unbundled', unbundledDeps, swConfig),
+            genSW('build/unbundled', unbundledDeps, swConfig, Array.from(scriptDeps)),
             genSW('build/bundled', bundledDeps, swConfig)
           ]);
         })
