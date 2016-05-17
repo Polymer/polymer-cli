@@ -2,6 +2,7 @@
   "name": "<%= name %>",
 <% if (description) { -%>  "description": "<%= description %>",
 <% } -%>
+  "main": "index.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0"
   },
