@@ -38,6 +38,7 @@ export class BuildCommand implements Command {
     {
       name: 'insert-dependency-links',
       type: Boolean,
+      devaultValue: true,
       description: 'Flatten dependency tree downloads by inserting ' +
         'additional `<link rel="prefetch">` tags into ' +
         'entrypoint and `<link rel="import">` tags into fragments and shell.'
