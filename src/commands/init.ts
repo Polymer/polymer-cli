@@ -47,11 +47,10 @@ export class InitCommand implements Command {
       let env = new YeomanEnvironment();
 
       let templateDescriptions = {
-        'application': "Application-style project",
-        'element': "Reusable element-style project",
-        'shop': "The Shop PRPL demo application",
-        'app-drawer-template':
-            "Application template that demonstrates the PRPL pattern",
+        'element': 'A blank element template',
+        'application': 'A blank application template',
+        'app-drawer-template': 'A starter application template, with navigation and "PRPL pattern" loading',
+        'shop': 'The "Shop" Progressive Web App demo',
       };
 
       env.registerStub(ElementGenerator, 'polymer-init-element:app');
@@ -122,7 +121,7 @@ export class InitCommand implements Command {
           inquirer.prompt([{
             type: 'list',
             name: 'generatorName',
-            message: 'Choose a template to initialize this folder with',
+            message: 'Which starter template would you like to use?',
             choices: choices,
           }]).then((answers) => {
             let generatorName = answers.generatorName;
