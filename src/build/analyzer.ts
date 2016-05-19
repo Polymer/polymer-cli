@@ -241,8 +241,8 @@ class StreamResolver implements Resolver {
   }
 
   accept(url: string, deferred: Deferred<string>): boolean {
-    var parsed = parseUrl(url);
-    var filepath: string;
+    let parsed = parseUrl(url);
+    let filepath: string;
 
     if (!parsed.hostname) {
       filepath = parsed.pathname;

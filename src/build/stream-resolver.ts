@@ -100,8 +100,8 @@ export class StreamResolver extends Transform /* implements Resolver */ {
   }
 
   accept(uri: string, deferred: Deferred<string>): boolean {
-    var parsed = url.parse(uri);
-    var local: string;
+    let parsed = url.parse(uri);
+    let local: string;
 
     if (!parsed.hostname || parsed.hostname === this.host) {
       local = parsed.pathname;
@@ -164,7 +164,7 @@ export class StreamResolver extends Transform /* implements Resolver */ {
  * Returns true if `patha` is a sibling or aunt of `pathb`.
  */
 function isSiblingOrAunt(patha: string, pathb: string) {
-  var parent = path.dirname(patha);
+  let parent = path.dirname(patha);
   if (pathb.indexOf(patha) === -1 && pathb.indexOf(parent) === 0) {
     return true;
   }
@@ -176,7 +176,7 @@ function isSiblingOrAunt(patha: string, pathb: string) {
  * `basePath` joined with `redirect`.
  */
 function redirectSibling(basePath: string, localPath: string, redirect: string) {
-  var parent = path.dirname(basePath);
-  var redirected = path.join(basePath, redirect, localPath.slice(parent.length));
+  let parent = path.dirname(basePath);
+  let redirected = path.join(basePath, redirect, localPath.slice(parent.length));
   return redirected;
 }

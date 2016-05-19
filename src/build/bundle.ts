@@ -129,7 +129,7 @@ export class Bundler extends Transform {
 
         promises.push(new Promise((resolve, reject) => {
           logger.debug(`vulcanizing ${fragment}...`);
-          var vulcanize = new Vulcanize({
+          let vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.analyzer.resolver,
             addedImports: addedImports,
@@ -224,7 +224,7 @@ export class Bundler extends Transform {
       // make the shared bundle visible to vulcanize
       this.analyzer.addFile(this.sharedFile);
 
-      var vulcanize = new Vulcanize({
+      let vulcanize = new Vulcanize({
         abspath: null,
         fsResolver: this.analyzer.resolver,
         inlineScripts: true,

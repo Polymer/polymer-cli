@@ -26,9 +26,9 @@ export class ApplicationGenerator extends Base {
   }
 
   prompting() {
-    var _this = this;
+    let _this = this;
 
-    var prompts = [
+    let prompts = [
       {
         name: 'name',
         type: 'input',
