@@ -76,27 +76,27 @@ export class TestCommand implements Command {
     },
     {
       name: 'build-number',
-      description: "The build number tested by this test for the sauce labs REST API",
+      description: 'The build number tested by this test for the sauce labs REST API',
       type: String,
     },
     {
       name: 'job-name',
-      description: "Job name for the sauce labs REST API",
+      description: 'Job name for the sauce labs REST API',
       type: String,
     },
     {
       name: 'port',
-      description: "Select an alternative port for Sauce Connect (default is 4445)",
+      description: 'Select an alternative port for Sauce Connect (default is 4445)',
       type: String,
     },
     {
       name: 'sauce-tunnel-id',
-      description: "Sauce Connect tunnel identifier",
+      description: 'Sauce Connect tunnel identifier',
       type: String,
     },
     {
       name: 'sauce-username',
-      description: "Sauce Labs username",
+      description: 'Sauce Labs username',
       type: String,
     },
     {

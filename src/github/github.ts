@@ -20,7 +20,7 @@ const tar = require('tar-fs');
 let logger = logging.getLogger('cli.github');
 
 class GithubResponseError extends Error {
-  name = "GithubResponseError";
+  name = 'GithubResponseError';
   statusCode: number;
   statusMessage: string;
 
