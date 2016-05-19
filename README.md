@@ -1,6 +1,10 @@
 # polymer-cli
 
-A command-line tool for Polymer projects
+A command-line tool for Polymer projects.
+
+For detailed help, check out the 
+[Polymer CLI](https://www.polymer-project.org/1.0/docs/tools/polymer-cli)
+guide. 
 
 ## Overview
 
