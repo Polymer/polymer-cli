@@ -30,9 +30,9 @@ export class HelpCommand implements Command {
     defaultOption: true,
   }];
 
-  commands : Map<String, Command> = new Map();
+  commands: Map<String, Command> = new Map();
 
-  constructor(commands : Map<String, Command>) {
+  constructor(commands: Map<String, Command>) {
     this.commands = commands;
   }
 

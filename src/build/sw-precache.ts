@@ -94,7 +94,7 @@ export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
       if (!err) {
         try {
           config = require(configFile);
-        } catch(e) {
+        } catch (e) {
           logger.warn(`${configFile} file was found but could not be loaded`, {err});
         }
       }

@@ -69,7 +69,7 @@ export class Bundler extends Transform {
       file: File,
       encoding: string,
       callback: (error?, data?: File) => void
-    ) : void {
+    ): void {
 
     // If this is the entrypoint, hold on to the file, so that it's fully
     // analyzed by the time down-stream transforms see it.

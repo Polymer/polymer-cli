@@ -20,7 +20,7 @@ import {Node, queryAll, predicates, getAttribute} from 'dom5';
 const minimatchAll = require('minimatch-all');
 let logger = logging.getLogger('cli.build.analyzer');
 
-export interface DocumentDeps{
+export interface DocumentDeps {
   imports?: Array<string>;
   scripts?: Array<string>;
   styles?: Array<string>;
@@ -77,7 +77,7 @@ export class StreamAnalyzer extends Transform {
       file: File,
       encoding: string,
       callback: (error?, data?: File) => void
-    ) : void {
+    ): void {
 
     // store the file for access by the resolver
     this.files.set(file.path, file);

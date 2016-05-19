@@ -40,7 +40,7 @@ process.on('unhandledRejection', (error) => {
 export class PolymerCli {
 
   commandDescriptors = [];
-  commands : Map<String, Command> = new Map();
+  commands: Map<String, Command> = new Map();
   cli: commandLineCommands.CLI;
   args: string[];
 
@@ -78,8 +78,10 @@ export class PolymerCli {
     });
   }
 
-  mergeDefinitions(command: Command, globals: ArgDescriptor[])
-      : ArgDescriptor[] {
+  mergeDefinitions(
+      command: Command,
+      globals: ArgDescriptor[]
+      ): ArgDescriptor[] {
     let mergedArgs = new Map<string, ArgDescriptor>();
     let defaultOption: string = null;
 

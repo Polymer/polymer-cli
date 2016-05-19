@@ -22,7 +22,7 @@ export class UglifyTransform extends Transform {
     super({objectMode: true});
   }
 
-  _transform(file: File, encoding: string, callback:(error?, data?) => void): void {
+  _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
     if (file.contents && file.path.endsWith('.js')) {
       try {
         let contents = file.contents.toString();

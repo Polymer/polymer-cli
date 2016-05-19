@@ -23,6 +23,6 @@ const environments = new EnvironmentMap();
 /**
  * Builds an environment with the given name.
  */
-export function buildEnvironment(name: string):Environment {
+export function buildEnvironment(name: string): Environment {
   return environments.has(name) && new (environments.get(name.toLowerCase()))();
 }
