@@ -133,11 +133,11 @@ class Splitter extends Transform {
           scriptTag.childNodes = [];
           dom5.setAttribute(scriptTag, 'src', childFilename);
           let scriptFile = new File({
-        		cwd: file.cwd,
-        		base: file.base,
-        		path: childPath,
-        		contents: new Buffer(source),
-        	});
+            cwd: file.cwd,
+            base: file.base,
+            path: childPath,
+            contents: new Buffer(source),
+          });
           this._project.addSplitPath(file.path, childPath);
           this.push(scriptFile);
         }
