@@ -16,6 +16,15 @@ const gunzip = require('gunzip-maybe');
 const request = require('request');
 const tar = require('tar-fs');
 
+class GithubResponseError extends Error {
+  public name = "GithubResponseError";
+  public statusCode: number;
+  public statusMessage: string;
+  constructor(public message?: string) {
+    super(message);
+  }
+}
+
 export interface GithubOpts {
   owner: string,
   repo: string,
@@ -79,7 +88,15 @@ export class Github {
           url: tarballUrl,
           headers: {
             'User-Agent': 'request',
-            'Authorization': (this._token) ? `token ${this._token}` : undefined
+            'Authorization': (this._token) ? `token ${this._token}` : undefined,
+          }
+        })
+        .on('response', function(response) {
+          if (response.statusCode != 200) {
+            let err = new GithubResponseError('Unexpected response from GitHub');
+            err.statusCode = response.statusCode;
+            err.statusMessage = response.statusMessage;
+            throw err;
           }
         })
         .on('end', () => {
