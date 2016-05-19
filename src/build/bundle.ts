@@ -122,7 +122,7 @@ export class Bundler extends Transform {
       for (let fragment of this.allFragments) {
         let addedImports = (fragment == this.shell && this.shell)
             ? []
-            : [path.relative(path.dirname(fragment), sharedDepsBundle)]
+            : [path.relative(path.dirname(fragment), sharedDepsBundle)];
         let excludes = (fragment == this.shell && this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
@@ -261,7 +261,7 @@ export class Bundler extends Transform {
         if (!imports.includes(to)) {
           imports.push(to);
         }
-      }
+      };
 
       // We want to collect dependencies that appear in > 1 entrypoint, but
       // we need to collect them in document order, so rather than iterate

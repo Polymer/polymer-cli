@@ -16,7 +16,7 @@ class EnvironmentMap extends Map<string, {new(): Environment}> {
 }
 
 // TODO(garlicnation): Bring this into polytool.ts
-const environments = new EnvironmentMap()
+const environments = new EnvironmentMap();
 // TODO(garlicnation): Re-enable
 // environments.set('reyserve', ReyServe);
 

@@ -9,8 +9,8 @@
  */
 
 import {ArgDescriptor} from './commands/command';
-import {Environment} from './environment/environment'
-import {buildEnvironment} from './environments/environments'
+import {Environment} from './environment/environment';
+import {buildEnvironment} from './environments/environments';
 
 export const globalArguments: ArgDescriptor[] = [
   {

@@ -53,7 +53,7 @@ export function optimize(options?: OptimizeOptions) {
       transforms.push(cssSlam());
     }
     if (options.html) {
-      transforms.push(gulpif(/\.html$/, htmlmin(options.html)))
+      transforms.push(gulpif(/\.html$/, htmlmin(options.html)));
     }
   }
   return compose(transforms);

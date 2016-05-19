@@ -33,11 +33,11 @@ class GithubResponseError extends Error {
 }
 
 export interface GithubOpts {
-  owner: string,
-  repo: string,
-  githubToken?: string,
-  githubApi?,
-  requestApi?
+  owner: string;
+  repo: string;
+  githubToken?: string;
+  githubApi?;
+  requestApi?;
 }
 
 export class Github {
@@ -117,7 +117,7 @@ export class Github {
         })
         .on('error', (error) => {
           throw error;
-        })
+        });
       })
       .catch((error) => {
         reject(error);

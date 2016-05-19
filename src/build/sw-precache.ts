@@ -25,7 +25,7 @@ function writeSWPrecache(destinationPath: string, config: SWConfig): Promise<voi
 }
 
 export interface SWConfig {
-  cacheId?: string,
+  cacheId?: string;
   directoryIndex?: string;
   dynamicUrlToDependencies?: {
     [property: string]: string[]

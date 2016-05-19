@@ -21,9 +21,9 @@ const minimatchAll = require('minimatch-all');
 let logger = logging.getLogger('cli.build.analyzer');
 
 export interface DocumentDeps{
-  imports?: Array<string>,
-  scripts?: Array<string>,
-  styles?: Array<string>
+  imports?: Array<string>;
+  scripts?: Array<string>;
+  styles?: Array<string>;
 }
 
 export class StreamAnalyzer extends Transform {
@@ -220,7 +220,7 @@ export class StreamAnalyzer extends Transform {
     return {
       scripts,
       styles
-    }
+    };
   }
 }
 
