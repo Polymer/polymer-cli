@@ -9,6 +9,7 @@
  */
 
 import {Command} from './command';
+import {execSync} from 'child_process';
 import {ArgDescriptor} from 'command-line-args';
 import * as fs from 'fs';
 import * as logging from 'plylog';
@@ -118,18 +119,32 @@ export class InitCommand implements Command {
               short: name,
             };
           });
-          inquirer.prompt([{
-            type: 'list',
+          // Some windows emulators (mingw) don't handle arrows correctly
+          // https://github.com/SBoudrias/Inquirer.js/issues/266
+          // Fall back to rawlist and use number input
+          // Credit to https://gist.github.com/geddski/c42feb364f3c671d22b6390d82b8af8f
+          let isWindows = /^win/.test(process.platform);
+          let isMinGW = false;
+          if (isWindows) {
+            // uname might not exist if using cmd or powershell,
+            // which would throw an exception
+            try {
+              let uname = execSync('uname -s').toString();
+              isMinGW = /^mingw/i.test(uname);
+            } catch (e) {}
+          }
+          let prompt = {
+            type: isMinGW ? 'rawlist' : 'list',
             name: 'generatorName',
             message: 'Which starter template would you like to use?',
             choices: choices,
-          }]).then((answers) => {
+          };
+          inquirer.prompt([prompt]).then((answers) => {
             let generatorName = answers.generatorName;
             runGenerator(generatorName, getDisplayName(generatorName));
           });
         }
       });
-
     });
   }
 }
