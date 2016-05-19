@@ -92,7 +92,7 @@ export class PolymerCli {
         } else {
           let mergedDefinition = Object.assign({}, oldDefinition);
           for (let propName of Object.keys(definition)) {
-            if (propName == 'name') continue;
+            if (propName === 'name') continue;
             let propValue = definition[propName];
             let oldProp = oldDefinition[propName];
             if (oldProp == null) {
@@ -106,7 +106,7 @@ export class PolymerCli {
           definition = mergedDefinition;
         }
         if (definition.defaultOption) {
-          if (defaultOption && defaultOption != name) {
+          if (defaultOption && defaultOption !== name) {
             throw new Error(`Multiple default arguments in ${command.name}: ` +
                 `${defaultOption} and ${name}`);
           }

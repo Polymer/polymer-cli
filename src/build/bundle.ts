@@ -120,10 +120,10 @@ export class Bundler extends Transform {
       }
 
       for (let fragment of this.allFragments) {
-        let addedImports = (fragment == this.shell && this.shell)
+        let addedImports = (fragment === this.shell && this.shell)
             ? []
             : [path.relative(path.dirname(fragment), sharedDepsBundle)];
-        let excludes = (fragment == this.shell && this.shell)
+        let excludes = (fragment === this.shell && this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
 

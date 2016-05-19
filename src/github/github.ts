@@ -100,7 +100,7 @@ export class Github {
           }
         })
         .on('response', function(response) {
-          if (response.statusCode != 200) {
+          if (response.statusCode !== 200) {
             let err = new GithubResponseError(
                 response.statusCode,
                 response.statusMessage);

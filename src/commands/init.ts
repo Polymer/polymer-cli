@@ -85,7 +85,7 @@ export class InitCommand implements Command {
 
         let getDisplayName = (generatorName) => {
           let nameEnd = generatorName.indexOf(':');
-          if (nameEnd == -1) nameEnd = generatorName.length;
+          if (nameEnd === -1) nameEnd = generatorName.length;
           return generatorName.substring('polymer-init-'.length, nameEnd);
         };
 
