@@ -79,7 +79,7 @@ export class Github {
           url: tarballUrl,
           headers: {
             'User-Agent': 'request',
-            'Authorization': `token ${this._token}`
+            'Authorization': (this._token) ? `token ${this._token}` : undefined
           }
         })
         .on('end', () => {
