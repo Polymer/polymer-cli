@@ -63,7 +63,6 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "depcheck": "^0.6.3",
-    "eslint": "^2.9.0",
     "gulp-eslint": "^2.0.0",
     "gulp-mocha": "^2.2.0",
     "gulp-tslint": "^5.0.0",
