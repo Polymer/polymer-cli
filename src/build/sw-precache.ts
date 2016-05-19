@@ -25,7 +25,7 @@ function writeSWPrecache(destinationPath: string, config: SWConfig): Promise<voi
 }
 
 export interface SWConfig {
-  cacheId?: string,
+  cacheId?: string;
   directoryIndex?: string;
   dynamicUrlToDependencies?: {
     [property: string]: string[]
@@ -94,7 +94,7 @@ export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
       if (!err) {
         try {
           config = require(configFile);
-        } catch(e) {
+        } catch (e) {
           logger.warn(`${configFile} file was found but could not be loaded`, {err});
         }
       }

@@ -32,8 +32,8 @@ const extensionsForType = {
  */
 export class HtmlProject {
 
-  _splitFiles : Map<string, SplitFile> = new Map();
-  _parts : Map<string, SplitFile> = new Map();
+  _splitFiles: Map<string, SplitFile> = new Map();
+  _parts: Map<string, SplitFile> = new Map();
   split = new Splitter(this);
   rejoin = new Rejoiner(this);
 
@@ -67,10 +67,10 @@ export class HtmlProject {
  * Represents a file that is split into multiple files.
  */
 class SplitFile {
-  path : string;
-  parts : Map<string, string> = new Map();
+  path: string;
+  parts: Map<string, string> = new Map();
   outstandingPartCount = 0;
-  vinylFile : File = null;
+  vinylFile: File = null;
 
   constructor(path: string) {
     this.path = path;
@@ -103,7 +103,7 @@ class Splitter extends Transform {
     pred.NOT(pred.hasAttr('src'))
   );
 
-  _project : HtmlProject;
+  _project: HtmlProject;
 
   constructor(project) {
     super({objectMode: true});
@@ -133,11 +133,11 @@ class Splitter extends Transform {
           scriptTag.childNodes = [];
           dom5.setAttribute(scriptTag, 'src', childFilename);
           let scriptFile = new File({
-        		cwd: file.cwd,
-        		base: file.base,
-        		path: childPath,
-        		contents: new Buffer(source),
-        	});
+            cwd: file.cwd,
+            base: file.base,
+            path: childPath,
+            contents: new Buffer(source),
+          });
           this._project.addSplitPath(file.path, childPath);
           this.push(scriptFile);
         }
@@ -169,7 +169,7 @@ class Rejoiner extends Transform {
     pred.hasAttr('src')
   );
 
-  _project : HtmlProject;
+  _project: HtmlProject;
 
   constructor(project) {
     super({objectMode: true});

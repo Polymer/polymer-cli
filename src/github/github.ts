@@ -20,7 +20,7 @@ const tar = require('tar-fs');
 let logger = logging.getLogger('cli.github');
 
 class GithubResponseError extends Error {
-  name = "GithubResponseError";
+  name = 'GithubResponseError';
   statusCode: number;
   statusMessage: string;
 
@@ -33,11 +33,11 @@ class GithubResponseError extends Error {
 }
 
 export interface GithubOpts {
-  owner: string,
-  repo: string,
-  githubToken?: string,
-  githubApi?,
-  requestApi?
+  owner: string;
+  repo: string;
+  githubToken?: string;
+  githubApi?;
+  requestApi?;
 }
 
 export class Github {
@@ -100,7 +100,7 @@ export class Github {
           }
         })
         .on('response', function(response) {
-          if (response.statusCode != 200) {
+          if (response.statusCode !== 200) {
             let err = new GithubResponseError(
                 response.statusCode,
                 response.statusMessage);
@@ -117,7 +117,7 @@ export class Github {
         })
         .on('error', (error) => {
           throw error;
-        })
+        });
       })
       .catch((error) => {
         reject(error);

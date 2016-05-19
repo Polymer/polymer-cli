@@ -63,5 +63,5 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
         npm: false,
       });
     }
-  }
+  };
 }

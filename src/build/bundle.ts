@@ -69,7 +69,7 @@ export class Bundler extends Transform {
       file: File,
       encoding: string,
       callback: (error?, data?: File) => void
-    ) : void {
+    ): void {
 
     // If this is the entrypoint, hold on to the file, so that it's fully
     // analyzed by the time down-stream transforms see it.
@@ -120,16 +120,16 @@ export class Bundler extends Transform {
       }
 
       for (let fragment of this.allFragments) {
-        let addedImports = (fragment == this.shell && this.shell)
+        let addedImports = (fragment === this.shell && this.shell)
             ? []
-            : [path.relative(path.dirname(fragment), sharedDepsBundle)]
-        let excludes = (fragment == this.shell && this.shell)
+            : [path.relative(path.dirname(fragment), sharedDepsBundle)];
+        let excludes = (fragment === this.shell && this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
 
         promises.push(new Promise((resolve, reject) => {
           logger.debug(`vulcanizing ${fragment}...`);
-          var vulcanize = new Vulcanize({
+          let vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.analyzer.resolver,
             addedImports: addedImports,
@@ -224,7 +224,7 @@ export class Bundler extends Transform {
       // make the shared bundle visible to vulcanize
       this.analyzer.addFile(this.sharedFile);
 
-      var vulcanize = new Vulcanize({
+      let vulcanize = new Vulcanize({
         abspath: null,
         fsResolver: this.analyzer.resolver,
         inlineScripts: true,
@@ -261,7 +261,7 @@ export class Bundler extends Transform {
         if (!imports.includes(to)) {
           imports.push(to);
         }
-      }
+      };
 
       // We want to collect dependencies that appear in > 1 entrypoint, but
       // we need to collect them in document order, so rather than iterate

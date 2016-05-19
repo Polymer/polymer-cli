@@ -16,13 +16,13 @@ class EnvironmentMap extends Map<string, {new(): Environment}> {
 }
 
 // TODO(garlicnation): Bring this into polytool.ts
-const environments = new EnvironmentMap()
+const environments = new EnvironmentMap();
 // TODO(garlicnation): Re-enable
 // environments.set('reyserve', ReyServe);
 
 /**
  * Builds an environment with the given name.
  */
-export function buildEnvironment(name: string):Environment {
+export function buildEnvironment(name: string): Environment {
   return environments.has(name) && new (environments.get(name.toLowerCase()))();
 }

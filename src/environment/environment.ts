@@ -12,5 +12,5 @@ import {BuildOptions} from '../build/build';
 
 export interface Environment {
   serve(options: ServerOptions): Promise<any>;
-  build(options: BuildOptions): Promise<any>
+  build(options: BuildOptions): Promise<any>;
 }

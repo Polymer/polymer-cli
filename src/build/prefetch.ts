@@ -107,7 +107,7 @@ export class PrefetchTransform extends Transform {
   }
 
   isImportantFile(file) {
-    return file.path == this.entrypoint ||
+    return file.path === this.entrypoint ||
         this.allFragments.indexOf(file.path) > -1;
   }
 

@@ -117,7 +117,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
     let analyzer = new StreamAnalyzer(root, entrypoint, shell, fragments);
     let bundler = new Bundler(root, entrypoint, shell, fragments, analyzer);
 
-    logger.info(`Building application...`)
+    logger.info(`Building application...`);
     logger.debug(`Reading source files...`);
     let sourcesStream =
       vfs.src(allSources, {cwdbase: true, allowEmpty: true})
@@ -131,7 +131,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
       vfs.src(dependencies, {cwdbase: true, allowEmpty: true})
         .pipe(depsProject.split)
         .pipe(optimize(optimizeOptions))
-        .pipe(depsProject.rejoin)
+        .pipe(depsProject.rejoin);
 
     let allFiles = mergeStream(sourcesStream, depsStream)
       .once('data', () => { logger.debug('Analyzing build dependencies...'); })
@@ -201,7 +201,7 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
         .then(() => {
           logger.info('Build complete!');
           buildResolve();
-        })
+        });
       });
   });
 }

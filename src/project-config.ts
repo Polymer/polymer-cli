@@ -30,7 +30,7 @@ export class ProjectConfig {
     try {
       let configContent = fs.readFileSync(filepath, 'utf-8');
       return JSON.parse(configContent);
-    } catch(error) {
+    } catch (error) {
       // don't log if error is just "file not found"
       if (error.code !== 'ENOENT') {
         console.log('Could not load config file');
@@ -66,7 +66,9 @@ export class ProjectConfig {
         if (bowerConfig.main && typeof bowerConfig.main === 'string') {
           this.entrypoint = path.resolve(this.root, bowerConfig.main);
         }
-      } catch(_) {}
+      } catch (e) {
+        // do nothing
+      }
     }
     if (options.shell) {
       this.shell = path.resolve(this.root, options.shell);

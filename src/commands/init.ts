@@ -85,7 +85,7 @@ export class InitCommand implements Command {
 
         let getDisplayName = (generatorName) => {
           let nameEnd = generatorName.indexOf(':');
-          if (nameEnd == -1) nameEnd = generatorName.length;
+          if (nameEnd === -1) nameEnd = generatorName.length;
           return generatorName.substring('polymer-init-'.length, nameEnd);
         };
 
@@ -106,7 +106,7 @@ export class InitCommand implements Command {
             } else if (generator.resolved && generator.resolved !== 'unknown') {
               let metapath = findup('package.json', {cwd: generator.resolved});
               if (metapath) {
-                var meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
+                let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
                 description = meta.description;
               }
             }

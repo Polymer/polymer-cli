@@ -24,34 +24,34 @@ export class LintCommand implements Command {
 
   args = [
     {
-      name: "policy",
+      name: 'policy',
       type: String,
-      alias: "p",
-      description: "Your jsconf.json policy file.",
+      alias: 'p',
+      description: 'Your jsconf.json policy file.',
       defaultValue: null
     },
     {
-      name: "config-file",
+      name: 'config-file',
       type: String,
-      defaultValue: "bower.json",
+      defaultValue: 'bower.json',
       description: (
-        "If inputs are specified, look for `config-field` in this JSON file."
+        'If inputs are specified, look for `config-field` in this JSON file.'
       )
     },
     {
-      name: "config-field",
+      name: 'config-field',
       type: String,
-      defaultValue: "main",
+      defaultValue: 'main',
       description: (
-        "If config-file is used for inputs, this field determines which " +
-        "file(s) are linted."
+        'If config-file is used for inputs, this field determines which ' +
+        'file(s) are linted.'
       )
     },
     {
-      name: "no-recursion",
+      name: 'no-recursion',
       type: Boolean,
       description: (
-        "Only report errors on specified input files, not from their dependencies."
+        'Only report errors on specified input files, not from their dependencies.'
       )
     }
   ];

@@ -29,12 +29,12 @@ export class ReyServe implements Environment {
     const unbundled = path.join(process.cwd(), 'build/unbundled');
     const reyserveFiles = temp.mkdirSync('reyserve');
     return build(opts).then(() => {
-      console.log("Downloading reyserve release");
+      console.log('Downloading reyserve release');
       const repo = new Github({owner: 'Polymer', repo: 'reyserve'});
       return repo.extractLatestRelease(reyserveFiles);
     })
     .then(() => {
-      console.log("Coyping reyserve files");
+      console.log('Coyping reyserve files');
       // TODO(garlicnation): One server serves bundled and unbundled.
       REYSERVE_FILES.forEach((file) => {
         fs.copySync(path.join(reyserveFiles, file), path.join(bundled, file));
