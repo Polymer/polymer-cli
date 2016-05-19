@@ -10,7 +10,7 @@
     "polymer": "bin/polymer.js"
   },
   "scripts": {
-    "lint": "depcheck . --ignores 'generator-polymer-init' && eslint test/",
+    "lint": "gulp lint",
     "init": "gulp init",
     "build": "gulp build",
     "test": "gulp test",
