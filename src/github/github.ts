@@ -10,19 +10,26 @@
 
 import * as fs from 'fs';
 import * as GitHubApi from 'github';
+import * as logging from 'plylog';
 import * as path from 'path';
 
 const gunzip = require('gunzip-maybe');
 const request = require('request');
 const tar = require('tar-fs');
 
+let logger = logging.getLogger('cli.github');
+
 class GithubResponseError extends Error {
-  public name = "GithubResponseError";
-  public statusCode: number;
-  public statusMessage: string;
-  constructor(public message?: string) {
-    super(message);
+  name = "GithubResponseError";
+  statusCode: number;
+  statusMessage: string;
+
+  constructor(statusCode: number, statusMessage: string) {
+    super('unexpected response: ' + statusCode + ' ' + statusMessage);
+    this.statusCode = statusCode;
+    this.statusMessage = statusMessage;
   }
+
 }
 
 export interface GithubOpts {
@@ -75,7 +82,8 @@ export class Github {
           return splitPath.length < 2 || splitPath[1] === '';
         },
         map: (header) => {
-          let unprefixed = header.name.split(path.sep).slice(1).join(path.sep).trim();
+          let unprefixed =
+              header.name.split(path.sep).slice(1).join(path.sep).trim();
           // the ./ is needed to unpack top-level files in the tar, otherwise
           // they're just not written
           header.name = './' + unprefixed;
@@ -93,17 +101,20 @@ export class Github {
         })
         .on('response', function(response) {
           if (response.statusCode != 200) {
-            let err = new GithubResponseError('Unexpected response from GitHub');
-            err.statusCode = response.statusCode;
-            err.statusMessage = response.statusMessage;
+            let err = new GithubResponseError(
+                response.statusCode,
+                response.statusMessage);
             throw err;
           }
-        })
-        .on('end', () => {
-          resolve();
+          logger.info('Unpacking template files');
         })
         .pipe(gunzip())
         .pipe(tarPipe)
+        // tar-fs/tar-stream do not send 'end' events, only 'finish' events
+        .on('finish', () => {
+          logger.info('Finished writing template files');
+          resolve();
+        })
         .on('error', (error) => {
           throw error;
         })
