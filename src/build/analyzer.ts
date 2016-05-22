@@ -252,8 +252,8 @@ class StreamResolver implements Resolver {
 
     if (filepath) {
       //fix windows path root
-      filepath = path.join(path.parse(this.analyzer.root).root, filepath)
-      
+      filepath = path.join(path.parse(this.analyzer.root).root, filepath);
+
       // un-escape HTML escapes
       filepath = decodeURIComponent(filepath);
 
