@@ -79,8 +79,8 @@ export class StreamAnalyzer extends Transform {
       callback: (error?, data?: File) => void
     ): void {
 
-    // store the file for access by the resolver
-    this.files.set(file.path, file);
+    // store the file for access by the resolver force to convert correct os path via path join
+    this.files.set(path.join("", file.path), file);
 
     // If this is the entrypoint, hold on to the file, so that it's fully
     // analyzed by the time down-stream transforms see it.
@@ -251,6 +251,9 @@ class StreamResolver implements Resolver {
     // this.analyzer.requestedUrls.add(local);
 
     if (filepath) {
+      //fix windows path root
+      filepath = path.join(path.parse(this.analyzer.root).root, filepath)
+      
       // un-escape HTML escapes
       filepath = decodeURIComponent(filepath);
 
