@@ -27,7 +27,16 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [undefined, defaultConfig]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
+  });
+
+  test('displays general help when no command is called with the --help flag', () => {
+    let cli = new PolymerCli(['--help']);
+    let helpCommand = cli.commands.get('help');
+    let helpCommandSpy = sinon.spy(helpCommand, 'run');
+    cli.run();
+    assert.isOk(helpCommandSpy.calledOnce);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
   });
 
   test('displays general help when unknown command is called', () => {
@@ -36,7 +45,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [undefined, defaultConfig]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
   });
 
   test('displays command help when called with the --help flag', () => {

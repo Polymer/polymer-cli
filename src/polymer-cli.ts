@@ -132,26 +132,30 @@ export class PolymerCli {
       return;
     }
 
-    // Alias the "--help"/"-h" flag to run the help command for the given
-    // command. This gets us around some limitations in our arguments
-    // parsers and keeps us from having to implement additional help logic
-    // inside of each command.
-    if (this.args.indexOf('--help') > -1 || this.args.indexOf('-h') > -1) {
-      this.args = ['help', this.args[0]];
-    }
-
     this.cli = commandLineCommands(this.commandDescriptors);
     let cliCommand = this.cli.parse(this.args);
-    logger.debug('command parsed', cliCommand);
-    let command = this.commands.get(cliCommand.name || 'help');
-    let options = <{[name: string]: string}>(cliCommand.options
-        && cliCommand.options['_all']);
+    let commandName = cliCommand.name;
+    let commandOptions = <{ [name: string]: string }>(cliCommand.options
+      && cliCommand.options['_all']);
+    logger.debug('command parsed', { name: commandName, command: cliCommand });
+    logger.debug('command options found', { options: commandOptions });
 
-    let config = new ProjectConfig('polymer.json', options);
+    // When neccessary user input (incl. a sub-command name) is missing,
+    // make sure the help command runs as accurately as possible.
+    if (!commandName) {
+      commandOptions = {};
+      commandName = 'help';
+    } else if (commandOptions && commandOptions['help']) {
+      commandOptions = { command: commandName };
+      commandName = 'help';
+    }
+
+    let command = this.commands.get(commandName);
+    let config = new ProjectConfig('polymer.json', commandOptions);
     logger.debug('config read', config);
 
     logger.debug('Running command...');
-    command.run(options, config).catch((error) => {
+    command.run(commandOptions, config).catch((error) => {
       console.error('error', error);
       if (error.stack) console.error(error.stack);
     });
