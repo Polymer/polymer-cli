@@ -80,7 +80,7 @@ export class StreamAnalyzer extends Transform {
     ): void {
 
     // store the file for access by the resolver force to convert correct os path via path join
-    this.files.set(path.join("", file.path), file);
+    this.files.set(path.join('', file.path), file);
 
     // If this is the entrypoint, hold on to the file, so that it's fully
     // analyzed by the time down-stream transforms see it.

@@ -25,7 +25,7 @@ export class UglifyTransform extends Transform {
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
     // fixing the file path
-    file.path = path.join("", file.path);
+    file.path = path.join('', file.path);
     if (file.contents && file.path.endsWith('.js')) {
       try {
         let contents = file.contents.toString();
