@@ -10,7 +10,8 @@
 
 import * as dom5 from 'dom5';
 import * as gulpif from 'gulp-if';
-import * as path from 'path';
+import {posix as path} from 'path';
+import * as osPath from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import * as logging from 'plylog';
@@ -32,7 +33,6 @@ export class Bundler extends Transform {
   fragments: string[];
   allFragments: string[];
 
-  sharedBundlePath: string;
   sharedBundleUrl: string;
 
   analyzer: StreamAnalyzer;
@@ -59,10 +59,9 @@ export class Bundler extends Transform {
     if (fragments) {
       this.allFragments = this.allFragments.concat(fragments);
     }
-    this.analyzer = analyzer;
 
-    this.sharedBundlePath = 'shared-bundle.html';
-    this.sharedBundleUrl = path.resolve(root, this.sharedBundlePath);
+    this.analyzer = analyzer;
+    this.sharedBundleUrl = 'shared-bundle.html';
   }
 
   _transform(
@@ -106,8 +105,6 @@ export class Bundler extends Transform {
 
   _buildBundles(): Promise<Map<string, string>> {
     return this._getBundles().then((bundles) => {
-      logger.debug('calculated bundles', bundles);
-
       let sharedDepsBundle = this.shell || this.sharedBundleUrl;
       let sharedDeps = bundles.get(sharedDepsBundle) || [];
       let promises = [];
@@ -128,7 +125,6 @@ export class Bundler extends Transform {
             : sharedDeps.concat(sharedDepsBundle);
 
         promises.push(new Promise((resolve, reject) => {
-          logger.debug(`vulcanizing ${fragment}...`);
           let vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.analyzer.resolver,
@@ -151,10 +147,10 @@ export class Bundler extends Transform {
         }));
       }
       // vulcanize the shared bundle
-      if (!this.shell && sharedDeps) {
+      if (!this.shell && sharedDeps && sharedDeps.length !== 0) {
+        logger.info(`generating shared bundle`);
         promises.push(this._generateSharedBundle(sharedDeps));
       }
-
       return Promise.all(promises).then((bundles) => {
         // convert {url,contents}[] into a Map
         let contentsMap = new Map();
@@ -205,19 +201,14 @@ export class Bundler extends Transform {
   _generateSharedBundle(sharedDeps: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
       let contents = sharedDeps
-          .map((d) => {
-            console.assert(d.startsWith(this.root));
-            let url = d.substring(this.root.length);
-            return `<link rel="import" href="${url}">`;
-          })
+          .map((d) => `<link rel="import" href="${d}">`)
           .join('\n');
 
-      logger.debug(`shared-bundle.html: ${contents}`);
-
+      let sharedFsPath = osPath.resolve(this.root, this.sharedBundleUrl);
       this.sharedFile = new File({
         cwd: this.root,
         base: this.root,
-        path: this.sharedBundleUrl,
+        path: sharedFsPath,
         contents: new Buffer(contents),
       });
 

@@ -25,7 +25,7 @@ suite('Analzyer', () => {
         'a.html',
         'b.html',
       ]);
-      vfs.src(root + '/**', {cwdbase: true})
+      vfs.src(path.join(root, '**'), {cwdbase: true})
         .pipe(analyzer)
         .on('finish', () => {
           analyzer.analyze.then((depsIndex) => {

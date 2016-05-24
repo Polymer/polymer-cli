@@ -10,6 +10,7 @@
 
 import * as fs from 'fs';
 import {Analyzer, Deferred, Loader, Resolver, DocumentDescriptor} from 'hydrolysis';
+import {posix as posixPath} from 'path';
 import * as path from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
@@ -18,7 +19,6 @@ import * as logging from 'plylog';
 import {Node, queryAll, predicates, getAttribute} from 'dom5';
 
 const minimatchAll = require('minimatch-all');
-let logger = logging.getLogger('cli.build.analyzer');
 
 export interface DocumentDeps {
   imports?: Array<string>;
@@ -79,8 +79,7 @@ export class StreamAnalyzer extends Transform {
       callback: (error?, data?: File) => void
     ): void {
 
-    // store the file for access by the resolver
-    this.files.set(file.path, file);
+    this.addFile(file);
 
     // If this is the entrypoint, hold on to the file, so that it's fully
     // analyzed by the time down-stream transforms see it.
@@ -89,7 +88,6 @@ export class StreamAnalyzer extends Transform {
     } else {
       callback(null, file);
     }
-
   }
 
   _flush(done: (error?) => void) {
@@ -111,7 +109,12 @@ export class StreamAnalyzer extends Transform {
    * can be injected into the stream.
    */
   addFile(file) {
-    this.files.set(file.path, file);
+    // Store only root-relative paths, in URL/posix format
+    if (!file.path.startsWith(this.root)) {
+      throw new Error(`Received a file not in root: ${file.path} (${this.root})`);
+    }
+    let localPath = posixPath.normalize(path.relative(this.root, file.path));
+    this.files.set(localPath, file);
   }
 
   isFragment(file): boolean {
@@ -241,33 +244,20 @@ class StreamResolver implements Resolver {
   }
 
   accept(url: string, deferred: Deferred<string>): boolean {
-    let parsed = parseUrl(url);
-    let filepath: string;
+    let urlObject = parseUrl(url);
 
-    if (!parsed.hostname) {
-      filepath = parsed.pathname;
+    if (urlObject.hostname || !urlObject.pathname) {
+      return false;
     }
 
-    // this.analyzer.requestedUrls.add(local);
+    let filepath = decodeURIComponent(urlObject.pathname);
+    let file = this.analyzer.files.get(filepath);
 
-    if (filepath) {
-      // un-escape HTML escapes
-      filepath = decodeURIComponent(filepath);
-
-      // If the file path is not already under root, such as /bower_components/...,
-      // prefix it with root
-      if (!filepath.startsWith(this.analyzer.root)) {
-        filepath = path.join(this.analyzer.root, filepath);
-      }
-
-      let file = this.analyzer.files.get(filepath);
-      if (file) {
-        deferred.resolve(file.contents.toString());
-      } else {
-        logger.info('No file found for', filepath);
-      }
-      return true;
+    if (file) {
+      deferred.resolve(file.contents.toString());
+    } else {
+      throw new Error(`No file found for ${filepath}`);
     }
-    return false;
+    return true;
   }
 }

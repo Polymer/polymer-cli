@@ -22,7 +22,7 @@ const bundle = require('../../lib/build/bundle');
 const Bundler = bundle.Bundler;
 const StreamAnalyzer = analyzer.StreamAnalyzer;
 
-const root = '/root';
+const root = path.resolve('/root');
 
 suite('Bundler', () => {
 
@@ -31,7 +31,7 @@ suite('Bundler', () => {
   let bundledStream;
   let files;
 
-  let setupTest = (options) => new Promise((resolve, _) => {
+  let setupTest = (options) => new Promise((resolve, reject) => {
     let fragments = options.fragments || [];
     let analyzer = new StreamAnalyzer(root, options.entrypoint, options.shell, fragments);
     bundler = new Bundler(root, options.entrypoint, options.shell, fragments, analyzer);
@@ -47,6 +47,9 @@ suite('Bundler', () => {
     });
     bundledStream.on('end', (data) => {
       resolve(files);
+    });
+    bundledStream.on('error', (err) => {
+      reject(err);
     });
     pushFiles(options.files);
   });
@@ -64,6 +67,7 @@ suite('Bundler', () => {
   };
 
   let getFile = (filename) => {
+    // we're getting FS paths, so add root
     let file = files.get(path.resolve(root, filename));
     return file && file.contents && file.contents.toString();
   }
@@ -88,32 +92,34 @@ suite('Bundler', () => {
   };
 
   test('entrypoint only', () => setupTest({
-    entrypoint: '/root/entrypointA.html',
+    entrypoint: 'entrypointA.html',
     files: [framework(), entrypointA()],
   }).then((files) => {
     let doc = dom5.parse(getFile('entrypointA.html'));
     assert.isTrue(hasMarker(doc, 'framework'));
     assert.isFalse(hasImport(doc, '/root/framework.html'));
+    // TODO(justinfagnani): check that shared-bundle.html doesn't exist
+    // it's in the analyzer's file map for some reason
   }));
 
   test('two fragments', () => setupTest({
-    fragments: ['/root/shell.html', '/root/entrypointA.html'],
+    fragments: ['shell.html', 'entrypointA.html'],
     files: [framework(), shell(), entrypointA()],
   }).then((files) => {
     // shell doesn't import framework
     let shellDoc = dom5.parse(getFile('shell.html'));
     assert.isFalse(hasMarker(shellDoc, 'framework'));
-    assert.isFalse(hasImport(shellDoc, '/root/framework.html'));
+    assert.isFalse(hasImport(shellDoc, 'framework.html'));
 
     // entrypoint doesn't import framework
     let entrypointDoc = dom5.parse(getFile('entrypointA.html'));
     assert.isFalse(hasMarker(entrypointDoc, 'framework'));
-    assert.isFalse(hasImport(entrypointDoc, '/root/framework.html'));
+    assert.isFalse(hasImport(entrypointDoc, 'framework.html'));
 
     // No shared-bundle bundles framework
     let sharedDoc = dom5.parse(getFile('shared-bundle.html'));
     assert.isTrue(hasMarker(sharedDoc, 'framework'));
-    assert.isFalse(hasImport(sharedDoc, '/root/framework.html'));
+    assert.isFalse(hasImport(sharedDoc, 'framework.html'));
 
     // fragments import shared-bundle
     assert.isTrue(hasImport(entrypointDoc, 'shared-bundle.html'));
@@ -143,28 +149,28 @@ suite('Bundler', () => {
   }));
 
   test('shell and fragments with shared dependency', () => setupTest({
-    shell: '/root/shell.html',
-    fragments: ['/root/entrypointB.html', '/root/entrypointC.html'],
+    shell: 'shell.html',
+    fragments: ['entrypointB.html', 'entrypointC.html'],
     files: [framework(), shell(), entrypointB(), entrypointC(), commonDep()],
   }).then((files) => {
     // shell bundles framework
     let shellDoc = dom5.parse(getFile('shell.html'));
     assert.isTrue(hasMarker(shellDoc, 'framework'));
-    assert.isFalse(hasImport(shellDoc, '/root/framework.html'));
+    assert.isFalse(hasImport(shellDoc, 'framework.html'));
 
     // shell bundles commonDep
     assert.isTrue(hasMarker(shellDoc, 'commonDep'));
-    assert.isFalse(hasImport(shellDoc, '/root/commonDep.html'));
+    assert.isFalse(hasImport(shellDoc, 'commonDep.html'));
 
     // entrypoint B doesn't import commonDep
     let entrypointBDoc = dom5.parse(getFile('entrypointB.html'));
     assert.isFalse(hasMarker(entrypointBDoc, 'commonDep'));
-    assert.isFalse(hasImport(entrypointBDoc, '/root/commonDep.html'));
+    assert.isFalse(hasImport(entrypointBDoc, 'commonDep.html'));
 
     // entrypoint C doesn't import commonDep
     let entrypointCDoc = dom5.parse(getFile('entrypointC.html'));
     assert.isFalse(hasMarker(entrypointCDoc, 'commonDep'));
-    assert.isFalse(hasImport(entrypointCDoc, '/root/commonDep.html'));
+    assert.isFalse(hasImport(entrypointCDoc, 'commonDep.html'));
 
     // entrypoints import shell
     assert.isTrue(hasImport(entrypointBDoc, 'shell.html'));
