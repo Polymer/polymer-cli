@@ -38,7 +38,7 @@ export class InitCommand implements Command {
     // Defer dependency loading until this specific command is run
     const createGithubGenerator =
         require('../init/github').createGithubGenerator;
-    const findup = require('findup');
+    const findup = require('findup-sync');
     const inquirer = require('inquirer');
     const YeomanEnvironment = require('yeoman-environment');
 
