@@ -129,7 +129,7 @@ class Splitter extends Transform {
           let typeAtribute = dom5.getAttribute(scriptTag, 'type');
           let extension = typeAtribute && extensionsForType[typeAtribute] || 'js';
           let childFilename = `${path.basename(file.path)}_script_${i}.${extension}`;
-          let childPath = `${path.dirname(file.path)}/${childFilename}`;
+          let childPath = path.join(path.dirname(file.path), childFilename);
           scriptTag.childNodes = [];
           dom5.setAttribute(scriptTag, 'src', childFilename);
           let scriptFile = new File({
@@ -215,7 +215,7 @@ class Rejoiner extends Transform {
     for (let i = 0; i < scriptTags.length; i++) {
       let scriptTag = scriptTags[i];
       let srcAttribute = dom5.getAttribute(scriptTag, 'src');
-      let scriptPath = path.resolve(path.dirname(splitFile.path), srcAttribute);
+      let scriptPath = path.join(path.dirname(splitFile.path), srcAttribute);
       if (splitFile.parts.has(scriptPath)) {
         let scriptSource = splitFile.parts.get(scriptPath);
         dom5.setTextContent(scriptTag, scriptSource);
