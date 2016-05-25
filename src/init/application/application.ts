@@ -66,11 +66,7 @@ export class ApplicationGenerator extends Base {
     let elementName = this.props.elementName;
 
     this.fs.copyTpl(
-      [
-        `${this.templatePath()}/**/*`,
-        `${this.templatePath()}/**/.*`,
-        `!**/_*`,
-      ],
+      `${this.templatePath()}/**/?(.)!(_)*`,
       this.destinationPath(),
       this.props);
 
