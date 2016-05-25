@@ -76,17 +76,17 @@ export class Github {
     return new Promise<void>((resolve, reject) => {
       let tarPipe = tar.extract(outDir, {
         ignore: (_, header) => {
-          let splitPath = header.name.split(path.sep);
+          let splitPath = path.normalize(header.name).split(path.sep);
           // ignore the top directory in the tarfile to unpack directly to
           // the cwd
-          return splitPath.length < 2 || splitPath[1] === '';
+          return splitPath.length < 1 || splitPath[1] === '';
         },
         map: (header) => {
-          let unprefixed =
-              header.name.split(path.sep).slice(1).join(path.sep).trim();
-          // the ./ is needed to unpack top-level files in the tar, otherwise
-          // they're just not written
-          header.name = './' + unprefixed;
+          let splitPath = path.normalize(header.name).split(path.sep);
+          let unprefixed = splitPath.slice(1).join(path.sep).trim();
+          // A ./ prefix is needed to unpack top-level files in the tar,
+          // otherwise they're just not written
+          header.name = path.join('.', unprefixed);
           return header;
         },
       });
