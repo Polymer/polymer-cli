@@ -26,7 +26,7 @@ const tsProject = typescript.createProject('tsconfig.json');
 
 gulp.task('init', () => gulp.src("./typings.json").pipe(typings()));
 
-gulp.task('lint', ['tslint', 'eslint', 'depcheck']);
+gulp.task('lint', ['tslint', 'eslint']);
 
 gulp.task('build', () =>
   mergeStream(
