@@ -32,9 +32,15 @@ suite('Bundler', () => {
   let files;
 
   let setupTest = (options) => new Promise((resolve, reject) => {
-    let fragments = options.fragments || [];
-    let analyzer = new StreamAnalyzer(root, options.entrypoint, options.shell, fragments);
-    bundler = new Bundler(root, options.entrypoint, options.shell, fragments, analyzer);
+    let fragments = options.fragments
+        ? options.fragments.map((f) => path.resolve(root, f))
+        : [];
+    let entrypoint = options.entrypoint
+        && path.resolve(root, options.entrypoint);
+    let shell = options.shell
+        && path.resolve(root, options.shell);
+    let analyzer = new StreamAnalyzer(root, entrypoint, shell, fragments);
+    bundler = new Bundler(root, entrypoint, shell, fragments, analyzer);
     sourceStream = new stream.Readable({
       objectMode: true,
     });
@@ -97,7 +103,7 @@ suite('Bundler', () => {
   }).then((files) => {
     let doc = dom5.parse(getFile('entrypointA.html'));
     assert.isTrue(hasMarker(doc, 'framework'));
-    assert.isFalse(hasImport(doc, '/root/framework.html'));
+    assert.isFalse(hasImport(doc, 'framework.html'));
     // TODO(justinfagnani): check that shared-bundle.html doesn't exist
     // it's in the analyzer's file map for some reason
   }));

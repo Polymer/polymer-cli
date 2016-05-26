@@ -12,6 +12,7 @@ import * as fs from 'fs';
 import {Analyzer, Deferred, Loader, Resolver, DocumentDescriptor} from 'hydrolysis';
 import {posix as posixPath} from 'path';
 import * as path from 'path';
+import * as osPath from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import {parse as parseUrl} from 'url';
@@ -19,6 +20,7 @@ import * as logging from 'plylog';
 import {Node, queryAll, predicates, getAttribute} from 'dom5';
 
 const minimatchAll = require('minimatch-all');
+const logger = logging.getLogger('cli.build.analyzer');
 
 export interface DocumentDeps {
   imports?: Array<string>;
@@ -93,8 +95,12 @@ export class StreamAnalyzer extends Transform {
   _flush(done: (error?) => void) {
     this._getDepsToEntrypointIndex().then((depsIndex) => {
       // push held back files
-      for (let entrypoint of this.allFragments) {
-        let file = this.files.get(entrypoint);
+      for (let fragment of this.allFragments) {
+        let url = this.urlFromPath(fragment);
+        let file = this.files.get(url);
+        if (file == null) {
+          done(new Error(`no file found for fragment ${fragment}`));
+        }
         this.push(file);
       }
       this._analyzeResolve(depsIndex);
@@ -108,23 +114,30 @@ export class StreamAnalyzer extends Transform {
    * shared-bundle.html. This should probably be refactored so that the files
    * can be injected into the stream.
    */
-  addFile(file) {
+  addFile(file: File) {
     // Store only root-relative paths, in URL/posix format
-    if (!file.path.startsWith(this.root)) {
-      throw new Error(`Received a file not in root: ${file.path} (${this.root})`);
-    }
-    let localPath = posixPath.normalize(path.relative(this.root, file.path));
-    this.files.set(localPath, file);
+    this.files.set(this.urlFromPath(file.path), file);
+  }
+
+  getFile(filepath: string) {
+    return this.files.get(this.urlFromPath(filepath));
   }
 
   isFragment(file): boolean {
     return this.allFragments.indexOf(file.path) !== -1;
   }
 
+  urlFromPath(filepath) {
+    if (!filepath.startsWith(this.root)) {
+      throw new Error(`file path is not in root: ${filepath} (${this.root})`);
+    }
+    // convert filesystem path to URL
+    return path.normalize(osPath.relative(this.root, filepath));
+  }
+
   _getDepsToEntrypointIndex(): Promise<DepsIndex> {
-    // TODO: tsc is being really weird here...
-    let depsPromises = <Promise<DocumentDeps>[]>this.allFragments.map(
-        (e) => this._getDependencies(e));
+    let depsPromises = <Promise<DepsIndex>[]>this.allFragments.map((f) =>
+        this._getDependencies(this.urlFromPath(f)));
 
     return Promise.all(depsPromises).then((value: any) => {
       // tsc was giving a spurious error with `allDeps` as the parameter
@@ -170,7 +183,6 @@ export class StreamAnalyzer extends Transform {
    * Attempts to retreive document-order transitive dependencies for `url`.
    */
   _getDependencies(url: string): Promise<DocumentDeps> {
-    let documents = this.analyzer.parsedDocuments;
     let dir = path.dirname(url);
     return this.analyzer.metadataTree(url)
         .then((tree) => this._getDependenciesFromDescriptor(tree, dir));
@@ -250,13 +262,17 @@ class StreamResolver implements Resolver {
       return false;
     }
 
-    let filepath = decodeURIComponent(urlObject.pathname);
-    let file = this.analyzer.files.get(filepath);
+    let urlPath = decodeURIComponent(urlObject.pathname);
+    let file = this.analyzer.files.get(urlPath);
 
     if (file) {
       deferred.resolve(file.contents.toString());
     } else {
-      throw new Error(`No file found for ${filepath}`);
+      logger.debug(`No file found for ${urlPath}`);
+      // If you're template to do the next line, Loader does that for us, so
+      // don't double reject!
+      // deferred.reject(new Error(`No file found for ${urlPath}`));
+      return false;
     }
     return true;
   }
