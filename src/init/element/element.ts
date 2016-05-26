@@ -62,11 +62,7 @@ export class ElementGenerator extends Base {
     let name = this.props.name;
 
     this.fs.copyTpl(
-      [
-        `${this.templatePath()}/**/*`,
-        `${this.templatePath()}/**/.*`,
-        `!**/_*`,
-      ],
+      `${this.templatePath()}/**/?(.)!(_)*`,
       this.destinationPath(),
       this.props);
 
