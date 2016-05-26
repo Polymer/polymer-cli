@@ -9,10 +9,13 @@
  */
 
 import * as dom5 from 'dom5';
-import * as path from 'path';
+import {posix as posixPath} from 'path';
+import * as osPath from 'path';
+import * as logging from 'plylog';
 import {Transform} from 'stream';
 import File = require('vinyl');
 
+const logger = logging.getLogger('cli.build.html-project');
 const pred = dom5.predicates;
 
 const extensionsForType = {
@@ -111,7 +114,8 @@ class Splitter extends Transform {
   }
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    if (file.contents && file.path.endsWith('.html')) {
+    let filePath = osPath.normalize(file.path);
+    if (file.contents && filePath.endsWith('.html')) {
       try {
         let contents = file.contents.toString();
         let doc = dom5.parse(contents);
@@ -128,8 +132,8 @@ class Splitter extends Transform {
           let source = dom5.getTextContent(scriptTag);
           let typeAtribute = dom5.getAttribute(scriptTag, 'type');
           let extension = typeAtribute && extensionsForType[typeAtribute] || 'js';
-          let childFilename = `${path.basename(file.path)}_script_${i}.${extension}`;
-          let childPath = path.join(path.dirname(file.path), childFilename);
+          let childFilename = `${osPath.basename(filePath)}_script_${i}.${extension}`;
+          let childPath = osPath.join(osPath.dirname(filePath), childFilename);
           scriptTag.childNodes = [];
           dom5.setAttribute(scriptTag, 'src', childFilename);
           let scriptFile = new File({
@@ -138,7 +142,7 @@ class Splitter extends Transform {
             path: childPath,
             contents: new Buffer(source),
           });
-          this._project.addSplitPath(file.path, childPath);
+          this._project.addSplitPath(filePath, childPath);
           this.push(scriptFile);
         }
 
@@ -146,7 +150,7 @@ class Splitter extends Transform {
         let newFile = new File({
           cwd: file.cwd,
           base: file.base,
-          path: file.path,
+          path: filePath,
           contents: new Buffer(splitContents),
         });
         callback(null, newFile);
@@ -177,9 +181,10 @@ class Rejoiner extends Transform {
   }
 
   _transform(file: File, encoding: string, callback: (error?, data?) => void): void {
-    if (this._project.isSplitFile(file.path)) {
+    let filePath = osPath.normalize(file.path);
+    if (this._project.isSplitFile(filePath)) {
       // this is a parent file
-      let splitFile = this._project.getSplitFile(file.path);
+      let splitFile = this._project.getSplitFile(filePath);
       splitFile.vinylFile = file;
       if (splitFile.isComplete) {
         callback(null, this._rejoin(splitFile));
@@ -188,10 +193,10 @@ class Rejoiner extends Transform {
         callback();
       }
     } else {
-      let parentFile = this._project.getParentFile(file.path);
+      let parentFile = this._project.getParentFile(filePath);
       if (parentFile) {
         // this is a child file
-        parentFile.setPartContent(file.path, file.contents.toString());
+        parentFile.setPartContent(filePath, file.contents.toString());
         if (parentFile.isComplete) {
           callback(null, this._rejoin(parentFile));
         } else {
@@ -205,6 +210,7 @@ class Rejoiner extends Transform {
 
   _rejoin(splitFile: SplitFile) {
     let file = splitFile.vinylFile;
+    let filePath = osPath.normalize(file.path);
     let contents = file.contents.toString();
     let doc = dom5.parse(contents);
     let body = dom5.query(doc, pred.hasTagName('body'));
@@ -215,7 +221,7 @@ class Rejoiner extends Transform {
     for (let i = 0; i < scriptTags.length; i++) {
       let scriptTag = scriptTags[i];
       let srcAttribute = dom5.getAttribute(scriptTag, 'src');
-      let scriptPath = path.join(path.dirname(splitFile.path), srcAttribute);
+      let scriptPath = osPath.join(osPath.dirname(splitFile.path), srcAttribute);
       if (splitFile.parts.has(scriptPath)) {
         let scriptSource = splitFile.parts.get(scriptPath);
         dom5.setTextContent(scriptTag, scriptSource);
@@ -228,7 +234,7 @@ class Rejoiner extends Transform {
     return new File({
       cwd: file.cwd,
       base: file.base,
-      path: file.path,
+      path: filePath,
       contents: new Buffer(joinedContents),
     });
 
