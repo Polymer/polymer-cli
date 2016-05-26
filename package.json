@@ -14,7 +14,7 @@
     "init": "gulp init",
     "build": "gulp build",
     "test": "gulp test",
-    "prepublish": "gulp build-all"
+    "prepublish": "gulp build-all && gulp test"
   },
   "repository": {
     "type": "git",
