@@ -64,22 +64,15 @@ gulp.task('eslint', () =>
     .pipe(eslint.format())
     .pipe(eslint.failAfterError()));
 
-gulp.task('depcheck', () => new Promise((resolve, reject) => {
-  depcheck(__dirname, {ignoreDirs: ['generator-polymer-init']}, (result) => {
-    let invalidFiles = Object.keys(result.invalidFiles) || [];
-    let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
-    if (invalidJsFiles.length > 0) {
-      console.log('Invalid files:', result.invalidFiles);
-      reject(new Error('Invalid files'));
-      return;
-    }
-
-    if (result.dependencies.length) {
-      console.log('Unused dependencies:', unused.dependencies);
-      reject(new Error('Unused dependencies'));
-      return;
-    }
-
-    resolve();
-  });
-}));
+gulp.task('depcheck', () =>
+  depcheck(__dirname, {ignoreMatches: ['generator-polymer-init']})
+    .then((result) => {
+      let invalidFiles = Object.keys(result.invalidFiles) || [];
+      let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
+      if (invalidJsFiles.length > 0) {
+        throw new Error(`Invalid files: ${invalidJsFiles}`);
+      }
+      if (result.dependencies.length) {
+        throw new Error(`Unused dependencies: ${result.dependencies}`);
+      }
+  }));
