@@ -10,7 +10,8 @@
 
 import * as dom5 from 'dom5';
 import * as gulpif from 'gulp-if';
-import * as path from 'path';
+import {posix as path} from 'path';
+import * as osPath from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import * as logging from 'plylog';
@@ -32,7 +33,6 @@ export class Bundler extends Transform {
   fragments: string[];
   allFragments: string[];
 
-  sharedBundlePath: string;
   sharedBundleUrl: string;
 
   analyzer: StreamAnalyzer;
@@ -59,10 +59,9 @@ export class Bundler extends Transform {
     if (fragments) {
       this.allFragments = this.allFragments.concat(fragments);
     }
-    this.analyzer = analyzer;
 
-    this.sharedBundlePath = 'shared-bundle.html';
-    this.sharedBundleUrl = path.resolve(root, this.sharedBundlePath);
+    this.analyzer = analyzer;
+    this.sharedBundleUrl = 'shared-bundle.html';
   }
 
   _transform(
@@ -84,7 +83,8 @@ export class Bundler extends Transform {
   _flush(done: (error?) => void) {
     this._buildBundles().then((bundles: Map<string, string>) => {
       for (let fragment of this.allFragments) {
-        let file = this.analyzer.files.get(fragment);
+        let file = this.analyzer.getFile(fragment);
+        console.assert(file != null);
         let contents = bundles.get(fragment);
         file.contents = new Buffer(contents);
         this.push(file);
@@ -104,31 +104,39 @@ export class Bundler extends Transform {
     return this.allFragments.indexOf(file.path) !== -1;
   }
 
+  urlFromPath(filepath) {
+    if (!filepath.startsWith(this.root)) {
+      throw new Error(`file path is not in root: ${filepath} (${this.root})`);
+    }
+    // convert filesystem path to URL
+    return path.normalize(osPath.relative(this.root, filepath));
+  }
+
   _buildBundles(): Promise<Map<string, string>> {
     return this._getBundles().then((bundles) => {
-      logger.debug('calculated bundles', bundles);
-
-      let sharedDepsBundle = this.shell || this.sharedBundleUrl;
+      let sharedDepsBundle = (this.shell)
+          ? this.urlFromPath(this.shell)
+          : this.sharedBundleUrl;
       let sharedDeps = bundles.get(sharedDepsBundle) || [];
       let promises = [];
 
       if (this.shell) {
-        let shellFile = this.analyzer.files.get(this.shell);
+        let shellFile = this.analyzer.getFile(this.shell);
         console.assert(shellFile != null);
         let newShellContent = this._addSharedImportsToShell(bundles);
         shellFile.contents = new Buffer(newShellContent);
       }
 
       for (let fragment of this.allFragments) {
+        let fragmentUrl = this.urlFromPath(fragment);
         let addedImports = (fragment === this.shell && this.shell)
             ? []
-            : [path.relative(path.dirname(fragment), sharedDepsBundle)];
+            : [path.relative(path.dirname(fragmentUrl), sharedDepsBundle)];
         let excludes = (fragment === this.shell && this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
 
         promises.push(new Promise((resolve, reject) => {
-          logger.debug(`vulcanizing ${fragment}...`);
           let vulcanize = new Vulcanize({
             abspath: null,
             fsResolver: this.analyzer.resolver,
@@ -136,7 +144,7 @@ export class Bundler extends Transform {
             stripExcludes: excludes,
             inlineScripts: true,
             inlineCss: true,
-            inputUrl: fragment,
+            inputUrl: fragmentUrl,
           });
           vulcanize.process(null, (err, doc) => {
             if (err) {
@@ -151,10 +159,10 @@ export class Bundler extends Transform {
         }));
       }
       // vulcanize the shared bundle
-      if (!this.shell && sharedDeps) {
+      if (!this.shell && sharedDeps && sharedDeps.length !== 0) {
+        logger.info(`generating shared bundle`);
         promises.push(this._generateSharedBundle(sharedDeps));
       }
-
       return Promise.all(promises).then((bundles) => {
         // convert {url,contents}[] into a Map
         let contentsMap = new Map();
@@ -168,10 +176,11 @@ export class Bundler extends Transform {
 
   _addSharedImportsToShell(bundles: Map<string, string[]>): string {
     console.assert(this.shell != null);
-    let shellDeps = bundles.get(this.shell)
-        .map((d) => path.relative(path.dirname(this.shell), d));
+    let shellUrl = this.urlFromPath(this.shell);
+    let shellDeps = bundles.get(shellUrl)
+        .map((d) => path.relative(path.dirname(shellUrl), d));
 
-    let file = this.analyzer.files.get(this.shell);
+    let file = this.analyzer.getFile(this.shell);
     console.assert(file != null);
     let contents = file.contents.toString();
     let doc = dom5.parse(contents);
@@ -205,19 +214,14 @@ export class Bundler extends Transform {
   _generateSharedBundle(sharedDeps: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
       let contents = sharedDeps
-          .map((d) => {
-            console.assert(d.startsWith(this.root));
-            let url = d.substring(this.root.length);
-            return `<link rel="import" href="${url}">`;
-          })
+          .map((d) => `<link rel="import" href="${d}">`)
           .join('\n');
 
-      logger.debug(`shared-bundle.html: ${contents}`);
-
+      let sharedFsPath = osPath.resolve(this.root, this.sharedBundleUrl);
       this.sharedFile = new File({
         cwd: this.root,
         base: this.root,
-        path: this.sharedBundleUrl,
+        path: sharedFsPath,
         contents: new Buffer(contents),
       });
 
@@ -273,19 +277,21 @@ export class Bundler extends Transform {
       // conflicting orders between their top level imports. The shell should
       // always come first.
       for (let fragment of fragmentToDeps.keys()) {
+
+        let fragmentUrl = this.urlFromPath(fragment);
         let dependencies = fragmentToDeps.get(fragment);
         for (let dep of dependencies) {
           let fragmentCount = depsToEntrypoints.get(dep).length;
           if (fragmentCount > 1) {
             if (this.shell) {
-              addImport(this.shell, dep);
+              addImport(this.urlFromPath(this.shell), dep);
               // addImport(entrypoint, this.shell);
             } else {
               addImport(this.sharedBundleUrl, dep);
-              addImport(fragment, this.sharedBundleUrl);
+              addImport(fragmentUrl, this.sharedBundleUrl);
             }
           } else {
-            addImport(fragment, dep);
+            addImport(fragmentUrl, dep);
           }
         }
       }

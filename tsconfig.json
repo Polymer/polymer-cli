@@ -30,7 +30,6 @@
     "src/build/html-project.ts",
     "src/build/optimize.ts",
     "src/build/prefetch.ts",
-    "src/build/stream-resolver.ts",
     "src/build/streams.ts",
     "src/build/sw-precache.ts",
     "src/build/uglify-transform.ts",

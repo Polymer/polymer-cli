@@ -66,7 +66,7 @@ suite('optimize()', () => {
       `<!DOCTYPE html><html><head><style>foo{background:blue;}</style><script>document.registerElement("x-foo",XFoo);</script></head><body><x-foo>bar</x-foo></body></html>`;
     let stream = vfs.src([
       {
-        path: `${process.cwd()}/foo.html`,
+        path: 'foo.html',
         contents: `
         <!doctype html>
         <style>

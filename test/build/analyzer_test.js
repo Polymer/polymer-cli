@@ -15,17 +15,17 @@ const path = require('path');
 const StreamAnalyzer = require('../../lib/build/analyzer').StreamAnalyzer;
 const vfs = require('vinyl-fs-fake');
 
-suite('Analzyer', () => {
+suite('Analyzer', () => {
 
   suite('DepsIndex', () => {
 
     test('fragment to deps list has only uniques', (done) => {
       let root = path.resolve('test/build/analyzer');
       let analyzer = new StreamAnalyzer(root, null, null, [
-        'a.html',
-        'b.html',
+        path.resolve(root, 'a.html'),
+        path.resolve(root, 'b.html'),
       ]);
-      vfs.src(root + '/**', {cwdbase: true})
+      vfs.src(path.join(root, '**'), {cwdbase: true})
         .pipe(analyzer)
         .on('finish', () => {
           analyzer.analyze.then((depsIndex) => {
@@ -40,7 +40,10 @@ suite('Analzyer', () => {
 
     test("analyzing shell and entrypoint doesn't double load files", (done) => {
       let root = path.resolve('test/build/analyzer');
-      let analyzer = new StreamAnalyzer(root, 'entrypoint.html', 'shell.html');
+      let analyzer = new StreamAnalyzer(
+          root,
+          path.resolve(root, 'entrypoint.html'),
+          path.resolve(root, 'shell.html'));
       vfs.src(root + '/**', {cwdbase: true})
         .pipe(analyzer)
         .on('finish', () => {
