@@ -11,7 +11,6 @@
 import * as fs from 'fs';
 import {Analyzer, Deferred, Loader, Resolver, DocumentDescriptor} from 'hydrolysis';
 import {posix as posixPath} from 'path';
-import * as path from 'path';
 import * as osPath from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
@@ -97,7 +96,7 @@ export class StreamAnalyzer extends Transform {
       // push held back files
       for (let fragment of this.allFragments) {
         let url = this.urlFromPath(fragment);
-        let file = this.files.get(url);
+        let file = this.getUrl(url);
         if (file == null) {
           done(new Error(`no file found for fragment ${fragment}`));
         }
@@ -114,25 +113,41 @@ export class StreamAnalyzer extends Transform {
    * shared-bundle.html. This should probably be refactored so that the files
    * can be injected into the stream.
    */
-  addFile(file: File) {
+  addFile(file: File): void {
+    // Badly-behaved upstream transformers (looking at you gulp-html-minifier)
+    // may use posix path separators on Windows.
+    let filepath = osPath.normalize(file.path);
     // Store only root-relative paths, in URL/posix format
-    this.files.set(this.urlFromPath(file.path), file);
+    this.files.set(this.urlFromPath(filepath), file);
   }
 
-  getFile(filepath: string) {
-    return this.files.get(this.urlFromPath(filepath));
+  getFile(filepath: string): File {
+    return this.getUrl(this.urlFromPath(filepath));
+  }
+
+  getUrl(url: string): File {
+    if (url.startsWith('/')) {
+      url = url.substring(1);
+    }
+    let file = this.files.get(url);
+    if (!file) {
+      logger.debug(`no file for ${url} :(`);
+    }
+    return file;
   }
 
   isFragment(file): boolean {
     return this.allFragments.indexOf(file.path) !== -1;
   }
 
-  urlFromPath(filepath) {
+  urlFromPath(filepath: string): string {
     if (!filepath.startsWith(this.root)) {
       throw new Error(`file path is not in root: ${filepath} (${this.root})`);
     }
     // convert filesystem path to URL
-    return path.normalize(osPath.relative(this.root, filepath));
+    let relativePath = osPath.relative(this.root, filepath);
+    let url = posixPath.join.apply(null, relativePath.split(osPath.sep));
+    return url;
   }
 
   _getDepsToEntrypointIndex(): Promise<DepsIndex> {
@@ -183,7 +198,7 @@ export class StreamAnalyzer extends Transform {
    * Attempts to retreive document-order transitive dependencies for `url`.
    */
   _getDependencies(url: string): Promise<DocumentDeps> {
-    let dir = path.dirname(url);
+    let dir = posixPath.dirname(url);
     return this.analyzer.metadataTree(url)
         .then((tree) => this._getDependenciesFromDescriptor(tree, dir));
   }
@@ -194,8 +209,8 @@ export class StreamAnalyzer extends Transform {
     let allStyleDeps = new Set<string>();
 
     let deps: DocumentDeps = this._collectScriptsAndStyles(descriptor);
-    deps.scripts.forEach((s) => allScriptDeps.add(path.resolve(dir, s)));
-    deps.styles.forEach((s) => allStyleDeps.add(path.resolve(dir, s)));
+    deps.scripts.forEach((s) => allScriptDeps.add(posixPath.resolve(dir, s)));
+    deps.styles.forEach((s) => allStyleDeps.add(posixPath.resolve(dir, s)));
     if (descriptor.imports) {
       let queue = descriptor.imports.slice();
       while (queue.length > 0) {
@@ -204,7 +219,7 @@ export class StreamAnalyzer extends Transform {
           continue;
         }
         allHtmlDeps.push(next.href);
-        let childDeps = this._getDependenciesFromDescriptor(next, path.dirname(next.href));
+        let childDeps = this._getDependenciesFromDescriptor(next, posixPath.dirname(next.href));
         allHtmlDeps = allHtmlDeps.concat(childDeps.imports);
         childDeps.scripts.forEach((s) => allScriptDeps.add(s));
         childDeps.styles.forEach((s) => allStyleDeps.add(s));
@@ -263,7 +278,7 @@ class StreamResolver implements Resolver {
     }
 
     let urlPath = decodeURIComponent(urlObject.pathname);
-    let file = this.analyzer.files.get(urlPath);
+    let file = this.analyzer.getUrl(urlPath);
 
     if (file) {
       deferred.resolve(file.contents.toString());
