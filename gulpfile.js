@@ -65,7 +65,7 @@ gulp.task('eslint', () =>
     .pipe(eslint.failAfterError()));
 
 gulp.task('depcheck', () =>
-  depcheck(__dirname, {ignoreMatches: ['generator-polymer-init']})
+  depcheck(__dirname, {})
     .then((result) => {
       let invalidFiles = Object.keys(result.invalidFiles) || [];
       let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
