@@ -150,16 +150,11 @@ New templates can be distributed and installed via npm. Yeoman generators
 prefixed with `generator-polymer-init` will show up in the `polymer init`
 menu.
 
-## Compiling from source
-
-To compile your own version of the Polymer CLI clone this repo and make sure you have typescript installed
-
-    $ npm install -g typescript typings
-    $ typings install
-
-Then run the build script
+## Compiling from Source
 
     $ npm run build
+
+You can compile and run the CLI from source by cloning the repo from Github and then running `npm run build`. But make sure you have already run `npm install` before building.
 
 ## Supported node.js versions
 
