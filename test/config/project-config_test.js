@@ -14,7 +14,16 @@ const path = require('path');
 const ProjectConfig = require('../../lib/project-config').ProjectConfig;
 
 suite('Project Config', () => {
-  test('sane defaults', () => {
+
+  test('reads options from config file', () => {
+    let defaultOptions = ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer.json'));
+    assert.deepEqual(defaultOptions, {
+      entrypoint: 'foo.html',
+      fragments: ['bar.html'],
+    });
+  });
+
+  test('sane config defaults', () => {
     let config = new ProjectConfig();
     assert.equal(config.root, process.cwd());
     assert.equal(config.entrypoint, path.resolve('index.html'));
@@ -22,7 +31,15 @@ suite('Project Config', () => {
     assert.deepEqual(config.fragments, []);
   });
 
-  test('read from flags', () => {
+  test('sets config from options object', () => {
+    let defaultOptions = ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer.json'));
+    let config = new ProjectConfig(defaultOptions);
+    assert.equal(config.root, process.cwd());
+    assert.equal(config.entrypoint, path.resolve('foo.html'));
+    assert.deepEqual(config.fragments, [path.resolve('bar.html')])
+  });
+
+  test('read config from flags', () => {
     let config = new ProjectConfig(null, {
       entrypoint: 'index.html',
       fragments: ['foo.html'],
@@ -34,15 +51,9 @@ suite('Project Config', () => {
     assert.deepEqual(config.fragments, [path.resolve('foo.html')]);
   });
 
-  test('inits from config file', () => {
-    let config = new ProjectConfig(path.join(__dirname, 'polymer.json'));
-    assert.equal(config.root, process.cwd());
-    assert.equal(config.entrypoint, path.resolve('foo.html'));
-    assert.deepEqual(config.fragments, [path.resolve('bar.html')])
-  });
-
-  test('flags override config file', () => {
-    let config = new ProjectConfig(path.join(__dirname, 'polymer.json'), {
+  test('flags override default config values', () => {
+    let defaultOptions = ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer.json'));
+    let config = new ProjectConfig(defaultOptions, {
       entrypoint: 'bar.html',
       fragments: [],
       shell: 'zizz.html',

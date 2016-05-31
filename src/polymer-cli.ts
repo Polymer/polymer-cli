@@ -43,8 +43,9 @@ export class PolymerCli {
   commands: Map<String, Command> = new Map();
   cli: commandLineCommands.CLI;
   args: string[];
+  defaultConfig: ProjectConfigOptions;
 
-  constructor(args) {
+  constructor(args: string[], config?: ProjectConfigOptions) {
     // If the "--quiet"/"-q" flag is ever present, set our global logging
     // to quiet mode. Also set the level on the logger we've already created.
     if (args.indexOf('--quiet') > -1 || args.indexOf('-q') > -1) {
@@ -57,8 +58,16 @@ export class PolymerCli {
       logging.setVerbose();
     }
 
-    logger.debug('got args:', { args: args });
     this.args = args;
+    logger.debug('got args:', { args: args });
+
+    if (config) {
+      this.defaultConfig = config;
+      logger.debug('got default config from constructor argument:', { config: this.defaultConfig });
+    } else {
+      this.defaultConfig = ProjectConfig.fromConfigFile('polymer.json');
+      logger.debug('got default config from file:', { config: this.defaultConfig });
+    }
 
     this.addCommand(new BuildCommand());
     this.addCommand(new HelpCommand(this.commands));
@@ -150,11 +159,12 @@ export class PolymerCli {
       commandName = 'help';
     }
 
-    let command = this.commands.get(commandName);
-    let config = new ProjectConfig('polymer.json', commandOptions);
-    logger.debug('config read', config);
+    let config = new ProjectConfig(this.defaultConfig, commandOptions);
+    logger.debug('config merged with command options', config);
 
+    let command = this.commands.get(commandName);
     logger.debug('Running command...');
+
     command.run(commandOptions, config).catch((error) => {
       console.error('error', error);
       if (error.stack) console.error(error.stack);

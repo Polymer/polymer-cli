@@ -10,6 +10,9 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as logging from 'plylog';
+
+const logger = logging.getLogger('cli.project-config');
 
 export interface ProjectConfigOptions {
   root?: string;
@@ -26,33 +29,30 @@ export class ProjectConfig {
   fragments: string[];
   inputs: string[];
 
-  static fromConfigFile(filepath: string): ProjectConfig {
+  static fromConfigFile(filepath: string): ProjectConfigOptions {
     try {
       let configContent = fs.readFileSync(filepath, 'utf-8');
       return JSON.parse(configContent);
     } catch (error) {
-      // don't log if error is just "file not found"
-      if (error.code !== 'ENOENT') {
-        console.log('Could not load config file');
-        console.error(error);
+      if (error.code === 'ENOENT') {
+        logger.debug('config file not found', {path: filepath});
+      } else {
+        logger.warn('Could not load config file', {path: filepath, err: error});
       }
+      return {};
     }
   }
 
-  constructor(configFile?: string, options?: ProjectConfigOptions) {
-    this._init(configFile, options);
+  constructor(defaultOptions?: string | ProjectConfigOptions, overrideOptions?: ProjectConfigOptions) {
+    if (typeof defaultOptions === 'string') {
+      defaultOptions = ProjectConfig.fromConfigFile(<string>defaultOptions);
+    }
+    this._init(defaultOptions, overrideOptions);
   }
 
-  _init(configFile?: string, options?: ProjectConfigOptions) {
-    options = options || {};
-    if (configFile) {
-      // config file is default, options will override
-      let fromFile = ProjectConfig.fromConfigFile(configFile);
-      if (fromFile) {
-        Object.assign(fromFile, options);
-        options = fromFile;
-      }
-    }
+  _init(defaultOptions?: ProjectConfigOptions, overrideOptions?: ProjectConfigOptions) {
+    let options: ProjectConfigOptions = Object.assign({}, defaultOptions, overrideOptions);
+
     this.root = options.root || process.cwd();
     if (options.entrypoint) {
       this.entrypoint = path.resolve(this.root, options.entrypoint);
