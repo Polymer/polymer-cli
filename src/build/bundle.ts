@@ -10,8 +10,8 @@
 
 import * as dom5 from 'dom5';
 import * as gulpif from 'gulp-if';
-import {posix as path} from 'path';
-import * as osPath from 'path';
+import * as path from 'path';
+import {posix as posixPath} from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import * as logging from 'plylog';
@@ -109,7 +109,7 @@ export class Bundler extends Transform {
       throw new Error(`file path is not in root: ${filepath} (${this.root})`);
     }
     // convert filesystem path to URL
-    return path.normalize(osPath.relative(this.root, filepath));
+    return path.normalize(path.relative(this.root, filepath));
   }
 
   _buildBundles(): Promise<Map<string, string>> {
@@ -131,7 +131,7 @@ export class Bundler extends Transform {
         let fragmentUrl = this.urlFromPath(fragment);
         let addedImports = (fragment === this.shell && this.shell)
             ? []
-            : [path.relative(path.dirname(fragmentUrl), sharedDepsBundle)];
+            : [posixPath.relative(posixPath.dirname(fragmentUrl), sharedDepsBundle)];
         let excludes = (fragment === this.shell && this.shell)
             ? []
             : sharedDeps.concat(sharedDepsBundle);
@@ -160,7 +160,7 @@ export class Bundler extends Transform {
       }
       // vulcanize the shared bundle
       if (!this.shell && sharedDeps && sharedDeps.length !== 0) {
-        logger.info(`generating shared bundle`);
+        logger.info(`generating shared bundle...`);
         promises.push(this._generateSharedBundle(sharedDeps));
       }
       return Promise.all(promises).then((bundles) => {
@@ -178,7 +178,11 @@ export class Bundler extends Transform {
     console.assert(this.shell != null);
     let shellUrl = this.urlFromPath(this.shell);
     let shellDeps = bundles.get(shellUrl)
-        .map((d) => path.relative(path.dirname(shellUrl), d));
+      .map((d) => posixPath.relative(posixPath.dirname(shellUrl), d));
+    logger.debug('found shell dependencies', {
+      shellUrl: shellUrl,
+      shellDeps: shellDeps,
+    });
 
     let file = this.analyzer.getFile(this.shell);
     console.assert(file != null);
@@ -188,13 +192,18 @@ export class Bundler extends Transform {
       dom5.predicates.hasTagName('link'),
       dom5.predicates.hasAttrValue('rel', 'import')
     ));
+    logger.debug('found html import elements', {
+      imports: imports.map((el) => dom5.getAttribute(el, 'href')),
+    });
 
     // Remove all imports that are in the shared deps list so that we prefer
     // the ordering or shared deps. Any imports left should be independent of
     // ordering of shared deps.
     let shellDepsSet = new Set(shellDeps);
     for (let _import of imports) {
-      if (shellDepsSet.has(dom5.getAttribute(_import, 'href'))) {
+      let importHref = dom5.getAttribute(_import, 'href');
+      if (shellDepsSet.has(importHref)) {
+        logger.debug(`removing duplicate import element "${importHref}"...`);
         dom5.remove(_import);
       }
     }
@@ -217,7 +226,7 @@ export class Bundler extends Transform {
           .map((d) => `<link rel="import" href="${d}">`)
           .join('\n');
 
-      let sharedFsPath = osPath.resolve(this.root, this.sharedBundleUrl);
+      let sharedFsPath = path.resolve(this.root, this.sharedBundleUrl);
       this.sharedFile = new File({
         cwd: this.root,
         base: this.root,
