@@ -109,7 +109,7 @@ export class Bundler extends Transform {
       throw new Error(`file path is not in root: ${filepath} (${this.root})`);
     }
     // convert filesystem path to URL
-    return path.normalize(path.relative(this.root, filepath));
+    return posixPath.normalize(path.relative(this.root, filepath));
   }
 
   _buildBundles(): Promise<Map<string, string>> {
