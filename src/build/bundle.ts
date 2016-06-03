@@ -15,7 +15,7 @@ import {posix as posixPath} from 'path';
 import {Transform} from 'stream';
 import File = require('vinyl');
 import * as logging from 'plylog';
-
+import urlFromPath from './url-from-path';
 import {StreamAnalyzer, DepsIndex} from './analyzer';
 import {compose} from './streams';
 
@@ -104,26 +104,10 @@ export class Bundler extends Transform {
     return this.allFragments.indexOf(file.path) !== -1;
   }
 
-  urlFromPath(filepath) {
-    if (!filepath.startsWith(this.root)) {
-      throw new Error(`file path is not in root: ${filepath} (${this.root})`);
-    }
-    // On windows systems, convert filesystem path to URL by replacing slashes
-    let isPlatformWin = /^win/.test(process.platform);
-    let isExtendedLengthPath = /^\\\\\?\\/.test(filepath);
-    let hasNonAscii = /[^\x00-\x80]+/.test(filepath);
-    if (isPlatformWin && !isExtendedLengthPath && !hasNonAscii) {
-      return path.relative(this.root, filepath).replace(/\\/g, '/');
-    }
-
-    // Otherwise, just return the relative path between the two
-    return path.relative(this.root, filepath);
-  }
-
   _buildBundles(): Promise<Map<string, string>> {
     return this._getBundles().then((bundles) => {
       let sharedDepsBundle = (this.shell)
-          ? this.urlFromPath(this.shell)
+          ? urlFromPath(this.root, this.shell)
           : this.sharedBundleUrl;
       let sharedDeps = bundles.get(sharedDepsBundle) || [];
       let promises = [];
@@ -136,7 +120,7 @@ export class Bundler extends Transform {
       }
 
       for (let fragment of this.allFragments) {
-        let fragmentUrl = this.urlFromPath(fragment);
+        let fragmentUrl = urlFromPath(this.root, fragment);
         let addedImports = (fragment === this.shell && this.shell)
             ? []
             : [posixPath.relative(posixPath.dirname(fragmentUrl), sharedDepsBundle)];
@@ -184,7 +168,7 @@ export class Bundler extends Transform {
 
   _addSharedImportsToShell(bundles: Map<string, string[]>): string {
     console.assert(this.shell != null);
-    let shellUrl = this.urlFromPath(this.shell);
+    let shellUrl = urlFromPath(this.root, this.shell);
     let shellUrlDir = posixPath.dirname(shellUrl);
     let shellDeps = bundles.get(shellUrl)
       .map((d) => posixPath.relative(shellUrlDir, d));
@@ -297,13 +281,13 @@ export class Bundler extends Transform {
       // always come first.
       for (let fragment of fragmentToDeps.keys()) {
 
-        let fragmentUrl = this.urlFromPath(fragment);
+        let fragmentUrl = urlFromPath(this.root, fragment);
         let dependencies = fragmentToDeps.get(fragment);
         for (let dep of dependencies) {
           let fragmentCount = depsToEntrypoints.get(dep).length;
           if (fragmentCount > 1) {
             if (this.shell) {
-              addImport(this.urlFromPath(this.shell), dep);
+              addImport(urlFromPath(this.root, this.shell), dep);
               // addImport(entrypoint, this.shell);
             } else {
               addImport(this.sharedBundleUrl, dep);

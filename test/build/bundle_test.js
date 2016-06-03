@@ -23,7 +23,6 @@ const Bundler = bundle.Bundler;
 const StreamAnalyzer = analyzer.StreamAnalyzer;
 
 const root = path.resolve('/root');
-var isPlatformWin = /^win/.test(process.platform);
 
 suite('Bundler', () => {
 
@@ -97,21 +96,6 @@ suite('Bundler', () => {
       ));
     return link != null;
   };
-
-  suite('urlFromPath()', () => {
-
-    // TODO(fschott): Get path-related tests working in multiple environments
-    if(!isPlatformWin) {
-      test('creates a URL path relative to root when called with a file path', () => setupTest({
-        entrypoint: 'entrypointA.html',
-        files: [framework(), entrypointA()],
-      }).then((files) => {
-        let urlPath = bundler.urlFromPath('/root/src/123.html');
-        assert.equal(urlPath, 'src/123.html');
-      }));
-    }
-
-  });
 
   test('entrypoint only', () => setupTest({
     entrypoint: 'entrypointA.html',
