@@ -108,8 +108,16 @@ export class Bundler extends Transform {
     if (!filepath.startsWith(this.root)) {
       throw new Error(`file path is not in root: ${filepath} (${this.root})`);
     }
-    // convert filesystem path to URL
-    return posixPath.normalize(path.relative(this.root, filepath));
+    // On windows systems, convert filesystem path to URL by replacing slashes
+    let isPlatformWin = /^win/.test(process.platform);
+    let isExtendedLengthPath = /^\\\\\?\\/.test(filepath);
+    let hasNonAscii = /[^\x00-\x80]+/.test(filepath);
+    if (isPlatformWin && !isExtendedLengthPath && !hasNonAscii) {
+      return path.relative(this.root, filepath).replace(/\\/g, '/');
+    }
+
+    // Otherwise, just return the relative path between the two
+    return path.relative(this.root, filepath);
   }
 
   _buildBundles(): Promise<Map<string, string>> {
@@ -177,10 +185,12 @@ export class Bundler extends Transform {
   _addSharedImportsToShell(bundles: Map<string, string[]>): string {
     console.assert(this.shell != null);
     let shellUrl = this.urlFromPath(this.shell);
+    let shellUrlDir = posixPath.dirname(shellUrl);
     let shellDeps = bundles.get(shellUrl)
-      .map((d) => posixPath.relative(posixPath.dirname(shellUrl), d));
+      .map((d) => posixPath.relative(shellUrlDir, d));
     logger.debug('found shell dependencies', {
       shellUrl: shellUrl,
+      shellUrlDir: shellUrlDir,
       shellDeps: shellDeps,
     });
 
