@@ -17,6 +17,7 @@ import File = require('vinyl');
 import {parse as parseUrl} from 'url';
 import * as logging from 'plylog';
 import {Node, queryAll, predicates, getAttribute} from 'dom5';
+import urlFromPath from './url-from-path';
 
 const minimatchAll = require('minimatch-all');
 const logger = logging.getLogger('cli.build.analyzer');
@@ -95,7 +96,7 @@ export class StreamAnalyzer extends Transform {
     this._getDepsToEntrypointIndex().then((depsIndex) => {
       // push held back files
       for (let fragment of this.allFragments) {
-        let url = this.urlFromPath(fragment);
+        let url = urlFromPath(this.root, fragment);
         let file = this.getUrl(url);
         if (file == null) {
           done(new Error(`no file found for fragment ${fragment}`));
@@ -118,11 +119,11 @@ export class StreamAnalyzer extends Transform {
     // may use posix path separators on Windows.
     let filepath = osPath.normalize(file.path);
     // Store only root-relative paths, in URL/posix format
-    this.files.set(this.urlFromPath(filepath), file);
+    this.files.set(urlFromPath(this.root, filepath), file);
   }
 
   getFile(filepath: string): File {
-    return this.getUrl(this.urlFromPath(filepath));
+    return this.getUrl(urlFromPath(this.root, filepath));
   }
 
   getUrl(url: string): File {
@@ -140,19 +141,9 @@ export class StreamAnalyzer extends Transform {
     return this.allFragments.indexOf(file.path) !== -1;
   }
 
-  urlFromPath(filepath: string): string {
-    if (!filepath.startsWith(this.root)) {
-      throw new Error(`file path is not in root: ${filepath} (${this.root})`);
-    }
-    // convert filesystem path to URL
-    let relativePath = osPath.relative(this.root, filepath);
-    let url = posixPath.join.apply(null, relativePath.split(osPath.sep));
-    return url;
-  }
-
   _getDepsToEntrypointIndex(): Promise<DepsIndex> {
     let depsPromises = <Promise<DepsIndex>[]>this.allFragments.map((f) =>
-        this._getDependencies(this.urlFromPath(f)));
+        this._getDependencies(urlFromPath(this.root, f)));
 
     return Promise.all(depsPromises).then((value: any) => {
       // tsc was giving a spurious error with `allDeps` as the parameter
