@@ -18,6 +18,7 @@ import * as path from 'path';
 import {PassThrough, Readable} from 'stream';
 import File = require('vinyl');
 import * as vfs from 'vinyl-fs';
+import * as findup from 'findup';
 import * as logging from 'plylog';
 
 import {StreamAnalyzer, DepsIndex} from './analyzer';
@@ -29,11 +30,23 @@ import {PrefetchTransform} from './prefetch';
 import {waitForAll, compose, ForkedVinylStream} from './streams';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
 
-
 // non-ES compatible modules
-const findConfig = require('liftoff/lib/find_config');
 const minimatchAll = require('minimatch-all');
 let logger = logging.getLogger('cli.build.build');
+
+function getGulpfile(): any {
+  // TODO: Should we really be searching procses.cwd()? What about config.root?
+  let foundGulpfileDir = findup.sync(process.cwd(), 'gulpfile.js');
+  if (foundGulpfileDir) {
+    let gulpfulePath = path.join(foundGulpfileDir, 'gulpfile.js');
+    logger.debug('found gulpfile', { path: gulpfulePath });
+    return require(gulpfulePath);
+  }
+
+  logger.debug(`no gulpfile found (searched up from ${process.cwd()})`);
+  return null;
+}
+
 
 export interface BuildOptions extends OptimizeOptions {
   sources?: string[];
@@ -204,12 +217,4 @@ export function build(options?: BuildOptions, config?: ProjectConfig): Promise<a
         });
       });
   });
-}
-
-function getGulpfile(): any {
-  let gulpfilePath = findConfig({
-    searchPaths: [process.cwd()], // TODO: root?
-    configNameSearch: 'gulpfile.js',
-  });
-  return gulpfilePath && require(gulpfilePath);
 }
