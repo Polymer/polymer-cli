@@ -106,65 +106,65 @@ export class InitCommand implements Command {
   }
 }
 
-  function registerDefaultGenerators(env: YeomanEnvironment): void {
-    const createGithubGenerator =
-      require('../init/github').createGithubGenerator;
-    env.registerStub(ElementGenerator, 'polymer-init-element:app');
-    env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
-    let shopGenerator = createGithubGenerator({
-      owner: 'Polymer',
-      repo: 'shop',
-    });
-    env.registerStub(shopGenerator, 'polymer-init-shop:app');
-    let appDrawerGenerator = createGithubGenerator({
-      owner: 'Polymer',
-      repo: 'app-drawer-template',
-    });
-    env.registerStub(appDrawerGenerator,
-      'polymer-init-app-drawer-template:app');
-  }
+function registerDefaultGenerators(env: YeomanEnvironment): void {
+  const createGithubGenerator =
+    require('../init/github').createGithubGenerator;
+  env.registerStub(ElementGenerator, 'polymer-init-element:app');
+  env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
+  let shopGenerator = createGithubGenerator({
+    owner: 'Polymer',
+    repo: 'shop',
+  });
+  env.registerStub(shopGenerator, 'polymer-init-shop:app');
+  let appDrawerGenerator = createGithubGenerator({
+    owner: 'Polymer',
+    repo: 'app-drawer-template',
+  });
+  env.registerStub(appDrawerGenerator,
+    'polymer-init-app-drawer-template:app');
+}
 
-  function checkIsMinGW(): boolean {
-    let isWindows = /^win/.test(process.platform);
-    if (isWindows) {
-      // uname might not exist if using cmd or powershell,
-      // which would throw an exception
-      try {
-        let uname = execSync('uname -s').toString();
-        return !!/^mingw/i.test(uname);
-      } catch (e) {
-      }
+function checkIsMinGW(): boolean {
+  let isWindows = /^win/.test(process.platform);
+  if (isWindows) {
+    // uname might not exist if using cmd or powershell,
+    // which would throw an exception
+    try {
+      let uname = execSync('uname -s').toString();
+      return !!/^mingw/i.test(uname);
+    } catch (e) {
     }
-    return false;
   }
+  return false;
+}
 
-  function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, generatorName: string): GeneratorDescription {
-    let description = 'no description';
-    let name = getDisplayName(generatorName);
+function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, generatorName: string): GeneratorDescription {
+  let description = 'no description';
+  let name = getDisplayName(generatorName);
 
-    if (templateDescriptions.hasOwnProperty(name)) {
-      description = templateDescriptions[name];
-    } else if (generator.resolved && generator.resolved !== 'unknown') {
-      let findup = require('findup');
-      let metapath = findup('package.json', {cwd: generator.resolved});
-      if (metapath) {
-        let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
-        description = meta.description;
-      }
+  if (templateDescriptions.hasOwnProperty(name)) {
+    description = templateDescriptions[name];
+  } else if (generator.resolved && generator.resolved !== 'unknown') {
+    let findup = require('findup');
+    let metapath = findup('package.json', {cwd: generator.resolved});
+    if (metapath) {
+      let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
+      description = meta.description;
     }
-
-    return {
-      name: `${name}: ${chalk.dim(description)}`,
-      value: generatorName,
-      // inquirer is broken and doesn't print descriptions :(
-      // keeping this so things work when it does
-      short: name,
-    };
   }
 
-  function getDisplayName(generatorName: string) {
-    let nameEnd = generatorName.indexOf(':');
-    if (nameEnd === -1) nameEnd = generatorName.length;
-    return generatorName.substring('polymer-init-'.length, nameEnd);
-  }
+  return {
+    name: `${name}: ${chalk.dim(description)}`,
+    value: generatorName,
+    // inquirer is broken and doesn't print descriptions :(
+    // keeping this so things work when it does
+    short: name,
+  };
+}
+
+function getDisplayName(generatorName: string) {
+  let nameEnd = generatorName.indexOf(':');
+  if (nameEnd === -1) nameEnd = generatorName.length;
+  return generatorName.substring('polymer-init-'.length, nameEnd);
+}
 
