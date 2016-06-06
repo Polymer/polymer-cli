@@ -11,9 +11,16 @@
  * Code distributed by Google as part of the polymer project is also
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
-var resolve = require('resolve');
-
 process.title = 'polymer';
+
+const resolve = require('resolve');
+const updateNotifier = require('update-notifier');
+const packageJson = require('../package.json');
+
+// Update Notifier: Asynchronously check for package updates and, if needed,
+// notify on the next time the CLI is run.
+// See https://github.com/yeoman/update-notifier#how for how this works.
+updateNotifier({pkg: packageJson}).notify();
 
 resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
   let lib = path ? require(path) : require('..');
