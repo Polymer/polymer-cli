@@ -17,6 +17,7 @@ import * as chalk from 'chalk';
 import {ApplicationGenerator} from '../init/application/application';
 import {ElementGenerator} from '../init/element/element';
 import * as YeomanEnvironment from 'yeoman-environment';
+import * as findup from 'findup';
 
 let logger = logging.getLogger('cli.init');
 
@@ -145,11 +146,16 @@ function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, gen
   if (templateDescriptions.hasOwnProperty(name)) {
     description = templateDescriptions[name];
   } else if (generator.resolved && generator.resolved !== 'unknown') {
-    let findup = require('findup');
-    let metapath = findup('package.json', {cwd: generator.resolved});
-    if (metapath) {
+    try {
+      let metapath = findup.sync(generator.resolved, 'package.json');
       let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
       description = meta.description;
+    } catch (err) {
+      if (err.message === 'not found') {
+        logger.debug('no package.json found for generator');
+      } else {
+        logger.debug('problem reading/parsing package.json for generator', { err: err.message });
+      }
     }
   }
 
