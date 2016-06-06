@@ -12,6 +12,7 @@ import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
 import {Command} from './command';
 
+
 let logger = logging.getLogger('cli.lint');
 
 export class LintCommand implements Command {

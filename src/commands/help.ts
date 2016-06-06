@@ -13,7 +13,7 @@ import {CLI} from 'command-line-commands';
 import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
 
-let logger = logging.getLogger('cli.help');
+let logger = logging.getLogger('cli.command.help');
 
 
 import {globalArguments} from '../args';
