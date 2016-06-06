@@ -165,6 +165,11 @@ export class PolymerCli {
     let command = this.commands.get(commandName);
     logger.debug('Running command...');
 
+    // Do any pre-run command initialization
+    if (command.init) {
+      command.init();
+    }
+
     command.run(commandOptions, config).catch((error) => {
       console.error('error', error);
       if (error.stack) console.error(error.stack);

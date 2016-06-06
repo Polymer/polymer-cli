@@ -10,258 +10,193 @@
 'use strict';
 
 const assert = require('chai').assert;
-const mockery = require('mockery');
 const sinon = require('sinon');
+const helpers = require('yeoman-test');
+const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
+const childProcess = require('child_process');
+const inquirer = require('inquirer');
 
-const match = sinon.match;
+var isPlatformWin = /^win/.test(process.platform);
 
 suite('init', () => {
-  let InitCommand;
   let sandbox;
-  let originalPlatform;
-  let execStub;
-  let yeomanEnvStub;
-  let inquirerStub;
-  let elementGeneratorStub;
-  let applicationGeneratorStub;
+  let cli;
+  let initCommand;
 
   setup(() => {
     sandbox = sinon.sandbox.create();
-    originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
-    mockery.enable({useCleanCache: true});
-    mockery.registerAllowables(['../../lib/commands/init']);
-    mockDependencies();
-    //We need to re-import this each time mockery gets set up
-    // so that we have fresh stubs/spies
-    InitCommand = require('../../lib/commands/init').InitCommand
+    cli = new PolymerCli(['init']);
+    initCommand = cli.commands.get('init');
   });
 
   teardown(() => {
     sandbox.restore();
-    Object.defineProperty(process, 'platform', originalPlatform);
-    mockery.disable();
   });
 
-  function stubInquirer(generatorName) {
-    inquirerStub.prompt.returns(Promise.resolve({
-      generatorName: generatorName,
-    }))
-  }
-
   test('registers default template generators', () => {
-    let registeredGens = {};
-    let registerSpy = sandbox.spy(function (gen, name) {
-      registeredGens[name] = gen;
+    initCommand.init();
+    let registeredGenerators = initCommand.env.getGeneratorsMeta();
+    assert.deepEqual(registeredGenerators, {
+      'polymer-init-element:app': {
+        resolved: 'unknown',
+        namespace: 'polymer-init-element:app',
+      },
+      'polymer-init-application:app': {
+        resolved: 'unknown',
+        namespace: 'polymer-init-application:app',
+      },
+      'polymer-init-shop:app': {
+        resolved: 'unknown',
+        namespace: 'polymer-init-shop:app',
+      },
+      'polymer-init-app-drawer-template:app': {
+        resolved: 'unknown',
+        namespace: 'polymer-init-app-drawer-template:app',
+      },
     });
-    yeomanEnvStub.prototype.registerStub = registerSpy;
-
-    yeomanEnvStub.prototype.getGeneratorsMeta.returns(registeredGens);
-    stubInquirer('polymer-init-element:app');
-
-    return new InitCommand().run({}, {})
-      .then(() => {
-        assert.isTrue(registerSpy.calledWith(
-          match.same(elementGeneratorStub.ElementGenerator),
-          'polymer-init-element:app'
-        ));
-
-        assert.isTrue(registerSpy.calledWith(
-          match.same(applicationGeneratorStub.ApplicationGenerator),
-          'polymer-init-application:app'
-        ));
-
-        assert.isTrue(registerSpy.calledWith(
-          {
-            owner: 'Polymer', repo: 'shop',
-          },
-          'polymer-init-shop:app')
-        );
-
-        assert.isTrue(registerSpy.calledWith(
-          {
-            owner: 'Polymer', repo: 'app-drawer-template',
-          },
-          'polymer-init-app-drawer-template:app'
-        ));
-
-        assert.isTrue(inquirerStub.prompt.calledWithMatch(match(function (value) {
-          assert.sameDeepMembers(
-            value[0].choices,
-            [
-              {
-                name: 'element: A blank element template',
-                value: 'polymer-init-element:app',
-                short: 'element',
-              },
-              {
-                name: 'application: A blank application template',
-                value: 'polymer-init-application:app',
-                short: 'application',
-              },
-              {
-                name: 'shop: The "Shop" Progressive Web App demo',
-                value: 'polymer-init-shop:app',
-                short: 'shop',
-              },
-              {
-                name: 'app-drawer-template: A starter application template, ' +
-                'with navigation and "PRPL pattern" loading',
-                value: 'polymer-init-app-drawer-template:app',
-                short: 'app-drawer-template',
-              },
-            ]
-          );
-          return true;
-        })));
-      });
   });
 
   test('prompts with a list of all registered generators', () => {
-    mockPlatform('linux');
-    yeomanEnvStub.prototype.getGeneratorsMeta.returns({
-      'polymer-init-foo:app': {},
-      'polymer-init-bar:app': {},
-    });
-    stubInquirer('polymer-init-foo:app');
+    let promptStub = sandbox.stub(inquirer, 'prompt').returns(new Promise(function() {}));
+    cli.run();
 
-    return new InitCommand().run({}, {})
-      .then(() => {
-        assert.isTrue(inquirerStub.prompt.calledWith([
+    assert.isTrue(promptStub.calledOnce);
+    assert.isTrue(promptStub.calledWith([
+      {
+        "type":"list",
+        "name":"generatorName",
+        "message":"Which starter template would you like to use?",
+        "choices":[
           {
-            type: 'list',
-            name: 'generatorName',
-            message: 'Which starter template would you like to use?',
-            choices: [
-              {
-                "name": "foo: no description",
-                "value": "polymer-init-foo:app",
-                "short": "foo",
-              },
-              {
-                "name": "bar: no description",
-                "value": "polymer-init-bar:app",
-                "short": "bar",
-              },
-            ],
+            "name":"element: \u001b[2mA blank element template\u001b[22m",
+            "value":"polymer-init-element:app",
+            "short":"element",
           },
-        ]));
-      });
+          {
+            "name":"application: \u001b[2mA blank application template\u001b[22m",
+            "value":"polymer-init-application:app",
+            "short":"application",
+          },
+          {
+            "name":"shop: \u001b[2mThe \"Shop\" Progressive Web App demo\u001b[22m",
+            "value":"polymer-init-shop:app",
+            "short":"shop",
+          },
+          {
+            "name":"app-drawer-template: \u001b[2mA starter application template, with navigation and \"PRPL pattern\" loading\u001b[22m",
+            "value":"polymer-init-app-drawer-template:app",
+            "short":"app-drawer-template",
+          },
+        ],
+      },
+    ]));
   });
 
-  test('prompts with a rawlist if being used in MinGW shell', () => {
-    mockPlatform('windows');
-    execStub.execSync.returns('mingw');
+  test('includes user-provided generators in the list when properly installed/registered', () => {
+    let promptStub = sandbox.stub(inquirer, 'prompt').returns(new Promise(function() {}));
+    initCommand.init();
+    helpers.registerDependencies(initCommand.env, [[helpers.createDummyGenerator(), 'polymer-init-custom-template:app']]);
+    initCommand.run({});
 
-    yeomanEnvStub.prototype.getGeneratorsMeta.returns({
-      'polymer-init-foo:app': {},
-      'polymer-init-bar:app': {},
+    assert.isTrue(promptStub.calledOnce);
+    assert.isTrue(promptStub.calledWith([
+      {
+        "type":"list",
+        "name":"generatorName",
+        "message":"Which starter template would you like to use?",
+        "choices":[
+          {
+            "name":"element: \u001b[2mA blank element template\u001b[22m",
+            "value":"polymer-init-element:app",
+            "short":"element",
+          },
+          {
+            "name":"application: \u001b[2mA blank application template\u001b[22m",
+            "value":"polymer-init-application:app",
+            "short":"application",
+          },
+          {
+            "name":"shop: \u001b[2mThe \"Shop\" Progressive Web App demo\u001b[22m",
+            "value":"polymer-init-shop:app",
+            "short":"shop",
+          },
+          {
+            "name":"app-drawer-template: \u001b[2mA starter application template, with navigation and \"PRPL pattern\" loading\u001b[22m",
+            "value":"polymer-init-app-drawer-template:app",
+            "short":"app-drawer-template",
+          },
+          {
+            name: 'custom-template: \u001b[2mno description\u001b[22m',
+            value: 'polymer-init-custom-template:app',
+            short: 'custom-template',
+          },
+        ],
+      },
+    ]));
+  });
+
+  if (isPlatformWin) {
+
+    test('prompts with a rawlist if being used in MinGW shell', () => {
+      let promptStub = sandbox.stub(inquirer, 'prompt').returns(new Promise(function() {}));
+      sandbox.stub(childProcess, 'execSync').withExactArgs('uname -s').returns('mingw');
+      cli.run();
+
+      assert.isTrue(promptStub.calledWith([
+        {
+          "type":"rawlist",
+          "name":"generatorName",
+          "message":"Which starter template would you like to use?",
+          "choices":[
+            {
+              "name":"element: \u001b[2mA blank element template\u001b[22m",
+              "value":"polymer-init-element:app",
+              "short":"element",
+            },
+            {
+              "name":"application: \u001b[2mA blank application template\u001b[22m",
+              "value":"polymer-init-application:app",
+              "short":"application",
+            },
+            {
+              "name":"shop: \u001b[2mThe \"Shop\" Progressive Web App demo\u001b[22m",
+              "value":"polymer-init-shop:app",
+              "short":"shop",
+            },
+            {
+              "name":"app-drawer-template: \u001b[2mA starter application template, with navigation and \"PRPL pattern\" loading\u001b[22m",
+              "value":"polymer-init-app-drawer-template:app",
+              "short":"app-drawer-template",
+            },
+          ],
+        },
+      ]));
     });
-    stubInquirer('polymer-init-foo:app');
 
-    return new InitCommand().run({}, {})
-      .then(() => {
-        assert.isTrue(inquirerStub.prompt.calledWith(match((value) => {
-          return value[0].type === 'rawlist';
-        }, 'prompt type must be rawlist')));
-      });
-  });
+  }
 
   test('allows a generator to be be specified', () => {
-    yeomanEnvStub.prototype.getGeneratorsMeta.returns({
-      'polymer-init-test:app': {},
-    });
+    initCommand.init();
+    let runStub = sandbox.stub(initCommand.env, 'run').returns(Promise.resolve());
+    let promptStub = sandbox.stub(inquirer, 'prompt').returns(new Promise(function() {}));
 
-    let run = new InitCommand().run({name: 'test'}, {});
-
-    return run.then(() => {
-      let runStub = yeomanEnvStub.prototype.run;
-
-      assert.isTrue(runStub.calledWith('polymer-init-test:app'));
-      assert.isTrue(runStub.calledOnce);
-
-      //Make sure we never prompted, we just ran with it
-      assert.isFalse(inquirerStub.prompt.called);
-    })
+    initCommand.run({name: 'shop'});
+    assert.isTrue(runStub.calledOnce);
+    assert.isTrue(runStub.calledWith('polymer-init-shop:app'));
+    //Make sure we never prompted, we just ran with it
+    assert.isFalse(promptStub.called);
   });
 
   test('fails if an unknown generator is requested', (done) => {
-    yeomanEnvStub.prototype.getGeneratorsMeta.returns({
-      'polymer-init-test:app': {},
-    });
+    initCommand.init();
+    let unknownGeneratorName = 'UNKNOWN-GENERATOR';
 
-    let run = new InitCommand().run({name: 'fake'}, {});
-
-    run.then(function () {
+    initCommand.run({name: unknownGeneratorName}).then(() => {
       done('The promise should have been rejected');
-    }, function (err) {
-      assert.equal(err, 'Template fake not found');
+    }, (err) => {
+      assert.equal(err, `Template ${unknownGeneratorName} not found`);
       done();
-    }).catch(done);//to catch the assertion error
+    }).catch(done); // to catch the assertion error
   });
-
-  //TODO(ThatJoeMoore): pending as part of #177
-  test('detects and prompts with custom generators');
-
-  function mockPlatform(platform) {
-    Object.defineProperty(process, 'platform', {
-      value: platform,
-    });
-  }
-
-  function mockDependencies() {
-    execStub = registerMock('child_process', {
-      execSync: sandbox.stub(),
-    });
-
-    registerMock('fs', {
-      readFileSync: sandbox.stub(),
-    });
-
-    registerMock('chalk', {
-      dim: sandbox.stub().returnsArg(0),
-    });
-
-    //This fails with arrow functions
-    //  (arrow functions don't have an accessible prototype)
-    yeomanEnvStub = registerMock('yeoman-environment', function() {});
-    yeomanEnvStub.prototype.registerStub = sandbox.stub();
-    yeomanEnvStub.prototype.lookup = sandbox.stub().yields();
-    yeomanEnvStub.prototype.run = sandbox.stub().yields();
-    yeomanEnvStub.prototype.getGeneratorsMeta = sandbox.stub();
-
-    registerMock('findup', {
-      sync: sandbox.stub(),
-    });
-
-    inquirerStub = registerMock('inquirer', {
-      prompt: sandbox.stub().returns(Promise.resolve()),
-    });
-
-    registerMock('../init/github', {
-      createGithubGenerator: sandbox.stub().returnsArg(0),
-    });
-
-    registerMock('plylog', {
-      getLogger: () => {
-        return {
-          info: sandbox.spy(),
-          debug: sandbox.spy(),
-          warn: sandbox.spy(),
-        }
-      },
-    });
-
-    elementGeneratorStub = registerMock(
-      '../init/element/element', {ElementGenerator: {}}
-    );
-    applicationGeneratorStub = registerMock(
-      '../init/application/application', {ApplicationGenerator: {}}
-    );
-  }
-
-  function registerMock(name, obj) {
-    mockery.registerMock(name, obj);
-    return obj;
-  }
 
 });
