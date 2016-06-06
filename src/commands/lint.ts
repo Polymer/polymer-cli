@@ -13,7 +13,7 @@ import * as logging from 'plylog';
 
 import {Command} from './command';
 
-let logger = logging.getLogger('cli.lint');
+let logger = logging.getLogger('cli.command.lint');
 const polylint = require('polylint/lib/cli');
 
 

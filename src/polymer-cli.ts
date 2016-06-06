@@ -131,7 +131,7 @@ export class PolymerCli {
     return Array.from(mergedArgs.values());
   }
 
-  run() {
+  run(): Promise<any> {
     logger.debug('running...');
 
     // If the "--version" flag is ever present, just print
@@ -165,9 +165,6 @@ export class PolymerCli {
     let command = this.commands.get(commandName);
     logger.debug('Running command...');
 
-    command.run(commandOptions, config).catch((error) => {
-      console.error('error', error);
-      if (error.stack) console.error(error.stack);
-    });
+    return command.run(commandOptions, config);
   }
 }
