@@ -48,27 +48,37 @@ export class InitCommand implements Command {
     }
   ];
 
-  run(options, config): Promise<any> {
-    // Defer dependency loading until this specific command is run
-    const inquirer = require('inquirer');
+  env: YeomanEnvironment;
+
+  /**
+   * Do any pre-run command initialization here. This step is useful for
+   * setting up your command and any other expensive loading you don't want
+   * to do until absolutely necessary.
+   */
+  init() {
+    // Defer dependency loading until needed
     const YeomanEnvironment = require('yeoman-environment');
+
+    this.env = new YeomanEnvironment();
+    registerDefaultGenerators(this.env);
+  }
+
+  run(options, config): Promise<any> {
+    // Defer dependency loading until needed
+    const inquirer = require('inquirer');
 
     return new Promise((resolve, reject) => {
       logger.debug('creating yeoman environment...');
 
-      let env = new YeomanEnvironment();
-
-      registerDefaultGenerators(env);
-
-      env.lookup(() => {
-        let generators = env.getGeneratorsMeta();
+      this.env.lookup(() => {
+        let generators = this.env.getGeneratorsMeta();
 
         let runGenerator = (generatorName: string, templateName?: string) => {
           let generator = generators[generatorName];
           if (generator) {
             logger.info(`Running template ${templateName || generatorName}`);
             logger.debug(`Running generator ${generatorName}`);
-            env.run(generatorName, {}, () => resolve());
+            this.env.run(generatorName, {}, () => resolve());
           } else {
             logger.warn(`Template ${options.name} not found`);
             reject(`Template ${options.name} not found`);
