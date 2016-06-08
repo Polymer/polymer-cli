@@ -10,12 +10,9 @@
 
 import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
-
 import {Command} from './command';
 
 let logger = logging.getLogger('cli.lint');
-const polylint = require('polylint/lib/cli');
-
 
 export class LintCommand implements Command {
   name = 'lint';
@@ -57,6 +54,9 @@ export class LintCommand implements Command {
   ];
 
   run(options, config): Promise<any> {
+    // Defer dependency loading until this specific command is run
+    const polylint = require('polylint/lib/cli');
+
     if (config.inputs.length === 0) {
       let argsCli = commandLineArgs(this.args);
 
