@@ -21,8 +21,6 @@ import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
 import {ProjectConfig, ProjectConfigOptions} from './project-config';
-import {Environment} from './environment/environment';
-import {buildEnvironment} from './environments/environments';
 
 
 const logger = logging.getLogger('cli.main');

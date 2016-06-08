@@ -8,10 +8,7 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {startServer, args as polyserveArgs} from 'polyserve';
-import {ServerOptions} from 'polyserve/lib/start_server';
 import {Command} from './command';
-import {Environment} from '../environment/environment';
 import * as logging from 'plylog';
 
 let logger = logging.getLogger('cli.serve');
@@ -69,6 +66,11 @@ export class ServeCommand implements Command {
   ];
 
   run(options, config): Promise<any> {
+    // Defer dependency loading until this specific command is run
+    const polyserve = require('polyserve');
+    const ServerOptions = require('polyserve/lib/start_server').ServerOptions;
+    const Environment = require('../environment/environment').Environment;
+
     let openPath;
     if (config.entrypoint && config.shell) {
       let rootLength = (config.root && config.root.length) || 0;
@@ -97,7 +99,7 @@ export class ServeCommand implements Command {
       return env.serve(serverOptions);
     }
 
-    logger.debug('serving via startServer()...');
-    return startServer(serverOptions);
+    logger.debug('serving via polyserve.startServer()...');
+    return polyserve.startServer(serverOptions);
   }
 }
