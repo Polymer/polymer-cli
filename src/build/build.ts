@@ -36,17 +36,18 @@ let logger = logging.getLogger('cli.build.build');
 
 function getGulpfile(): any {
   // TODO: Should we really be searching procses.cwd()? What about config.root?
-  let foundGulpfileDir = findup.sync(process.cwd(), 'gulpfile.js');
-  if (foundGulpfileDir) {
-    let gulpfulePath = path.join(foundGulpfileDir, 'gulpfile.js');
-    logger.debug('found gulpfile', { path: gulpfulePath });
-    return require(gulpfulePath);
+  let foundGulpfileDir;
+  try {
+    foundGulpfileDir = findup.sync(process.cwd(), 'gulpfile.js');
+  } catch (e) {
+    logger.debug(`no gulpfile found (searched up from ${process.cwd()})`);
+    return null;
   }
 
-  logger.debug(`no gulpfile found (searched up from ${process.cwd()})`);
-  return null;
+  let gulpfulePath = path.join(foundGulpfileDir, 'gulpfile.js');
+  logger.debug('found gulpfile', { path: gulpfulePath });
+  return require(gulpfulePath);
 }
-
 
 export interface BuildOptions extends OptimizeOptions {
   sources?: string[];
