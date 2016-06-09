@@ -45,6 +45,10 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
       });
     }
 
+    rootGeneratorName() {
+      return 'GithubGenerator';
+    }
+
     writing() {
       let done = this.async();
       logger.info(`Downloading latest release of ${owner}/${repo}`);
