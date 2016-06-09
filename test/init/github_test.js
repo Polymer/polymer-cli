@@ -10,7 +10,7 @@
 'use strict';
 
 const assert = require('chai').assert;
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
@@ -23,7 +23,8 @@ suite('init/github', () => {
   test('untars a release', (done) => {
     let mockRequestApi = (options) => {
       assert.equal(options.url, 'http://foo.com/bar.tar');
-      return fs.createReadStream(path.join(__dirname, 'test_tarball.tgz'));
+      return fs.createReadStream(
+        path.join(__dirname, 'github-test-data/test_tarball.tgz'));
     };
 
     let mockGithubApi = {
@@ -54,6 +55,48 @@ suite('init/github', () => {
     helpers.run(generator)
       .on('end', (a) => {
         yoAssert.file(['file1.txt']);
+        done();
+      });
+  });
+
+  test('works when package.json with no name is present', (done) => {
+    let mockRequestApi = (options) => {
+      throw new Error('should have errored earlier');
+    };
+
+    let mockGithubApi = {
+      authenticate(options) {
+      },
+
+      releases: {
+        listReleases(options, cb) {
+          // If we got to this point, the test passed. Abort.
+          throw new Error('expected');
+        },
+      },
+    };
+
+    let generator = new createGithubGenerator({
+      requestApi: mockRequestApi,
+      githubApi: mockGithubApi,
+      githubToken: 'token-token',
+      owner: 'PolymerLabs',
+      repo: 'polykart',
+    });
+
+    helpers.run(generator)
+      .inTmpDir((dir) => {
+        fs.copySync(
+          path.join(__dirname, 'github-test-data/package.json'),
+          path.join(dir, 'package.json')
+        );
+      })
+      .on('error', (e) => {
+        assert.equal(e.message, 'expected');
+        done();
+      })
+      .on('end', (a) => {
+        assert.fail();
         done();
       });
   });
