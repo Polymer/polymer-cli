@@ -15,7 +15,7 @@ import {BuildOptions} from '../build/build';
 import {Command} from './command';
 import * as logging from 'plylog';
 
-let logger = logging.getLogger('cli.build');
+let logger = logging.getLogger('cli.command.build');
 
 
 export class BuildCommand implements Command {

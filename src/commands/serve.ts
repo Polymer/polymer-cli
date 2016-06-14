@@ -11,7 +11,7 @@
 import {Command} from './command';
 import * as logging from 'plylog';
 
-let logger = logging.getLogger('cli.serve');
+let logger = logging.getLogger('cli.command.serve');
 
 
 export class ServeCommand implements Command {
