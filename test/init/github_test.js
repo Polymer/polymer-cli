@@ -33,9 +33,9 @@ suite('init/github', () => {
         assert.equal(options.token, 'token-token');
       },
 
-      releases: {
-        listReleases(options, cb) {
-          assert.equal(options.owner, 'PolymerLabs');
+      repos: {
+        getReleases(options, cb) {
+          assert.equal(options.user, 'PolymerLabs');
           assert.equal(options.repo, 'polykart');
           cb(null, [{
             tarball_url: 'http://foo.com/bar.tar',
@@ -68,8 +68,8 @@ suite('init/github', () => {
       authenticate(options) {
       },
 
-      releases: {
-        listReleases(options, cb) {
+      repos: {
+        getReleases(options, cb) {
           // If we got to this point, the test passed. Abort.
           throw new Error('expected');
         },

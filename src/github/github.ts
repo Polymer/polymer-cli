@@ -127,19 +127,21 @@ export class Github {
 
   getLatestRelease(): Promise<GitHubApi.Release> {
     return new Promise((resolve, reject) => {
-      this._github.releases.listReleases({
-        owner: this._owner,
-        repo: this._repo
+      this._github.repos.getReleases({
+        user: this._owner,
+        repo: this._repo,
+        per_page: 1,
       }, (err, result) => {
         if (err) {
           reject(err);
-        } else {
-          if (result.length === 0) {
-            reject('no releases');
-          } else {
-            resolve(result[0]);
-          }
+          return;
         }
+        if (result.length === 0) {
+          reject(new Error(`${this._owner}/${this._repo} has 0 releases. ` +
+            'Cannot get latest release.'));
+          return;
+        }
+        resolve(result[0]);
       });
     });
   }
