@@ -59,7 +59,7 @@ export interface BuildOptions extends OptimizeOptions {
 export function build(options?: BuildOptions, config?: ProjectConfig): Promise<any> {
   return new Promise<any>((buildResolve, _) => {
     options = options || {};
-    let root = config.root;
+    let root = path.resolve(config.root);
     let entrypoint = config.entrypoint;
     let shell = config.shell;
     let fragments = config.fragments;
