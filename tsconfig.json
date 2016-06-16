@@ -51,6 +51,7 @@
     "src/project-config.ts",
     "custom_typings/command-line-args.d.ts",
     "custom_typings/command-line-commands.d.ts",
+    "custom_typings/command-line-usage.d.ts",
     "custom_typings/dom5.d.ts",
     "custom_typings/fs-extra.d.ts",
     "custom_typings/github.d.ts",

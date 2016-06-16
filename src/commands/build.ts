@@ -9,8 +9,6 @@
  */
 
 import {ArgDescriptor} from 'command-line-args';
-import {CLI} from 'command-line-commands';
-
 import {BuildOptions} from '../build/build';
 import {Command} from './command';
 import * as logging from 'plylog';

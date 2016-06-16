@@ -8,8 +8,9 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import * as commandLineCommands from 'command-line-commands';
 import * as logging from 'plylog';
+import * as commandLineArgs from 'command-line-args';
+import * as commandLineCommands from 'command-line-commands';
 
 import {globalArguments} from './args';
 import {ArgDescriptor} from './commands/command';
@@ -21,7 +22,6 @@ import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
 import {ProjectConfig, ProjectConfigOptions} from './project-config';
-
 
 const logger = logging.getLogger('cli.main');
 
@@ -37,9 +37,7 @@ process.on('unhandledRejection', (error) => {
 
 export class PolymerCli {
 
-  commandDescriptors = [];
-  commands: Map<String, Command> = new Map();
-  cli: commandLineCommands.CLI;
+  commands: Map<string, Command> = new Map();
   args: string[];
   defaultConfig: ProjectConfigOptions;
 
@@ -78,11 +76,6 @@ export class PolymerCli {
   addCommand(command: Command) {
     logger.debug('adding command', command.name);
     this.commands.set(command.name, command);
-    this.commandDescriptors.push({
-      name: command.name,
-      definitions: this.mergeDefinitions(command, globalArguments),
-      description: command.description,
-    });
   }
 
   mergeDefinitions(
@@ -130,6 +123,9 @@ export class PolymerCli {
   }
 
   run() {
+    let helpCommand = this.commands.get('help');
+    let commandNames = Array.from(this.commands.keys());
+    let parsedArgs;
     logger.debug('running...');
 
     // If the "--version" flag is ever present, just print
@@ -139,33 +135,44 @@ export class PolymerCli {
       return;
     }
 
-    this.cli = commandLineCommands(this.commandDescriptors);
-    let cliCommand = this.cli.parse(this.args);
-    let commandName = cliCommand.name;
-    let commandOptions = <{ [name: string]: string }>(cliCommand.options
-      && cliCommand.options['_all']);
-    logger.debug('command parsed', { name: commandName, command: cliCommand });
-    logger.debug('command options found', { options: commandOptions });
-
-    // When neccessary user input (incl. a sub-command name) is missing,
-    // make sure the help command runs as accurately as possible.
-    if (!commandName) {
-      commandOptions = {};
-      commandName = 'help';
-    } else if (commandOptions && commandOptions['help']) {
-      commandOptions = { command: commandName };
-      commandName = 'help';
+    try {
+      parsedArgs = commandLineCommands(commandNames, this.args);
+    } catch (err) {
+      // Polymer CLI needs a valid command name to do anything. If the given
+      // command is invalid, run the generalized help command with default
+      // config. This should print the general usage information.
+      if (err.name === 'INVALID_COMMAND') {
+        if (err.command) {
+          logger.warn(`'${err.command}' is not an available command.`);
+        }
+        return helpCommand.run({command: err.command}, new ProjectConfig(this.defaultConfig));
+      }
+      // If an unexpected error occurred, propagate it
+      throw err;
     }
 
-    let config = new ProjectConfig(this.defaultConfig, commandOptions);
-    logger.debug('config merged with command options', config);
-
+    let commandName = parsedArgs.command;
+    let commandArgs = parsedArgs.argv;
     let command = this.commands.get(commandName);
-    logger.debug('Running command...');
+    logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
 
-    command.run(commandOptions, config).catch((error) => {
-      console.error('error', error);
-      if (error.stack) console.error(error.stack);
-    });
+    let commandDefinitions = this.mergeDefinitions(command, globalArguments);
+    let commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
+    let commandOptions = <{ [name: string]: string }>(commandOptionsRaw && commandOptionsRaw['_all']);
+    logger.debug(`command options parsed from args:`, commandOptions);
+
+    let config = new ProjectConfig(this.defaultConfig, commandOptions);
+    logger.debug(`final project configuration generated:`, config);
+
+    // Help is a special argument for displaying help for the given command.
+    // If found, run the help command instead, with the given command name as
+    // an option.
+    if (commandOptions['help']) {
+      logger.debug(`'--help' option found, running 'help' for given command...`);
+      return helpCommand.run({ command: commandName }, config);
+    }
+
+    logger.debug('Running command...');
+    return command.run(commandOptions, config);
   }
 }
