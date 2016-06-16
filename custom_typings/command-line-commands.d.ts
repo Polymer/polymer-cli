@@ -1,26 +1,13 @@
 declare module 'command-line-commands' {
   module commandLineCommands {
-    interface CommandDescriptor {
-      name: string;
-      definitions?: any[];
-      description?: string;
-      defaultOption?: boolean;
-    }
-
-    interface Command {
-      name: string;
-      options: {[name: string]: string|{[name: string]: string}};
-    }
-
-    interface CLI {
-      commands: CommandDescriptor[];
-      parse(args?: string[]): Command;
-      getUsage(): string;
+    interface ParsedCommand {
+      command: string;
+      argv: string[];
     }
   }
 
-  function commandLineCommands(args: commandLineCommands.CommandDescriptor[])
-      : commandLineCommands.CLI;
+  function commandLineCommands(commands: string[], argv?: string[])
+      : commandLineCommands.ParsedCommand;
 
   export = commandLineCommands;
 }

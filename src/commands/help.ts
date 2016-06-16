@@ -9,15 +9,29 @@
  */
 
 import * as chalk from 'chalk';
-import {CLI} from 'command-line-commands';
+import * as commandLineUsage from 'command-line-usage';
 import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
+import {globalArguments} from '../args';
+import {Command} from './command';
 
 let logger = logging.getLogger('cli.command.help');
 
+const b = chalk.blue;
+const m = chalk.magenta;
+const CLI_TITLE = chalk.bold.underline('Polymer-CLI');
+const CLI_DESCRIPTION = 'The multi-tool for Polymer projects';
+const CLI_USAGE = 'Usage: \`polymer <command> [options ...]\`';
+const HELP_HEADER = '\n' +
+  b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
+  b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + CLI_TITLE + '\n' +
+  b(' /\\  /   ') + m('/\\  /') + b('\\  /\\ ') + '\n' +
+  b('/__\\/   ') + m('/__\\/  ') + b('\\/__\\') + '  ' + CLI_DESCRIPTION + '\n' +
+  b('\\  /\\  ') + m('/\\  /   ') + b('/\\  /') + '\n' +
+  b(' \\/__\\') + m('/__\\/   ') + b('/__\\/ ') + '  ' + CLI_USAGE + '\n' +
+  b('  \\  ') + m('/\\  /   ') + b('/\\  /  ') + '\n' +
+  b('   \\') + m('/__\\/   ') + b('/__\\/   ') + '\n';
 
-import {globalArguments} from '../args';
-import {Command} from './command';
 
 export class HelpCommand implements Command {
   name = 'help';
@@ -36,68 +50,66 @@ export class HelpCommand implements Command {
     this.commands = commands;
   }
 
-  printGeneralUsage() {
-    console.log(helpHeader);
-    console.log(chalk.bold.underline(`Available Commands\n`));
-    for (let command of this.commands.values()) {
-      console.log(`  ${chalk.bold(command.name)}\t\t${command.description}`);
-    }
-    this.printGlobalOptions();
-    console.log(`\nRun \`polymer help <command>\` for help with a specific ` +
-        `command.\n`);
+  generateGeneralUsage() {
+    return commandLineUsage([
+      {
+        content: HELP_HEADER,
+        raw: true,
+      },
+      {
+        header: 'Available Commands',
+        content: Array.from(this.commands.values()).map((command) => {
+          return { name: command.name, summary: command.description };
+        }),
+      },
+      {
+        header: 'Global Options',
+        optionList: globalArguments
+      },
+      {
+        content: 'Run `polymer help <command>` for help with a specific command.',
+        raw: true,
+      }
+    ]);
   }
 
-  printGlobalOptions() {
-    let globalCli = commandLineArgs(globalArguments);
-    console.log(globalCli.getUsage({
-      groups: {
-        global: 'Global Options',
-      }
-    }));
+  generateCommandUsage(command) {
+    return commandLineUsage([
+      {
+        header: `polymer ${command.name}`,
+        content: command.description,
+      },
+      {
+        header: 'Command Options',
+        optionList: command.args
+      },
+      {
+        header: 'Global Options',
+        optionList: globalArguments
+      },
+    ]);
   }
 
   run(options, config): Promise<any> {
     return new Promise<any>((resolve, _) => {
-
       if (!options || !options.command) {
-        this.printGeneralUsage();
+        logger.debug('no command given, printing general help...', {options: options});
+        console.log(this.generateGeneralUsage());
         resolve(null);
         return;
       }
 
       let command = this.commands.get(options.command);
-
       if (!command) {
-        this.printGeneralUsage();
+        logger.error(`'${options.command}' is not an available command.`);
+        console.log(this.generateGeneralUsage());
         resolve(null);
         return;
       }
 
-      logger.debug('logging help for command', command.name);
-      let argsCli = commandLineArgs(command.args);
-      console.log(argsCli.getUsage({
-        title: `polymer ${command.name}`,
-        description: command.description,
-      }));
-      this.printGlobalOptions();
+      logger.debug(`printing help for command '${command.name}'...`);
+      console.log(this.generateCommandUsage(command));
       resolve(null);
     });
   }
 }
-
-const h = chalk.bold.underline;
-const b = chalk.blue;
-const m = chalk.magenta;
-const title = h('Polymer-CLI');
-const description = 'The multi-tool for Polymer projects';
-const usage = 'Usage: \`polymer <command> [options ...]\`';
-
-const helpHeader = '\n' +
-    b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
-    b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + title + '\n' +
-    b(' /\\  /   ') + m('/\\  /') + b('\\  /\\ ') + '\n' +
-    b('/__\\/   ') + m('/__\\/  ') + b('\\/__\\') + '  ' + description + '\n' +
-    b('\\  /\\  ') + m('/\\  /   ') + b('/\\  /') + '\n' +
-    b(' \\/__\\') + m('/__\\/   ') + b('/__\\/ ') + '  ' + usage + '\n' +
-    b('  \\  ') + m('/\\  /   ') + b('/\\  /  ') + '\n' +
-    b('   \\') + m('/__\\/   ') + b('/__\\/   ') + '\n';

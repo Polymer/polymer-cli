@@ -1,7 +1,4 @@
 declare module 'command-line-args' {
-  function commandLineArgs(args: commandLineArgs.ArgDescriptor[])
-      : commandLineArgs.CLI;
-
   module commandLineArgs {
     interface ArgDescriptor {
       name: string;
@@ -13,17 +10,9 @@ declare module 'command-line-args' {
       defaultOption?: boolean;
       group?: string;
     }
-    interface UsageOpts {
-      title?: string;
-      header?: string;
-      description?: string;
-      groups?: any;
-    }
-    interface CLI {
-      parse(): any;
-      getUsage(opts: UsageOpts): string;
-    }
   }
+
+  function commandLineArgs(groups: commandLineArgs.ArgDescriptor[], args?: string[]): any;
 
   export = commandLineArgs;
 }

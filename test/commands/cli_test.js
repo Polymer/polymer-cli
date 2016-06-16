@@ -27,7 +27,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
   });
 
   test('displays general help when no command is called with the --help flag', () => {
@@ -36,7 +36,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
   });
 
   test('displays general help when unknown command is called', () => {
@@ -45,7 +45,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'THIS_IS_SOME_UNKNOWN_COMMAND'}, defaultConfig]);
   });
 
   test('displays command help when called with the --help flag', () => {
