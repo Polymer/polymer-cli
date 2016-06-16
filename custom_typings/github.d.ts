@@ -31,13 +31,13 @@ declare module "github" {
   }
   interface GetReleaseMessage {
     headers?: {string: string};
-    owner: string;
+    user: string;
     repo: string;
     id: number;
   }
   interface ListReleasesMessage {
     headers?: {string: string};
-    owner: string;
+    user: string;
     repo: string;
     page?: number;
     per_page?: number;
@@ -48,6 +48,8 @@ declare module "github" {
       getFromOrg(msg: GetFromOrgOpts, cb: NodeCallback<GitHubApi.Repo[]>): void;
       get(msg: {user: string, repo: string},
           cb: NodeCallback<GitHubApi.Repo>): void;
+      getRelease(msg: GetReleaseMessage, cb: NodeCallback<GitHubApi.Release>): void;
+      getReleases(msg: ListReleasesMessage, cb: NodeCallback<GitHubApi.Release[]>): void;
     }
     pullRequests: {
       create(
@@ -55,10 +57,6 @@ declare module "github" {
     }
     issues: {
       edit(msg: IssuesEditOpts, cb: NodeCallback<GitHubApi.Issue>): void;
-    }
-    releases: {
-      getRelease(msg: GetReleaseMessage, cb: NodeCallback<GitHubApi.Release>): void;
-      listReleases(msg: ListReleasesMessage, cb: NodeCallback<GitHubApi.Release[]>): void;
     }
     authenticate(credentials: {type: string, token: string}): void;
     user: { get(msg: {}, cb: NodeCallback<GitHubApi.User>): void; };
