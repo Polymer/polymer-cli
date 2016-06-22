@@ -39,7 +39,6 @@
 import * as path from 'path';
 
 export default function urlFromPath(root, filepath) {
-  console.log(root, filepath);
   if (!filepath.startsWith(root)) {
     throw new Error(`file path is not in root: ${filepath} (${root})`);
   }
