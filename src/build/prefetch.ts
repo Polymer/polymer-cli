@@ -79,23 +79,51 @@ export class PrefetchTransform extends Transform {
     let contents = file.contents.toString();
     let ast = dom5.parse(contents);
     let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
-    for (let dep of deps) {
-      if (dep.startsWith(this.root)) {
-        dep = path.relative(file.dirname, dep);
-      }
+    let rooted_deps = [];
+    let server_relpath = path.relative(this.root, file.path);
+    let server_abspath = path.join('/', server_relpath);
+    for (const dep of deps) {
+      let resolved_dep = path.relative(file.dirname, dep);
+      let rooted_dep = path.join('/', path.relative(this.root, dep));
+      rooted_deps.push(rooted_dep);
       // prefetched deps should be absolute, as they will be in the main file
       if (type === 'prefetch') {
-        dep = path.join('/', dep);
+        // In case an entrypoint is in a subdirectory, resolve absolute paths
+        // against server root.
+        resolved_dep = rooted_dep;
       }
       let link = dom5.constructors.element('link');
       dom5.setAttribute(link, 'rel', type);
-      dom5.setAttribute(link, 'href', dep);
+      dom5.setAttribute(link, 'href', resolved_dep);
       dom5.append(head, link);
     }
+    this._pushApacheFile(server_relpath, rooted_deps);
     contents = dom5.serialize(ast);
     file.contents = new Buffer(contents);
   }
-
+  _pushApacheFile(server_relpath: string, rooted_deps: Array<string>) {
+    const confPath = path.join(this.root, 'apache', server_relpath.replace('/', '_') + '.conf');
+    let location: string;
+    let locationTag: string;
+    if (server_relpath == "index.html") {
+      location = '"^[^.]*$"';
+      locationTag = 'LocationMatch';
+    } else {
+      location = `/${server_relpath}`;
+      locationTag = 'Location'
+    }
+    const confOpenTag = `<${locationTag} ${location}>\n`;
+    const confBody = rooted_deps.map((dep) =>
+      `    Header Add Link "<${dep}>;rel=preload;as=document"`
+    ).join('\n');
+    const confCloseTag = `\n</${locationTag}>`;
+    const confContents = confOpenTag + confBody + confCloseTag;
+    console.log(confContents);
+    this.push(new File({
+      path: confPath,
+      contents: new Buffer(confContents)
+    }));
+  }
   _transform(file: File, enc: string, callback: (err?, file?) => void) {
     if (this.isImportantFile(file)) {
       // hold on to the file for safe keeping

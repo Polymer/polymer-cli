@@ -56,7 +56,7 @@ export class BuildCommand implements Command {
     let buildOptions: BuildOptions = {
       sources: options.sources,
       swPrecacheConfig: options['sw-precache-config'],
-      insertDependencyLinks: options['insert-dependency-links'],
+      insertDependencyLinks: true,
       html: {},
       css: {},
       js: {}
