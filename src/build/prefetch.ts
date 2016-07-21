@@ -14,7 +14,7 @@ import * as logging from 'plylog';
 import {Transform} from 'stream';
 import File = require('vinyl');
 
-import {StreamAnalyzer, DepsIndex} from './analyzer';
+import {StreamAnalyzer, DepsIndex} from 'polymer-build';
 
 let logger = logging.getLogger('cli.build.prefech');
 
@@ -115,7 +115,7 @@ export class PrefetchTransform extends Transform {
     if (this.fileMap.size === 0) {
       return done();
     }
-    this.analyzer.analyze.then((depsIndex: DepsIndex) => {
+    this.analyzer.analyzeDependencies.then((depsIndex: DepsIndex) => {
       let fragmentToDeps = new Map(depsIndex.fragmentToDeps);
 
       if (this.entrypoint && this.shell) {

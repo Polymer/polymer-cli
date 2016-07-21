@@ -39,30 +39,3 @@ export function compose(streams: NodeJS.ReadWriteStream[]) {
     return new PassThrough({objectMode: true});
   }
 }
-
-/**
- * Forks a stream of Vinyl files, cloning each file before emitting on the fork.
- */
-export class ForkedVinylStream extends Readable {
-
-  input: NodeJS.ReadableStream;
-
-  constructor(input: NodeJS.ReadableStream) {
-    super({objectMode: true});
-    this.input = input;
-    input.on('data', (file) => {
-      this.push(file.clone({deep: true, contents: true}));
-    });
-    input.on('end', () => {
-      this.push(null);
-    });
-    input.on('error', (e) => {
-      this.emit('error', e);
-    });
-  }
-
-  _read(size: number) {
-    // apparently no-op is fine, but this method is required,
-    // see: https://nodejs.org/api/stream.html#stream_readable_read_size_1
-  }
-}

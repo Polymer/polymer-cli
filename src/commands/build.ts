@@ -9,7 +9,6 @@
  */
 
 import {ArgDescriptor} from 'command-line-args';
-import {BuildOptions} from '../build/build';
 import {Command} from './command';
 import * as logging from 'plylog';
 
@@ -25,7 +24,13 @@ export class BuildCommand implements Command {
     {
       name: 'sources',
       multiple: true,
-      description: 'The sources file to build',
+      description: 'Globs to match your application sources files.',
+    },
+    {
+      name: 'include-dependencies',
+      multiple: true,
+      description: 'Globs to match any additional dependencies not ' +
+        'automatically detected via import analysis.',
     },
     {
       name: 'sw-precache-config',
@@ -50,14 +55,16 @@ export class BuildCommand implements Command {
   run(options, config): Promise<any> {
     // Defer dependency loading until this specific command is run
     const build = require('../build/build').build;
+    const BuildOptions = require('../build/build').BuildOptions;
 
     let buildOptions: BuildOptions = {
       sources: options.sources,
+      includeDependencies: options['include-dependencies'],
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
       html: {},
       css: {},
-      js: {}
+      js: {},
     };
     if (options['html.collapseWhitespace']) {
       buildOptions.html.collapseWhitespace = true;
