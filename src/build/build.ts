@@ -19,8 +19,12 @@ import {PassThrough, Readable} from 'stream';
 import * as logging from 'plylog';
 import {PolymerProject, forkStream, DepsIndex} from 'polymer-build';
 
+const uglify = require('gulp-uglify');
+const cssSlam = require('css-slam').gulp;
+const htmlmin = require('gulp-html-minifier');
+
 import {ProjectConfig} from '../project-config';
-import {optimize, OptimizeOptions} from './optimize';
+import {OptimizeOptions} from './optimize';
 import {PrefetchTransform} from './prefetch';
 import {waitForAll} from './streams';
 import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
@@ -32,6 +36,17 @@ export interface BuildOptions extends OptimizeOptions {
   includeDependencies?: string[];
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
+  // TODO(fks) 07-21-2016: Fully complete these with available options
+  html?: {
+    collapseWhitespace?: boolean;
+    removeComments?: boolean;
+  };
+  css?: {
+    stripWhitespace?: boolean;
+  };
+  js?: {
+    minify?: boolean;
+  };
 }
 
 export function build(options: BuildOptions, config: ProjectConfig): Promise<any> {
@@ -50,38 +65,22 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
       logger.debug(`Additional dependency links will be inserted into application`);
     }
 
-    // TODO: let this be set by the user
-    let optimizeOptions: OptimizeOptions = {
-      html: {
-        removeComments: true,
-      },
-      css: {
-        stripWhitespace: true
-      },
-      js: {
-        minify: true
-      }
-    };
-
     // mix in optimization options from build command
-    if (options.html) {
-      Object.assign(optimizeOptions.html, options.html);
-    }
-    if (options.css) {
-      Object.assign(optimizeOptions.css, options.css);
-    }
-    if (options.js) {
-      Object.assign(optimizeOptions.js, options.js);
-    }
+    // TODO: let this be set by the user
+    let optimizeOptions = {
+      html: Object.assign({removeComments: true}, options.html),
+      css: Object.assign({stripWhitespace: true}, options.css),
+      js: Object.assign({minify: true}, options.js),
+    };
 
     logger.info(`Building application...`);
 
     logger.debug(`Reading source files...`);
-
-
     let sourcesStream = polymerProject.sources()
       .pipe(polymerProject.splitHtml())
-      .pipe(optimize(optimizeOptions))
+      .pipe(gulpif(/\.js$/, uglify(optimizeOptions.js)))
+      .pipe(gulpif(/\.css$/, cssSlam(optimizeOptions.css)))
+      .pipe(gulpif(/\.html$/, htmlmin(optimizeOptions.html)))
       .pipe(polymerProject.rejoinHtml());
 
     logger.debug(`Reading dependencies...`);

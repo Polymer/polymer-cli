@@ -28,14 +28,3 @@ export function waitFor(stream: NodeJS.ReadableStream): Promise<NodeJS.ReadableS
 export function waitForAll(streams: NodeJS.ReadableStream[]): Promise<NodeJS.ReadableStream[]> {
   return Promise.all<NodeJS.ReadableStream>(streams.map((s) => waitFor(s)));
 }
-
-/**
- * Composes multiple streams (or Transforms) into one.
- */
-export function compose(streams: NodeJS.ReadWriteStream[]) {
-  if (streams && streams.length > 0) {
-    return multipipe(streams);
-  } else {
-    return new PassThrough({objectMode: true});
-  }
-}
