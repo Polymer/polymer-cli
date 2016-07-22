@@ -76,6 +76,8 @@ declare module 'polymer-build' {
   }
 
   export interface AddServiceWorkerOptions {
+    project: PolymerProject;
+    buildRoot: string;
     bundled?: boolean;
     serviceWorkerPath?: string;
     swConfig?: SWConfig;
@@ -102,11 +104,13 @@ declare module 'polymer-build' {
     analyzeDependencies: Promise<DepsIndex>;
   }
 
+  export function addServiceWorker(options: AddServiceWorkerOptions):
+      Promise<{}>;
+
   export function forkStream(stream: NodeJS.ReadableStream):
       NodeJS.ReadableStream;
 
   export class PolymerProject {
-
     root: string;
     entrypoint: string;
     shell: string;
@@ -115,17 +119,14 @@ declare module 'polymer-build' {
     includeDependencies: string[];
 
     allSourceGlobs: string[];
-    analyze: StreamAnalyzer;
-    bundle: Bundler;
+    analyzer: StreamAnalyzer;
+    bundler: Bundler;
 
     constructor(options?: ProjectOptions);
     sources(): NodeJS.ReadableStream;
     dependencies(): NodeJS.ReadableStream;
     splitHtml(): Transform;
     rejoinHtml(): Transform;
-    addServiceWorker(buildRoot: string, options: AddServiceWorkerOptions): Promise<{}>;
   }
-
-
 
 }
