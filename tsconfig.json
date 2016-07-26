@@ -24,11 +24,9 @@
   "files": [
     "src/args.ts",
     "src/build/build.ts",
-    "src/build/optimize.ts",
     "src/build/prefetch.ts",
     "src/build/streams.ts",
     "src/build/sw-precache.ts",
-    "src/build/uglify-transform.ts",
     "src/commands/build.ts",
     "src/commands/command.ts",
     "src/commands/help.ts",
