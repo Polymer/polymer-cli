@@ -12,8 +12,6 @@
 
 const assert = require('chai').assert;
 const vfs = require('vinyl-fs-fake');
-
-const HtmlProject = require('../../lib/build/html-project').HtmlProject;
 const optimize = require('../../lib/build/optimize').optimize;
 
 suite('optimize()', () => {
@@ -61,9 +59,11 @@ suite('optimize()', () => {
     });
   });
 
-  test('all together', (done) => {
+  test('html', (done) => {
     let expected =
-      `<!DOCTYPE html><html><head><style>foo{background:blue;}</style><script>document.registerElement("x-foo",XFoo);</script></head><body><x-foo>bar</x-foo></body></html>`;
+      `<!doctype html><style>foo {
+            background: blue;
+          }</style><script>document.registerElement(\'x-foo\', XFoo);</script><x-foo>bar</x-foo>`;
     let stream = vfs.src([
       {
         path: 'foo.html',
@@ -88,16 +88,8 @@ suite('optimize()', () => {
         collapseWhitespace: true,
         removeComments: true,
       },
-      css: {
-        stripWhitespace: true,
-      },
-      js: {
-        minify: true,
-      },
     };
-    let project = new HtmlProject();
-    let op = stream.pipe(project.split);
-    op = op.pipe(optimize(options)).pipe(project.rejoin);
+    let op = stream.pipe(optimize(options));
     testStream(op, (err, f) => {
       if (err) {
         return done(err);

@@ -9,8 +9,9 @@
  */
 import {ServerOptions} from 'polyserve/lib/start_server';
 import {BuildOptions} from '../build/build';
+import {ProjectConfig} from '../project-config';
 
 export interface Environment {
   serve(options: ServerOptions): Promise<any>;
-  build(options: BuildOptions): Promise<any>;
+  build(options: BuildOptions, config: ProjectConfig): Promise<any>;
 }

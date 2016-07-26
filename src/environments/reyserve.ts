@@ -11,6 +11,7 @@
 import {ServerOptions} from 'polyserve/lib/start_server';
 import {build, BuildOptions} from '../build/build';
 import {Environment} from '../environment/environment';
+import {ProjectConfig} from '../project-config';
 import {Github} from '../github/github';
 import * as temp from 'temp';
 import * as fs from 'fs-extra';
@@ -24,11 +25,11 @@ const REYSERVE_FILES = ['app.yaml', 'reyserve.py', 'http2push.py'];
 
 export class ReyServe implements Environment {
 
-  build(opts: BuildOptions): Promise<any> {
+  build(opts: BuildOptions, config: ProjectConfig): Promise<any> {
     const bundled = path.join(process.cwd(), 'build/bundled');
     const unbundled = path.join(process.cwd(), 'build/unbundled');
     const reyserveFiles = temp.mkdirSync('reyserve');
-    return build(opts).then(() => {
+    return build(opts, config).then(() => {
       console.log('Downloading reyserve release');
       const repo = new Github({owner: 'Polymer', repo: 'reyserve'});
       return repo.extractLatestRelease(reyserveFiles);
