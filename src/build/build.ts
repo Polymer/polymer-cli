@@ -19,9 +19,7 @@ import {PassThrough, Readable} from 'stream';
 import * as logging from 'plylog';
 import {PolymerProject, addServiceWorker, forkStream, DepsIndex, SWConfig} from 'polymer-build';
 
-const uglify = require('gulp-uglify');
-const cssSlam = require('css-slam').gulp;
-const htmlmin = require('gulp-html-minifier');
+import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
 import {ProjectConfig} from '../project-config';
 import {PrefetchTransform} from './prefetch';
@@ -77,9 +75,9 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
     logger.debug(`Reading source files...`);
     let sourcesStream = polymerProject.sources()
       .pipe(polymerProject.splitHtml())
-      .pipe(gulpif(/\.js$/, uglify(optimizeOptions.js)))
-      .pipe(gulpif(/\.css$/, cssSlam(optimizeOptions.css)))
-      .pipe(gulpif(/\.html$/, htmlmin(optimizeOptions.html)))
+      .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+      .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
+      .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
       .pipe(polymerProject.rejoinHtml());
 
     logger.debug(`Reading dependencies...`);
