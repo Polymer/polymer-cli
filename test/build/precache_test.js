@@ -11,17 +11,14 @@
 'use strict';
 
 const assert = require('chai').assert;
-const fs = require('fs');
 const path = require('path');
-const temp = require('temp').track();
-const vfs = require('vinyl-fs-fake');
 
 const precache = require('../../lib/build/sw-precache');
 
 suite('sw-precache', () => {
-  const configFile = path.resolve(__dirname, 'precache', 'config.js');
-  suite('parsing', () => {
-    test('js file', (done) => {
+  suite('parsePreCacheConfig()', () => {
+    test('should parse a js file', (done) => {
+      const configFile = path.resolve(__dirname, 'precache', 'config.js');
       precache.parsePreCacheConfig(configFile).then((config) => {
         assert.ok(config);
         assert.property(config, 'staticFileGlobs');
@@ -29,59 +26,4 @@ suite('sw-precache', () => {
       })
     });
   });
-
-  suite('generation', () => {
-    let buildRoot;
-    setup((done) => {
-      temp.mkdir('polymer-cli', (err, dir) => {
-          if (err) {
-            return done(err);
-          }
-          buildRoot = dir;
-          vfs.src(path.join(__dirname, 'precache/static/*'))
-          .pipe(vfs.dest(dir))
-          .on('finish', () => done());
-        }
-      );
-    });
-
-    teardown((done) => {
-      temp.cleanup(done)
-    });
-
-    test('without config', (done) => {
-      precache.parsePreCacheConfig(path.join(__dirname, 'nope')).then(() => {
-        precache.generateServiceWorker({
-          root: path.resolve(__dirname, 'precache/static'),
-          entrypoint: path.resolve(__dirname, 'precache/static/fizz.html'),
-          buildRoot,
-          deps: [],
-          serviceWorkerPath: path.join(buildRoot, 'service-worker.js'),
-        }).then(() => {
-          let content =
-            fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
-          assert.include(content, '/fizz.html', 'entrypoint file should be present');
-          done();
-        });
-      }).catch((err) => done(err));
-    });
-
-    test('with config', (done) => {
-      precache.parsePreCacheConfig(configFile).then((config) => {
-        return precache.generateServiceWorker({
-          root: path.resolve(__dirname, 'precache/static'),
-          entrypoint: path.resolve(__dirname, 'precache/static/fizz.html'),
-          buildRoot,
-          deps: [],
-          swConfig: config,
-          serviceWorkerPath: path.join(buildRoot, 'service-worker.js'),
-        });
-      }).then(() => {
-        let content = fs.readFileSync(path.join(buildRoot, 'service-worker.js'), 'utf-8');
-        assert.include(content, '/fizz.html', 'entrypoint file should be present');
-        assert.include(content, '/foo.js', 'staticFileGlobs should match foo.js');
-        done();
-      });
-    });
-  })
 });

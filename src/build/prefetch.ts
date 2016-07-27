@@ -13,7 +13,6 @@ import * as path from 'path';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
 import File = require('vinyl');
-
 import {StreamAnalyzer, DepsIndex} from 'polymer-build';
 
 let logger = logging.getLogger('cli.build.prefech');

@@ -17,21 +17,20 @@ import mergeStream = require('merge-stream');
 import * as path from 'path';
 import {PassThrough, Readable} from 'stream';
 import * as logging from 'plylog';
-import {PolymerProject, forkStream, DepsIndex} from 'polymer-build';
+import {PolymerProject, addServiceWorker, forkStream, DepsIndex, SWConfig} from 'polymer-build';
 
 const uglify = require('gulp-uglify');
 const cssSlam = require('css-slam').gulp;
 const htmlmin = require('gulp-html-minifier');
 
 import {ProjectConfig} from '../project-config';
-import {OptimizeOptions} from './optimize';
 import {PrefetchTransform} from './prefetch';
-import {waitForAll} from './streams';
-import {generateServiceWorker, parsePreCacheConfig, SWConfig} from './sw-precache';
+import {waitFor} from './streams';
+import {parsePreCacheConfig} from './sw-precache';
 
 let logger = logging.getLogger('cli.build.build');
 
-export interface BuildOptions extends OptimizeOptions {
+export interface BuildOptions {
   sources?: string[];
   includeDependencies?: string[];
   swPrecacheConfig?: string;
@@ -90,9 +89,7 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
 
     let buildStream = mergeStream(sourcesStream, depsStream)
       .once('data', () => { logger.debug('Analyzing build dependencies...'); })
-      .pipe(polymerProject.analyze);
-
-    let serviceWorkerName = 'service-worker.js';
+      .pipe(polymerProject.analyzer);
 
     let unbundledPhase = forkStream(buildStream)
       .once('data', () => { logger.info('Generating build/unbundled...'); })
@@ -101,64 +98,49 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
           options.insertDependencyLinks,
           new PrefetchTransform(polymerProject.root, polymerProject.entrypoint,
             polymerProject.shell, polymerProject.fragments,
-            polymerProject.analyze)
+            polymerProject.analyzer)
         )
       )
       .pipe(gulp.dest('build/unbundled'));
 
     let bundledPhase = forkStream(buildStream)
       .once('data', () => { logger.info('Generating build/bundled...'); })
-      .pipe(polymerProject.bundle)
+      .pipe(polymerProject.bundler)
       .pipe(gulp.dest('build/bundled'));
 
-
-    let genSW = (buildRoot: string, deps: string[], swConfig: SWConfig, scriptAndStyleDeps?: string[]) => {
-      logger.debug(`Generating service worker for ${buildRoot}...`);
-      logger.debug(`Script and style deps: ${scriptAndStyleDeps}`);
-      return generateServiceWorker({
-        root: polymerProject.root,
-        entrypoint: polymerProject.entrypoint,
-        deps,
-        scriptAndStyleDeps,
-        buildRoot,
-        swConfig: clone(swConfig),
-        serviceWorkerPath: path.join(polymerProject.root, buildRoot, serviceWorkerName),
-      });
-    };
-
     let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
-    return Promise.all([
-      parsePreCacheConfig(swPrecacheConfig),
-      polymerProject.analyze.analyzeDependencies,
-      waitForAll([unbundledPhase, bundledPhase])
-    ]).then((results) => {
-      let swConfig: SWConfig = results[0];
-      let depsIndex: DepsIndex = results[1];
+    let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
 
+    loadSWConfig.then((swConfig) => {
       if (swConfig) {
         logger.debug(`Service worker config found`, swConfig);
       } else {
         logger.debug(`No service worker configuration found at ${swPrecacheConfig}, continuing with defaults`);
       }
+    });
 
-      let unbundledDeps = polymerProject.analyze.allFragments
-          .concat(Array.from(depsIndex.depsToFragments.keys()));
-      let bundledDeps = polymerProject.analyze.allFragments
-          .concat(polymerProject.bundle.sharedBundleUrl);
-      let fullDeps = Array.from(depsIndex.fragmentToFullDeps.values());
-      let scriptAndStyleDeps = new Set<string>();
-      fullDeps.forEach(d => {
-        d.scripts.forEach((s) => scriptAndStyleDeps.add(s));
-        d.styles.forEach((s) => scriptAndStyleDeps.add(s));
+    // Once the unbundled build stream is complete, create a service worker for the build
+    let unbundledPostProcessing = Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
+      let swConfig: SWConfig = results[0];
+      return addServiceWorker({
+        buildRoot: 'build/unbundled',
+        project: polymerProject,
+        swConfig: swConfig,
       });
+    });
 
-      logger.info(`Generating service workers...`);
-      return Promise.all([
-        genSW('build/unbundled', unbundledDeps, swConfig, Array.from(scriptAndStyleDeps)),
-        genSW('build/bundled', bundledDeps, swConfig)
-      ]);
-    })
-    .then(() => {
+    // Once the bundled build stream is complete, create a service worker for the build
+    let bundledPostProcessing = Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
+      let swConfig: SWConfig = results[0];
+      return addServiceWorker({
+        buildRoot: 'build/bundled',
+        project: polymerProject,
+        swConfig: swConfig,
+        bundled: true,
+      });
+    });
+
+    return Promise.all([unbundledPostProcessing, bundledPostProcessing]).then(() => {
       logger.info('Build complete!');
       buildResolve();
     });

@@ -49,7 +49,6 @@
     "custom_typings/dom5.d.ts",
     "custom_typings/fs-extra.d.ts",
     "custom_typings/github.d.ts",
-    "custom_typings/hydrolysis.d.ts",
     "custom_typings/node.d.ts",
     "custom_typings/plylog.d.ts",
     "custom_typings/polymer-build.d.ts",
