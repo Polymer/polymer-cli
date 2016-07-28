@@ -83,6 +83,9 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
     logger.debug(`Reading dependencies...`);
     let depsStream = polymerProject.dependencies()
       .pipe(polymerProject.splitHtml())
+      .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+      .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
+      .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
       .pipe(polymerProject.rejoinHtml());
 
     let buildStream = mergeStream(sourcesStream, depsStream)

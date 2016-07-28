@@ -13,31 +13,61 @@ export type CSSOptimizeOptions = {
 }
 
 /**
+ * GenericOptimizeStream is a generic optimization stream. It can be extended
+ * to create a new kind of specific file-type optimizer, or it can be used
+ * directly to create an ad-hoc optimization stream for certain types of files.
+ */
+export class GenericOptimizeStream extends Transform {
+
+  validExtension: string;
+  optimizer: (content: string, options: any) => string;
+  optimizerOptions: any;
+
+  constructor(
+      validExtension: string,
+      optimizer: (content: string, optimizerOptions: any) => string,
+      optimizerOptions: any) {
+    super({objectMode: true});
+    this.optimizer = optimizer;
+    this.validExtension = validExtension;
+    this.optimizerOptions = optimizerOptions || {};
+  }
+
+  _transform(file: File, encoding: string, callback: FileCB): void {
+    if (file.contents && file.path.endsWith(`${this.validExtension}`)) {
+      try {
+        let contents = file.contents.toString();
+        contents = this.optimizer(contents, this.optimizerOptions);
+        file.contents = new Buffer(contents);
+      } catch (err) {
+        logger.warn(
+          `Unable to optimize ${this.validExtension} file ${file.path}`,
+          {err}
+        );
+      }
+    }
+    callback(null, file);
+  }
+
+}
+
+/**
  * JSOptimizeStream optimizes JS files that pass through it (via uglify).
  * If a file is not a `.js` file or if uglify throws an exception when run,
  * the file will pass through unaffected.
  */
-export class JSOptimizeStream extends Transform {
-
-  options: UglifyOptions;
+export class JSOptimizeStream extends GenericOptimizeStream {
 
   constructor(options: UglifyOptions) {
-    super({objectMode: true});
-    // NOTE: We automatically add the fromString option because it is required.
-    this.options = Object.assign({fromString: true}, options);
-  }
-
-  _transform(file: File, encoding: string, callback: FileCB): void {
-    if (file.contents && file.path.endsWith('.js')) {
-      try {
-        let contents = file.contents.toString();
-        contents = uglify(contents, this.options).code;
-        file.contents = new Buffer(contents);
-      } catch (err) {
-        logger.warn(`Unable to uglify js file ${file.path}`, {err});
-      }
-    }
-    callback(null, file);
+    // uglify is special, in that it returns an object with a code property
+    // instead of just a code string. We create a compliant optimizer here
+    // that returns a string instead.
+    let uglifyOptimizer = (contents: string, options: UglifyOptions) => {
+      return uglify(contents, options).code;
+    };
+    // We automatically add the fromString option because it is required.
+    let uglifyOptions = Object.assign({fromString: true}, options);
+    super('.js', uglifyOptimizer, uglifyOptions);
   }
 
 }
@@ -48,30 +78,19 @@ export class JSOptimizeStream extends Transform {
  * If a file is not a `.css` file or if css-slam throws an exception when run,
  * the file will pass through unaffected.
  */
-export class CSSOptimizeStream extends Transform {
-
-  options: CSSOptimizeOptions;
+export class CSSOptimizeStream extends GenericOptimizeStream {
 
   constructor(options: CSSOptimizeOptions) {
-    super({objectMode: true});
-    this.options = options || {};
+    super('.css', cssSlam, options);
   }
 
   _transform(file: File, encoding: string, callback: FileCB): void {
     // css-slam will only be run if the `stripWhitespace` option is true.
     // Because css-slam itself doesn't accept any options, we handle the
-    // options here in the stream.
-    if (this.options.stripWhitespace && file.contents
-        && file.path.endsWith('.css')) {
-      try {
-        let contents = file.contents.toString();
-        contents = cssSlam(contents);
-        file.contents = new Buffer(contents);
-      } catch (err) {
-        logger.warn(`Unable to optimize css file ${file.path}`, {err});
-      }
+    // option here before transforming.
+    if (this.optimizerOptions.stripWhitespace) {
+      super._transform(file, encoding, callback);
     }
-    callback(null, file);
   }
 
 }
@@ -82,26 +101,10 @@ export class CSSOptimizeStream extends Transform {
  * (via html-minifier). If a file is not a `.html` file or if html-minifier
  * throws an exception when run, the file will pass through unaffected.
  */
-export class HTMLOptimizeStream extends Transform {
-
-  options: HTMLMinifierOptions;
+export class HTMLOptimizeStream extends GenericOptimizeStream {
 
   constructor(options: HTMLMinifierOptions) {
-    super({objectMode: true});
-    this.options = options || {};
-  }
-
-  _transform(file: File, encoding: string, callback: FileCB): void {
-    if (file.contents && file.path.endsWith('.html')) {
-      try {
-        let contents = file.contents.toString();
-        contents = htmlMinify(contents, this.options);
-        file.contents = new Buffer(contents);
-      } catch (err) {
-        logger.warn(`Unable to minify html file ${file.path}`, {err});
-      }
-    }
-    callback(null, file);
+    super('.html', htmlMinify, options);
   }
 
 }
