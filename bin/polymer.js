@@ -29,9 +29,11 @@ resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
   let lib = path ? require(path) : require('..');
   let args = process.argv.slice(2);
   let cli = new lib.PolymerCli(args);
-  cli.run().catch(err => {
-    logger.error(err);
-    if (err.stack) logger.error(err.stack);
+  cli.run().catch((err) => {
+    logger.error(`cli runtime exception: ${err}`);
+    if (err.stack) {
+      logger.error(err.stack);
+    }
     process.exit(1);
   });
 });
