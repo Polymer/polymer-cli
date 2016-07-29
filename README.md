@@ -144,6 +144,10 @@ Start the development server, and open the default browser:
 
     $ polymer serve -o
 
+By default the server listen to `127.0.0.1`. To listen to a different address add the `--hostname` flag. For example:
+
+    $ polymer serve -o --hostname 0.0.0.0
+
 ## Templates and Generators
 
 Polymer-CLI initialize new projects with the `init` command, and includes
