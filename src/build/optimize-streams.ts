@@ -39,10 +39,10 @@ export class GenericOptimizeStream extends Transform {
         let contents = file.contents.toString();
         contents = this.optimizer(contents, this.optimizerOptions);
         file.contents = new Buffer(contents);
-      } catch (err) {
+      } catch (error) {
         logger.warn(
           `Unable to optimize ${this.validExtension} file ${file.path}`,
-          {err}
+          {err: error}
         );
       }
     }

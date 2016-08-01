@@ -66,7 +66,7 @@ export class ProjectConfig {
         if (bowerConfig.main && typeof bowerConfig.main === 'string') {
           this.entrypoint = path.resolve(this.root, bowerConfig.main);
         }
-      } catch (e) {
+      } catch (error) {
         // do nothing
       }
     }

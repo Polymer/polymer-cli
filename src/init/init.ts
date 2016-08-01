@@ -59,8 +59,8 @@ function checkIsMinGW(): boolean {
   try {
     let uname = execSync('uname -s').toString();
     return !!/^mingw/i.test(uname);
-  } catch (err) {
-    logger.debug('`uname -s` failed to execute correctly', {err: err.message});
+  } catch (error) {
+    logger.debug('`uname -s` failed to execute correctly', {err: error.message});
     return false;
   }
 }
@@ -80,13 +80,13 @@ function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, gen
       let metapath = findup.sync(generator.resolved, 'package.json');
       let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
       description = meta.description;
-    } catch (err) {
-      if (err.message === 'not found') {
+    } catch (error) {
+      if (error.message === 'not found') {
         logger.debug('no package.json found for generator');
       } else {
         logger.debug('problem reading/parsing package.json for generator', {
           generator: generatorName,
-          err: err.message,
+          err: error.message,
         });
       }
     }
@@ -122,9 +122,9 @@ function createYeomanEnvironment(): Promise<any> {
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
     env.registerStub(shopGenerator, 'polymer-init-shop:app');
     env.registerStub(appDrawerGenerator, 'polymer-init-app-drawer-template:app');
-    env.lookup((err) => {
-      if (err) {
-        reject(err);
+    env.lookup((error) => {
+      if (error) {
+        reject(error);
         return;
       }
       resolve(env);
@@ -184,9 +184,9 @@ export function runGenerator(generatorName, options): Promise<any> {
     }
 
     return new Promise((resolve, reject) => {
-      env.run(generatorName, {}, (err) => {
-        if (err) {
-          reject(err);
+      env.run(generatorName, {}, (error) => {
+        if (error) {
+          reject(error);
           return;
         }
         resolve();
