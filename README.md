@@ -130,9 +130,10 @@ Use `index.html` as the entryopint, or read from `polymer.json`:
 
     $ polymer build
 
-`build` is opinionated and defaults to a good build for app-shell apps. It works very much like a pre-configured gulpfile. Over time the build steps that Polymer-CLI uses will be available for use with Gulp, and the CLI will add hooks that let you extend it's functionality via Gulp.
+`build` is opinionated and defaults to a good build for app-shell apps. It writes the built output to `build/bundled` and `build/unbundled` folders. Both outputs have been run though HTML, JS and CSS optimizers, and have a Service Worked generated for them. The bundled folder contains the application files process by Vulcanize, Polymer's HTML bundler, for optimal loading via HTTP/1. The unbundled folder is optimized for HTTP/2 + Push.
 
-`build` writes the built output to `build/bundled` and `build/unbundled` folders. Both outputs have been run though HTML, JS and CSS optimizers, and have a Service Worked generated for them. The bundled folder contains the application files process by Vulcanize, Polymer's HTML bundler, for optimal loading via HTTP/1. The unbundled folder is optimized for HTTP/2 + Push.
+While the build command should support most projects, some users will need greater control over their build pipeline. If that's you, check out the [polymer-build](https://github.com/Polymer/polymer-build) library. Polymer-build can be called and customized programatically, giving you much greater control than the CLI can provide. Visit the repo for usage information and examples.
+
 
 ### serve
 
