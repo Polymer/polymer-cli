@@ -2,7 +2,7 @@
 
 ## v0.13.0
 
-- Refactor build logic out into standalone library: https://github.com/Polymer/polymer-build
+- Refactor build logic out into standalone library: https://github.com/Polymer/polymer-build. Build behavior should remain the same from v0.12.0, but lots of work has been done in the new library to fix bugs and reduce build time/size.
 - Refactor build file optimization streams
 - Send an error code on polymer command run error
 
