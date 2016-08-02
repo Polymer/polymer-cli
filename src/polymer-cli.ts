@@ -122,7 +122,7 @@ export class PolymerCli {
     return Array.from(mergedArgs.values());
   }
 
-  run() {
+  run(): Promise<any> {
     let helpCommand = this.commands.get('help');
     let commandNames = Array.from(this.commands.keys());
     let parsedArgs;
@@ -132,7 +132,7 @@ export class PolymerCli {
     // the current version. Useful for globally installed CLIs.
     if (this.args.indexOf('--version') > -1) {
       console.log(require('../package.json').version);
-      return;
+      return Promise.resolve();
     }
 
     try {

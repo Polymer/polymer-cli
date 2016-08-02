@@ -25,59 +25,65 @@ suite('The general CLI', () => {
     let cli = new PolymerCli([]);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
+    return cli.run().then(() => {
+      assert.isOk(helpCommandSpy.calledOnce);
+      assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
+    });
   });
 
   test('displays general help when no command is called with the --help flag', () => {
     let cli = new PolymerCli(['--help']);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
+    return cli.run().then(() => {
+      assert.isOk(helpCommandSpy.calledOnce);
+      assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
+    });
   });
 
   test('displays general help when unknown command is called', () => {
     let cli = new PolymerCli(['THIS_IS_SOME_UNKNOWN_COMMAND']);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'THIS_IS_SOME_UNKNOWN_COMMAND'}, defaultConfig]);
+    return cli.run().then(() => {
+      assert.isOk(helpCommandSpy.calledOnce);
+      assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'THIS_IS_SOME_UNKNOWN_COMMAND'}, defaultConfig]);
+    });
   });
 
   test('displays command help when called with the --help flag', () => {
     let cli = new PolymerCli(['build', '--help']);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(
-      helpCommandSpy.firstCall.args,
-      [{command: 'build'}, defaultConfig]
-    );
+    return cli.run().then(() => {
+      assert.isOk(helpCommandSpy.calledOnce);
+      assert.deepEqual(
+        helpCommandSpy.firstCall.args,
+        [{command: 'build'}, defaultConfig]
+      );
+    });
   });
 
   test('displays command help when called with the -h flag', () => {
     let cli = new PolymerCli(['init', '-h']);
     let helpCommand = cli.commands.get('help');
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
-    cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(
-      helpCommandSpy.firstCall.args,
-      [{command: 'init'}, defaultConfig]
-    );
+    return cli.run().then(() => {
+      assert.isOk(helpCommandSpy.calledOnce);
+      assert.deepEqual(
+        helpCommandSpy.firstCall.args,
+        [{command: 'init'}, defaultConfig]
+      );
+    });
   });
 
   test('displays version information when called with the --version flag', () => {
     let cli = new PolymerCli(['--version']);
     let consoleLogSpy = sinon.spy(console, 'log');
-    cli.run();
-    assert.isOk(consoleLogSpy.calledWithExactly(packageJSON.version));
-    consoleLogSpy.restore();
+    return cli.run().then(() => {
+      assert.isOk(consoleLogSpy.calledWithExactly(packageJSON.version));
+      consoleLogSpy.restore();
+    });
   });
 
   test('sets the appropriate log levels when the --verbose & --quiet flags are used', () => {
