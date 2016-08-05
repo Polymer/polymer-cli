@@ -24,7 +24,7 @@ suite('optimize-streams', () => {
     stream.on('data', (data) => {
       cb(null, data)
     });
-    stream.on('error', (err) => cb(err));
+    stream.on('error', cb);
   }
 
   test('css', (done) => {
@@ -36,9 +36,9 @@ suite('optimize-streams', () => {
     ]);
     let op = stream.pipe(new CSSOptimizeStream({stripWhitespace: true}));
     assert.notEqual(stream, op, 'stream should be wrapped');
-    testStream(op, (err, f) => {
-      if (err) {
-        return done(err);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
       }
       assert.equal(f.contents.toString(), 'selector{property:value;}');
       done();
@@ -54,9 +54,9 @@ suite('optimize-streams', () => {
     ]);
     let op = stream.pipe(new JSOptimizeStream({minify: true}));
     assert.notEqual(stream, op);
-    testStream(op, (err, f) => {
-      if (err) {
-        return done(err);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
       }
       assert.equal(f.contents.toString(), 'var foo=3;');
       done();
@@ -92,9 +92,9 @@ suite('optimize-streams', () => {
       removeComments: true,
     };
     let op = stream.pipe(new HTMLOptimizeStream(options));
-    testStream(op, (err, f) => {
-      if (err) {
-        return done(err);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
       }
       assert.equal(f.contents.toString(), expected);
       done();

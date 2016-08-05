@@ -91,8 +91,8 @@ suite('init/github', () => {
           path.join(dir, 'package.json')
         );
       })
-      .on('error', (e) => {
-        assert.equal(e.message, 'expected');
+      .on('error', (error) => {
+        assert.equal(error.message, 'expected');
         done();
       })
       .on('end', (a) => {

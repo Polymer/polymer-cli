@@ -50,7 +50,7 @@ export class Github {
   static tokenFromFile(filename: string): string {
     try {
       return fs.readFileSync(filename, 'utf8').trim();
-    } catch (e) {
+    } catch (error) {
       return null;
     }
   }
@@ -101,10 +101,9 @@ export class Github {
         })
         .on('response', function(response) {
           if (response.statusCode !== 200) {
-            let err = new GithubResponseError(
+            throw new GithubResponseError(
                 response.statusCode,
                 response.statusMessage);
-            throw err;
           }
           logger.info('Unpacking template files');
         })
@@ -131,9 +130,9 @@ export class Github {
         user: this._owner,
         repo: this._repo,
         per_page: 1,
-      }, (err, result) => {
-        if (err) {
-          reject(err);
+      }, (error, result) => {
+        if (error) {
+          reject(error);
           return;
         }
         if (result.length === 0) {

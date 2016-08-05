@@ -17,14 +17,14 @@ let logger = logging.getLogger('cli.build.sw-precache');
 
 export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
   return new Promise<SWConfig>((resolve, reject) => {
-    fs.stat(configFile, (err) => {
+    fs.stat(configFile, (statError) => {
       let config: SWConfig;
       // only log if the config file exists at all
-      if (!err) {
+      if (!statError) {
         try {
           config = require(configFile);
-        } catch (e) {
-          logger.warn(`${configFile} file was found but could not be loaded`, {err});
+        } catch (loadError) {
+          logger.warn(`${configFile} file was found but could not be loaded`, {loadError});
         }
       }
       resolve(config);

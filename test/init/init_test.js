@@ -66,8 +66,8 @@ suite('init', () => {
 
       return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME, {env: yeomanEnv}).then(() => {
         throw new Error('The promise should have been rejected before it got here');
-      }, (err) => {
-        assert.equal(err.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
+      }, (error) => {
+        assert.equal(error.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
       });
     });
 
@@ -89,8 +89,8 @@ suite('init', () => {
 
     test('prompts with a list to get generatorName property from user', () => {
       let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
-      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((err) => {
-        assert.equal(err.message, 'Template TEST not found');
+      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
+        assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         assert.isTrue(promptStub.calledOnce);
         assert.equal(promptStub.firstCall.args[0][0].type, 'list');
@@ -101,8 +101,8 @@ suite('init', () => {
 
     test('prompts with a list of all registered generators', () => {
       let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
-      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((err) => {
-        assert.equal(err.message, 'Template TEST not found');
+      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
+        assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         let choices = promptStub.firstCall.args[0][0].choices;
         assert.equal(choices.length, 1);
@@ -116,8 +116,8 @@ suite('init', () => {
       let yeomanEnv = new YeomanEnvironment();
       let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
       helpers.registerDependencies(yeomanEnv, [[helpers.createDummyGenerator(), 'polymer-init-custom-template:app']]);
-      return polymerInit.promptGeneratorSelection({env: yeomanEnv}).catch((err) => {
-        assert.equal(err.message, 'Template TEST not found');
+      return polymerInit.promptGeneratorSelection({env: yeomanEnv}).catch((error) => {
+        assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         assert.isTrue(promptStub.calledOnce);
         let choices = promptStub.firstCall.args[0][0].choices;
@@ -131,8 +131,8 @@ suite('init', () => {
     test('prompts the user with a list', () => {
       let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
 
-      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((err) => {
-        assert.equal(err.message, 'Template TEST not found');
+      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
+        assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         assert.isTrue(promptStub.calledOnce);
         assert.equal(promptStub.firstCall.args[0][0].type, 'list');
@@ -145,8 +145,8 @@ suite('init', () => {
         let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
         sandbox.stub(childProcess, 'execSync').withArgs('uname -s').returns('mingw');
 
-        return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((err) => {
-          assert.equal(err.message, 'Template TEST not found');
+        return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
+          assert.equal(error.message, 'Template TEST not found');
         }).then(() => {
           assert.isTrue(promptStub.calledOnce);
           assert.equal(promptStub.firstCall.args[0][0].type, 'rawlist');

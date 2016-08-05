@@ -137,18 +137,18 @@ export class PolymerCli {
 
     try {
       parsedArgs = commandLineCommands(commandNames, this.args);
-    } catch (err) {
+    } catch (error) {
       // Polymer CLI needs a valid command name to do anything. If the given
       // command is invalid, run the generalized help command with default
       // config. This should print the general usage information.
-      if (err.name === 'INVALID_COMMAND') {
-        if (err.command) {
-          logger.warn(`'${err.command}' is not an available command.`);
+      if (error.name === 'INVALID_COMMAND') {
+        if (error.command) {
+          logger.warn(`'${error.command}' is not an available command.`);
         }
-        return helpCommand.run({command: err.command}, new ProjectConfig(this.defaultConfig));
+        return helpCommand.run({command: error.command}, new ProjectConfig(this.defaultConfig));
       }
       // If an unexpected error occurred, propagate it
-      throw err;
+      throw error;
     }
 
     let commandName = parsedArgs.command;

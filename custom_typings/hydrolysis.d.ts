@@ -100,7 +100,7 @@ declare module 'hydrolysis' {
   export class Deferred<T> {
     promise: Promise<T>;
     resolve: (val:(T|PromiseLike<T>))=>void;
-    reject: (err:any)=>void;
+    reject: (error:any)=>void;
   }
 
   /**
