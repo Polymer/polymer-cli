@@ -10,7 +10,7 @@
 
 import clone = require('clone');
 import * as fs from 'fs';
-import * as gulp from 'gulp';
+import {dest} from 'vinyl-fs';
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
 import mergeStream = require('merge-stream');
@@ -102,12 +102,12 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
             polymerProject.analyzer)
         )
       )
-      .pipe(gulp.dest('build/unbundled'));
+      .pipe(dest('build/unbundled'));
 
     let bundledPhase = forkStream(buildStream)
       .once('data', () => { logger.info('Generating build/bundled...'); })
       .pipe(polymerProject.bundler)
-      .pipe(gulp.dest('build/bundled'));
+      .pipe(dest('build/bundled'));
 
     let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
     let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
