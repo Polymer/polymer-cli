@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.14.0
+
+- replace unneccesary gulp dependency with vinyl-fs
+- polymer-build@v0.4.0 fixes build path issues
+- fix bug where `--version` flag threw an exception
+
+
 ## v0.13.0
 
 - Refactor build logic out into standalone library: https://github.com/Polymer/polymer-build. Build behavior should remain the same from v0.12.0, but lots of work has been done in the new library to fix bugs and reduce build time/size.
