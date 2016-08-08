@@ -4,6 +4,7 @@
 
 - replace unneccesary gulp dependency with vinyl-fs
 - polymer-build@v0.4.0 fixes build path issues
+- but wait... THERE'S MORE! polymer-build@v0.4.0 also handles external resources properly now
 - fix bug where `--version` flag threw an exception
 
 
