@@ -30,7 +30,7 @@ interface GeneratorDescription {
 const templateDescriptions = {
   'element': 'A blank element template',
   'application': 'A blank application template',
-  'app-drawer-template': 'A starter application template, with navigation and "PRPL pattern" loading',
+  'starter-kit': 'A starter application template, with navigation and "PRPL pattern" loading',
   'shop': 'The "Shop" Progressive Web App demo',
 };
 
@@ -39,9 +39,9 @@ let shopGenerator = createGithubGenerator({
   repo: 'shop',
 });
 
-let appDrawerGenerator = createGithubGenerator({
-  owner: 'Polymer',
-  repo: 'app-drawer-template',
+let pskGenerator = createGithubGenerator({
+  owner: 'PolymerElements',
+  repo: 'polymer-starter-kit',
 });
 
 /**
@@ -121,7 +121,7 @@ function createYeomanEnvironment(): Promise<any> {
     env.registerStub(ElementGenerator, 'polymer-init-element:app');
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
     env.registerStub(shopGenerator, 'polymer-init-shop:app');
-    env.registerStub(appDrawerGenerator, 'polymer-init-app-drawer-template:app');
+    env.registerStub(pskGenerator, 'polymer-init-starter-kit:app');
     env.lookup((error) => {
       if (error) {
         reject(error);
