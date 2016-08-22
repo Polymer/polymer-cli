@@ -11,6 +11,7 @@
 import clone = require('clone');
 import * as fs from 'fs';
 import {dest} from 'vinyl-fs';
+import vfs = require('vinyl-fs');
 import * as gulpif from 'gulp-if';
 import * as gutil from 'gulp-util';
 import mergeStream = require('merge-stream');
@@ -112,13 +113,27 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
     let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
     let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
 
-    loadSWConfig.then((swConfig) => {
-      if (swConfig) {
-        logger.debug(`Service worker config found`, swConfig);
-      } else {
-        logger.debug(`No service worker configuration found at ${swPrecacheConfig}, continuing with defaults`);
-      }
+
+    let copySwPrecacheConfigStaticFileGlobs = loadSWConfig.then((swConfig) => {
+      return new Promise((resolve, reject) => {
+        if (swConfig) {
+          logger.debug(`Service worker config found`, swConfig);
+          // copy
+          let glob = swConfig.staticFileGlobs.map(function (g) {
+            return path.join(polymerProject.root, g);
+          });
+
+          vfs.src(glob, {base: polymerProject.root})
+              .pipe(vfs.dest('build/bundled'))
+              .pipe(vfs.dest('build/unbundled'));
+          resolve();
+        } else {
+          logger.debug(`No service worker configuration found at ${swPrecacheConfig}, continuing with defaults`);
+          reject();
+        }
+      })
     });
+
 
     // Once the unbundled build stream is complete, create a service worker for the build
     let unbundledPostProcessing = Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
