@@ -131,7 +131,7 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
           logger.debug(`No service worker configuration found at ${swPrecacheConfig}, continuing with defaults`);
           reject();
         }
-      })
+      });
     });
 
 
