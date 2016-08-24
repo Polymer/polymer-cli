@@ -29,8 +29,6 @@ import {parsePreCacheConfig} from './sw-precache';
 let logger = logging.getLogger('cli.build.build');
 
 export interface BuildOptions {
-  sources?: string[];
-  includeDependencies?: string[];
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
@@ -54,8 +52,8 @@ export function build(options: BuildOptions, config: ProjectConfig): Promise<any
       shell: config.shell,
       entrypoint: config.entrypoint,
       fragments: config.fragments,
-      sourceGlobs: options.sources,
-      includeDependencies: options.includeDependencies,
+      sourceGlobs: config.sourceGlobs,
+      includeDependencies: config.includeDependencies,
     });
 
     if (options.insertDependencyLinks) {
