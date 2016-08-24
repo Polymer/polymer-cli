@@ -20,6 +20,8 @@ suite('Project Config', () => {
     assert.deepEqual(defaultOptions, {
       entrypoint: 'foo.html',
       fragments: ['bar.html'],
+      includeDependencies: ['baz.html'],
+      sourceGlobs: ['src/**/*', 'images/**/*'],
     });
   });
 
@@ -28,7 +30,9 @@ suite('Project Config', () => {
     assert.equal(config.root, process.cwd());
     assert.equal(config.entrypoint, path.resolve('index.html'));
     assert.equal(config.shell, undefined);
+    assert.equal(config.includeDependencies, undefined);
     assert.deepEqual(config.fragments, []);
+    assert.deepEqual(config.sourceGlobs, ['src/**/*', 'bower.json']);
   });
 
   test('sets config from options object', () => {
@@ -36,6 +40,8 @@ suite('Project Config', () => {
     let config = new ProjectConfig(defaultOptions);
     assert.equal(config.root, process.cwd());
     assert.equal(config.entrypoint, path.resolve('foo.html'));
+    assert.deepEqual(config.sourceGlobs, ['src/**/*', 'images/**/*']);
+    assert.deepEqual(config.includeDependencies, ['baz.html']);
     assert.deepEqual(config.fragments, [path.resolve('bar.html')])
   });
 
@@ -44,11 +50,13 @@ suite('Project Config', () => {
       entrypoint: 'index.html',
       fragments: ['foo.html'],
       shell: 'bar.html',
+      'include-dependencies': ['bower_components/webcomponents_js/**/*'],
     });
     assert.equal(config.root, process.cwd());
     assert.equal(config.entrypoint, path.resolve('index.html'));
     assert.equal(config.shell, path.resolve('bar.html'));
     assert.deepEqual(config.fragments, [path.resolve('foo.html')]);
+    assert.deepEqual(config.includeDependencies, ['bower_components/webcomponents_js/**/*']);
   });
 
   test('flags override default config values', () => {
@@ -57,8 +65,11 @@ suite('Project Config', () => {
       entrypoint: 'bar.html',
       fragments: [],
       shell: 'zizz.html',
+      sources: ['src/**/*', 'index.html'],
     });
     assert.equal(config.entrypoint, path.resolve('bar.html'));
+    assert.deepEqual(config.includeDependencies, ['baz.html']);
+    assert.deepEqual(config.sourceGlobs, ['src/**/*', 'index.html']);
     assert.deepEqual(config.fragments, []);
     assert.equal(config.shell, path.resolve('zizz.html'));
   });

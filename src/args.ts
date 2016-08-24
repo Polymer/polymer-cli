@@ -43,8 +43,24 @@ export const globalArguments: ArgDescriptor[] = [
   {
     name: 'root',
     type: String,
-    description: 'The directory in which to find sources and place build. ' +
-        'Defaults to current working directory',
+    description: 'The directory where your project exists. ' +
+        'Defaults to the current working directory',
+    group: 'global',
+  },
+  {
+    name: 'sources',
+    type: String,
+    multiple: true,
+    description: 'Glob(s) that match your project source files. ' +
+        'Defaults to `src/**/*`.',
+    group: 'global',
+  },
+  {
+    name: 'include-dependencies',
+    type: String,
+    multiple: true,
+    description: 'Glob(s) that match any additional dependencies not caught ' +
+        'by the analyzer to include with your build.',
     group: 'global',
   },
   {

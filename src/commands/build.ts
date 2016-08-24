@@ -22,17 +22,6 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'sources',
-      multiple: true,
-      description: 'Globs to match your application sources files.',
-    },
-    {
-      name: 'include-dependencies',
-      multiple: true,
-      description: 'Globs to match any additional dependencies not ' +
-        'automatically detected via import analysis.',
-    },
-    {
       name: 'sw-precache-config',
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
@@ -58,8 +47,6 @@ export class BuildCommand implements Command {
     const BuildOptions = require('../build/build').BuildOptions;
 
     let buildOptions: BuildOptions = {
-      sources: options.sources,
-      includeDependencies: options['include-dependencies'],
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
       html: {},

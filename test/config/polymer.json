@@ -2,5 +2,12 @@
   "entrypoint": "foo.html",
   "fragments": [
     "bar.html"
+  ],
+  "includeDependencies": [
+    "baz.html"
+  ],
+  "sourceGlobs": [
+    "src/**/*",
+    "images/**/*"
   ]
 }
