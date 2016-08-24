@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.16.0
+
+- build: fail immediately if polymer.json is invalid
+- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json 
+- polymer-build@v0.4.1 (fixes ignored `staticFileGlobs` bug)
+
+
+## v0.15.0
+
+- replace app-drawer-template with starter-kit
+
+
 ## v0.14.0
 
 - replace unneccesary gulp dependency with vinyl-fs
