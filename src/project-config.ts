@@ -34,19 +34,23 @@ export class ProjectConfig {
       let configContent = fs.readFileSync(filepath, 'utf-8');
       return JSON.parse(configContent);
     } catch (error) {
+      // swallow "not found" errors because they are so common / expected
       if (error.code === 'ENOENT') {
-        logger.debug('config file not found', {path: filepath});
-      } else {
-        logger.error('Could not load config file', {path: filepath, err: error.message});
-        throw error;
+        logger.debug('no polymer config file found', {file: filepath});
+        return;
       }
-      return {};
+      // throw all other errors when a config exists but was not properly read
+      logger.error('Failed to load/parse polymer config file', {
+        file: filepath,
+        err: error.message,
+      });
+      throw error;
     }
   }
 
   constructor(defaultOptions?: string | ProjectConfigOptions, overrideOptions?: ProjectConfigOptions) {
     if (typeof defaultOptions === 'string') {
-      defaultOptions = ProjectConfig.fromConfigFile(<string>defaultOptions);
+      defaultOptions = ProjectConfig.fromConfigFile(<string>defaultOptions) || {};
     }
     this._init(defaultOptions, overrideOptions);
   }
