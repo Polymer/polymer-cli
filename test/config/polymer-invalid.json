@@ -1,0 +1,6 @@
+{
+  "entrypoint": "foo.html",
+  "fragments": [
+    "bar.html",
+  ]
+}

@@ -76,4 +76,9 @@ suite('Project Config', () => {
     });
     assert.equal(config.entrypoint, path.resolve(__dirname, 'broken-bower', 'index.html'));
   });
+
+  test('fails build immediately for invalid polymer.json', () => {
+    assert.throws(() => ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer-invalid.json')));
+  });
+
 });

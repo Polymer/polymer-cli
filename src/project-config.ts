@@ -37,7 +37,8 @@ export class ProjectConfig {
       if (error.code === 'ENOENT') {
         logger.debug('config file not found', {path: filepath});
       } else {
-        logger.warn('Could not load config file', {path: filepath, err: error});
+        logger.error('Could not load config file', {path: filepath, err: error.message});
+        throw error;
       }
       return {};
     }
