@@ -1,4 +1,7 @@
 import {Command} from './command';
+import * as logging from 'plylog';
+
+let logger = logging.getLogger('cli.command.test');
 
 export class TestCommand implements Command {
   name = 'test';
@@ -107,8 +110,14 @@ export class TestCommand implements Command {
   ];
 
   run(options, config): Promise<void> {
+    let wct;
     // Defer dependency loading until this specific command is run
-    const wct = require('web-component-tester');
+    try {
+      wct = require('web-component-tester');
+    } catch (er) {
+      logger.error('web-component-tester not installed!');
+      return Promise.resolve();
+    }
 
     return new Promise<void>((resolve, reject) => {
       wct.cli.run(process.env, process.argv.slice(3), process.stdout,
