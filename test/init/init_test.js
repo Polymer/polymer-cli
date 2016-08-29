@@ -106,7 +106,7 @@ suite('init', () => {
       }).then(() => {
         let choices = promptStub.firstCall.args[0][0].choices;
         assert.equal(choices.length, 1);
-        assert.equal(stripAnsi(choices[0].name), 'element: A blank element template');
+        assert.equal(stripAnsi(choices[0].name), 'element - A blank element template');
         assert.equal(choices[0].value, 'polymer-init-element:app');
         assert.equal(choices[0].short, 'element');
       });
@@ -122,7 +122,7 @@ suite('init', () => {
         assert.isTrue(promptStub.calledOnce);
         let choices = promptStub.firstCall.args[0][0].choices;
         let customGeneratorChoice = choices[choices.length-1];
-        assert.equal(stripAnsi(customGeneratorChoice.name), 'custom-template: no description');
+        assert.equal(stripAnsi(customGeneratorChoice.name), 'custom-template');
         assert.equal(customGeneratorChoice.value, 'polymer-init-custom-template:app');
         assert.equal(customGeneratorChoice.short, 'custom-template');
       });

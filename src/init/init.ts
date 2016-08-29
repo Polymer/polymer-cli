@@ -71,7 +71,7 @@ function checkIsMinGW(): boolean {
  */
 function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, generatorName: string): GeneratorDescription {
   let name = getDisplayName(generatorName);
-  let description = 'no description';
+  let description;
 
   if (templateDescriptions.hasOwnProperty(name)) {
     description = templateDescriptions[name];
@@ -84,16 +84,18 @@ function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, gen
       if (error.message === 'not found') {
         logger.debug('no package.json found for generator');
       } else {
-        logger.debug('problem reading/parsing package.json for generator', {
+        logger.debug('unable to read/parse package.json for generator', {
           generator: generatorName,
           err: error.message,
         });
       }
     }
   }
+  // If a description exists, format it properly for the command-line
+  description = (description) ? chalk.dim(' - ' + description) : '';
 
   return {
-    name: `${name}: ${chalk.dim(description)}`,
+    name: `${name}${description}`,
     value: generatorName,
     // inquirer is broken and doesn't print descriptions :(
     // keeping this so things work when it does
