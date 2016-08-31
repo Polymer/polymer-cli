@@ -77,6 +77,15 @@ You can specify the project files in `polymer.json` so that commands like `polym
     "src/app-home/app-home.html",
     "src/app-view-1/app-view-1.html",
   ],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "bower.json"
+  ],
+  "includeDependencies": [
+    "bower_components/additional-files-to-include-in-build/**/*",
+    "bower_components/webcomponentsjs/webcomponents-lite.js"
+  ]
 }
 ```
 
