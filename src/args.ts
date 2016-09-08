@@ -24,7 +24,7 @@ export const globalArguments: ArgDescriptor[] = [
   },
   {
     name: 'entrypoint',
-    description: 'The main HTML file that will requested for all routes.',
+    description: 'The main HTML file that will be requested for all routes.',
     group: 'global',
   },
   {
