@@ -18,6 +18,7 @@ suite('Project Config', () => {
   test('reads options from config file', () => {
     let defaultOptions = ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer.json'));
     assert.deepEqual(defaultOptions, {
+      root: 'public',
       entrypoint: 'foo.html',
       fragments: ['bar.html'],
       includeDependencies: ['baz.html'],
@@ -38,11 +39,11 @@ suite('Project Config', () => {
   test('sets config from options object', () => {
     let defaultOptions = ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer.json'));
     let config = new ProjectConfig(defaultOptions);
-    assert.equal(config.root, process.cwd());
-    assert.equal(config.entrypoint, path.resolve('foo.html'));
+    assert.equal(config.root, path.resolve(process.cwd(), 'public'));
+    assert.equal(config.entrypoint, path.resolve(config.root, 'foo.html'));
     assert.deepEqual(config.sourceGlobs, ['src/**/*', 'images/**/*']);
     assert.deepEqual(config.includeDependencies, ['baz.html']);
-    assert.deepEqual(config.fragments, [path.resolve('bar.html')])
+    assert.deepEqual(config.fragments, [path.resolve(config.root, 'bar.html')])
   });
 
   test('read config from flags', () => {
@@ -53,25 +54,28 @@ suite('Project Config', () => {
       'include-dependencies': ['bower_components/webcomponents_js/**/*'],
     });
     assert.equal(config.root, process.cwd());
-    assert.equal(config.entrypoint, path.resolve('index.html'));
-    assert.equal(config.shell, path.resolve('bar.html'));
-    assert.deepEqual(config.fragments, [path.resolve('foo.html')]);
+    assert.equal(config.entrypoint, path.resolve(config.root, 'index.html'));
+    assert.equal(config.shell, path.resolve(config.root, 'bar.html'));
+    assert.deepEqual(config.fragments, [path.resolve(config.root, 'foo.html')]);
     assert.deepEqual(config.includeDependencies, ['bower_components/webcomponents_js/**/*']);
   });
 
   test('flags override default config values', () => {
     let defaultOptions = ProjectConfig.fromConfigFile(path.join(__dirname, 'polymer.json'));
+    let fullRootPath = path.resolve(process.cwd(), 'private');
     let config = new ProjectConfig(defaultOptions, {
+      root: fullRootPath,
       entrypoint: 'bar.html',
       fragments: [],
       shell: 'zizz.html',
       sources: ['src/**/*', 'index.html'],
     });
-    assert.equal(config.entrypoint, path.resolve('bar.html'));
+    assert.equal(config.root, fullRootPath);
+    assert.equal(config.entrypoint, path.resolve(config.root, 'bar.html'));
     assert.deepEqual(config.includeDependencies, ['baz.html']);
     assert.deepEqual(config.sourceGlobs, ['src/**/*', 'index.html']);
     assert.deepEqual(config.fragments, []);
-    assert.equal(config.shell, path.resolve('zizz.html'));
+    assert.equal(config.shell, path.resolve(config.root, 'zizz.html'));
   });
 
   test('Read bower.json for "main"', () => {

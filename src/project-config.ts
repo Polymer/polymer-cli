@@ -74,10 +74,13 @@ export class ProjectConfig {
   _init(defaultOptions?: ProjectConfigOptions, overrideOptions?: ProjectConfigOptions) {
     let options: ProjectConfigOptions = Object.assign({}, defaultOptions, overrideOptions);
 
-    this.root = options.root || process.cwd();
+    this.root = process.cwd();
     this.sourceGlobs = options.sources || options.sourceGlobs || defaultSourceGlobs;
     this.includeDependencies = options['include-dependencies'] || options.includeDependencies;
 
+    if (options.root) {
+      this.root = path.resolve(this.root, options.root);
+    }
     if (options.entrypoint) {
       this.entrypoint = path.resolve(this.root, options.entrypoint);
     } else {

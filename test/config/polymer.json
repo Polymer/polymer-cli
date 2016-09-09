@@ -1,4 +1,5 @@
 {
+  "root": "public",
   "entrypoint": "foo.html",
   "fragments": [
     "bar.html"
