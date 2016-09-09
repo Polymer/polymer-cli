@@ -16,7 +16,7 @@ const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 
 const createGithubGenerator
-  = require('../../lib/init/github').createGithubGenerator;
+  = require('../../../lib/init/github').createGithubGenerator;
 
 suite('init/github', () => {
 

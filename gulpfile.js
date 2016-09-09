@@ -44,12 +44,21 @@ gulp.task('build-all', (done) => {
 });
 
 gulp.task('test', ['build'], () =>
-  gulp.src('test/**/*_test.js', {read: false})
+  gulp.src('test/unit/**/*_test.js', {read: false})
       .pipe(mocha({
         ui: 'tdd',
         reporter: 'spec',
       }))
 );
+
+gulp.task('test:integration', ['build-all'], () =>
+  gulp.src(['test/integration/**/*_test.js'], {read: false})
+      .pipe(mocha({
+        ui: 'tdd',
+        reporter: 'spec',
+      }))
+);
+
 
 gulp.task('tslint', () =>
   gulp.src('src/**/*.ts')
@@ -59,7 +68,7 @@ gulp.task('tslint', () =>
     .pipe(tslint.report('verbose')));
 
 gulp.task('eslint', () =>
-  gulp.src('test/**/*.js')
+  gulp.src('test/**/*_test.js')
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError()));

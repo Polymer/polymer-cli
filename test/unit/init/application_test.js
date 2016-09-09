@@ -12,7 +12,7 @@
 const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const ApplicationGenerator
-  = require('../../lib/init/application/application').ApplicationGenerator;
+  = require('../../../lib/init/application/application').ApplicationGenerator;
 
 suite('init/application', () => {
 

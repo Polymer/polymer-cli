@@ -11,8 +11,8 @@
 'use strict';
 
 const assert = require('chai').assert;
-const Config = require('../../lib/project-config').ProjectConfig;
-const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
+const Config = require('../../../lib/project-config').ProjectConfig;
+const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const sinon = require('sinon');
 
 suite('help', () => {

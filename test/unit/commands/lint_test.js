@@ -12,8 +12,8 @@
 
 const path = require('path');
 const assert = require('chai').assert;
-const ProjectConfig = require('../../lib/project-config').ProjectConfig;
-const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
+const ProjectConfig = require('../../../lib/project-config').ProjectConfig;
+const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const polylintCli = require('polylint/lib/cli');
 const sinon = require('sinon');
 

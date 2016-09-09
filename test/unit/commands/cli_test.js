@@ -10,9 +10,9 @@
 
 'use strict';
 
-const Config = require('../../lib/project-config').ProjectConfig;
-const packageJSON = require('../../package.json');
-const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
+const Config = require('../../../lib/project-config').ProjectConfig;
+const packageJSON = require('../../../package.json');
+const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const logging = require('plylog');
 const assert = require('chai').assert;
 const sinon = require('sinon');
