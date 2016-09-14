@@ -1,6 +1,6 @@
 import {ArgDescriptor} from 'command-line-args';
 
-import {ProjectConfig} from '../project-config';
+import {ProjectConfig} from 'polymer-project-config';
 
 export interface Command {
   name: string;

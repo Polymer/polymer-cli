@@ -13,7 +13,8 @@ import * as parse5 from 'parse5';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
-import {StreamAnalyzer, DepsIndex} from 'polymer-build';
+import {PolymerProject, StreamAnalyzer, DepsIndex} from 'polymer-build';
+import {ProjectConfig} from 'polymer-project-config';
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -23,55 +24,15 @@ import File = require('vinyl');
 let logger = logging.getLogger('cli.build.prefech');
 
 export class PrefetchTransform extends Transform {
-  root: string;
-  entrypoint: string;
-  shell: string;
-  fragments: string[];
-  allFragments: string[];
+
+  config: ProjectConfig;
   fileMap: Map<string, File>;
   analyzer: StreamAnalyzer;
 
-  constructor(
-    /**
-     * Root of the dependencies.
-     * Will be stripped when making links
-     */
-    root: string,
-
-    /**
-     * The main HTML file. This will have link rel=prefetches added to it.
-     */
-    entrypoint: string,
-
-    /**
-     * The app shell. This will have link rel=imports added to it.
-     */
-    shell: string,
-
-    /**
-     * List of files that will have dependencies flattened with
-     * `<link rel="import">`
-     */
-    fragments: string[],
-
-    /**
-     * The analyzer to retreive dependency information from.
-     */
-    analyzer: StreamAnalyzer
-  ) {
+  constructor(project: PolymerProject) {
     super({objectMode: true});
-    this.root = root;
-    this.entrypoint = entrypoint;
-    this.shell = shell;
-    this.fragments = fragments;
-    // clone fragments
-    this.allFragments = Array.from(fragments);
-    if (shell) {
-      this.allFragments.push(shell);
-    } else {
-      this.allFragments.push(entrypoint);
-    }
-    this.analyzer = analyzer;
+    this.config = project.config;
+    this.analyzer = project.analyzer;
     this.fileMap = new Map<string, File>();
   }
 
@@ -84,7 +45,7 @@ export class PrefetchTransform extends Transform {
     let ast = parse5.parse(contents);
     let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
     for (let dep of deps) {
-      if (dep.startsWith(this.root)) {
+      if (dep.startsWith(this.config.root)) {
         dep = path.relative(file.dirname, dep);
       }
       // prefetched deps should be absolute, as they will be in the main file
@@ -111,8 +72,8 @@ export class PrefetchTransform extends Transform {
   }
 
   isImportantFile(file) {
-    return file.path === this.entrypoint ||
-        this.allFragments.indexOf(file.path) > -1;
+    return file.path === this.config.entrypoint ||
+        this.config.allFragments.indexOf(file.path) > -1;
   }
 
   _flush(done: (error?) => void) {
@@ -122,18 +83,18 @@ export class PrefetchTransform extends Transform {
     this.analyzer.analyzeDependencies.then((depsIndex: DepsIndex) => {
       let fragmentToDeps = new Map(depsIndex.fragmentToDeps);
 
-      if (this.entrypoint && this.shell) {
-        let file = this.fileMap.get(this.entrypoint);
+      if (this.config.entrypoint && this.config.shell) {
+        let file = this.fileMap.get(this.config.entrypoint);
         // forward shell's dependencies to main to be prefetched
-        let deps = fragmentToDeps.get(this.shell);
+        let deps = fragmentToDeps.get(this.config.shell);
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
         this.push(file);
-        this.fileMap.delete(this.entrypoint);
+        this.fileMap.delete(this.config.entrypoint);
       }
 
-      for (let im of this.allFragments) {
+      for (let im of this.config.allFragments) {
         let file = this.fileMap.get(im);
         let deps = fragmentToDeps.get(im);
         if (deps) {

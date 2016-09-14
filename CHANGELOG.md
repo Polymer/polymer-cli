@@ -3,6 +3,8 @@
 ## Upcoming (Potentially Breaking)
 
 - Upgrade `polymer-build` to `v0.5.0`, which means the build command will now use the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer)! See [the polymer-build changelog](https://github.com/Polymer/polymer-build/blob/v0.5.0/CHANGELOG.md) for more information.
+- `build`: Rename the `--include-dependencies` flag to `--extra-dependencies`
+- `polymer.json`: Rename the `includeDependencies` & `sourceGlobs` fields to `extraDependencies` & `sources`, respectively
 
 ## v0.17.0
 
@@ -17,7 +19,7 @@
 ## v0.16.0
 
 - build: fail immediately if polymer.json is invalid
-- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json 
+- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json
 - polymer-build@v0.4.1 (fixes ignored `staticFileGlobs` bug)
 
 

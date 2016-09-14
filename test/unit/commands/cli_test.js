@@ -10,16 +10,14 @@
 
 'use strict';
 
-const Config = require('../../../lib/project-config').ProjectConfig;
 const packageJSON = require('../../../package.json');
 const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const logging = require('plylog');
 const assert = require('chai').assert;
 const sinon = require('sinon');
+const path = require('path');
 
 suite('The general CLI', () => {
-
-  const defaultConfig = new Config();
 
   test('displays general help when no command is called', () => {
     let cli = new PolymerCli([]);
@@ -27,7 +25,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     return cli.run().then(() => {
       assert.isOk(helpCommandSpy.calledOnce);
-      assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
+      assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: null});
     });
   });
 
@@ -37,7 +35,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     return cli.run().then(() => {
       assert.isOk(helpCommandSpy.calledOnce);
-      assert.deepEqual(helpCommandSpy.firstCall.args, [{command: null}, defaultConfig]);
+      assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: null});
     });
   });
 
@@ -47,7 +45,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     return cli.run().then(() => {
       assert.isOk(helpCommandSpy.calledOnce);
-      assert.deepEqual(helpCommandSpy.firstCall.args, [{command: 'THIS_IS_SOME_UNKNOWN_COMMAND'}, defaultConfig]);
+      assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: 'THIS_IS_SOME_UNKNOWN_COMMAND'});
     });
   });
 
@@ -57,10 +55,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     return cli.run().then(() => {
       assert.isOk(helpCommandSpy.calledOnce);
-      assert.deepEqual(
-        helpCommandSpy.firstCall.args,
-        [{command: 'build'}, defaultConfig]
-      );
+      assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: 'build'});
     });
   });
 
@@ -70,10 +65,7 @@ suite('The general CLI', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     return cli.run().then(() => {
       assert.isOk(helpCommandSpy.calledOnce);
-      assert.deepEqual(
-        helpCommandSpy.firstCall.args,
-        [{command: 'init'}, defaultConfig]
-      );
+      assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: 'init'});
     });
   });
 
@@ -92,6 +84,63 @@ suite('The general CLI', () => {
     assert.equal(logger.level, 'debug');
     new PolymerCli(['help', '--quiet']);
     assert.equal(logger.level, 'error');
+  });
+
+  test('read config from flags', () => {
+    let cli = new PolymerCli([
+      'build',
+      '--root', 'public-cli',
+      '--entrypoint', 'foo-cli.html',
+      '--shell', 'bar-cli.html',
+      '--sources', '**/*',
+      '--extra-dependencies', 'bower_components/baz-cli/**/*',
+    ]);
+    let buildCommand = cli.commands.get('build');
+    let buildCommandStub = sinon.stub(buildCommand, 'run').returns(Promise.resolve());
+    return cli.run().then(() => {
+      assert.isOk(buildCommandStub.calledOnce);
+      let config = buildCommandStub.firstCall.args[1];
+      let expectedRoot = path.resolve('public-cli');
+      assert.equal(config.root, expectedRoot);
+      assert.equal(config.entrypoint, path.resolve(expectedRoot, 'foo-cli.html'));
+      assert.equal(config.shell, path.resolve(expectedRoot, 'bar-cli.html'));
+      assert.deepEqual(config.extraDependencies, [path.resolve(expectedRoot, 'bower_components/baz-cli/**/*')]);
+      assert.deepEqual(config.sources, [
+        path.resolve(expectedRoot, '**/*'),
+        path.resolve(expectedRoot, 'foo-cli.html'),
+        path.resolve(expectedRoot, 'bar-cli.html'),
+      ]);
+    });
+  });
+
+ test('flags override default config values', () => {
+    let cli = new PolymerCli(['build',
+        '--root', 'public-cli',
+        '--entrypoint', 'foo-cli.html',
+        '--extra-dependencies', 'bower_components/baz-cli/**/*',
+      ], {
+        root: 'public',
+        entrypoint: 'foo.html',
+        shell: 'bar.html',
+        extraDependencies: ['bower_components/baz/**/*'],
+        sources: ['src/**'],
+      });
+    let buildCommand = cli.commands.get('build');
+    let buildCommandStub = sinon.stub(buildCommand, 'run').returns(Promise.resolve());
+    return cli.run().then(() => {
+      assert.isOk(buildCommandStub.calledOnce);
+      let config = buildCommandStub.firstCall.args[1];
+      let expectedRoot = path.resolve('public-cli');
+      assert.equal(config.root, expectedRoot);
+      assert.equal(config.entrypoint, path.resolve(expectedRoot, 'foo-cli.html'));
+      assert.equal(config.shell, path.resolve(expectedRoot, 'bar.html'));
+      assert.deepEqual(config.extraDependencies, [path.resolve(expectedRoot, 'bower_components/baz-cli/**/*')]);
+      assert.deepEqual(config.sources, [
+        path.resolve(expectedRoot, 'src/**'),
+        path.resolve(expectedRoot, 'foo-cli.html'),
+        path.resolve(expectedRoot, 'bar.html'),
+      ]);
+    });
   });
 
 });

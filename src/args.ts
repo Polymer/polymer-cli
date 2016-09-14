@@ -56,7 +56,7 @@ export const globalArguments: ArgDescriptor[] = [
     group: 'global',
   },
   {
-    name: 'include-dependencies',
+    name: 'extra-dependencies',
     type: String,
     multiple: true,
     description: 'Glob(s) that match any additional dependencies not caught ' +

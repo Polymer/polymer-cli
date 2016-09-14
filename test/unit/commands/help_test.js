@@ -11,12 +11,12 @@
 'use strict';
 
 const assert = require('chai').assert;
-const Config = require('../../../lib/project-config').ProjectConfig;
+const ProjectConfig = require('polymer-project-config').ProjectConfig;
 const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const sinon = require('sinon');
 
 suite('help', () => {
-  const defaultConfig = new Config();
+  const defaultConfig = new ProjectConfig();
 
   test('displays help for a specific command when called with that command', () => {
     let cli = new PolymerCli(['help', 'build']);
