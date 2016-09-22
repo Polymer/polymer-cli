@@ -39,7 +39,7 @@ export class ApplicationGenerator extends Base {
         type: 'input',
         name: 'elementName',
         message: `Main element name`,
-        default: `${this.appname}-app`,
+        default: (answers) => `${answers.name}-app`,
         validate(name) {
           let nameContainsHyphen = name.includes('-');
           if (!nameContainsHyphen) {
