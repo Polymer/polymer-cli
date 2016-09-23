@@ -172,7 +172,7 @@ export function runGenerator(generatorName, options): Promise<any> {
   options = options || {};
   let templateName = options.templateName || generatorName;
 
-  return ((options.env)
+  return (options.env
       ? Promise.resolve(options.env)
       : createYeomanEnvironment()
   ).then(function(env: YeomanEnvironment) {
@@ -206,7 +206,7 @@ export function promptGeneratorSelection(options): Promise<any> {
   options = options || {};
   let env: YeomanEnvironment;
 
-  return ((options.env)
+  return (options.env
       ? Promise.resolve(options.env)
       : createYeomanEnvironment()
   ).then(function(_env: YeomanEnvironment) {
