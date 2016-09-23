@@ -16,7 +16,7 @@ import {SWConfig} from 'polymer-build';
 let logger = logging.getLogger('cli.build.sw-precache');
 
 export function parsePreCacheConfig(configFile: string): Promise<SWConfig> {
-  return new Promise<SWConfig>((resolve, reject) => {
+  return new Promise<SWConfig>((resolve, _reject) => {
     fs.stat(configFile, (statError) => {
       let config: SWConfig;
       // only log if the config file exists at all

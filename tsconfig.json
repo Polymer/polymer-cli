@@ -7,6 +7,8 @@
     "isolatedModules": false,
     "declaration": false,
     "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "removeComments": false,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": false,

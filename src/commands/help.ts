@@ -89,7 +89,7 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  run(options, config): Promise<any> {
+  run(options, _config): Promise<any> {
     return new Promise<any>((resolve, _) => {
       if (!options || !options.command) {
         logger.debug('no command given, printing general help...', {options: options});

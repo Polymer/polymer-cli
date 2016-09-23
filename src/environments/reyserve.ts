@@ -44,7 +44,7 @@ export class ReyServe implements Environment {
     });
   }
 
-  serve(options: ServerOptions): Promise<any> {
+  serve(options: ServerOptions): Promise<number> {
     return new Promise((resolve, reject) => {
       console.log('Launching reyserve dev server');
       let devServer = child_process.spawn(
@@ -55,7 +55,10 @@ export class ReyServe implements Environment {
           cwd: options.root
         });
       devServer.on('close', (code) => {
-        resolve();
+        resolve(code);
+      });
+      devServer.on('error', (error) => {
+        reject(error);
       });
     });
   };
