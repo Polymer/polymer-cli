@@ -10,7 +10,6 @@
 
 import * as chalk from 'chalk';
 import * as commandLineUsage from 'command-line-usage';
-import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
 import {globalArguments} from '../args';
 import {Command} from './command';

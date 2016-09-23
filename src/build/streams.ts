@@ -8,8 +8,6 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {PassThrough, Readable, Transform} from 'stream';
-
 /**
  * Waits for the given ReadableStream
  */

@@ -10,7 +10,6 @@
 
 import {Environment} from '../environment/environment';
 
-import {ReyServe} from './reyserve';
 
 class EnvironmentMap extends Map<string, {new(): Environment}> {
 }

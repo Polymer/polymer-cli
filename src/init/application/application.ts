@@ -9,7 +9,7 @@
 
 import * as chalk from 'chalk';
 import * as path from 'path';
-import {Base, IPromptOptions} from 'yeoman-generator';
+import {Base} from 'yeoman-generator';
 
 export class ApplicationGenerator extends Base {
 
