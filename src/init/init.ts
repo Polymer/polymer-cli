@@ -12,11 +12,11 @@ import {execSync} from 'child_process';
 import * as fs from 'fs';
 import * as logging from 'plylog';
 import * as chalk from 'chalk';
-import * as findup from 'findup';
+import * as findup from 'findup-sync';
 import {ApplicationGenerator} from '../init/application/application';
 import {ElementGenerator} from '../init/element/element';
 import * as YeomanEnvironment from 'yeoman-environment';
-import * as inquirer from 'inquirer';
+import {prompt, Question as InquirerQuestion} from 'inquirer';
 import {createGithubGenerator} from '../init/github';
 
 let logger = logging.getLogger('init');
@@ -77,7 +77,7 @@ function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, gen
     description = templateDescriptions[name];
   } else if (generator.resolved && generator.resolved !== 'unknown') {
     try {
-      let metapath = findup.sync(generator.resolved, 'package.json');
+      let metapath = findup('package.json', {cwd: generator.resolved});
       let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
       description = meta.description;
     } catch (error) {
@@ -124,11 +124,7 @@ function createYeomanEnvironment(): Promise<any> {
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
     env.registerStub(shopGenerator, 'polymer-init-shop:app');
     env.registerStub(pskGenerator, 'polymer-init-starter-kit:app');
-    env.lookup((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
+    env.lookup(() => {
       resolve(env);
     });
   });
@@ -139,7 +135,7 @@ function createYeomanEnvironment(): Promise<any> {
  * the list of available generators by filtering relevent ones out from
  * the environment list.
  */
-function createSelectPrompt(env): Promise<any> {
+function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
   let generators = env.getGeneratorsMeta();
   let polymerInitGenerators = Object.keys(generators).filter((k) => {
     return k.startsWith('polymer-init') && k !== 'polymer-init:app';
@@ -174,7 +170,7 @@ export function runGenerator(generatorName, options): Promise<any> {
 
   return new Promise((resolve, reject) => {
     resolve(options.env || createYeomanEnvironment());
-  }).then(function(env) {
+  }).then(function(env: YeomanEnvironment) {
     logger.info(`Running template ${templateName}...`);
     logger.debug(`Running generator ${generatorName}...`);
     let generators = env.getGeneratorsMeta();
@@ -203,15 +199,15 @@ export function runGenerator(generatorName, options): Promise<any> {
  */
 export function promptGeneratorSelection(options): Promise<any> {
   options = options || {};
-  let env;
+  let env: YeomanEnvironment;
 
   return new Promise((resolve, reject) => {
     resolve(options.env || createYeomanEnvironment());
-  }).then(function(_env) {
+  }).then(function(_env: YeomanEnvironment) {
     env = _env;
-    return inquirer.prompt([createSelectPrompt(env)]);
+    return prompt([createSelectPrompt(env)]);
   }).then(function(answers) {
-    let generatorName = answers.generatorName;
+    let generatorName = answers['generatorName'];
     return runGenerator(generatorName, {
       templateName: getDisplayName(generatorName),
       env: env

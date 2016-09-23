@@ -11,6 +11,12 @@
 import {Command} from './command';
 import * as logging from 'plylog';
 
+// Only import type definitions here, otherwise this line will be included in
+// the JS output, triggering  the entire build library & its dependencies to
+// be loaded and parsed.
+import {ServerOptions} from 'polyserve/lib/start_server';
+import {Environment} from '../environment/environment';
+
 let logger = logging.getLogger('cli.command.serve');
 
 
@@ -68,8 +74,6 @@ export class ServeCommand implements Command {
   run(options, config): Promise<any> {
     // Defer dependency loading until this specific command is run
     const polyserve = require('polyserve');
-    const ServerOptions = require('polyserve/lib/start_server').ServerOptions;
-    const Environment = require('../environment/environment').Environment;
 
     let openPath;
     if (config.entrypoint && config.shell) {
