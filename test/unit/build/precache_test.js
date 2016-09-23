@@ -1,4 +1,5 @@
-/*
+/**
+ * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
  * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
  * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -9,23 +10,20 @@
 
 'use strict';
 
-const yoAssert = require('yeoman-assert');
-const helpers = require('yeoman-test');
-const ElementGenerator
-  = require('../../lib/init/element/element').ElementGenerator;
+const assert = require('chai').assert;
+const path = require('path');
 
-suite('init/element', () => {
+const precache = require('../../../lib/build/sw-precache');
 
-  test('creates expected files while ignoring filenames with dangling underscores', (done) => {
-
-    helpers
-      .run(ElementGenerator)
-      .on('end', (a) => {
-        yoAssert.file(['bower.json']);
-        yoAssert.noFile(['_element.html']);
+suite('sw-precache', () => {
+  suite('parsePreCacheConfig()', () => {
+    test('should parse a js file', (done) => {
+      const configFile = path.resolve(__dirname, 'precache', 'config.js');
+      precache.parsePreCacheConfig(configFile).then((config) => {
+        assert.ok(config);
+        assert.property(config, 'staticFileGlobs');
         done();
-      });
-
+      })
+    });
   });
-
 });

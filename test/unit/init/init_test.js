@@ -16,7 +16,7 @@ const childProcess = require('child_process');
 const inquirer = require('inquirer');
 const YeomanEnvironment = require('yeoman-environment');
 
-const polymerInit = require('../../lib/init/init');
+const polymerInit = require('../../../lib/init/init');
 
 var isPlatformWin = /^win/.test(process.platform);
 

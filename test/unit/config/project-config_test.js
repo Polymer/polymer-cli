@@ -11,7 +11,7 @@
 'use strict';
 const assert = require('chai').assert;
 const path = require('path');
-const ProjectConfig = require('../../lib/project-config').ProjectConfig;
+const ProjectConfig = require('../../../lib/project-config').ProjectConfig;
 
 suite('Project Config', () => {
 

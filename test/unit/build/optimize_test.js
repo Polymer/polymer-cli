@@ -12,7 +12,7 @@
 
 const assert = require('chai').assert;
 const vfs = require('vinyl-fs-fake');
-const optimizeStreams = require('../../lib/build/optimize-streams');
+const optimizeStreams = require('../../../lib/build/optimize-streams');
 
 const JSOptimizeStream = optimizeStreams.JSOptimizeStream;
 const CSSOptimizeStream = optimizeStreams.CSSOptimizeStream;
