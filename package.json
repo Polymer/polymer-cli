@@ -12,8 +12,8 @@
   "scripts": {
     "lint": "gulp lint",
     "build": "gulp build",
-    "test": "gulp test",
-    "prepublish": "gulp build-all && gulp test"
+    "test": "gulp lint test",
+    "prepublish": "npm run build && npm test"
   },
   "repository": {
     "type": "git",
