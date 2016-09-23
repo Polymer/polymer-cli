@@ -4,7 +4,7 @@ declare module 'yeoman-environment' {
     registerStub(generator: any, namespace: string);
     run(target: string, options: any, done: Function);
     getGeneratorsMeta(): YeomanEnvironment.GeneratorMeta[];
-    lookup(callback: (error?: Error) => void);
+    lookup(callback: (error?: any) => void);
   }
 
   namespace YeomanEnvironment {
