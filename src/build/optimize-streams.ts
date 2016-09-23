@@ -5,7 +5,8 @@ import {Transform} from 'stream';
 import * as logging from 'plylog';
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
-// entity. Upgrade to import once compatible .d.ts file is released.
+// entity. Upgrade to proper JS import once compatible .d.ts file is released,
+// or consider writing a custom declaration in the `custom_typings/` folder.
 import File = require('vinyl');
 
 let logger = logging.getLogger('cli.build.optimize-streams');
