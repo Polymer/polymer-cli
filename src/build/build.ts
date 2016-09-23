@@ -15,6 +15,7 @@ import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import {PassThrough, Readable} from 'stream';
 import * as logging from 'plylog';
+import * as mergeStream from 'merge-stream';
 import {PolymerProject, addServiceWorker, forkStream, DepsIndex, SWConfig} from 'polymer-build';
 
 import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
@@ -23,11 +24,6 @@ import {ProjectConfig} from '../project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
-
-// TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
-// entity. Upgrade to proper JS import once compatible .d.ts file is released,
-// or consider writing a custom declaration in the `custom_typings/` folder.
-import mergeStream = require('merge-stream');
 
 let logger = logging.getLogger('cli.build.build');
 
