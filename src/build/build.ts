@@ -8,12 +8,10 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import clone = require('clone');
+import * as clone from 'clone';
 import * as fs from 'fs';
 import {dest} from 'vinyl-fs';
 import * as gulpif from 'gulp-if';
-import * as gutil from 'gulp-util';
-import mergeStream = require('merge-stream');
 import * as path from 'path';
 import {PassThrough, Readable} from 'stream';
 import * as logging from 'plylog';
@@ -25,6 +23,11 @@ import {ProjectConfig} from '../project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
+
+// TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
+// entity. Upgrade to proper JS import once compatible .d.ts file is released,
+// or consider writing a custom declaration in the `custom_typings/` folder.
+import mergeStream = require('merge-stream');
 
 let logger = logging.getLogger('cli.build.build');
 

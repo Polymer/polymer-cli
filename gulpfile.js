@@ -20,11 +20,8 @@ const path = require('path');
 const runSeq = require('run-sequence');
 const tslint = require("gulp-tslint");
 const typescript = require('gulp-typescript');
-const typings = require('gulp-typings');
 
 const tsProject = typescript.createProject('tsconfig.json');
-
-gulp.task('init', () => gulp.src("./typings.json").pipe(typings()));
 
 gulp.task('lint', ['tslint', 'eslint', 'depcheck']);
 
@@ -41,7 +38,7 @@ gulp.task('clean', (done) => {
 });
 
 gulp.task('build-all', (done) => {
-  runSeq('clean', 'init', 'lint', 'build', done);
+  runSeq('clean', 'lint', 'build', done);
 });
 
 gulp.task('test', ['build'], () =>
