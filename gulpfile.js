@@ -29,10 +29,9 @@ gulp.task('init', () => gulp.src("./typings.json").pipe(typings()));
 gulp.task('lint', ['tslint', 'eslint', 'depcheck']);
 
 gulp.task('build', () =>
-  mergeStream(
-    gulp.src('src/**/*.ts').pipe(typescript(tsProject)),
-    gulp.src(['src/**/*', '!src/**/*.ts'])
-  ).pipe(gulp.dest('lib'))
+  tsProject.src()
+  .pipe(tsProject(typescript.reporter.defaultReporter()))
+  .pipe(gulp.dest('lib'))
 );
 
 gulp.task('clean', (done) => {
@@ -65,7 +64,12 @@ gulp.task('eslint', () =>
     .pipe(eslint.failAfterError()));
 
 gulp.task('depcheck', () =>
-  depcheck(__dirname, {ignoreMatches: ['vinyl']})
+  depcheck(__dirname, {
+      // "@types/*" dependencies are type declarations that are automatically
+      // loaded by TypeScript during build. depcheck can't detect this
+      // so we ignore them here.
+      ignoreMatches: ['@types/*', 'vinyl']
+    })
     .then((result) => {
       let invalidFiles = Object.keys(result.invalidFiles) || [];
       let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));

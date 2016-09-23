@@ -23,7 +23,7 @@ export interface GithubGeneratorOptions {
   repo: string;
 }
 
-export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
+export function createGithubGenerator(githubOptions: GithubGeneratorOptions): (typeof Base) {
   let requestApi = githubOptions.requestApi;
   let githubApi = githubOptions.githubApi;
   let githubToken = githubOptions.githubToken;
@@ -45,7 +45,7 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions) {
       });
     }
 
-    rootGeneratorName() {
+    rootGeneratorName(): string {
       return 'GithubGenerator';
     }
 

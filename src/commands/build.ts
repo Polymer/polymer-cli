@@ -12,6 +12,11 @@ import {ArgDescriptor} from 'command-line-args';
 import {Command} from './command';
 import * as logging from 'plylog';
 
+// Only import type definitions here, otherwise this line will be included in
+// the JS output, triggering  the entire build library & its dependencies to
+// be loaded and parsed.
+import {BuildOptions} from '../build/build';
+
 let logger = logging.getLogger('cli.command.build');
 
 
@@ -44,7 +49,6 @@ export class BuildCommand implements Command {
   run(options, config): Promise<any> {
     // Defer dependency loading until this specific command is run
     const build = require('../build/build').build;
-    const BuildOptions = require('../build/build').BuildOptions;
 
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],

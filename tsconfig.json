@@ -1,67 +1,20 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "lib": ["es2016"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "isolatedModules": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "isolatedModules": false,
     "declaration": false,
     "noImplicitAny": false,
     "removeComments": false,
-    "noLib": true,
     "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "outDir": "lib"
+    "suppressImplicitAnyIndexErrors": false,
+    "outDir": "lib",
+    "rootDir": "src"
   },
-  "filesGlob": [
-    "src/**/*.ts",
-    "!node_modules/**",
-    "custom_typings/*.d.ts",
-    "typings/index.d.ts",
-    "node_modules/typescript/lib/lib.core.es6.d.ts"
-  ],
-  "files": [
-    "src/args.ts",
-    "src/build/build.ts",
-    "src/build/optimize-streams.ts",
-    "src/build/prefetch.ts",
-    "src/build/streams.ts",
-    "src/build/sw-precache.ts",
-    "src/commands/build.ts",
-    "src/commands/command.ts",
-    "src/commands/help.ts",
-    "src/commands/init.ts",
-    "src/commands/lint.ts",
-    "src/commands/serve.ts",
-    "src/commands/test.ts",
-    "src/environment/environment.ts",
-    "src/environments/environments.ts",
-    "src/environments/reyserve.ts",
-    "src/github/github.ts",
-    "src/init/application/application.ts",
-    "src/init/element/element.ts",
-    "src/init/github.ts",
-    "src/polymer-cli.ts",
-    "src/project-config.ts",
-    "custom_typings/command-line-args.d.ts",
-    "custom_typings/command-line-commands.d.ts",
-    "custom_typings/command-line-usage.d.ts",
-    "custom_typings/css-slam.d.ts",
-    "custom_typings/dom5.d.ts",
-    "custom_typings/fs-extra.d.ts",
-    "custom_typings/github.d.ts",
-    "custom_typings/node.d.ts",
-    "custom_typings/plylog.d.ts",
-    "custom_typings/polymer-build.d.ts",
-    "custom_typings/temp.d.ts",
-    "custom_typings/web-component-tester.d.ts",
-    "custom_typings/yeoman-environment.d.ts",
-    "custom_typings/yeoman-generator.d.ts",
-    "typings/index.d.ts",
-    "node_modules/typescript/lib/lib.core.es6.d.ts"
-  ],
-  "atom": {
-    "rewriteTsconfig": true
-  }
+  "include": [
+    "custom_typings/**/*.ts",
+    "src/**/*.ts"
+  ]
 }
