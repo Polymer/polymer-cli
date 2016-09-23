@@ -28,11 +28,13 @@ gulp.task('init', () => gulp.src("./typings.json").pipe(typings()));
 
 gulp.task('lint', ['tslint', 'eslint', 'depcheck']);
 
-gulp.task('build', () =>
-  tsProject.src()
-  .pipe(tsProject(typescript.reporter.defaultReporter()))
-  .pipe(gulp.dest('lib'))
-);
+gulp.task('build', () => {
+  let tsReporter = typescript.reporter.defaultReporter();
+  return mergeStream(
+      tsProject.src().pipe(tsProject(tsReporter)),
+      gulp.src(['src/**/*', '!src/**/*.ts'])
+    ).pipe(gulp.dest('lib'));
+});
 
 gulp.task('clean', (done) => {
   fs.remove(path.join(__dirname, 'lib'), done);
