@@ -8,4 +8,4 @@ before_script:
   - npm install
   - npm run build
 script:
-  - npm run test
+  - npm test
