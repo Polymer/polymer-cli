@@ -20,7 +20,6 @@ const path = require('path');
 const runSeq = require('run-sequence');
 const tslint = require("gulp-tslint");
 const typescript = require('gulp-typescript');
-const typings = require('gulp-typings');
 
 const tsProject = typescript.createProject('tsconfig.json');
 
