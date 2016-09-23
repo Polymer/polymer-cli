@@ -8,7 +8,6 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {ArgDescriptor} from 'command-line-args';
 import {Command} from './command';
 import * as logging from 'plylog';
 

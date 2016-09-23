@@ -8,15 +8,12 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import * as clone from 'clone';
-import * as fs from 'fs';
 import {dest} from 'vinyl-fs';
 import * as gulpif from 'gulp-if';
 import * as path from 'path';
-import {PassThrough, Readable} from 'stream';
 import * as logging from 'plylog';
 import * as mergeStream from 'merge-stream';
-import {PolymerProject, addServiceWorker, forkStream, DepsIndex, SWConfig} from 'polymer-build';
+import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
 import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 

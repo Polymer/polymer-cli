@@ -37,7 +37,7 @@ export class GenericOptimizeStream extends Transform {
     this.optimizerOptions = optimizerOptions || {};
   }
 
-  _transform(file: File, encoding: string, callback: FileCB): void {
+  _transform(file: File, _encoding: string, callback: FileCB): void {
     if (file.contents && file.path.endsWith(`${this.validExtension}`)) {
       try {
         let contents = file.contents.toString();

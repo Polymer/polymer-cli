@@ -172,9 +172,10 @@ export function runGenerator(generatorName, options): Promise<any> {
   options = options || {};
   let templateName = options.templateName || generatorName;
 
-  return new Promise((resolve, reject) => {
-    resolve(options.env || createYeomanEnvironment());
-  }).then(function(env: YeomanEnvironment) {
+  return (options.env
+      ? Promise.resolve(options.env)
+      : createYeomanEnvironment()
+  ).then(function(env: YeomanEnvironment) {
     logger.info(`Running template ${templateName}...`);
     logger.debug(`Running generator ${generatorName}...`);
     let generators = env.getGeneratorsMeta();
@@ -205,9 +206,10 @@ export function promptGeneratorSelection(options): Promise<any> {
   options = options || {};
   let env: YeomanEnvironment;
 
-  return new Promise((resolve, reject) => {
-    resolve(options.env || createYeomanEnvironment());
-  }).then(function(_env: YeomanEnvironment) {
+  return (options.env
+      ? Promise.resolve(options.env)
+      : createYeomanEnvironment()
+  ).then(function(_env: YeomanEnvironment) {
     env = _env;
     return prompt([createSelectPrompt(env)]);
   }).then(function(answers) {

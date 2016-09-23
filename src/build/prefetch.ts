@@ -99,7 +99,7 @@ export class PrefetchTransform extends Transform {
     file.contents = new Buffer(contents);
   }
 
-  _transform(file: File, enc: string, callback: (error?, file?) => void) {
+  _transform(file: File, _encoding: string, callback: (error?, file?) => void) {
     if (this.isImportantFile(file)) {
       // hold on to the file for safe keeping
       this.fileMap.set(file.path, file);

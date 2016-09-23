@@ -77,7 +77,6 @@ export class ServeCommand implements Command {
 
     let openPath;
     if (config.entrypoint && config.shell) {
-      let rootLength = (config.root && config.root.length) || 0;
       openPath = config.entrypoint.substring(config.root.length);
       if (openPath === 'index.html' || openPath === '/index.html') {
         openPath = '/';

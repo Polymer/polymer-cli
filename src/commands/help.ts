@@ -10,7 +10,6 @@
 
 import * as chalk from 'chalk';
 import * as commandLineUsage from 'command-line-usage';
-import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
 import {globalArguments} from '../args';
 import {Command} from './command';
@@ -90,7 +89,7 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  run(options, config): Promise<any> {
+  run(options, _config): Promise<any> {
     return new Promise<any>((resolve, _) => {
       if (!options || !options.command) {
         logger.debug('no command given, printing general help...', {options: options});
