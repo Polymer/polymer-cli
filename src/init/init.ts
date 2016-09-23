@@ -124,7 +124,11 @@ function createYeomanEnvironment(): Promise<any> {
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
     env.registerStub(shopGenerator, 'polymer-init-shop:app');
     env.registerStub(pskGenerator, 'polymer-init-starter-kit:app');
-    env.lookup(() => {
+    env.lookup((error?: Error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
       resolve(env);
     });
   });
