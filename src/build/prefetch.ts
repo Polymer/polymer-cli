@@ -12,8 +12,11 @@ import * as dom5 from 'dom5';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
-import File = require('vinyl');
 import {StreamAnalyzer, DepsIndex} from 'polymer-build';
+
+// TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
+// entity. Upgrade to import once compatible .d.ts file is released.
+import File = require('vinyl');
 
 let logger = logging.getLogger('cli.build.prefech');
 

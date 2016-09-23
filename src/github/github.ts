@@ -12,9 +12,9 @@ import * as fs from 'fs';
 import * as GitHubApi from 'github';
 import * as logging from 'plylog';
 import * as path from 'path';
+import * as request from 'request';
 
 const gunzip = require('gunzip-maybe');
-const request = require('request');
 const tar = require('tar-fs');
 
 let logger = logging.getLogger('cli.github');

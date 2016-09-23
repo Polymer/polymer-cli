@@ -10,8 +10,6 @@
 
 import {PassThrough, Readable, Transform} from 'stream';
 
-const multipipe = require('multipipe');
-
 /**
  * Waits for the given ReadableStream
  */

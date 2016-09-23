@@ -3,6 +3,9 @@ import {css as cssSlam} from 'css-slam';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import {Transform} from 'stream';
 import * as logging from 'plylog';
+
+// TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
+// entity. Upgrade to import once compatible .d.ts file is released.
 import File = require('vinyl');
 
 let logger = logging.getLogger('cli.build.optimize-streams');
