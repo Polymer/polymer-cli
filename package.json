@@ -26,6 +26,7 @@
     "@types/gulp-if": "0.0.30",
     "@types/html-minifier": "^1.1.30",
     "@types/inquirer": "0.0.29",
+    "@types/node": "^6.0.41",
     "@types/request": "0.0.31",
     "@types/temp": "^0.8.28",
     "@types/uglify-js": "^2.6.28",
