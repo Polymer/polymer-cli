@@ -110,16 +110,6 @@ export class TestCommand implements Command {
     // Defer dependency loading until this specific command is run
     const wct = require('web-component-tester');
 
-    return new Promise<void>((resolve, reject) => {
-      wct.cli.run(process.env, process.argv.slice(3), process.stdout,
-        (error) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(null);
-          }
-        }
-      );
-    });
+    return wct.cli.run(process.env, process.argv.slice(3), process.stdout);
   }
 }

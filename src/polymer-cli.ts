@@ -28,11 +28,13 @@ const logger = logging.getLogger('cli.main');
 process.on('uncaughtException', (error) => {
   logger.error(`Uncaught exception: ${error}`);
   if (error.stack) logger.error(error.stack);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
   logger.error(`Promise rejection: ${error}`);
   if (error.stack) logger.error(error.stack);
+  process.exit(1);
 });
 
 export class PolymerCli {
