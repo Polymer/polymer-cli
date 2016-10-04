@@ -42,6 +42,11 @@ export class BuildCommand implements Command {
       name: 'html.collapseWhitespace',
       type: Boolean,
       description: 'Collapse whitespace in HTML files'
+    },
+    {
+      name: 'js.compile',
+      type: Boolean,
+      description: 'Compile all the JS',
     }
   ];
 
@@ -58,6 +63,9 @@ export class BuildCommand implements Command {
     };
     if (options['html.collapseWhitespace']) {
       buildOptions.html.collapseWhitespace = true;
+    }
+    if (options['js.compile']) {
+      buildOptions.js.compile = true;
     }
     logger.debug('building with options', buildOptions);
 
