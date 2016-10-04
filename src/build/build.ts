@@ -21,8 +21,9 @@ import {ProjectConfig} from '../project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
+import {BabelTransform} from './babel-transform';
 
-let logger = logging.getLogger('cli.build.build');
+const logger = logging.getLogger('cli.build.build');
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
@@ -36,13 +37,21 @@ export interface BuildOptions {
     stripWhitespace?: boolean;
   };
   js?: {
+    compile?: boolean;
     minify?: boolean;
   };
 }
 
 export async function build(options: BuildOptions, config: ProjectConfig): Promise<void> {
+  let sourcesBabelTransform: BabelTransform;
+  let depsBabelTransform: BabelTransform;
 
-  let polymerProject = new PolymerProject({
+  if (options.js.compile) {
+    sourcesBabelTransform = new BabelTransform();
+    depsBabelTransform = new BabelTransform();
+  }
+
+  const polymerProject = new PolymerProject({
     root: config.root,
     shell: config.shell,
     entrypoint: config.entrypoint,
@@ -57,7 +66,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
 
   // mix in optimization options from build command
   // TODO: let this be set by the user
-  let optimizeOptions = {
+  const optimizeOptions = {
     html: Object.assign({removeComments: true}, options.html),
     css: Object.assign({stripWhitespace: true}, options.css),
     js: Object.assign({minify: true}, options.js),
@@ -66,26 +75,38 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   logger.info(`Building application...`);
 
   logger.debug(`Reading source files...`);
-  let sourcesStream = polymerProject.sources()
-    .pipe(polymerProject.splitHtml())
+  let sourcesStream: NodeJS.ReadableStream = polymerProject.sources()
+    .pipe(polymerProject.splitHtml());
+
+  if (sourcesBabelTransform) {
+    sourcesStream = sourcesStream.pipe(gulpif(/\.js$/, sourcesBabelTransform))
+  }
+
+  sourcesStream = sourcesStream
     .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
     .pipe(polymerProject.rejoinHtml());
 
   logger.debug(`Reading dependencies...`);
-  let depsStream = polymerProject.dependencies()
+  let depsStream: NodeJS.ReadableStream = polymerProject.dependencies()
     .pipe(polymerProject.splitHtml())
+
+  if (depsBabelTransform) {
+    depsStream = depsStream.pipe(gulpif(/\.js$/, depsBabelTransform))
+  }
+
+  depsStream = depsStream
     .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
     .pipe(polymerProject.rejoinHtml());
 
-  let buildStream = mergeStream(sourcesStream, depsStream)
+  const buildStream = mergeStream(sourcesStream, depsStream)
     .once('data', () => { logger.debug('Analyzing build dependencies...'); })
     .pipe(polymerProject.analyzer);
 
-  let unbundledPhase = forkStream(buildStream)
+  const unbundledPhase = forkStream(buildStream)
     .once('data', () => { logger.info('Generating build/unbundled...'); })
     .pipe(
       gulpif(
@@ -97,13 +118,13 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     )
     .pipe(dest('build/unbundled'));
 
-  let bundledPhase = forkStream(buildStream)
+  const bundledPhase = forkStream(buildStream)
     .once('data', () => { logger.info('Generating build/bundled...'); })
     .pipe(polymerProject.bundler)
     .pipe(dest('build/bundled'));
 
-  let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
-  let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
+  const swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
+  const loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
 
   loadSWConfig.then((swConfig) => {
     if (swConfig) {
@@ -114,8 +135,8 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   });
 
   // Once the unbundled build stream is complete, create a service worker for the build
-  let unbundledPostProcessing = Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
-    let swConfig: SWConfig = results[0];
+  const unbundledPostProcessing = Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
+    const swConfig: SWConfig = results[0];
     return addServiceWorker({
       buildRoot: 'build/unbundled',
       project: polymerProject,
@@ -124,8 +145,8 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   });
 
   // Once the bundled build stream is complete, create a service worker for the build
-  let bundledPostProcessing = Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
-    let swConfig: SWConfig = results[0];
+  const bundledPostProcessing = Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
+    const swConfig: SWConfig = results[0];
     return addServiceWorker({
       buildRoot: 'build/bundled',
       project: polymerProject,

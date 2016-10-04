@@ -52,6 +52,7 @@
     "polymer-build": "^0.4.1",
     "polyserve": "^0.13.0",
     "request": "^2.72.0",
+    "requireg": "^0.1.6",
     "resolve": "^1.1.7",
     "tar-fs": "^1.12.0",
     "temp": "^0.8.3",
