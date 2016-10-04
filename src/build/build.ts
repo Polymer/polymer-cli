@@ -13,15 +13,17 @@
  */
 
 import * as del from 'del';
+import * as fs from 'fs';
 import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as logging from 'plylog';
+import {PassThrough} from 'stream';
 import {dest} from 'vinyl-fs';
 
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker} from 'polymer-build';
 
-import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
+import {JSOptimizeStream, CSSOptimizeStream, JSBabelStream, HTMLOptimizeStream} from './optimize-streams';
 
 import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
@@ -36,6 +38,7 @@ export interface BuildOptions {
   swPrecacheConfig?: string;
   prefetchDepedencies?: boolean;
   bundle?: boolean;
+  compile?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
   html?: {collapseWhitespace?: boolean; removeComments?: boolean};
   css?: {stripWhitespace?: boolean};
@@ -59,10 +62,35 @@ export async function build(
   logger.info(`Deleting build/ directory...`);
   await del([buildDirectory]);
 
+  let babelConfigJson = null;
+  if (options.compile) {
+    try {
+      const babelConfigPath = path.resolve(config.root, '.babelrc');
+      const babelConfigString = fs.readFileSync(babelConfigPath, 'utf8');
+      babelConfigJson = JSON.parse(babelConfigString);
+      logger.debug('using project .babelrc', babelConfigString);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        logger.debug(
+            '.babelrc not found in root, using es2015 preset.',
+            {err: err.message});
+      }
+      if (err instanceof SyntaxError) {
+        logger.warn(
+            '.babelrc was found in root but could not be parsed, using default es2015 preset instead.',
+            {err: err.message});
+      }
+    }
+  }
+
   logger.debug(`Reading source files...`);
   let sourcesStream =
       polymerProject.sources()
           .pipe(polymerProject.splitHtml())
+          .pipe(gulpif(
+              /\.js$/,
+              options.compile ? new JSBabelStream(babelConfigJson) :
+                                new PassThrough({objectMode: true})))
           .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
           .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
           .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
@@ -72,6 +100,10 @@ export async function build(
   let depsStream =
       polymerProject.dependencies()
           .pipe(polymerProject.splitHtml())
+          .pipe(gulpif(
+              /\.js$/,
+              options.compile ? new JSBabelStream(babelConfigJson) :
+                                new PassThrough({objectMode: true})))
           .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
           .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
           .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
