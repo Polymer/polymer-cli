@@ -22,6 +22,7 @@
   "author": "The Polymer Project Authors",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "@types/babel-core": "^6.7.14",
     "@types/fs-extra": "0.0.32",
     "@types/gulp-if": "0.0.30",
     "@types/html-minifier": "^1.1.30",
@@ -33,6 +34,7 @@
     "@types/vinyl": "^1.1.29",
     "@types/vinyl-fs": "0.0.28",
     "@types/yeoman-generator": "0.0.30",
+    "babel-core": "^6.17.0",
     "chalk": "^1.1.3",
     "command-line-args": "^3.0.0",
     "command-line-commands": "^1.0.3",

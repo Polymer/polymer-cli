@@ -10,12 +10,14 @@
 
 import {dest} from 'vinyl-fs';
 import * as gulpif from 'gulp-if';
+import {PassThrough} from 'stream';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as logging from 'plylog';
 import * as mergeStream from 'merge-stream';
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
-import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
+import {JSOptimizeStream, JSBabelStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
 import {ProjectConfig} from '../project-config';
 import {PrefetchTransform} from './prefetch';
@@ -27,6 +29,7 @@ let logger = logging.getLogger('cli.build.build');
 export interface BuildOptions {
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
+  compile?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
   html?: {
     collapseWhitespace?: boolean;
@@ -63,11 +66,24 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     js: Object.assign({minify: true}, options.js),
   };
 
+  let jsCompileStep;
+  if (options.compile) {
+    try {
+      const babelConfig = fs.readFileSync(path.resolve(config.root, '.babelrc'), 'utf8');
+      const babelConfigJson = JSON.parse(babelConfig);
+      jsCompileStep = gulpif(/\.js$/, new JSBabelStream(babelConfigJson));
+    } catch (err) {
+      console.log(err, err.message);
+      // ignore
+    }
+  }
+
   logger.info(`Building application...`);
 
   logger.debug(`Reading source files...`);
   let sourcesStream = polymerProject.sources()
     .pipe(polymerProject.splitHtml())
+    .pipe(jsCompileStep || new PassThrough({objectMode: true}))
     .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))

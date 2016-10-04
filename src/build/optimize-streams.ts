@@ -1,6 +1,7 @@
 import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
 import {css as cssSlam} from 'css-slam';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
+import {transform as babelTransform} from 'babel-core';
 import {Transform} from 'stream';
 import * as logging from 'plylog';
 
@@ -46,7 +47,7 @@ export class GenericOptimizeStream extends Transform {
       } catch (error) {
         logger.warn(
           `Unable to optimize ${this.validExtension} file ${file.path}`,
-          {err: error}
+          {err: error.message}
         );
       }
     }
@@ -75,6 +76,36 @@ export class JSOptimizeStream extends GenericOptimizeStream {
   }
 
 }
+
+
+export class JSBabelStream extends Transform {
+
+  optimizerOptions: any;
+
+  constructor(optimizerOptions: any) {
+    super({objectMode: true});
+    this.optimizerOptions = optimizerOptions || {};
+  }
+
+  _transform(file: File, _encoding: string, callback: FileCB): void {
+    if (file.contents && file.path.endsWith(`.js`)) {
+      try {
+        let contents = file.contents.toString();
+        console.log(this.optimizerOptions);
+        contents = babelTransform(contents, this.optimizerOptions).code;
+        file.contents = new Buffer(contents);
+      } catch (error) {
+        logger.warn(
+          `Unable to babelify file ${file.path}`,
+          {err: error.message}
+        );
+      }
+    }
+    callback(null, file);
+  }
+
+}
+
 
 
 /**

@@ -26,6 +26,12 @@ export class BuildCommand implements Command {
 
   args = [
     {
+      name: 'compile',
+      type: Boolean,
+      description: 'Path to an sw-precache configuration to be ' +
+        'used for service worker generation.'
+    },
+    {
       name: 'sw-precache-config',
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
@@ -50,6 +56,7 @@ export class BuildCommand implements Command {
     const build = require('../build/build').build;
 
     let buildOptions: BuildOptions = {
+      compile: options['compile'],
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
       html: {},
