@@ -106,7 +106,7 @@ export class TestCommand implements Command {
     },
     {
       name: 'configFile',
-      description: "Config file that needs to be used by wct. ie: wct.config-sauce.js",
+      description: 'Config file that needs to be used by wct. ie: wct.config-sauce.js',
       type: String,
     },
   ];
