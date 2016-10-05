@@ -104,6 +104,11 @@ export class TestCommand implements Command {
       description: "Set job visibility to 'public', 'public restricted', 'share', 'team' or 'private'",
       type: String,
     },
+    {
+      name: 'configFile',
+      description: "Config file that needs to be used by wct. ie: wct.config-sauce.js",
+      type: String,
+    },
   ];
 
   run(_options, _config): Promise<void> {
