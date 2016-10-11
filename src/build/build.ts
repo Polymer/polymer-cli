@@ -11,6 +11,7 @@
 import {dest} from 'vinyl-fs';
 import * as gulpif from 'gulp-if';
 import * as path from 'path';
+import * as del from 'del';
 import * as logging from 'plylog';
 import * as mergeStream from 'merge-stream';
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
@@ -22,7 +23,10 @@ import {PrefetchTransform} from './prefetch';
 import {waitFor} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
 
-let logger = logging.getLogger('cli.build.build');
+const logger = logging.getLogger('cli.build.build');
+
+const unbundledBuildDirectory = 'build/unbundled';
+const bundledBuildDirectory = 'build/bundled';
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
@@ -63,6 +67,9 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     js: Object.assign({minify: true}, options.js),
   };
 
+  logger.info(`Preparing build...`);
+  await del([unbundledBuildDirectory, bundledBuildDirectory]);
+
   logger.info(`Building application...`);
 
   logger.debug(`Reading source files...`);
@@ -95,12 +102,12 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
           polymerProject.analyzer)
       )
     )
-    .pipe(dest('build/unbundled'));
+    .pipe(dest(unbundledBuildDirectory));
 
   let bundledPhase = forkStream(buildStream)
     .once('data', () => { logger.info('Generating build/bundled...'); })
     .pipe(polymerProject.bundler)
-    .pipe(dest('build/bundled'));
+    .pipe(dest(bundledBuildDirectory));
 
   let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
   let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
@@ -117,7 +124,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   let unbundledPostProcessing = Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
     let swConfig: SWConfig = results[0];
     return addServiceWorker({
-      buildRoot: 'build/unbundled',
+      buildRoot: unbundledBuildDirectory,
       project: polymerProject,
       swConfig: swConfig,
     });
@@ -127,7 +134,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   let bundledPostProcessing = Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
     let swConfig: SWConfig = results[0];
     return addServiceWorker({
-      buildRoot: 'build/bundled',
+      buildRoot: bundledBuildDirectory,
       project: polymerProject,
       swConfig: swConfig,
       bundled: true,
