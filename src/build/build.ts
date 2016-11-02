@@ -13,7 +13,7 @@ import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as del from 'del';
 import * as logging from 'plylog';
-import * as mergeStream from 'merge-stream';
+import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
 import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
