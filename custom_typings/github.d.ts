@@ -5,7 +5,7 @@ declare module "github" {
     protocol: string;
   }
   interface CreatePullRequestOpts {
-    user: string;
+    owner: string;
     repo: string;
     title: string;
     head: string;
@@ -14,7 +14,7 @@ declare module "github" {
   }
   interface IssuesEditOpts {
     headers?: Object;
-    user: string;
+    owner: string;
     repo: string;
     number: number;
     title?: string;
@@ -31,13 +31,13 @@ declare module "github" {
   }
   interface GetReleaseMessage {
     headers?: {string: string};
-    user: string;
+    owner: string;
     repo: string;
     id: number;
   }
   interface ListReleasesMessage {
     headers?: {string: string};
-    user: string;
+    owner: string;
     repo: string;
     page?: number;
     per_page?: number;
@@ -46,7 +46,7 @@ declare module "github" {
     constructor(options: Options);
     repos: {
       getFromOrg(msg: GetFromOrgOpts, cb: NodeCallback<GitHubApi.Repo[]>): void;
-      get(msg: {user: string, repo: string},
+      get(msg: {owner: string, repo: string},
           cb: NodeCallback<GitHubApi.Repo>): void;
       getRelease(msg: GetReleaseMessage, cb: NodeCallback<GitHubApi.Release>): void;
       getReleases(msg: ListReleasesMessage, cb: NodeCallback<GitHubApi.Release[]>): void;
@@ -59,7 +59,7 @@ declare module "github" {
       edit(msg: IssuesEditOpts, cb: NodeCallback<GitHubApi.Issue>): void;
     }
     authenticate(credentials: {type: string, token: string}): void;
-    user: { get(msg: {}, cb: NodeCallback<GitHubApi.User>): void; };
+    users: { get(msg: {}, cb: NodeCallback<GitHubApi.User>): void; };
   }
   namespace GitHubApi {
     class Repo {
@@ -78,7 +78,7 @@ declare module "github" {
       milestone: Milestone;
       state: string;
       labels: { name: string, color: string, url: string }[];
-      user: User;
+      owner: User;
     }
     interface PullRequest extends Issue {}
     interface Milestone {}
