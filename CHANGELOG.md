@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming (Potentially Breaking)
+
+- Upgrade `polymer-build` to `v0.5.0`, which means the build command will now use the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer)! See [the polymer-build changelog](https://github.com/Polymer/polymer-build/blob/v0.5.0/CHANGELOG.md) for more information.
+
 ## v0.17.0
 
 - Upgrade `web-component-tester` to `v5.0.0`, which includes a new major version of mocha. See [the wct changelog](https://github.com/Polymer/web-component-tester/blob/v5.0.0/CHANGELOG.md#500) for more details.
