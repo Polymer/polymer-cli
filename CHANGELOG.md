@@ -9,11 +9,12 @@
 - `init`: Fix issue where the application element name always used the current working directory name by default
 - `init`: Fix undefined template description
 - Fix issue with command failures exiting as successes (#418)
+- Fix element template so it works out of the box (#453)
 
 ## v0.16.0
 
 - build: fail immediately if polymer.json is invalid
-- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json 
+- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json
 - polymer-build@v0.4.1 (fixes ignored `staticFileGlobs` bug)
 
 
