@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming
+## Upcoming (Potentially Breaking)
 
 - Upgrade `web-component-tester` to `v5.0.0`, which includes a new major version of mocha. See [the wct changelog](https://github.com/Polymer/web-component-tester/blob/v5.0.0/CHANGELOG.md#500) for more details.
 
