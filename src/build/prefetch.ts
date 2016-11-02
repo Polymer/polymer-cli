@@ -9,6 +9,7 @@
  */
 
 import * as dom5 from 'dom5';
+import * as parse5 from 'parse5';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
@@ -80,7 +81,7 @@ export class PrefetchTransform extends Transform {
     type: 'import' | 'prefetch'
   ) {
     let contents = file.contents.toString();
-    let ast = dom5.parse(contents);
+    let ast = parse5.parse(contents);
     let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
     for (let dep of deps) {
       if (dep.startsWith(this.root)) {
@@ -95,7 +96,7 @@ export class PrefetchTransform extends Transform {
       dom5.setAttribute(link, 'href', dep);
       dom5.append(head, link);
     }
-    contents = dom5.serialize(ast);
+    contents = parse5.serialize(ast);
     file.contents = new Buffer(contents);
   }
 
