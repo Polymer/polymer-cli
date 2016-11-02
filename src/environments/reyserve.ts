@@ -26,8 +26,7 @@ const REYSERVE_FILES = ['app.yaml', 'reyserve.py', 'http2push.py'];
 export class ReyServe implements Environment {
 
   build(opts: BuildOptions, config: ProjectConfig): Promise<any> {
-    const bundled = path.join(process.cwd(), 'build/bundled');
-    const unbundled = path.join(process.cwd(), 'build/unbundled');
+    const buildPath = path.join(process.cwd(), 'build');
     const reyserveFiles = temp.mkdirSync('reyserve');
     return build(opts, config).then(() => {
       console.log('Downloading reyserve release');
@@ -35,11 +34,9 @@ export class ReyServe implements Environment {
       return repo.extractLatestRelease(reyserveFiles);
     })
     .then(() => {
-      console.log('Coyping reyserve files');
-      // TODO(garlicnation): One server serves bundled and unbundled.
+      console.log('Copying reyserve files');
       REYSERVE_FILES.forEach((file) => {
-        fs.copySync(path.join(reyserveFiles, file), path.join(bundled, file));
-        fs.copySync(path.join(reyserveFiles, file), path.join(unbundled, file));
+        fs.copySync(path.join(reyserveFiles, file), path.join(buildPath, file));
       });
     });
   }

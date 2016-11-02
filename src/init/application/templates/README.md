@@ -18,15 +18,15 @@ $ polymer serve
 $ polymer build
 ```
 
-This will create a `build/` folder with `bundled/` and `unbundled/` sub-folders
-containing a bundled (Vulcanized) and unbundled builds, both run through HTML,
-CSS, and JS optimizers.
+This will create a `build/` folder containing a bundled (Vulcanized) build
+(or an unbundled build when the --unbundled option is specified), run through
+HTML, CSS, and JS optimizers.
 
 You can serve the built versions by giving `polymer serve` a folder to serve
 from:
 
 ```
-$ polymer serve build/bundled
+$ polymer serve build
 ```
 
 ## Running Tests

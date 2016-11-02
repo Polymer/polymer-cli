@@ -14,7 +14,7 @@ import * as path from 'path';
 import * as del from 'del';
 import * as logging from 'plylog';
 import * as mergeStream from 'merge-stream';
-import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
+import {PolymerProject, addServiceWorker, SWConfig} from 'polymer-build';
 
 import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
@@ -25,16 +25,12 @@ import {parsePreCacheConfig} from './sw-precache';
 
 const logger = logging.getLogger('cli.build.build');
 
-const unbundledBuildDirectory = 'build/unbundled';
-const bundledBuildDirectory = 'build/bundled';
+const buildDirectory = 'build';
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
-  build?: {
-    bundled?: boolean;
-    unbundled?: boolean;
-  };
+  bundled?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
   html?: {
     collapseWhitespace?: boolean;
@@ -72,36 +68,38 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   };
 
   logger.info(`Preparing build...`);
-  if (options.build.unbundled) {
-    logger.debug(`Deleting ${unbundledBuildDirectory}`);
-    await del([unbundledBuildDirectory]);
-  }
-  if (options.build.bundled) {
-    logger.debug(`Deleting ${bundledBuildDirectory}`);
-    await del([bundledBuildDirectory]);
-  }
+  logger.debug(`Deleting ${buildDirectory}`);
+  await del([buildDirectory]);
 
   logger.info(`Building application...`);
 
   logger.debug(`Reading source files...`);
-  let sourcesStream = polymerProject.sources()
-    .pipe(polymerProject.splitHtml())
-    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
-    .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
-    .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
-    .pipe(polymerProject.rejoinHtml());
+  let sourcesStream = polymerProject.sources();
 
   logger.debug(`Reading dependencies...`);
-  let depsStream = polymerProject.dependencies()
-    .pipe(polymerProject.splitHtml())
-    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
-    .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
-    .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
-    .pipe(polymerProject.rejoinHtml());
+  let depsStream = polymerProject.dependencies();
 
   let buildStream = mergeStream(sourcesStream, depsStream)
     .once('data', () => { logger.debug('Analyzing build dependencies...'); })
-    .pipe(polymerProject.analyzer);
+    .pipe(gulpif(!options.bundled, polymerProject.analyzer))
+    .pipe(polymerProject.splitHtml())
+    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+    .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
+    .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
+    .pipe(polymerProject.rejoinHtml())
+    .pipe(gulpif(options.bundled, polymerProject.analyzer))
+    .once('data', () => { logger.info(`Generating ${options.bundled ? 'bundled' : 'unbundled'} build...`); })
+    .pipe(
+      options.bundled ?
+      polymerProject.bundler :
+      gulpif(
+        options.insertDependencyLinks,
+        new PrefetchTransform(polymerProject.root, polymerProject.entrypoint,
+          polymerProject.shell, polymerProject.fragments,
+          polymerProject.analyzer)
+      )
+    )
+    .pipe(dest(buildDirectory));
 
   let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
   let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
@@ -114,53 +112,16 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     }
   });
 
-  let serviceWorkers = [];
-  if (options.build.unbundled) {
-    let unbundledPhase = forkStream(buildStream)
-      .once('data', () => { logger.info(`Generating ${unbundledBuildDirectory}...`); })
-      .pipe(
-        gulpif(
-          options.insertDependencyLinks,
-          new PrefetchTransform(polymerProject.root, polymerProject.entrypoint,
-            polymerProject.shell, polymerProject.fragments,
-            polymerProject.analyzer)
-        )
-      )
-      .pipe(dest(unbundledBuildDirectory));
+  // Once the build stream is complete, create a service worker for the build
+  await Promise.all([loadSWConfig, waitFor(buildStream)]).then((results) => {
+    let swConfig: SWConfig = results[0];
+    return addServiceWorker({
+      buildRoot: buildDirectory,
+      project: polymerProject,
+      swConfig: swConfig,
+      bundled: options.bundled
+    });
+  });
 
-    // Once the unbundled build stream is complete, create a service worker for the build
-    serviceWorkers.push(
-      Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
-        let swConfig: SWConfig = results[0];
-        return addServiceWorker({
-          buildRoot: unbundledBuildDirectory,
-          project: polymerProject,
-          swConfig: swConfig,
-        });
-      })
-    );
-  }
-
-  if (options.build.bundled) {
-    let bundledPhase = forkStream(buildStream)
-      .once('data', () => { logger.info(`Generating ${bundledBuildDirectory}...`); })
-      .pipe(polymerProject.bundler)
-      .pipe(dest(bundledBuildDirectory));
-
-    // Once the bundled build stream is complete, create a service worker for the build
-    serviceWorkers.push(
-      Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
-        let swConfig: SWConfig = results[0];
-        return addServiceWorker({
-          buildRoot: bundledBuildDirectory,
-          project: polymerProject,
-          swConfig: swConfig,
-          bundled: true,
-        });
-      })
-    );
-  }
-
-  await Promise.all(serviceWorkers);
   logger.info('Build complete!');
 }

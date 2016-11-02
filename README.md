@@ -139,7 +139,7 @@ Use `index.html` as the entrypoint, or read from `polymer.json`:
 
     $ polymer build
 
-`build` is opinionated and defaults to a good build for app-shell apps. It writes the built output to `build/bundled` and `build/unbundled` folders. Both outputs have been run though HTML, JS and CSS optimizers, and have a Service Worker generated for them. The bundled folder contains the application files process by Vulcanize, Polymer's HTML bundler, for optimal loading via HTTP/1. The unbundled folder is optimized for HTTP/2 + Push.
+`build` is opinionated and defaults to a good build for app-shell apps. It writes the built output to `build` folder. The output has been run though HTML, JS and CSS optimizers, and has a Service Worker generated for it. By default, the build folder contains the application files processed by Vulcanize, Polymer's HTML bundler, for optimal loading via HTTP/1. If the `--unbundled` flag is set, the build is optimized for HTTP/2 + Push instead.
 
 While the build command should support most projects, some users will need greater control over their build pipeline. If that's you, check out the [polymer-build](https://github.com/Polymer/polymer-build) library. Polymer-build can be called and customized programmatically, giving you much greater control than the CLI can provide. Visit the repo for usage information and examples.
 

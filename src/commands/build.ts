@@ -39,14 +39,9 @@ export class BuildCommand implements Command {
         'entrypoint and `<link rel="import">` tags into fragments and shell.'
     },
     {
-      name: 'bundled',
-      type: Boolean,
-      description: 'Only create a bundled build'
-    },
-    {
       name: 'unbundled',
       type: Boolean,
-      description: 'Only create an unbundled build'
+      description: 'Create an unbundled build optimized for HTTP/2 + Push (do not Vulcanize)'
     },
     {
       name: 'html.collapseWhitespace',
@@ -62,10 +57,7 @@ export class BuildCommand implements Command {
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
-      build: {
-        bundled: options['bundled'] || !options['unbundled'],
-        unbundled: options['unbundled'] || !options['bundled'],
-      },
+      bundled: !options['unbundled'],
       html: {},
       css: {},
       js: {},
