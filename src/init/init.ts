@@ -12,7 +12,7 @@ import {execSync} from 'child_process';
 import * as fs from 'fs';
 import * as logging from 'plylog';
 import * as chalk from 'chalk';
-import * as findup from 'findup-sync';
+import findup = require('findup-sync');
 import {ApplicationGenerator} from '../init/application/application';
 import {ElementGenerator} from '../init/element/element';
 import * as YeomanEnvironment from 'yeoman-environment';
