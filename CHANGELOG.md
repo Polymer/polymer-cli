@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Fix element template so it works out of the box (#453)
+
 ## v0.17.0
 
 - Upgrade `web-component-tester` to `v5.0.0`, which includes a new major version of mocha. See [the wct changelog](https://github.com/Polymer/web-component-tester/blob/v5.0.0/CHANGELOG.md#500) for more details.
@@ -9,7 +12,6 @@
 - `init`: Fix issue where the application element name always used the current working directory name by default
 - `init`: Fix undefined template description
 - Fix issue with command failures exiting as successes (#418)
-- Fix element template so it works out of the box (#453)
 
 ## v0.16.0
 
