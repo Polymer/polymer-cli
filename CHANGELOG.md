@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Fix element template so it works out of the box (#453)
+
 ## v0.17.0
 
 - Upgrade `web-component-tester` to `v5.0.0`, which includes a new major version of mocha. See [the wct changelog](https://github.com/Polymer/web-component-tester/blob/v5.0.0/CHANGELOG.md#500) for more details.
@@ -13,7 +16,7 @@
 ## v0.16.0
 
 - build: fail immediately if polymer.json is invalid
-- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json 
+- build: Add missing support for `sourceGlobs` & `includeDependencies` in polymer.json
 - polymer-build@v0.4.1 (fixes ignored `staticFileGlobs` bug)
 
 
