@@ -127,7 +127,7 @@ export class Github {
   getLatestRelease(): Promise<GitHubApi.Release> {
     return new Promise((resolve, reject) => {
       this._github.repos.getReleases({
-        user: this._owner,
+        owner: this._owner,
         repo: this._repo,
         per_page: 1,
       }, (error, result) => {

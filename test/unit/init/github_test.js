@@ -35,7 +35,7 @@ suite('init/github', () => {
 
       repos: {
         getReleases(options, cb) {
-          assert.equal(options.user, 'PolymerLabs');
+          assert.equal(options.owner, 'PolymerLabs');
           assert.equal(options.repo, 'polykart');
           cb(null, [{
             tarball_url: 'http://foo.com/bar.tar',
