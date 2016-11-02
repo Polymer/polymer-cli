@@ -1,8 +1,14 @@
 # Changelog
 
-## Upcoming (Potentially Breaking)
+## v0.17.0
 
 - Upgrade `web-component-tester` to `v5.0.0`, which includes a new major version of mocha. See [the wct changelog](https://github.com/Polymer/web-component-tester/blob/v5.0.0/CHANGELOG.md#500) for more details.
+- Upgrade `polyserve` to `v0.13.0`. See [the polyserve changelog](https://github.com/PolymerLabs/polyserve/blob/master/CHANGELOG.md) for more details.
+- `build`: Add support for relative root path in polymer.json
+- `build`: clear the build directory before building (#332)
+- `init`: Fix issue where the application element name always used the current working directory name by default
+- `init`: Fix undefined template description
+- Fix issue with command failures exiting as successes (#418)
 
 ## v0.16.0
 
