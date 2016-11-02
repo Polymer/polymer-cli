@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+- Upgrade `web-component-tester` to `v5.0.0`, which includes a new major version of mocha. See [the wct changelog](https://github.com/Polymer/web-component-tester/blob/v5.0.0/CHANGELOG.md#500) for more details.
+
 ## v0.16.0
 
 - build: fail immediately if polymer.json is invalid
