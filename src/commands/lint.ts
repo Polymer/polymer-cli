@@ -77,8 +77,15 @@ export class LintCommand implements Command {
     // Defer dependency loading until this specific command is run
     const polylint = require('polylint/lib/cli');
 
-    let lintFiles: string[] = options.input
-      || config.inputs.map((i) => i.substring(config.root.length));
+    let lintFiles: string[] = options.input;
+    if (!lintFiles) {
+      lintFiles = [];
+      if (config.entrypoint) lintFiles.push(config.entrypoint);
+      if (config.shell) lintFiles.push(config.shell);
+      if (config.fragments) lintFiles = lintFiles.concat(config.fragments);
+      lintFiles = lintFiles.map((p) => p.substring(config.root.length));
+    }
+
     if (lintFiles.length === 0) {
       logger.warn('No inputs specified. Please use the --input, --entrypoint, ' +
         '--shell or --fragment flags');

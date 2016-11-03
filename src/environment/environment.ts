@@ -9,7 +9,7 @@
  */
 import {ServerOptions} from 'polyserve/lib/start_server';
 import {BuildOptions} from '../build/build';
-import {ProjectConfig} from '../project-config';
+import {ProjectConfig} from 'polymer-project-config';
 
 export interface Environment {
   serve(options: ServerOptions): Promise<any>;

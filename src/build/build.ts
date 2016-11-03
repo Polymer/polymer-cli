@@ -18,7 +18,7 @@ import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-bu
 
 import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
-import {ProjectConfig} from '../project-config';
+import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
@@ -46,14 +46,7 @@ export interface BuildOptions {
 
 export async function build(options: BuildOptions, config: ProjectConfig): Promise<void> {
 
-  let polymerProject = new PolymerProject({
-    root: config.root,
-    shell: config.shell,
-    entrypoint: config.entrypoint,
-    fragments: config.fragments,
-    sourceGlobs: config.sourceGlobs,
-    includeDependencies: config.includeDependencies,
-  });
+  let polymerProject = new PolymerProject(config);
 
   if (options.insertDependencyLinks) {
     logger.debug(`Additional dependency links will be inserted into application`);
@@ -97,9 +90,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     .pipe(
       gulpif(
         options.insertDependencyLinks,
-        new PrefetchTransform(polymerProject.root, polymerProject.entrypoint,
-          polymerProject.shell, polymerProject.fragments,
-          polymerProject.analyzer)
+        new PrefetchTransform(polymerProject)
       )
     )
     .pipe(dest(unbundledBuildDirectory));
@@ -109,7 +100,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     .pipe(polymerProject.bundler)
     .pipe(dest(bundledBuildDirectory));
 
-  let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
+  let swPrecacheConfig = path.resolve(config.root, options.swPrecacheConfig || 'sw-precache-config.js');
   let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
 
   loadSWConfig.then((swConfig) => {
