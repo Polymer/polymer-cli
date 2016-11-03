@@ -11,7 +11,7 @@
 import {ServerOptions} from 'polyserve/lib/start_server';
 import {build, BuildOptions} from '../build/build';
 import {Environment} from '../environment/environment';
-import {ProjectConfig} from '../project-config';
+import {ProjectConfig} from 'polymer-project-config';
 import {Github} from '../github/github';
 import * as temp from 'temp';
 import * as fs from 'fs-extra';

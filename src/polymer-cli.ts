@@ -21,7 +21,7 @@ import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
-import {ProjectConfig, ProjectConfigOptions} from './project-config';
+import {ProjectConfig, ProjectOptions} from 'polymer-project-config';
 
 const logger = logging.getLogger('cli.main');
 
@@ -37,13 +37,31 @@ process.on('unhandledRejection', (error) => {
   process.exit(1);
 });
 
+/**
+ * CLI arguments are in "hyphen-case" format, but our configuration is in
+ * "lowerCamelCase". This helper function converts the special
+ * `command-line-args` data format (with its hyphen-case flags) to an easier to
+ *  use options object with lowerCamelCase properties.
+ */
+function parseCLIArgs(commandOptions: any): {[name: string]: string} {
+  commandOptions = commandOptions && commandOptions['_all'];
+  let parsedOptions = Object.assign({}, commandOptions);
+
+  if (commandOptions['extra-dependencies']) {
+    parsedOptions.extraDependencies = commandOptions['extra-dependencies'];
+  }
+
+  return parsedOptions;
+}
+
+
 export class PolymerCli {
 
   commands: Map<string, Command> = new Map();
   args: string[];
-  defaultConfig: ProjectConfigOptions;
+  defaultConfigOptions: ProjectOptions;
 
-  constructor(args: string[], config?: ProjectConfigOptions) {
+  constructor(args: string[], configOptions?: ProjectOptions) {
     // If the "--quiet"/"-q" flag is ever present, set our global logging
     // to quiet mode. Also set the level on the logger we've already created.
     if (args.indexOf('--quiet') > -1 || args.indexOf('-q') > -1) {
@@ -59,12 +77,21 @@ export class PolymerCli {
     this.args = args;
     logger.debug('got args:', { args: args });
 
-    if (config) {
-      this.defaultConfig = config;
-      logger.debug('got default config from constructor argument:', { config: this.defaultConfig });
+    if (typeof configOptions !== 'undefined') {
+      this.defaultConfigOptions = configOptions;
+      logger.debug('got default config from constructor argument:', {
+        config: this.defaultConfigOptions
+      });
     } else {
-      this.defaultConfig = ProjectConfig.fromConfigFile('polymer.json');
-      logger.debug('got default config from file:', { config: this.defaultConfig });
+      this.defaultConfigOptions =
+        ProjectConfig.loadOptionsFromFile('polymer.json');
+      if (this.defaultConfigOptions) {
+        logger.debug('got default config from polymer.json file:', {
+          config: this.defaultConfigOptions
+        });
+      } else {
+        logger.debug('no polymer.json file found, no config loaded');
+      }
     }
 
     this.addCommand(new BuildCommand());
@@ -147,7 +174,7 @@ export class PolymerCli {
         if (error.command) {
           logger.warn(`'${error.command}' is not an available command.`);
         }
-        return helpCommand.run({command: error.command}, new ProjectConfig(this.defaultConfig));
+        return helpCommand.run({command: error.command}, new ProjectConfig(this.defaultConfigOptions));
       }
       // If an unexpected error occurred, propagate it
       throw error;
@@ -160,10 +187,13 @@ export class PolymerCli {
 
     let commandDefinitions = this.mergeDefinitions(command, globalArguments);
     let commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
-    let commandOptions = <{ [name: string]: string }>(commandOptionsRaw && commandOptionsRaw['_all']);
+    let commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
-    let config = new ProjectConfig(this.defaultConfig, commandOptions);
+    let mergedConfigOptions = Object.assign(
+      {}, this.defaultConfigOptions, commandOptions);
+
+    let config = new ProjectConfig(mergedConfigOptions);
     logger.debug(`final project configuration generated:`, config);
 
     // Help is a special argument for displaying help for the given command.

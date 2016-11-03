@@ -12,7 +12,6 @@
 
 const path = require('path');
 const assert = require('chai').assert;
-const ProjectConfig = require('../../../lib/project-config').ProjectConfig;
 const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const polylintCli = require('polylint/lib/cli');
 const sinon = require('sinon');
@@ -20,15 +19,15 @@ const sinon = require('sinon');
 suite('lint', () => {
 
   let polylintCliStub;
-  let defaultTestConfig;
+  let defaultConfigOptions;
 
   setup(function() {
     polylintCliStub = sinon.stub(polylintCli, 'runWithOptions').returns(Promise.resolve());
-    defaultTestConfig = new ProjectConfig(null, {
+    defaultConfigOptions = {
       entrypoint: 'index.html',
       fragments: ['foo.html'],
       shell: 'bar.html',
-    });
+    };
   });
 
   teardown(() => {
@@ -36,7 +35,7 @@ suite('lint', () => {
   });
 
   test('lints the entrypoint, shell, and fragments when no specific inputs are given', () => {
-    let cli = new PolymerCli(['lint'], defaultTestConfig);
+    let cli = new PolymerCli(['lint'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.deepEqual(polylintCliStub.firstCall.args[0].input, [
@@ -47,42 +46,42 @@ suite('lint', () => {
   });
 
   test('lints the given files when provided through the `input` argument', () => {
-    let cli = new PolymerCli(['lint', '--input', 'PATH/TO/TEST_THIS_FILE.html'], defaultTestConfig);
+    let cli = new PolymerCli(['lint', '--input', 'PATH/TO/TEST_THIS_FILE.html'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.deepEqual(polylintCliStub.firstCall.args[0].input, ['PATH/TO/TEST_THIS_FILE.html']);
   });
 
   test('lints the given files when provided through the default arguments', () => {
-    let cli = new PolymerCli(['lint', 'PATH/TO/TEST_THIS_FILE.html'], defaultTestConfig);
+    let cli = new PolymerCli(['lint', 'PATH/TO/TEST_THIS_FILE.html'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.deepEqual(polylintCliStub.firstCall.args[0].input, ['PATH/TO/TEST_THIS_FILE.html']);
   });
 
   test('follow and lint dependencies by default when no specific inputs are given', () => {
-    let cli = new PolymerCli(['lint'], defaultTestConfig);
+    let cli = new PolymerCli(['lint'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.equal(polylintCliStub.firstCall.args[0]['no-recursion'], false);
   });
 
   test('does not follow and lint dependencies when specific inputs are given', () => {
-    let cli = new PolymerCli(['lint', 'PATH/TO/TEST_THIS_FILE.html'], defaultTestConfig);
+    let cli = new PolymerCli(['lint', 'PATH/TO/TEST_THIS_FILE.html'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.equal(polylintCliStub.firstCall.args[0]['no-recursion'], true);
   });
 
   test('follows and lint dependencies when "follow-dependencies" argument is true', () => {
-    let cli = new PolymerCli(['lint', '--follow-dependencies', 'PATH/TO/TEST_THIS_FILE.html'], defaultTestConfig);
+    let cli = new PolymerCli(['lint', '--follow-dependencies', 'PATH/TO/TEST_THIS_FILE.html'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.equal(polylintCliStub.firstCall.args[0]['no-recursion'], false);
   });
 
   test('does not follow and lint dependencies when "no-follow-dependencies" argument is true', () => {
-    let cli = new PolymerCli(['lint', '--no-follow-dependencies'], defaultTestConfig);
+    let cli = new PolymerCli(['lint', '--no-follow-dependencies'], defaultConfigOptions);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
     assert.equal(polylintCliStub.firstCall.args[0]['no-recursion'], true);

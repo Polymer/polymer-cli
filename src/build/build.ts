@@ -16,9 +16,9 @@ import * as logging from 'plylog';
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
-import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
+import {CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
-import {ProjectConfig} from '../project-config';
+import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
@@ -46,14 +46,7 @@ export interface BuildOptions {
 
 export async function build(options: BuildOptions, config: ProjectConfig): Promise<void> {
 
-  let polymerProject = new PolymerProject({
-    root: config.root,
-    shell: config.shell,
-    entrypoint: config.entrypoint,
-    fragments: config.fragments,
-    sourceGlobs: config.sourceGlobs,
-    includeDependencies: config.includeDependencies,
-  });
+  let polymerProject = new PolymerProject(config);
 
   if (options.insertDependencyLinks) {
     logger.debug(`Additional dependency links will be inserted into application`);
@@ -75,7 +68,8 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   logger.debug(`Reading source files...`);
   let sourcesStream = polymerProject.sources()
     .pipe(polymerProject.splitHtml())
-    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+    // TODO(fks): Fix analyzer so that JS minification doesn't break it
+    // .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
     .pipe(polymerProject.rejoinHtml());
@@ -83,7 +77,8 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   logger.debug(`Reading dependencies...`);
   let depsStream = polymerProject.dependencies()
     .pipe(polymerProject.splitHtml())
-    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+    // TODO(fks): Fix analyzer so that JS minification doesn't break it
+    // .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
     .pipe(polymerProject.rejoinHtml());
@@ -97,9 +92,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     .pipe(
       gulpif(
         options.insertDependencyLinks,
-        new PrefetchTransform(polymerProject.root, polymerProject.entrypoint,
-          polymerProject.shell, polymerProject.fragments,
-          polymerProject.analyzer)
+        new PrefetchTransform(polymerProject)
       )
     )
     .pipe(dest(unbundledBuildDirectory));
@@ -109,7 +102,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     .pipe(polymerProject.bundler)
     .pipe(dest(bundledBuildDirectory));
 
-  let swPrecacheConfig = path.resolve(polymerProject.root, options.swPrecacheConfig || 'sw-precache-config.js');
+  let swPrecacheConfig = path.resolve(config.root, options.swPrecacheConfig || 'sw-precache-config.js');
   let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
 
   loadSWConfig.then((swConfig) => {
@@ -126,7 +119,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     return addServiceWorker({
       buildRoot: unbundledBuildDirectory,
       project: polymerProject,
-      swConfig: swConfig,
+      swPrecacheConfig: swConfig,
     });
   });
 
@@ -136,7 +129,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     return addServiceWorker({
       buildRoot: bundledBuildDirectory,
       project: polymerProject,
-      swConfig: swConfig,
+      swPrecacheConfig: swConfig,
       bundled: true,
     });
   });
