@@ -16,7 +16,7 @@ import * as logging from 'plylog';
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
-import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
+import {CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
 import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
