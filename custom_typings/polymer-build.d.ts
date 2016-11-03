@@ -1,5 +1,6 @@
 declare module 'polymer-build' {
 
+  import {ProjectConfig} from 'polymer-project-config';
   import {Node} from 'dom5';
   import {Transform} from 'stream';
   import * as fs from 'fs';
@@ -79,8 +80,8 @@ declare module 'polymer-build' {
     project: PolymerProject;
     buildRoot: string;
     bundled?: boolean;
-    serviceWorkerPath?: string;
-    swConfig?: SWConfig;
+    path?: string;
+    swPrecacheConfig?: SWConfig;
   }
 
   export interface DocumentDeps {
@@ -111,14 +112,7 @@ declare module 'polymer-build' {
       NodeJS.ReadableStream;
 
   export class PolymerProject {
-    root: string;
-    entrypoint: string;
-    shell: string;
-    fragments: string[];
-    sourceGlobs: string[];
-    includeDependencies: string[];
-
-    allSourceGlobs: string[];
+    config: ProjectConfig;
     analyzer: StreamAnalyzer;
     bundler: Bundler;
 

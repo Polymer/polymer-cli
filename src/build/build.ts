@@ -126,7 +126,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     return addServiceWorker({
       buildRoot: unbundledBuildDirectory,
       project: polymerProject,
-      swConfig: swConfig,
+      swPrecacheConfig: swConfig,
     });
   });
 
@@ -136,7 +136,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     return addServiceWorker({
       buildRoot: bundledBuildDirectory,
       project: polymerProject,
-      swConfig: swConfig,
+      swPrecacheConfig: swConfig,
       bundled: true,
     });
   });
