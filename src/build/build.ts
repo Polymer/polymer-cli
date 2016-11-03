@@ -68,7 +68,8 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   logger.debug(`Reading source files...`);
   let sourcesStream = polymerProject.sources()
     .pipe(polymerProject.splitHtml())
-    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+    // TODO(fks): Fix analyzer so that JS minification doesn't break it
+    // .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
     .pipe(polymerProject.rejoinHtml());
@@ -76,7 +77,8 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
   logger.debug(`Reading dependencies...`);
   let depsStream = polymerProject.dependencies()
     .pipe(polymerProject.splitHtml())
-    .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
+    // TODO(fks): Fix analyzer so that JS minification doesn't break it
+    // .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
     .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
     .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
     .pipe(polymerProject.rejoinHtml());
