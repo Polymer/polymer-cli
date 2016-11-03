@@ -7,16 +7,18 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {Github} from '../github/github';
 import {Base} from 'yeoman-generator';
 import * as logging from 'plylog';
 
-let logger = logging.getLogger('cli.init');
+import {Github, RequestAPI} from '../github/github';
+import GitHubApi = require('github');
+
+const logger = logging.getLogger('cli.init');
 
 export interface GithubGeneratorOptions {
-  requestApi?;
-  githubApi?;
-  githubToken?;
+  requestApi?: RequestAPI;
+  githubApi?: GitHubApi;
+  githubToken?: string;
   owner: string;
   repo: string;
 }
@@ -47,17 +49,16 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions): (t
       return 'GithubGenerator';
     }
 
-    writing() {
-      let done = this.async();
+    async writing(): Promise<void> {
+      const done = this.async();
       logger.info(`Downloading latest release of ${owner}/${repo}`);
-      return this._github.extractLatestRelease(this.destinationRoot())
-        .then(() => {
-          done();
-        })
-        .catch((error) => {
-          logger.error(`Could not download release from ${owner}/${repo}`);
-          done(error);
-        });
+      try {
+        await this._github.extractLatestRelease(this.destinationRoot());
+        done();
+      } catch (error) {
+        logger.error(`Could not download release from ${owner}/${repo}`);
+        done(error);
+      }
     }
 
     install() {

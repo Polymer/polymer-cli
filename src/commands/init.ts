@@ -8,7 +8,7 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {Command} from './command';
+import {Command, CommandOptions, ProjectConfig} from './command';
 import {ArgDescriptor} from 'command-line-args';
 import * as logging from 'plylog';
 
@@ -28,13 +28,13 @@ export class InitCommand implements Command {
     }
   ];
 
-  run(options, _config): Promise<any> {
+  run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
     // Defer dependency loading until needed
     const polymerInit = require('../init/init');
 
-    if (options.name) {
-      let templateName = options.name;
-      let generatorName = `polymer-init-${templateName}:app`;
+    const templateName = options['name'];
+    if (templateName) {
+      const generatorName = `polymer-init-${templateName}:app`;
       logger.debug('template name provided', {
         generator: generatorName,
         template: templateName,
@@ -46,4 +46,3 @@ export class InitCommand implements Command {
     return polymerInit.promptGeneratorSelection();
   }
 }
-

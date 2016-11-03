@@ -8,8 +8,9 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {Command} from './command';
 import * as logging from 'plylog';
+
+import {Command, CommandOptions, ProjectConfig} from './command';
 
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
@@ -71,11 +72,11 @@ export class ServeCommand implements Command {
     },
   ];
 
-  run(options, config): Promise<any> {
+  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
     const polyserve = require('polyserve');
 
-    let openPath;
+    let openPath: string;
     if (config.entrypoint && config.shell) {
       openPath = config.entrypoint.substring(config.root.length);
       if (openPath === 'index.html' || openPath === '/index.html') {
@@ -84,17 +85,17 @@ export class ServeCommand implements Command {
     }
     let serverOptions: ServerOptions = {
       root: config.root,
-      port: options.port,
-      hostname: options.hostname,
-      open: options.open,
+      port: options['port'],
+      hostname: options['hostname'],
+      open: options['open'],
       openPath: openPath,
-      browser: options.browser,
+      browser: options['browser'],
       componentDir: options['component-dir'],
       packageName: options['package-name'],
     };
 
     logger.debug('serving with options', serverOptions);
-    const env: Environment = options.env;
+    const env: Environment = options['env'];
 
     if (env && env.serve) {
       logger.debug('env.serve() found in options');

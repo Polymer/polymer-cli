@@ -10,7 +10,6 @@
 
 import * as logging from 'plylog';
 import * as commandLineArgs from 'command-line-args';
-import * as commandLineCommands from 'command-line-commands';
 
 import {globalArguments} from './args';
 import {ArgDescriptor} from './commands/command';
@@ -23,15 +22,18 @@ import {TestCommand} from './commands/test';
 import {Command} from './commands/command';
 import {ProjectConfig, ProjectOptions} from 'polymer-project-config';
 
+import commandLineCommands = require('command-line-commands');
+import {ParsedCommand} from 'command-line-commands';
+
 const logger = logging.getLogger('cli.main');
 
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', (error: any) => {
   logger.error(`Uncaught exception: ${error}`);
   if (error.stack) logger.error(error.stack);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (error) => {
+process.on('unhandledRejection', (error: any) => {
   logger.error(`Promise rejection: ${error}`);
   if (error.stack) logger.error(error.stack);
   process.exit(1);
@@ -111,23 +113,23 @@ export class PolymerCli {
       command: Command,
       globals: ArgDescriptor[]
       ): ArgDescriptor[] {
-    let mergedArgs = new Map<string, ArgDescriptor>();
+    const mergedArgs = new Map<string, ArgDescriptor>();
     let defaultOption: string = null;
 
-    let addAll = (args: ArgDescriptor[]) => {
+    const addAll = (args: ArgDescriptor[]) => {
       for (let definition of args) {
-        let name = definition.name;
-        let oldDefinition = mergedArgs.get(name);
+        const name = definition.name;
+        const oldDefinition = mergedArgs.get(name);
         if (oldDefinition == null) {
           mergedArgs.set(definition.name, definition);
         } else {
-          let mergedDefinition = Object.assign({}, oldDefinition);
-          for (let propName of Object.keys(definition)) {
+          const mergedDefinition = Object.assign({}, oldDefinition);
+          for (const propName of Object.keys(definition)) {
             if (propName === 'name') continue;
-            let propValue = definition[propName];
-            let oldProp = oldDefinition[propName];
+            const propValue: any = (definition as any)[propName];
+            const oldProp = (oldDefinition as any)[propName];
             if (oldProp == null) {
-              mergedDefinition[propName] = propValue;
+              (mergedDefinition as any)[propName] = propValue;
             } else {
               throw new Error(
                 `duplicate argument definition in ${command.name}: ${name}.${propName}`);
@@ -152,9 +154,9 @@ export class PolymerCli {
   }
 
   run(): Promise<any> {
-    let helpCommand = this.commands.get('help');
-    let commandNames = Array.from(this.commands.keys());
-    let parsedArgs;
+    const helpCommand = this.commands.get('help');
+    const commandNames = Array.from(this.commands.keys());
+    let parsedArgs: ParsedCommand;
     logger.debug('running...');
 
     // If the "--version" flag is ever present, just print

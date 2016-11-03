@@ -17,7 +17,7 @@ export const globalArguments: ArgDescriptor[] = [
     name: 'env',
     description: 'The environment to use to specialize certain commands, '
         + 'like build',
-    type: function(value): Environment {
+    type(value: string): Environment {
       return buildEnvironment(value);
     },
     group: 'global',

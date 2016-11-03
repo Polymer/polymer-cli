@@ -25,10 +25,8 @@ export class ApplicationGenerator extends Base {
     this.appname = this.appname.replace(/\s+/g, '-');
   }
 
-  prompting() {
-    let _this = this;
-
-    let prompts = [
+  async prompting(): Promise<void> {
+    const prompts = [
       {
         name: 'name',
         type: 'input',
@@ -39,11 +37,11 @@ export class ApplicationGenerator extends Base {
         type: 'input',
         name: 'elementName',
         message: `Main element name`,
-        default: (answers) => `${answers.name}-app`,
-        validate(name) {
+        default: (answers: any) => `${answers.name}-app`,
+        validate: (name: string) => {
           let nameContainsHyphen = name.includes('-');
           if (!nameContainsHyphen) {
-            _this.log('\nUh oh, custom elements must include a hyphen in '
+            this.log('\nUh oh, custom elements must include a hyphen in '
               + 'their name. Please try again.');
           }
           return nameContainsHyphen;
@@ -56,14 +54,11 @@ export class ApplicationGenerator extends Base {
       },
     ];
 
-    // typings is out of date
-    return (<any>this).prompt(prompts).then((props) => {
-      this.props = props;
-    });
+    this.props = await this.prompt(prompts);
   }
 
   writing() {
-    let elementName = this.props.elementName;
+    const elementName = this.props.elementName;
 
     this.fs.copyTpl(
       `${this.templatePath()}/**/?(.)!(_)*`,

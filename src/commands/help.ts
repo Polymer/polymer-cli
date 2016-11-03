@@ -12,7 +12,7 @@ import * as chalk from 'chalk';
 import * as commandLineUsage from 'command-line-usage';
 import * as logging from 'plylog';
 import {globalArguments} from '../args';
-import {Command} from './command';
+import {Command, CommandOptions, ProjectConfig} from './command';
 
 let logger = logging.getLogger('cli.command.help');
 
@@ -72,7 +72,7 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  generateCommandUsage(command) {
+  generateCommandUsage(command: Command) {
     return commandLineUsage([
       {
         header: `polymer ${command.name}`,
@@ -89,24 +89,25 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  run(options, _config): Promise<any> {
+  run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
     return new Promise<any>((resolve, _) => {
-      if (!options || !options.command) {
+      const commandName: string = options['command'];
+      if (!commandName) {
         logger.debug('no command given, printing general help...', {options: options});
         console.log(this.generateGeneralUsage());
         resolve(null);
         return;
       }
 
-      let command = this.commands.get(options.command);
+      let command = this.commands.get(commandName);
       if (!command) {
-        logger.error(`'${options.command}' is not an available command.`);
+        logger.error(`'${commandName}' is not an available command.`);
         console.log(this.generateGeneralUsage());
         resolve(null);
         return;
       }
 
-      logger.debug(`printing help for command '${command.name}'...`);
+      logger.debug(`printing help for command '${commandName}'...`);
       console.log(this.generateCommandUsage(command));
       resolve(null);
     });

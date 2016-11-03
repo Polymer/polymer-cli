@@ -9,15 +9,18 @@
  */
 
 import * as fs from 'fs';
-import * as GitHubApi from 'github';
 import * as logging from 'plylog';
 import * as path from 'path';
-import * as request from 'request';
+
+import request = require('request');
+import GitHubApi = require('github');
 
 const gunzip = require('gunzip-maybe');
 const tar = require('tar-fs');
 
-let logger = logging.getLogger('cli.github');
+const logger = logging.getLogger('cli.github');
+
+export type RequestAPI = request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
 
 class GithubResponseError extends Error {
   name = 'GithubResponseError';
@@ -36,14 +39,14 @@ export interface GithubOpts {
   owner: string;
   repo: string;
   githubToken?: string;
-  githubApi?;
-  requestApi?;
+  githubApi?: GitHubApi;
+  requestApi?: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
 }
 
 export class Github {
   private _token: string;
   private _github: GitHubApi;
-  private _request;
+  private _request: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private _owner: string;
   private _repo: string;
 
@@ -75,13 +78,13 @@ export class Github {
   extractLatestRelease(outDir: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let tarPipe = tar.extract(outDir, {
-        ignore: (_, header) => {
+        ignore: (_: any, header: any) => {
           let splitPath = path.normalize(header.name).split(path.sep);
           // ignore the top directory in the tarfile to unpack directly to
           // the cwd
           return splitPath.length < 1 || splitPath[1] === '';
         },
-        map: (header) => {
+        map: (header: any) => {
           let splitPath = path.normalize(header.name).split(path.sep);
           let unprefixed = splitPath.slice(1).join(path.sep).trim();
           // A ./ prefix is needed to unpack top-level files in the tar,
@@ -114,7 +117,7 @@ export class Github {
           logger.info('Finished writing template files');
           resolve();
         })
-        .on('error', (error) => {
+        .on('error', (error: any) => {
           throw error;
         });
       })

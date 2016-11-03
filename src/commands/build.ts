@@ -8,7 +8,7 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {Command} from './command';
+import {Command, CommandOptions, ProjectConfig} from './command';
 import * as logging from 'plylog';
 
 // Only import type definitions here, otherwise this line will be included in
@@ -45,7 +45,7 @@ export class BuildCommand implements Command {
     }
   ];
 
-  run(options, config): Promise<any> {
+  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
     const build = require('../build/build').build;
 
@@ -61,10 +61,10 @@ export class BuildCommand implements Command {
     }
     logger.debug('building with options', buildOptions);
 
-    if (options.env && options.env.build) {
+    if (options['env'] && options['env'].build) {
       logger.debug('env.build() found in options');
       logger.debug('building via env.build()...');
-      return options.env.build(buildOptions, config);
+      return options['env'].build(buildOptions, config);
     }
 
     logger.debug('building via standard build()...');

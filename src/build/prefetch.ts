@@ -61,7 +61,7 @@ export class PrefetchTransform extends Transform {
     file.contents = new Buffer(contents);
   }
 
-  _transform(file: File, _encoding: string, callback: (error?, file?) => void) {
+  _transform(file: File, _encoding: string, callback: (error?: any, file?: File) => void) {
     if (this.isImportantFile(file)) {
       // hold on to the file for safe keeping
       this.fileMap.set(file.path, file);
@@ -71,12 +71,12 @@ export class PrefetchTransform extends Transform {
     }
   }
 
-  isImportantFile(file) {
+  isImportantFile(file: File) {
     return file.path === this.config.entrypoint ||
         this.config.allFragments.indexOf(file.path) > -1;
   }
 
-  _flush(done: (error?) => void) {
+  _flush(done: (error?: any) => void) {
     if (this.fileMap.size === 0) {
       return done();
     }
