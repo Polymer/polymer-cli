@@ -57,7 +57,7 @@ export class BuildCommand implements Command {
       js: {},
     };
     if (options['html.collapseWhitespace']) {
-      buildOptions.html.collapseWhitespace = true;
+      buildOptions.html!.collapseWhitespace = true;
     }
     logger.debug('building with options', buildOptions);
 

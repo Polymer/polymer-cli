@@ -42,8 +42,9 @@ export class PrefetchTransform extends Transform {
     type: 'import' | 'prefetch'
   ) {
     let contents = file.contents.toString();
-    let ast = parse5.parse(contents);
-    let head = dom5.query(ast, dom5.predicates.hasTagName('head'));
+    const ast = parse5.parse(contents);
+    // parse5 always produces a <head> element
+    const head = dom5.query(ast, dom5.predicates.hasTagName('head'))!;
     for (let dep of deps) {
       if (dep.startsWith(this.config.root)) {
         dep = path.relative(file.dirname, dep);
@@ -52,7 +53,7 @@ export class PrefetchTransform extends Transform {
       if (type === 'prefetch') {
         dep = path.join('/', dep);
       }
-      let link = dom5.constructors.element('link');
+      const link = dom5.constructors.element('link');
       dom5.setAttribute(link, 'rel', type);
       dom5.setAttribute(link, 'href', dep);
       dom5.append(head, link);
@@ -65,7 +66,7 @@ export class PrefetchTransform extends Transform {
     if (this.isImportantFile(file)) {
       // hold on to the file for safe keeping
       this.fileMap.set(file.path, file);
-      callback(null, null);
+      callback(null);
     } else {
       callback(null, file);
     }
@@ -81,12 +82,13 @@ export class PrefetchTransform extends Transform {
       return done();
     }
     this.analyzer.analyzeDependencies.then((depsIndex: DepsIndex) => {
-      let fragmentToDeps = new Map(depsIndex.fragmentToDeps);
+      const fragmentToDeps = new Map(depsIndex.fragmentToDeps);
 
       if (this.config.entrypoint && this.config.shell) {
-        let file = this.fileMap.get(this.config.entrypoint);
+        const file = this.fileMap.get(this.config.entrypoint)!;
+        console.assert(file != null);
         // forward shell's dependencies to main to be prefetched
-        let deps = fragmentToDeps.get(this.config.shell);
+        const deps = fragmentToDeps.get(this.config.shell);
         if (deps) {
           this.pullUpDeps(file, deps, 'prefetch');
         }
@@ -94,14 +96,15 @@ export class PrefetchTransform extends Transform {
         this.fileMap.delete(this.config.entrypoint);
       }
 
-      for (let im of this.config.allFragments) {
-        let file = this.fileMap.get(im);
-        let deps = fragmentToDeps.get(im);
+      for (const importUrl of this.config.allFragments) {
+        const file = this.fileMap.get(importUrl)!;
+        console.assert(file != null);
+        const deps = fragmentToDeps.get(importUrl);
         if (deps) {
           this.pullUpDeps(file, deps, 'import');
         }
         this.push(file);
-        this.fileMap.delete(im);
+        this.fileMap.delete(importUrl);
       }
 
       for (let leftover of this.fileMap.keys()) {

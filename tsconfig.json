@@ -6,6 +6,7 @@
     "moduleResolution": "node",
     "isolatedModules": false,
     "declaration": false,
+    "strictNullChecks": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

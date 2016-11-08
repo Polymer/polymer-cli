@@ -114,7 +114,7 @@ export class PolymerCli {
       globals: ArgDescriptor[]
       ): ArgDescriptor[] {
     const mergedArgs = new Map<string, ArgDescriptor>();
-    let defaultOption: string = null;
+    let defaultOption: string|null = null;
 
     const addAll = (args: ArgDescriptor[]) => {
       for (let definition of args) {
@@ -154,7 +154,7 @@ export class PolymerCli {
   }
 
   run(): Promise<any> {
-    const helpCommand = this.commands.get('help');
+    const helpCommand = this.commands.get('help')!;
     const commandNames = Array.from(this.commands.keys());
     let parsedArgs: ParsedCommand;
     logger.debug('running...');
@@ -184,7 +184,8 @@ export class PolymerCli {
 
     let commandName = parsedArgs.command;
     let commandArgs = parsedArgs.argv;
-    let command = this.commands.get(commandName);
+    let command = this.commands.get(commandName)!;
+    console.assert(command != null);
     logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
 
     let commandDefinitions = this.mergeDefinitions(command, globalArguments);

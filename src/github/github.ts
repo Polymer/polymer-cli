@@ -24,10 +24,10 @@ export type RequestAPI = request.RequestAPI<request.Request, request.CoreOptions
 
 class GithubResponseError extends Error {
   name = 'GithubResponseError';
-  statusCode: number;
-  statusMessage: string;
+  statusCode?: number;
+  statusMessage?: string;
 
-  constructor(statusCode: number, statusMessage: string) {
+  constructor(statusCode?: number, statusMessage?: string) {
     super('unexpected response: ' + statusCode + ' ' + statusMessage);
     this.statusCode = statusCode;
     this.statusMessage = statusMessage;
@@ -44,13 +44,13 @@ export interface GithubOpts {
 }
 
 export class Github {
-  private _token: string;
+  private _token: string|null;
   private _github: GitHubApi;
   private _request: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private _owner: string;
   private _repo: string;
 
-  static tokenFromFile(filename: string): string {
+  static tokenFromFile(filename: string): string|null {
     try {
       return fs.readFileSync(filename, 'utf8').trim();
     } catch (error) {
