@@ -54,10 +54,10 @@ export class ReyServe implements Environment {
           stdio: 'inherit',
           cwd: options.root
         });
-      devServer.on('close', (code) => {
+      devServer.on('close', (code: number) => {
         resolve(code);
       });
-      devServer.on('error', (error) => {
+      devServer.on('error', (error: any) => {
         reject(error);
       });
     });

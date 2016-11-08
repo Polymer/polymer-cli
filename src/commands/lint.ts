@@ -10,10 +10,9 @@
 
 import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
-import {Command} from './command';
+import {Command, CommandOptions, ProjectConfig} from './command';
 
-
-let logger = logging.getLogger('cli.lint');
+const logger = logging.getLogger('cli.lint');
 
 export class LintCommand implements Command {
   name = 'lint';
@@ -34,7 +33,7 @@ export class LintCommand implements Command {
       type: String,
       alias: 'p',
       description: 'Your jsconf.json policy file.',
-      defaultValue: null
+      defaultValue: false
     },
     {
       name: 'config-file',
@@ -73,11 +72,11 @@ export class LintCommand implements Command {
     }
   ];
 
-  run(options, config): Promise<any> {
+  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
     const polylint = require('polylint/lib/cli');
 
-    let lintFiles: string[] = options.input;
+    let lintFiles: string[] = options['input'];
     if (!lintFiles) {
       lintFiles = [];
       if (config.entrypoint) lintFiles.push(config.entrypoint);
@@ -98,7 +97,7 @@ export class LintCommand implements Command {
     }
 
     // Default to false if input files are provided, otherwise default to true
-    let followDependencies = !options.input;
+    let followDependencies = !options['input'];
     if (options['follow-dependencies']) {
       followDependencies = true;
     } else if (options['no-follow-dependencies']) {
@@ -110,11 +109,11 @@ export class LintCommand implements Command {
       root: config.root,
       // TODO: read into config
       bowerdir: 'bower_components',
-      policy: options.policy,
+      policy: options['policy'],
       'config-file': options['config-file'],
       'config-field': options['config-field'],
       // NOTE: `no-recursion` has the opposite behavior of `follow-dependencies`
       'no-recursion': !followDependencies,
-    }).then(() => null);
+    }).then(() => null as void);
   }
 }

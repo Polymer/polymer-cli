@@ -19,7 +19,10 @@ import * as YeomanEnvironment from 'yeoman-environment';
 import {prompt, Question as InquirerQuestion} from 'inquirer';
 import {createGithubGenerator} from '../init/github';
 
-let logger = logging.getLogger('init');
+// import {Base} from 'yeoman-generator';
+
+
+const logger = logging.getLogger('init');
 
 interface GeneratorDescription {
   name: string;
@@ -27,7 +30,7 @@ interface GeneratorDescription {
   short: string;
 }
 
-const templateDescriptions = {
+const templateDescriptions: {[name: string]: string} = {
   'element': 'A blank element template',
   'application': 'A blank application template',
   'starter-kit': 'A starter application template, with navigation and "PRPL pattern" loading',
@@ -70,15 +73,15 @@ function checkIsMinGW(): boolean {
  * read the description from its package.json.
  */
 function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, generatorName: string): GeneratorDescription {
-  let name = getDisplayName(generatorName);
-  let description;
+  const name = getDisplayName(generatorName);
+  let description: string;
 
   if (templateDescriptions.hasOwnProperty(name)) {
     description = templateDescriptions[name];
   } else if (generator.resolved && generator.resolved !== 'unknown') {
     try {
-      let metapath = findup('package.json', {cwd: generator.resolved});
-      let meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
+      const metapath = findup('package.json', {cwd: generator.resolved});
+      const meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
       description = meta.description;
     } catch (error) {
       if (error.message === 'not found') {
@@ -119,7 +122,7 @@ function getDisplayName(generatorName: string) {
  */
 function createYeomanEnvironment(): Promise<any> {
   return new Promise((resolve, reject) => {
-    let env = new YeomanEnvironment();
+    const env = new YeomanEnvironment();
     env.registerStub(ElementGenerator, 'polymer-init-element:app');
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
     env.registerStub(shopGenerator, 'polymer-init-shop:app');
@@ -140,12 +143,12 @@ function createYeomanEnvironment(): Promise<any> {
  * the environment list.
  */
 function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
-  let generators = env.getGeneratorsMeta();
-  let polymerInitGenerators = Object.keys(generators).filter((k) => {
+  const generators = env.getGeneratorsMeta();
+  const polymerInitGenerators = Object.keys(generators).filter((k) => {
     return k.startsWith('polymer-init') && k !== 'polymer-init:app';
   });
-  let choices = polymerInitGenerators.map((generatorName: string) => {
-    let generator = generators[generatorName];
+  const choices = polymerInitGenerators.map((generatorName: string) => {
+    const generator = generators[generatorName];
     return getGeneratorDescription(generator, generatorName);
   });
 
@@ -153,7 +156,7 @@ function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
   // https://github.com/SBoudrias/Inquirer.js/issues/266
   // Fall back to rawlist and use number input
   // Credit to https://gist.github.com/geddski/c42feb364f3c671d22b6390d82b8af8f
-  let isMinGW = checkIsMinGW();
+  const isMinGW = checkIsMinGW();
 
   return {
     type: isMinGW ? 'rawlist' : 'list',
@@ -168,32 +171,29 @@ function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
  * will be created. If the generator does not exist in the environment, an
  * error will be thrown.
  */
-export function runGenerator(generatorName, options): Promise<any> {
+export async function runGenerator(generatorName: string, options: {[name: string]: any}): Promise<void> {
   options = options || {};
-  let templateName = options.templateName || generatorName;
+  const templateName = options['templateName'] || generatorName;
 
-  return (options.env
-      ? Promise.resolve(options.env)
-      : createYeomanEnvironment()
-  ).then(function(env: YeomanEnvironment) {
-    logger.info(`Running template ${templateName}...`);
-    logger.debug(`Running generator ${generatorName}...`);
-    let generators = env.getGeneratorsMeta();
-    let generator = generators[generatorName];
+  const env: YeomanEnvironment = await options['env'] || createYeomanEnvironment();
 
-    if (!generator) {
-      logger.error(`Template ${templateName} not found`);
-      throw new Error(`Template ${templateName} not found`);
-    }
+  logger.info(`Running template ${templateName}...`);
+  logger.debug(`Running generator ${generatorName}...`);
+  const generators = env.getGeneratorsMeta();
+  const generator = generators[generatorName];
 
-    return new Promise((resolve, reject) => {
-      env.run(generatorName, {}, (error) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve();
-      });
+  if (!generator) {
+    logger.error(`Template ${templateName} not found`);
+    throw new Error(`Template ${templateName} not found`);
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    env.run(generatorName, {}, (error: any) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
     });
   });
 }
@@ -202,21 +202,14 @@ export function runGenerator(generatorName, options): Promise<any> {
  * Prompt the user to select a generator. When the user
  * selects a generator, run it.
  */
-export function promptGeneratorSelection(options): Promise<any> {
+export async function promptGeneratorSelection(options: {[name: string]: any}): Promise<void> {
   options = options || {};
-  let env: YeomanEnvironment;
-
-  return (options.env
-      ? Promise.resolve(options.env)
-      : createYeomanEnvironment()
-  ).then(function(_env: YeomanEnvironment) {
-    env = _env;
-    return prompt([createSelectPrompt(env)]);
-  }).then(function(answers) {
-    let generatorName = answers['generatorName'];
-    return runGenerator(generatorName, {
-      templateName: getDisplayName(generatorName),
-      env: env
-    });
+  const env = await options['env'] || createYeomanEnvironment();
+  // TODO(justinfagnani): the typings for inquirer appear wrong
+  const answers = await (prompt([createSelectPrompt(env)]) as any);
+  const generatorName = answers['generatorName'];
+  await runGenerator(generatorName, {
+    templateName: getDisplayName(generatorName),
+    env: env
   });
 }

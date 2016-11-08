@@ -6,7 +6,7 @@
     "moduleResolution": "node",
     "isolatedModules": false,
     "declaration": false,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,

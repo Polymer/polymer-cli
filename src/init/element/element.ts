@@ -25,20 +25,17 @@ export class ElementGenerator extends Base {
     this.appname = this.appname.replace(/\s+/g, '-');
   }
 
-  prompting() {
-
-    let _this = this;
-
-    let prompts = [
+  async prompting(): Promise<void> {
+    const prompts = [
       {
         name: 'name',
         type: 'input',
         message: `Element name`,
         default: this.appname + (this.appname.includes('-') ? '' : '-element'),
-        validate(name) {
+        validate: (name: string) => {
           let nameContainsHyphen = name.includes('-');
           if (!nameContainsHyphen) {
-            _this.log('\nUh oh, custom elements must include a hyphen in '
+            this.log('\nUh oh, custom elements must include a hyphen in '
               + 'their name. Please try again.');
           }
           return nameContainsHyphen;
@@ -51,15 +48,11 @@ export class ElementGenerator extends Base {
       },
     ];
 
-    // typings is out of date
-    return (<any>this).prompt(prompts).then((props) => {
-      this.props = props;
-    });
-
+    this.props = await this.prompt(prompts);
   }
 
   writing() {
-    let name = this.props.name;
+    const name = this.props.name;
 
     this.fs.copyTpl(
       `${this.templatePath()}/**/?(.)!(_)*`,
