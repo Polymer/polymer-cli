@@ -182,21 +182,22 @@ export class PolymerCli {
       throw error;
     }
 
-    let commandName = parsedArgs.command;
-    let commandArgs = parsedArgs.argv;
-    let command = this.commands.get(commandName)!;
-    console.assert(command != null);
+    const commandName = parsedArgs.command;
+    const commandArgs = parsedArgs.argv;
+    const command = this.commands.get(commandName)!;
+    if (command == null) throw new TypeError('command is null');
+
     logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
 
-    let commandDefinitions = this.mergeDefinitions(command, globalArguments);
-    let commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
-    let commandOptions = parseCLIArgs(commandOptionsRaw);
+    const commandDefinitions = this.mergeDefinitions(command, globalArguments);
+    const commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
+    const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
-    let mergedConfigOptions = Object.assign(
+    const mergedConfigOptions = Object.assign(
       {}, this.defaultConfigOptions, commandOptions);
 
-    let config = new ProjectConfig(mergedConfigOptions);
+    const config = new ProjectConfig(mergedConfigOptions);
     logger.debug(`final project configuration generated:`, config);
 
     // Help is a special argument for displaying help for the given command.

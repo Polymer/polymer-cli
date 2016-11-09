@@ -85,8 +85,9 @@ export class PrefetchTransform extends Transform {
       const fragmentToDeps = new Map(depsIndex.fragmentToDeps);
 
       if (this.config.entrypoint && this.config.shell) {
-        const file = this.fileMap.get(this.config.entrypoint)!;
-        console.assert(file != null);
+        const file = this.fileMap.get(this.config.entrypoint);
+        if (file == null) throw new TypeError('file is null');
+
         // forward shell's dependencies to main to be prefetched
         const deps = fragmentToDeps.get(this.config.shell);
         if (deps) {
@@ -97,8 +98,9 @@ export class PrefetchTransform extends Transform {
       }
 
       for (const importUrl of this.config.allFragments) {
-        const file = this.fileMap.get(importUrl)!;
-        console.assert(file != null);
+        const file = this.fileMap.get(importUrl);
+        if (file == null) throw new TypeError('file is null');
+
         const deps = fragmentToDeps.get(importUrl);
         if (deps) {
           this.pullUpDeps(file, deps, 'import');
