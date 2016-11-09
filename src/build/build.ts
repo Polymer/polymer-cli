@@ -91,7 +91,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
     .once('data', () => { logger.info('Generating build/unbundled...'); })
     .pipe(
       gulpif(
-        options.insertDependencyLinks,
+        options.insertDependencyLinks || false,
         new PrefetchTransform(polymerProject)
       )
     )

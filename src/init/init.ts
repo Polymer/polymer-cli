@@ -74,7 +74,7 @@ function checkIsMinGW(): boolean {
  */
 function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, generatorName: string): GeneratorDescription {
   const name = getDisplayName(generatorName);
-  let description: string;
+  let description: string = '';
 
   if (templateDescriptions.hasOwnProperty(name)) {
     description = templateDescriptions[name];
@@ -95,7 +95,9 @@ function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, gen
     }
   }
   // If a description exists, format it properly for the command-line
-  description = (description) ? chalk.dim(' - ' + description) : '';
+  if (description.length > 0)  {
+    description = chalk.dim(` - ${description}`);
+  }
 
   return {
     name: `${name}${description}`,

@@ -114,7 +114,7 @@ export class PolymerCli {
       globals: ArgDescriptor[]
       ): ArgDescriptor[] {
     const mergedArgs = new Map<string, ArgDescriptor>();
-    let defaultOption: string = null;
+    let defaultOption: string|null = null;
 
     const addAll = (args: ArgDescriptor[]) => {
       for (let definition of args) {
@@ -154,7 +154,7 @@ export class PolymerCli {
   }
 
   run(): Promise<any> {
-    const helpCommand = this.commands.get('help');
+    const helpCommand = this.commands.get('help')!;
     const commandNames = Array.from(this.commands.keys());
     let parsedArgs: ParsedCommand;
     logger.debug('running...');
@@ -182,20 +182,22 @@ export class PolymerCli {
       throw error;
     }
 
-    let commandName = parsedArgs.command;
-    let commandArgs = parsedArgs.argv;
-    let command = this.commands.get(commandName);
+    const commandName = parsedArgs.command;
+    const commandArgs = parsedArgs.argv;
+    const command = this.commands.get(commandName)!;
+    if (command == null) throw new TypeError('command is null');
+
     logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
 
-    let commandDefinitions = this.mergeDefinitions(command, globalArguments);
-    let commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
-    let commandOptions = parseCLIArgs(commandOptionsRaw);
+    const commandDefinitions = this.mergeDefinitions(command, globalArguments);
+    const commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
+    const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
-    let mergedConfigOptions = Object.assign(
+    const mergedConfigOptions = Object.assign(
       {}, this.defaultConfigOptions, commandOptions);
 
-    let config = new ProjectConfig(mergedConfigOptions);
+    const config = new ProjectConfig(mergedConfigOptions);
     logger.debug(`final project configuration generated:`, config);
 
     // Help is a special argument for displaying help for the given command.

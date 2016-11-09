@@ -76,7 +76,7 @@ export class ServeCommand implements Command {
     // Defer dependency loading until this specific command is run
     const polyserve = require('polyserve');
 
-    let openPath: string;
+    let openPath: string|undefined;
     if (config.entrypoint && config.shell) {
       openPath = config.entrypoint.substring(config.root.length);
       if (openPath === 'index.html' || openPath === '/index.html') {

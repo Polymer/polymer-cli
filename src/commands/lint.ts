@@ -114,6 +114,6 @@ export class LintCommand implements Command {
       'config-field': options['config-field'],
       // NOTE: `no-recursion` has the opposite behavior of `follow-dependencies`
       'no-recursion': !followDependencies,
-    }).then(() => null as void);
+    }).then(() => undefined);
   }
 }
