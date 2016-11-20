@@ -15,6 +15,7 @@ const helpers = require('yeoman-test');
 const childProcess = require('child_process');
 const inquirer = require('inquirer');
 const YeomanEnvironment = require('yeoman-environment');
+const path = require('path');
 
 const polymerInit = require('../../../lib/init/init');
 
@@ -95,6 +96,10 @@ suite('init', () => {
           resolved: 'unknown',
           namespace: 'polymer-init-element:app',
         },
+        'polymer-init-my-test-app:app': {
+          resolved: path.resolve(__dirname, 'package.json'),
+          namespace: 'polymer-init-my-test-app:app',
+        },
       });
     });
 
@@ -124,10 +129,15 @@ suite('init', () => {
         assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         let choices = promptStub.firstCall.args[0][0].choices;
-        assert.equal(choices.length, 1);
+        assert.equal(choices.length, 2);
         assert.equal(stripAnsi(choices[0].name), 'element - A blank element template');
         assert.equal(choices[0].value, 'polymer-init-element:app');
         assert.equal(choices[0].short, 'element');
+
+        // custom generator's name and description parsed from package.json
+        assert.equal(stripAnsi(choices[1].name), 'my-test-app - dummy description');
+        assert.equal(choices[1].value, 'polymer-init-my-test-app:app');
+        assert.equal(choices[1].short, 'my-test-app');
       });
     });
 

@@ -82,16 +82,15 @@ function checkIsMinGW(): boolean {
 function getGeneratorDescription(
     generator: YeomanEnvironment.GeneratorMeta,
     generatorName: string): GeneratorDescription {
-  const name = getDisplayName(generatorName);
   let description: string = '';
+  let genName = generatorName;
 
-  if (templateDescriptions.hasOwnProperty(name)) {
-    description = templateDescriptions[name];
-  } else if (generator.resolved && generator.resolved !== 'unknown') {
+  if (generator.resolved && generator.resolved !== 'unknown') {
     try {
       const metapath = findup('package.json', {cwd: generator.resolved});
       const meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
-      description = meta.description;
+      description = meta.description || '';
+      genName = meta.name || generatorName;
     } catch (error) {
       if (error.message === 'not found') {
         logger.debug('no package.json found for generator');
@@ -103,6 +102,13 @@ function getGeneratorDescription(
       }
     }
   }
+
+  const name = getDisplayName(genName);
+
+  if (templateDescriptions.hasOwnProperty(name)) {
+    description = templateDescriptions[name];
+  }
+
   // If a description exists, format it properly for the command-line
   if (description.length > 0) {
     description = chalk.dim(` - ${description}`);
@@ -118,14 +124,31 @@ function getGeneratorDescription(
 }
 
 /**
- * Extract the meaningful name from the full yeoman generator name
+ * Extract the meaningful name from the full Yeoman generator name.
+ * Strip the standard generator prefixes ("generator-" and "polymer-init-"),
+ * and extract the remainder of the name (the first part of the string
+ * before any colons).
+ *
+ * Examples:
+ *
+ *   'generator-polymer-init-foo'         === 'foo'
+ *   'polymer-init-foo'                   === 'foo'
+ *   'foo-bar'                            === 'foo-bar'
+ *   'generator-polymer-init-foo:aaa'     === 'foo'
+ *   'polymer-init-foo:bbb'               === 'foo'
+ *   'foo-bar:ccc'                        === 'foo-bar'
  */
 function getDisplayName(generatorName: string) {
-  let nameEnd = generatorName.indexOf(':');
-  if (nameEnd === -1) {
-    nameEnd = generatorName.length;
-  }
-  return generatorName.substring('polymer-init-'.length, nameEnd);
+  // Breakdown of regular expression to extract name (group 3 in pattern):
+  //
+  //  Pattern           | Meaning
+  //  -------------------------------------------------------------------
+  //  (generator-)?     | Group 1; Match "generator-"; Optional
+  //  (polymer-init-)?  | Group 2; Match "polymer-init-"; Optional
+  //  ([^:]+)           | Group 3; Match one or more characters != ':'
+  //  (:.*)?            | Group 4; Match ':' followed by anything; Optional
+  return generatorName.replace(/(generator-)?(polymer-init-)?([^:]+)(:.*)?/g,
+                               '$3');
 }
 
 /**
