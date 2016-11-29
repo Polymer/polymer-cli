@@ -105,13 +105,11 @@ Choose a template from a menu:
 
     $ polymer init
 
-Use the 'element' template:
+Create a new project from the 'element' template:
 
     $ polymer init element
 
-Use the 'application' template:
-
-    $ polymer init application
+You can download and run templates built by our community as well. [Search npm](https://www.npmjs.com/search?q=generator-polymer-init) for the full list.
 
 ### lint
 
