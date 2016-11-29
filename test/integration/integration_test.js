@@ -10,10 +10,11 @@
 'use strict';
 
 const path = require('path');
-const childProcess = require('child_process');
 const runGenerator = require('yeoman-test').run;
 const createGithubGenerator
   = require('../../lib/init/github').createGithubGenerator;
+
+const runCommand = require('./run-command').runCommand;
 
 // Template Generators
 const ApplicationGenerator
@@ -28,32 +29,6 @@ const PSKGenerator = createGithubGenerator({
   owner: 'PolymerElements',
   repo: 'polymer-starter-kit',
 });
-
-/**
- * Run the given command as a forked child process, and return a promise
- * which will reject/resolve with the result of the command.
- */
-function runCommand(path, args, options) {
-  return new Promise((resolve, reject) => {
-    let commandError;
-    const forkedProcess = childProcess.fork(path, args, options);
-
-    // listen for errors as they may prevent the exit event from firing
-    forkedProcess.on('error', (error) => { commandError = error });
-    // execute the callback once the forkedProcess has finished running
-    forkedProcess.on('exit', (code) => {
-      if (commandError) {
-        reject(commandError);
-        return;
-      }
-      if (code !== 0) {
-        reject(new Error('exit code: ' + code));
-        return;
-      }
-      resolve();
-    });
-  });
-}
 
 suite('integration tests', function() {
 
