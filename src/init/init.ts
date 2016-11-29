@@ -177,7 +177,7 @@ export async function runGenerator(generatorName: string, options: {[name: strin
   options = options || {};
   const templateName = options['templateName'] || generatorName;
 
-  const env: YeomanEnvironment = await options['env'] || createYeomanEnvironment();
+  const env: YeomanEnvironment = await (options['env'] || createYeomanEnvironment());
 
   logger.info(`Running template ${templateName}...`);
   logger.debug(`Running generator ${generatorName}...`);
@@ -206,7 +206,7 @@ export async function runGenerator(generatorName: string, options: {[name: strin
  */
 export async function promptGeneratorSelection(options: {[name: string]: any}): Promise<void> {
   options = options || {};
-  const env = await options['env'] || createYeomanEnvironment();
+  const env = await (options['env'] || createYeomanEnvironment());
   // TODO(justinfagnani): the typings for inquirer appear wrong
   const answers = await (prompt([createSelectPrompt(env)]) as any);
   const generatorName = answers['generatorName'];
