@@ -71,6 +71,17 @@ suite('init', () => {
       });
     });
 
+    test('works with the default yeoman environment', () => {
+      // Note: Do not use a fake Yeoman environment in this test so that we get
+      // coverage of the case where env isn't specified.
+      const UNKNOWN_GENERATOR_NAME = 'UNKNOWN-GENERATOR';
+      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME).then(() => {
+        throw new Error('The promise should have been rejected before it got here');
+      }, (error) => {
+        assert.equal(error.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
+      });
+    });
+
   });
 
   suite('promptGeneratorSelection', () => {
@@ -84,6 +95,14 @@ suite('init', () => {
           resolved: 'unknown',
           namespace: 'polymer-init-element:app',
         },
+      });
+    });
+
+    test('works with the default yeoman environment', () => {
+      sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
+      polymerInit.runGenerator = function(name, options) {};
+      return polymerInit.promptGeneratorSelection().catch((error) => {
+        assert.equal(error.message, 'Template TEST not found');
       });
     });
 
