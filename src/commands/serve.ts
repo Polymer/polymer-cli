@@ -12,6 +12,8 @@ import * as logging from 'plylog';
 
 import {Command, CommandOptions, ProjectConfig} from './command';
 
+import {args as polyserveArgs} from 'polyserve/lib/args';
+
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
@@ -26,51 +28,7 @@ export class ServeCommand implements Command {
 
   description = 'Runs the polyserve development server';
 
-  args = [
-    {
-      name: 'port',
-      alias: 'p',
-      description: 'The port to serve from. Defaults to 8080',
-      type: Number,
-    },
-    {
-      name: 'hostname',
-      alias: 'H',
-      description: 'The hostname to serve from. Defaults to localhost',
-      type: String,
-    },
-    {
-      name: 'package-name',
-      alias: 'n',
-      description: 'The package name to use for the root directory. Defaults ' +
-          'to reading from bower.json',
-      type: String,
-    },
-    {
-      name: 'open',
-      alias: 'o',
-      description: 'The page to open in the default browser on startup.',
-      type: Boolean,
-    },
-    {
-      name: 'browser',
-      alias: 'b',
-      description: 'The browser(s) to open with when using the --open option.' +
-          ' Defaults to your default web browser.',
-      type: String,
-      multiple: true,
-    },
-    {
-      name: 'open-path',
-      description: 'The URL path to open when using the --open option.' +
-          ' Defaults to "index.html".',
-      type: String,
-    },
-    {
-      name: 'root',
-      defaultOption: true,
-    },
-  ];
+  args = polyserveArgs;
 
   run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run

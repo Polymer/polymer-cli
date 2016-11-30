@@ -129,13 +129,7 @@ export class PolymerCli {
           for (const propName of Object.keys(definition)) {
             if (propName === 'name') continue;
             const propValue: any = (definition as any)[propName];
-            const oldProp = (oldDefinition as any)[propName];
-            if (oldProp == null) {
-              (mergedDefinition as any)[propName] = propValue;
-            } else {
-              throw new Error(
-                `duplicate argument definition in ${command.name}: ${name}.${propName}`);
-            }
+            (mergedDefinition as any)[propName] = propValue;
           }
           mergedArgs.set(name, mergedDefinition);
           definition = mergedDefinition;
