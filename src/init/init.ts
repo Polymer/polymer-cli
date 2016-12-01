@@ -82,31 +82,12 @@ function checkIsMinGW(): boolean {
 function getGeneratorDescription(
     generator: YeomanEnvironment.GeneratorMeta,
     generatorName: string): GeneratorDescription {
-  let description: string = '';
-  let genName = generatorName;
+  const meta = getGeneratorMeta(generator.resolved, generatorName, '');
+  const displayName = getDisplayName(meta.name);
+  let description = meta.description;
 
-  if (generator.resolved && generator.resolved !== 'unknown') {
-    try {
-      const metapath = findup('package.json', {cwd: generator.resolved});
-      const meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
-      description = meta.description || '';
-      genName = meta.name || generatorName;
-    } catch (error) {
-      if (error.message === 'not found') {
-        logger.debug('no package.json found for generator');
-      } else {
-        logger.debug('unable to read/parse package.json for generator', {
-          generator: generatorName,
-          err: error.message,
-        });
-      }
-    }
-  }
-
-  const name = getDisplayName(genName);
-
-  if (templateDescriptions.hasOwnProperty(name)) {
-    description = templateDescriptions[name];
+  if (templateDescriptions.hasOwnProperty(displayName)) {
+    description = templateDescriptions[displayName];
   }
 
   // If a description exists, format it properly for the command-line
@@ -115,12 +96,42 @@ function getGeneratorDescription(
   }
 
   return {
-    name: `${name}${description}`,
+    name: `${displayName}${description}`,
     value: generatorName,
     // inquirer is broken and doesn't print descriptions :(
     // keeping this so things work when it does
-    short: name,
+    short: displayName,
   };
+}
+
+/**
+ * Get the metadata of a generator from its package.json
+ */
+function getGeneratorMeta(
+    rootDir: string,
+    defaultName: string,
+    defaultDescription: string): {name: string, description: string} {
+  let name = defaultName;
+  let description = defaultDescription;
+
+  if (rootDir && rootDir !== 'unknown') {
+    try {
+      const metapath = findup('package.json', {cwd: rootDir});
+      const meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
+      description = meta.description || description;
+      name = meta.name || name;
+    } catch (error) {
+      if (error.message === 'not found') {
+        logger.debug('no package.json found for generator');
+      } else {
+        logger.debug('unable to read/parse package.json for generator', {
+          generator: defaultName,
+          err: error.message,
+        });
+      }
+    }
+  }
+  return {name, description};
 }
 
 /**
