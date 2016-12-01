@@ -1,0 +1,19 @@
+{
+  "name": "install-variants",
+  "description": "A test of installing variants",
+  "dependencies": {
+    "polymer": "Polymer/polymer#1.7.0"
+  },
+  "variants": {
+    "variant-1": {
+      "dependencies": {
+        "polymer": "Polymer/polymer#1.6.0"
+      }
+    },
+    "variant-2": {
+      "dependencies": {
+        "polymer": "Polymer/polymer#1.7.0"
+      }
+    }
+  }
+}

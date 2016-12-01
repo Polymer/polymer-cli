@@ -16,6 +16,7 @@ import {ArgDescriptor} from './commands/command';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
+import {InstallCommand} from './commands/install';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
@@ -99,6 +100,7 @@ export class PolymerCli {
     this.addCommand(new BuildCommand());
     this.addCommand(new HelpCommand(this.commands));
     this.addCommand(new InitCommand());
+    this.addCommand(new InstallCommand());
     this.addCommand(new LintCommand());
     this.addCommand(new ServeCommand());
     this.addCommand(new TestCommand());
