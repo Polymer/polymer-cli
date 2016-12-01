@@ -58,13 +58,10 @@ suite('init', () => {
     });
 
     test('fails if an unknown generator is requested', () => {
+      // Note: Do not use a fake Yeoman environment in this test so that we get
+      // coverage of the case where env isn't specified.
       const UNKNOWN_GENERATOR_NAME = 'UNKNOWN-GENERATOR';
-      let yeomanEnv = createFakeEnv();
-      yeomanEnv.getGeneratorsMeta.returns({
-        'TEST-GENERATOR': 'TEST-GENERATOR',
-      });
-
-      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME, {env: yeomanEnv}).then(() => {
+      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME).then(() => {
         throw new Error('The promise should have been rejected before it got here');
       }, (error) => {
         assert.equal(error.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
@@ -84,6 +81,14 @@ suite('init', () => {
           resolved: 'unknown',
           namespace: 'polymer-init-element:app',
         },
+      });
+    });
+
+    test('works with default env', () => {
+      sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
+      polymerInit.runGenerator = function(name, options) {};
+      return polymerInit.promptGeneratorSelection().catch((error) => {
+        assert.equal(error.message, 'Template TEST not found');
       });
     });
 
