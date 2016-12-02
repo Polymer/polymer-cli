@@ -1,6 +1,6 @@
 {
   "name": "polymer-cli",
-  "version": "0.18.0-alpha.4",
+  "version": "0.18.0-alpha.5",
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polymer-cli.js",
   "engines": {
