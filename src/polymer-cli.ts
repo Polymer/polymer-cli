@@ -12,7 +12,6 @@ import * as logging from 'plylog';
 import * as commandLineArgs from 'command-line-args';
 
 import {globalArguments, mergeArguments} from './args';
-import {ArgDescriptor} from './commands/command';
 import {AnalyzeCommand} from './commands/analyze';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
