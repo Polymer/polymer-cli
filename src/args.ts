@@ -43,8 +43,8 @@ export const globalArguments: ArgDescriptor[] = [
   {
     name: 'root',
     type: String,
-    description: 'The directory where your project exists. ' +
-        'Defaults to the current working directory',
+    description: 'The root directory of your project. Defaults to the current' +
+        ' working directory',
     group: 'global',
   },
   {
@@ -85,3 +85,22 @@ export const globalArguments: ArgDescriptor[] = [
     group: 'global',
   },
 ];
+
+/**
+ * Performs a simple merge of multiple arguments lists. Does not mutate given
+ * arguments lists or arguments.
+ *
+ * This doesn't perform any validation of duplicate arguments, mutiple defaults,
+ * etc., because by the time this function is run, the user can't do anything
+ * about it. Validation of command and global arguments should be done in tests,
+ * not on users machines.
+ */
+export function mergeArguments(argumentLists: ArgDescriptor[][]): ArgDescriptor[] {
+  const argsByName = new Map<string, ArgDescriptor>();
+  for (const args of argumentLists) {
+    for (const arg of args) {
+      argsByName.set(arg.name, Object.assign({}, argsByName.get(arg.name), arg));
+    }
+  }
+  return Array.from(argsByName.values());
+}
