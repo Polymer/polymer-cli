@@ -11,8 +11,7 @@
 import * as logging from 'plylog';
 import * as commandLineArgs from 'command-line-args';
 
-import {globalArguments} from './args';
-import {ArgDescriptor} from './commands/command';
+import {globalArguments, mergeArguments} from './args';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
@@ -111,44 +110,6 @@ export class PolymerCli {
     this.commands.set(command.name, command);
   }
 
-  mergeDefinitions(
-      command: Command,
-      globals: ArgDescriptor[]
-      ): ArgDescriptor[] {
-    const mergedArgs = new Map<string, ArgDescriptor>();
-    let defaultOption: string|null = null;
-
-    const addAll = (args: ArgDescriptor[]) => {
-      for (let definition of args) {
-        const name = definition.name;
-        const oldDefinition = mergedArgs.get(name);
-        if (oldDefinition == null) {
-          mergedArgs.set(definition.name, definition);
-        } else {
-          const mergedDefinition = Object.assign({}, oldDefinition);
-          for (const propName of Object.keys(definition)) {
-            if (propName === 'name') continue;
-            const propValue: any = (definition as any)[propName];
-            (mergedDefinition as any)[propName] = propValue;
-          }
-          mergedArgs.set(name, mergedDefinition);
-          definition = mergedDefinition;
-        }
-        if (definition.defaultOption) {
-          if (defaultOption && defaultOption !== name) {
-            throw new Error(`Multiple default arguments in ${command.name}: ` +
-                `${defaultOption} and ${name}`);
-          }
-          defaultOption = name;
-        }
-      }
-    };
-
-    if (globals) addAll(globals);
-    if (command.args) addAll(command.args);
-    return Array.from(mergedArgs.values());
-  }
-
   run(): Promise<any> {
     const helpCommand = this.commands.get('help')!;
     const commandNames = Array.from(this.commands.keys());
@@ -185,7 +146,7 @@ export class PolymerCli {
 
     logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
 
-    const commandDefinitions = this.mergeDefinitions(command, globalArguments);
+    const commandDefinitions = mergeArguments([command.args, globalArguments]);
     const commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
     const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
