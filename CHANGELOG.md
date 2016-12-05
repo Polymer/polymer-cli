@@ -8,6 +8,7 @@
 - `build`: Rename the `--include-dependencies` flag to `--extra-dependencies`
 - `polymer.json`: Rename the `includeDependencies` & `sourceGlobs` fields to `extraDependencies` & `sources`, respectively
 - Added an `install` command, which can install "variants" of Bower dependencies. TODO(justinfagnani): document variants.
+- Added support for v7.x of Node.js, dropped support for v5.x. Please move to an [actively maintained version of Node.js](https://github.com/nodejs/LTS) for the best experience.
 
 ## v0.17.0
 
