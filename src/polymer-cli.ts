@@ -148,8 +148,14 @@ export class PolymerCli {
 
     logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
 
+    // TODO(rictic), remove this once
+    //     https://github.com/PolymerLabs/polyserve/pull/136 lands
+    type RealCommandLineArgs = (
+      groups: commandLineArgs.ArgDescriptor[], args?: string[]) => any;
+    const temporaryCommandLineArgs =
+        commandLineArgs as any as RealCommandLineArgs;
     const commandDefinitions = mergeArguments([command.args, globalArguments]);
-    const commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
+    const commandOptionsRaw = temporaryCommandLineArgs(commandDefinitions, commandArgs);
     const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
