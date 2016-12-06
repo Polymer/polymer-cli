@@ -62,7 +62,7 @@
     "polymer-analyzer": "2.0.0-alpha.18",
     "polymer-build": "^0.5.1",
     "polymer-project-config": "^1.0.0",
-    "polyserve": "0.16.0-prerelease.5",
+    "polyserve": "0.16.0-prerelease.6",
     "request": "^2.72.0",
     "resolve": "^1.1.7",
     "tar-fs": "^1.12.0",

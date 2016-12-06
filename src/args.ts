@@ -12,11 +12,7 @@ import {ArgDescriptor} from './commands/command';
 import {Environment} from './environment/environment';
 import {buildEnvironment} from './environments/environments';
 
-// Delete this type once https://github.com/PolymerLabs/polyserve/pull/136
-// is released.
-type TemporarilyExtendedArgDescriptor = ArgDescriptor & {group?: string};
-
-export const globalArguments: TemporarilyExtendedArgDescriptor[] = [
+export const globalArguments: ArgDescriptor[] = [
   {
     name: 'env',
     description: 'The environment to use to specialize certain commands, '
