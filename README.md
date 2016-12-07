@@ -89,6 +89,90 @@ You can specify the project files in `polymer.json` so that commands like `polym
 }
 ```
 
+## Dependency Variants
+
+A number of commands use a concept called "dependency variants", which are different sets of dependencies that the project should work with.
+
+Typically, when a project can work with a wide range of major versions of
+dependencies, tests are only run against the most recent versions of the
+dependencies. This leaves compatibility with older versions untested. With
+dependency variants you can specify a a number of narrower sets of versions
+to test against to ensure compatibility.
+
+Variants are specified in a `"variants"` property of `bower.json`. `"variants"`
+is a map of variant name to a patch that's applied to the rest of `bower.json`.
+Each property in a variant overwrites a property in `bower.json` if the property
+is a simple value or an Array, otherwise if the property is an Object, it's
+merged.
+
+The result of patching a variant into the `bower.json` is used to perform a
+separate Bower install into a directory named `bower_components-{variant_name}`.
+
+Example:
+
+```json
+{
+  "name": "example",
+  "dependencies": {
+    "polymer": "Polymer/polymer#1.7 - 2.x",
+    "foobar": "Foo/bar#^2.0.0"
+  },
+  "variants": {
+    "polymer-1": {
+      "dependencies": {
+        "polymer": "Polymer/polymer#^1.7.0"
+      }
+    },
+    "polymer-2": {
+      "dependencies": {
+        "polymer": "Polymer/polymer#^2.0.0"
+      }
+    }
+  }
+}
+```
+
+When using `polymer install --variants`, this results in two additional folders,
+`bower_components-polymer-1` and `bower_components-polymer-2`, installed as if
+they had their own `bower.json` files as follows:
+
+`bower_components-polymer-1`:
+
+```json
+{
+  "name": "example",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.7.0",
+    "foobar": "Foo/bar#^2.0.0"
+  }
+}
+```
+
+`bower_components-polymer-2`:
+
+```json
+{
+  "name": "example",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0",
+    "foobar": "Foo/bar#^2.0.0"
+  }
+}
+```
+
+Commands like `install`, `serve` and `test` recognize that variants are
+installed to offer additional support.
+
+`polymer install --variants` installs dependency variants into the proper
+folders.
+
+`polymer serve` will start up a development server for
+each variant on its own port so that you can easily switch between variants,
+viewing their demos and tests.
+
+`polymer test` will run the test suite once for each variant, ensuring that you
+have test coverage against supported configurations.
+
 ## Commands
 
 ### help
@@ -110,6 +194,21 @@ Create a new project from the 'element' template:
     $ polymer init element
 
 You can download and run templates built by our community as well. [Search npm](https://www.npmjs.com/search?q=generator-polymer-init) for the full list.
+
+### install
+
+Installs Bower dependencies, optionally installing multiple variants.
+
+    $ polymer install
+
+This performs a Bower install of dependencies listed in `bower.json`, and is
+equivalent to `bower install`.
+
+    $ polymer install --variants
+
+This performs a Bower install, and also installs any dependency variants
+specified in the `"variants"` property of `bower.json`. See
+[Dependency Variants](#dependency-variants) above.
 
 ### lint
 
