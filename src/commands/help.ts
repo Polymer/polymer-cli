@@ -1,11 +1,15 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
 import * as chalk from 'chalk';
@@ -21,6 +25,8 @@ const m = chalk.magenta;
 const CLI_TITLE = chalk.bold.underline('Polymer-CLI');
 const CLI_DESCRIPTION = 'The multi-tool for Polymer projects';
 const CLI_USAGE = 'Usage: \`polymer <command> [options ...]\`';
+
+// clang-format off - keep the custom white space here to help readibility
 const HELP_HEADER = '\n' +
   b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
   b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + CLI_TITLE + '\n' +
@@ -30,7 +36,7 @@ const HELP_HEADER = '\n' +
   b(' \\/__\\') + m('/__\\/   ') + b('/__\\/ ') + '  ' + CLI_USAGE + '\n' +
   b('  \\  ') + m('/\\  /   ') + b('/\\  /  ') + '\n' +
   b('   \\') + m('/__\\/   ') + b('/__\\/   ') + '\n';
-
+// clang-format on
 
 export class HelpCommand implements Command {
   name = 'help';
@@ -58,15 +64,13 @@ export class HelpCommand implements Command {
       {
         header: 'Available Commands',
         content: Array.from(this.commands.values()).map((command) => {
-          return { name: command.name, summary: command.description };
+          return {name: command.name, summary: command.description};
         }),
       },
+      {header: 'Global Options', optionList: globalArguments},
       {
-        header: 'Global Options',
-        optionList: globalArguments
-      },
-      {
-        content: 'Run `polymer help <command>` for help with a specific command.',
+        content:
+            'Run `polymer help <command>` for help with a specific command.',
         raw: true,
       }
     ]);
@@ -78,14 +82,8 @@ export class HelpCommand implements Command {
         header: `polymer ${command.name}`,
         content: command.description,
       },
-      {
-        header: 'Command Options',
-        optionList: command.args
-      },
-      {
-        header: 'Global Options',
-        optionList: globalArguments
-      },
+      {header: 'Command Options', optionList: command.args},
+      {header: 'Global Options', optionList: globalArguments},
     ]);
   }
 
@@ -93,7 +91,8 @@ export class HelpCommand implements Command {
     return new Promise<any>((resolve, _) => {
       const commandName: string = options['command'];
       if (!commandName) {
-        logger.debug('no command given, printing general help...', {options: options});
+        logger.debug(
+            'no command given, printing general help...', {options: options});
         console.log(this.generateGeneralUsage());
         resolve(null);
         return;

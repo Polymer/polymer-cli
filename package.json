@@ -13,7 +13,8 @@
     "lint": "gulp lint",
     "build": "gulp build",
     "test": "gulp lint test",
-    "prepublish": "npm run build && npm test"
+    "prepublish": "npm run build && npm test",
+    "format": "find src test | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
   "repository": {
     "type": "git",
@@ -78,6 +79,7 @@
   "devDependencies": {
     "bower": "^1.7.9",
     "chai": "^3.5.0",
+    "clang-format": "=1.0.45",
     "depcheck": "^0.6.3",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",

@@ -1,11 +1,15 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
 import {Command, CommandOptions, ProjectConfig} from './command';
@@ -44,7 +48,7 @@ export class TestCommand implements Command {
     },
     {
       name: 'skip-update-check',
-      description: "Don't check for updates",
+      description: 'Don\'t check for updates',
       type: String,
     },
     {
@@ -60,12 +64,13 @@ export class TestCommand implements Command {
     {
       name: 'local',
       alias: 'l',
-      description: "Local browsers to run tests on, or 'all'",
+      description: 'Local browsers to run tests on, or \'all\'',
       type: String,
     },
     {
       name: 'selenium-arg',
-      description: 'Additional selenium server arguments. Port is auto-selected.',
+      description:
+          'Additional selenium server arguments. Port is auto-selected.',
       type: String,
     },
     {
@@ -81,12 +86,13 @@ export class TestCommand implements Command {
     {
       name: 'sauce',
       alias: 's',
-      description: "Remote Sauce Labs browsers to run tests on, or 'default'",
+      description: 'Remote Sauce Labs browsers to run tests on, or \'default\'',
       type: String,
     },
     {
       name: 'build-number',
-      description: 'The build number tested by this test for the sauce labs REST API',
+      description:
+          'The build number tested by this test for the sauce labs REST API',
       type: String,
     },
     {
@@ -96,7 +102,8 @@ export class TestCommand implements Command {
     },
     {
       name: 'port',
-      description: 'Select an alternative port for Sauce Connect (default is 4445)',
+      description:
+          'Select an alternative port for Sauce Connect (default is 4445)',
       type: String,
     },
     {
@@ -111,7 +118,8 @@ export class TestCommand implements Command {
     },
     {
       name: 'visibility',
-      description: "Set job visibility to 'public', 'public restricted', 'share', 'team' or 'private'",
+      description:
+          'Set job visibility to \'public\', \'public restricted\', \'share\', \'team\' or \'private\'',
       type: String,
     },
   ];

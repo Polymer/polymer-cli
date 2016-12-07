@@ -1,27 +1,31 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
-import * as logging from 'plylog';
 import * as commandLineArgs from 'command-line-args';
+import * as logging from 'plylog';
+import {ProjectConfig, ProjectOptions} from 'polymer-project-config';
 
 import {globalArguments, mergeArguments} from './args';
 import {AnalyzeCommand} from './commands/analyze';
 import {BuildCommand} from './commands/build';
+import {Command} from './commands/command';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
 import {InstallCommand} from './commands/install';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
-import {Command} from './commands/command';
-import {ProjectConfig, ProjectOptions} from 'polymer-project-config';
 
 import commandLineCommands = require('command-line-commands');
 import {ParsedCommand} from 'command-line-commands';
@@ -30,13 +34,15 @@ const logger = logging.getLogger('cli.main');
 
 process.on('uncaughtException', (error: any) => {
   logger.error(`Uncaught exception: ${error}`);
-  if (error.stack) logger.error(error.stack);
+  if (error.stack)
+    logger.error(error.stack);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (error: any) => {
   logger.error(`Promise rejection: ${error}`);
-  if (error.stack) logger.error(error.stack);
+  if (error.stack)
+    logger.error(error.stack);
   process.exit(1);
 });
 
@@ -59,7 +65,6 @@ function parseCLIArgs(commandOptions: any): {[name: string]: string} {
 
 
 export class PolymerCli {
-
   commands: Map<string, Command> = new Map();
   args: string[];
   defaultConfigOptions: ProjectOptions;
@@ -78,20 +83,20 @@ export class PolymerCli {
     }
 
     this.args = args;
-    logger.debug('got args:', { args: args });
+    logger.debug('got args:', {args: args});
 
     if (typeof configOptions !== 'undefined') {
       this.defaultConfigOptions = configOptions;
-      logger.debug('got default config from constructor argument:', {
-        config: this.defaultConfigOptions
-      });
+      logger.debug(
+          'got default config from constructor argument:',
+          {config: this.defaultConfigOptions});
     } else {
       this.defaultConfigOptions =
-        ProjectConfig.loadOptionsFromFile('polymer.json');
+          ProjectConfig.loadOptionsFromFile('polymer.json');
       if (this.defaultConfigOptions) {
-        logger.debug('got default config from polymer.json file:', {
-          config: this.defaultConfigOptions
-        });
+        logger.debug(
+            'got default config from polymer.json file:',
+            {config: this.defaultConfigOptions});
       } else {
         logger.debug('no polymer.json file found, no config loaded');
       }
@@ -135,7 +140,9 @@ export class PolymerCli {
         if (error.command) {
           logger.warn(`'${error.command}' is not an available command.`);
         }
-        return helpCommand.run({command: error.command}, new ProjectConfig(this.defaultConfigOptions));
+        return helpCommand.run(
+            {command: error.command},
+            new ProjectConfig(this.defaultConfigOptions));
       }
       // If an unexpected error occurred, propagate it
       throw error;
@@ -144,17 +151,20 @@ export class PolymerCli {
     const commandName = parsedArgs.command;
     const commandArgs = parsedArgs.argv;
     const command = this.commands.get(commandName)!;
-    if (command == null) throw new TypeError('command is null');
+    if (command == null)
+      throw new TypeError('command is null');
 
-    logger.debug(`command '${commandName}' found, parsing command args:`, {args: commandArgs});
+    logger.debug(
+        `command '${commandName}' found, parsing command args:`,
+        {args: commandArgs});
 
     const commandDefinitions = mergeArguments([command.args, globalArguments]);
     const commandOptionsRaw = commandLineArgs(commandDefinitions, commandArgs);
     const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
-    const mergedConfigOptions = Object.assign(
-      {}, this.defaultConfigOptions, commandOptions);
+    const mergedConfigOptions =
+        Object.assign({}, this.defaultConfigOptions, commandOptions);
 
     const config = new ProjectConfig(mergedConfigOptions);
     logger.debug(`final project configuration generated:`, config);
@@ -163,8 +173,9 @@ export class PolymerCli {
     // If found, run the help command instead, with the given command name as
     // an option.
     if (commandOptions['help']) {
-      logger.debug(`'--help' option found, running 'help' for given command...`);
-      return helpCommand.run({ command: commandName }, config);
+      logger.debug(
+          `'--help' option found, running 'help' for given command...`);
+      return helpCommand.run({command: commandName}, config);
     }
 
     logger.debug('Running command...');

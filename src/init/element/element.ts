@@ -1,10 +1,14 @@
 /*
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
 import * as chalk from 'chalk';
@@ -12,10 +16,9 @@ import * as path from 'path';
 import {Base} from 'yeoman-generator';
 
 export class ElementGenerator extends Base {
-
   props: any;
 
-  constructor(args: string | string[], options: any) {
+  constructor(args: string|string[], options: any) {
     super(args, options);
     this.sourceRoot(path.join(__dirname, 'templates'));
   }
@@ -35,8 +38,9 @@ export class ElementGenerator extends Base {
         validate: (name: string) => {
           let nameContainsHyphen = name.includes('-');
           if (!nameContainsHyphen) {
-            this.log('\nUh oh, custom elements must include a hyphen in '
-              + 'their name. Please try again.');
+            this.log(
+                '\nUh oh, custom elements must include a hyphen in ' +
+                'their name. Please try again.');
           }
           return nameContainsHyphen;
         },
@@ -55,19 +59,17 @@ export class ElementGenerator extends Base {
     const name = this.props.name;
 
     this.fs.copyTpl(
-      `${this.templatePath()}/**/?(.)!(_)*`,
-      this.destinationPath(),
-      this.props);
+        `${this.templatePath()}/**/?(.)!(_)*`,
+        this.destinationPath(),
+        this.props);
 
     this.fs.copyTpl(
-      this.templatePath('_element.html'),
-      `${name}.html`,
-      this.props);
+        this.templatePath('_element.html'), `${name}.html`, this.props);
 
     this.fs.copyTpl(
-      this.templatePath('test/_element_test.html'),
-      `test/${name}_test.html`,
-      this.props);
+        this.templatePath('test/_element_test.html'),
+        `test/${name}_test.html`,
+        this.props);
   }
 
   install() {
@@ -80,6 +82,7 @@ export class ElementGenerator extends Base {
 
   end() {
     this.log(chalk.bold('\nSetup Complete!'));
-    this.log('Check out your new project README for information about what to do next.\n');
+    this.log(
+        'Check out your new project README for information about what to do next.\n');
   }
 }

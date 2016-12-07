@@ -1,16 +1,21 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
-import {Command, CommandOptions, ProjectConfig} from './command';
 import {ArgDescriptor} from 'command-line-args';
 import * as logging from 'plylog';
+
+import {Command, CommandOptions, ProjectConfig} from './command';
 
 let logger = logging.getLogger('cli.command.init');
 
@@ -19,14 +24,12 @@ export class InitCommand implements Command {
 
   description = 'Initializes a Polymer project';
 
-  args: ArgDescriptor[] = [
-    {
-      name: 'name',
-      description: 'The template name to use to initialize the project',
-      type: String,
-      defaultOption: true,
-    }
-  ];
+  args: ArgDescriptor[] = [{
+    name: 'name',
+    description: 'The template name to use to initialize the project',
+    type: String,
+    defaultOption: true,
+  }];
 
   run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
     // Defer dependency loading until needed
