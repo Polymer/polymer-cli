@@ -14,7 +14,8 @@
 
 import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
-import {Command, CommandOptions, ProjectConfig} from './command';
+import {ProjectConfig} from 'polymer-project-config';
+import {Command, CommandOptions} from './command';
 
 const logger = logging.getLogger('cli.lint');
 

@@ -19,7 +19,8 @@ import * as logging from 'plylog';
 // be loaded and parsed.
 import {BuildOptions} from '../build/build';
 
-import {Command, CommandOptions, ProjectConfig} from './command';
+import {ProjectConfig} from 'polymer-project-config';
+import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.build');
 

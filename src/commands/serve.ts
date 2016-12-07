@@ -18,10 +18,9 @@ import {args as polyserveArgs} from 'polyserve/lib/args';
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
 import {ServerOptions} from 'polyserve/lib/start_server';
-
 import {Environment} from '../environment/environment';
-
-import {Command, CommandOptions, ProjectConfig} from './command';
+import {ProjectConfig} from 'polymer-project-config';
+import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.serve');
 
