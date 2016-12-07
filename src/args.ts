@@ -1,11 +1,15 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
 import {ArgDescriptor} from './commands/command';
@@ -15,9 +19,9 @@ import {buildEnvironment} from './environments/environments';
 export const globalArguments: ArgDescriptor[] = [
   {
     name: 'env',
-    description: 'The environment to use to specialize certain commands, '
-        + 'like build',
-    type(value: string): Environment|undefined {
+    description: 'The environment to use to specialize certain commands, ' +
+        'like build',
+    type: (value: string): Environment | undefined => {
       return buildEnvironment(value);
     },
     group: 'global',
@@ -95,11 +99,13 @@ export const globalArguments: ArgDescriptor[] = [
  * about it. Validation of command and global arguments should be done in tests,
  * not on users machines.
  */
-export function mergeArguments(argumentLists: ArgDescriptor[][]): ArgDescriptor[] {
+export function mergeArguments(argumentLists: ArgDescriptor[][]):
+    ArgDescriptor[] {
   const argsByName = new Map<string, ArgDescriptor>();
   for (const args of argumentLists) {
     for (const arg of args) {
-      argsByName.set(arg.name, Object.assign({}, argsByName.get(arg.name), arg));
+      argsByName.set(
+          arg.name, Object.assign({}, argsByName.get(arg.name), arg));
     }
   }
   return Array.from(argsByName.values());

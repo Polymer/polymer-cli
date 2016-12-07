@@ -1,16 +1,20 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
 import * as fs from 'fs';
-import * as logging from 'plylog';
 import * as path from 'path';
+import * as logging from 'plylog';
 
 import request = require('request');
 import GitHubApi = require('github');
@@ -20,7 +24,10 @@ const tar = require('tar-fs');
 
 const logger = logging.getLogger('cli.github');
 
-export type RequestAPI = request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
+export type RequestAPI = request.RequestAPI<
+    request.Request,
+    request.CoreOptions,
+    request.RequiredUriUrl>;
 
 class GithubResponseError extends Error {
   name = 'GithubResponseError';
@@ -32,7 +39,6 @@ class GithubResponseError extends Error {
     this.statusCode = statusCode;
     this.statusMessage = statusMessage;
   }
-
 }
 
 export interface GithubOpts {
@@ -40,13 +46,15 @@ export interface GithubOpts {
   repo: string;
   githubToken?: string;
   githubApi?: GitHubApi;
-  requestApi?: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
+  requestApi?: request
+      .RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
 }
 
 export class Github {
   private _token: string|null;
   private _github: GitHubApi;
-  private _request: request.RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
+  private _request: request
+      .RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private _owner: string;
   private _repo: string;
 
@@ -63,9 +71,9 @@ export class Github {
     this._owner = opts.owner;
     this._repo = opts.repo;
     this._github = opts.githubApi || new GitHubApi({
-      version: '3.0.0',
-      protocol: 'https',
-    });
+                     version: '3.0.0',
+                     protocol: 'https',
+                   });
     if (this._token != null) {
       this._github.authenticate({
         type: 'oauth',
@@ -93,59 +101,65 @@ export class Github {
           return header;
         },
       });
-      this.getLatestRelease().then((release) => {
-        let tarballUrl = release.tarball_url;
-        this._request({
-          url: tarballUrl,
-          headers: {
-            'User-Agent': 'request',
-            'Authorization': (this._token) ? `token ${this._token}` : undefined,
-          }
-        })
-        .on('response', function(response) {
-          if (response.statusCode !== 200) {
-            throw new GithubResponseError(
-                response.statusCode,
-                response.statusMessage);
-          }
-          logger.info('Unpacking template files');
-        })
-        .pipe(gunzip())
-        .pipe(tarPipe)
-        // tar-fs/tar-stream do not send 'end' events, only 'finish' events
-        .on('finish', () => {
-          logger.info('Finished writing template files');
-          resolve();
-        })
-        .on('error', (error: any) => {
-          throw error;
-        });
-      })
-      .catch((error) => {
-        reject(error);
-      });
+      this.getLatestRelease()
+          .then((release) => {
+            let tarballUrl = release.tarball_url;
+            this._request({
+                  url: tarballUrl,
+                  headers: {
+                    'User-Agent': 'request',
+                    'Authorization': (this._token) ? `token ${this._token}` :
+                                                     undefined,
+                  }
+                })
+                .on('response',
+                    function(response) {
+                      if (response.statusCode !== 200) {
+                        throw new GithubResponseError(
+                            response.statusCode, response.statusMessage);
+                      }
+                      logger.info('Unpacking template files');
+                    })
+                .pipe(gunzip())
+                .pipe(tarPipe)
+                // tar-fs/tar-stream do not send 'end' events, only 'finish'
+                // events
+                .on('finish',
+                    () => {
+                      logger.info('Finished writing template files');
+                      resolve();
+                    })
+                .on('error', (error: any) => {
+                  throw error;
+                });
+          })
+          .catch((error) => {
+            reject(error);
+          });
     });
   }
 
   getLatestRelease(): Promise<GitHubApi.Release> {
     return new Promise((resolve, reject) => {
-      this._github.repos.getReleases({
-        owner: this._owner,
-        repo: this._repo,
-        per_page: 1,
-      }, (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        if (result.length === 0) {
-          reject(new Error(`${this._owner}/${this._repo} has 0 releases. ` +
-            'Cannot get latest release.'));
-          return;
-        }
-        resolve(result[0]);
-      });
+      this._github.repos.getReleases(
+          {
+            owner: this._owner,
+            repo: this._repo,
+            per_page: 1,
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            if (result.length === 0) {
+              reject(new Error(
+                  `${this._owner}/${this._repo} has 0 releases. ` +
+                  'Cannot get latest release.'));
+              return;
+            }
+            resolve(result[0]);
+          });
     });
   }
-
 }

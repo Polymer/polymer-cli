@@ -1,16 +1,21 @@
 /*
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
-import {Base} from 'yeoman-generator';
 import * as logging from 'plylog';
+import {Base} from 'yeoman-generator';
 
 import {Github, RequestAPI} from '../github/github';
+
 import GitHubApi = require('github');
 
 const logger = logging.getLogger('cli.init');
@@ -23,7 +28,8 @@ export interface GithubGeneratorOptions {
   repo: string;
 }
 
-export function createGithubGenerator(githubOptions: GithubGeneratorOptions): (typeof Base) {
+export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
+    (typeof Base) {
   let requestApi = githubOptions.requestApi;
   let githubApi = githubOptions.githubApi;
   let githubToken = githubOptions.githubToken;
@@ -31,18 +37,12 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions): (t
   let repo = githubOptions.repo;
 
   return class GithubGenerator extends Base {
-
     _github: Github;
 
-    constructor(args: string | string[], options: any) {
+    constructor(args: string|string[], options: any) {
       super(args, options);
-      this._github = new Github({
-        owner,
-        repo,
-        githubToken,
-        githubApi,
-        requestApi
-      });
+      this._github =
+          new Github({owner, repo, githubToken, githubApi, requestApi});
     }
 
     rootGeneratorName(): string {

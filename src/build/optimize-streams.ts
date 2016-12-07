@@ -1,8 +1,9 @@
-import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
 import {css as cssSlam} from 'css-slam';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
-import {Transform} from 'stream';
 import * as logging from 'plylog';
+import {Transform} from 'stream';
+import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
+
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -22,7 +23,6 @@ export type CSSOptimizeOptions = {
  * directly to create an ad-hoc optimization stream for certain types of files.
  */
 export class GenericOptimizeStream extends Transform {
-
   validExtension: string;
   optimizer: (content: string, options: any) => string;
   optimizerOptions: any;
@@ -45,14 +45,12 @@ export class GenericOptimizeStream extends Transform {
         file.contents = new Buffer(contents);
       } catch (error) {
         logger.warn(
-          `Unable to optimize ${this.validExtension} file ${file.path}`,
-          {err: error}
-        );
+            `Unable to optimize ${this.validExtension} file ${file.path}`,
+            {err: error});
       }
     }
     callback(null, file);
   }
-
 }
 
 /**
@@ -61,7 +59,6 @@ export class GenericOptimizeStream extends Transform {
  * the file will pass through unaffected.
  */
 export class JSOptimizeStream extends GenericOptimizeStream {
-
   constructor(options: UglifyOptions) {
     // uglify is special, in that it returns an object with a code property
     // instead of just a code string. We create a compliant optimizer here
@@ -73,7 +70,6 @@ export class JSOptimizeStream extends GenericOptimizeStream {
     let uglifyOptions = Object.assign({fromString: true}, options);
     super('.js', uglifyOptimizer, uglifyOptions);
   }
-
 }
 
 
@@ -83,7 +79,6 @@ export class JSOptimizeStream extends GenericOptimizeStream {
  * the file will pass through unaffected.
  */
 export class CSSOptimizeStream extends GenericOptimizeStream {
-
   constructor(options: CSSOptimizeOptions) {
     super('.css', cssSlam, options);
   }
@@ -96,7 +91,6 @@ export class CSSOptimizeStream extends GenericOptimizeStream {
       super._transform(file, encoding, callback);
     }
   }
-
 }
 
 
@@ -106,9 +100,7 @@ export class CSSOptimizeStream extends GenericOptimizeStream {
  * throws an exception when run, the file will pass through unaffected.
  */
 export class HTMLOptimizeStream extends GenericOptimizeStream {
-
   constructor(options: HTMLMinifierOptions) {
     super('.html', htmlMinify, options);
   }
-
 }

@@ -1,17 +1,22 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
  * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 
+import * as chalk from 'chalk';
 import {execSync} from 'child_process';
 import * as fs from 'fs';
 import * as logging from 'plylog';
-import * as chalk from 'chalk';
+
 import findup = require('findup-sync');
 import {ApplicationGenerator} from '../init/application/application';
 import {ElementGenerator} from '../init/element/element';
@@ -33,7 +38,8 @@ interface GeneratorDescription {
 const templateDescriptions: {[name: string]: string} = {
   'element': 'A blank element template',
   'application': 'A blank application template',
-  'starter-kit': 'A starter application template, with navigation and "PRPL pattern" loading',
+  'starter-kit':
+      'A starter application template, with navigation and "PRPL pattern" loading',
   'shop': 'The "Shop" Progressive Web App demo',
 };
 
@@ -63,7 +69,8 @@ function checkIsMinGW(): boolean {
     let uname = execSync('uname -s').toString();
     return !!/^mingw/i.test(uname);
   } catch (error) {
-    logger.debug('`uname -s` failed to execute correctly', {err: error.message});
+    logger.debug(
+        '`uname -s` failed to execute correctly', {err: error.message});
     return false;
   }
 }
@@ -72,7 +79,9 @@ function checkIsMinGW(): boolean {
  * Get a description for the given generator. If this is an external generator,
  * read the description from its package.json.
  */
-function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, generatorName: string): GeneratorDescription {
+function getGeneratorDescription(
+    generator: YeomanEnvironment.GeneratorMeta,
+    generatorName: string): GeneratorDescription {
   const name = getDisplayName(generatorName);
   let description: string = '';
 
@@ -95,7 +104,7 @@ function getGeneratorDescription(generator: YeomanEnvironment.GeneratorMeta, gen
     }
   }
   // If a description exists, format it properly for the command-line
-  if (description.length > 0)  {
+  if (description.length > 0) {
     description = chalk.dim(` - ${description}`);
   }
 
@@ -173,11 +182,13 @@ function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
  * will be created. If the generator does not exist in the environment, an
  * error will be thrown.
  */
-export async function runGenerator(generatorName: string, options: {[name: string]: any}): Promise<void> {
+export async function runGenerator(
+    generatorName: string, options: {[name: string]: any}): Promise<void> {
   options = options || {};
   const templateName = options['templateName'] || generatorName;
 
-  const env: YeomanEnvironment = await (options['env'] || createYeomanEnvironment());
+  const env: YeomanEnvironment =
+      await(options['env'] || createYeomanEnvironment());
 
   logger.info(`Running template ${templateName}...`);
   logger.debug(`Running generator ${generatorName}...`);
@@ -204,14 +215,13 @@ export async function runGenerator(generatorName: string, options: {[name: strin
  * Prompt the user to select a generator. When the user
  * selects a generator, run it.
  */
-export async function promptGeneratorSelection(options: {[name: string]: any}): Promise<void> {
+export async function promptGeneratorSelection(options: {[name: string]: any}):
+    Promise<void> {
   options = options || {};
-  const env = await (options['env'] || createYeomanEnvironment());
+  const env = await(options['env'] || createYeomanEnvironment());
   // TODO(justinfagnani): the typings for inquirer appear wrong
-  const answers = await (prompt([createSelectPrompt(env)]) as any);
+  const answers = await(prompt([createSelectPrompt(env)]) as any);
   const generatorName = answers['generatorName'];
-  await runGenerator(generatorName, {
-    templateName: getDisplayName(generatorName),
-    env: env
-  });
+  await runGenerator(
+      generatorName, {templateName: getDisplayName(generatorName), env: env});
 }
