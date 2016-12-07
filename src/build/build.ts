@@ -115,7 +115,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
 
   // Once the unbundled build stream is complete, create a service worker for the build
   let unbundledPostProcessing = Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
-    let swConfig: SWConfig = results[0];
+    let swConfig: SWConfig|undefined = results[0] || undefined;
     return addServiceWorker({
       buildRoot: unbundledBuildDirectory,
       project: polymerProject,
@@ -125,7 +125,7 @@ export async function build(options: BuildOptions, config: ProjectConfig): Promi
 
   // Once the bundled build stream is complete, create a service worker for the build
   let bundledPostProcessing = Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
-    let swConfig: SWConfig = results[0];
+    let swConfig: SWConfig|undefined = results[0] || undefined;
     return addServiceWorker({
       buildRoot: bundledBuildDirectory,
       project: polymerProject,
