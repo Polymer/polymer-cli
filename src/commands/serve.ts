@@ -22,7 +22,6 @@ import {Environment} from '../environment/environment';
 
 let logger = logging.getLogger('cli.command.serve');
 
-
 export class ServeCommand implements Command {
   name = 'serve';
 
@@ -30,9 +29,12 @@ export class ServeCommand implements Command {
 
   args = polyserveArgs;
 
-  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
     const polyserve = require('polyserve');
+    const startServers = polyserve.startServers;
+    const getServerUrls = polyserve.getServerUrls;
+    const url = require('url');
 
     let openPath: string|undefined;
     if (config.entrypoint && config.shell) {
@@ -41,15 +43,29 @@ export class ServeCommand implements Command {
         openPath = '/';
       }
     }
-    let serverOptions: ServerOptions = {
-      root: config.root,
+
+    // TODO(justinfagnani): Consolidate args handling between polymer-cli and
+    // polyserve's CLI.
+    const proxyArgs = {
+      path: options['proxy-path'],
+      target: options['proxy-target']
+    };
+
+    const serverOptions: ServerOptions = {
+      root: options['root'],
+      compile: options['compile'],
       port: options['port'],
       hostname: options['hostname'],
       open: options['open'],
-      openPath: openPath,
       browser: options['browser'],
+      openPath: options['open-path'],
       componentDir: options['component-dir'],
       packageName: options['package-name'],
+      protocol: options['protocol'],
+      keyPath: options['key'],
+      certPath: options['cert'],
+      pushManifestPath: options['manifest'],
+      proxy: proxyArgs.path && proxyArgs.target && proxyArgs,
     };
 
     logger.debug('serving with options', serverOptions);
@@ -61,7 +77,23 @@ export class ServeCommand implements Command {
       return env.serve(serverOptions);
     }
 
-    logger.debug('serving via polyserve.startServer()...');
-    return polyserve.startServer(serverOptions);
+    logger.debug('serving via polyserve.startServers()...');
+    const serverInfos = await startServers(serverOptions);
+
+    if (serverInfos.kind === 'mainline') {
+      const mainlineServer = serverInfos;
+      const urls = getServerUrls(options, mainlineServer.server);
+      logger.info(`Files in this directory are available under the following URLs
+      applications: ${
+                    url.format(urls.serverUrl)}
+      reusable components: ${url.format(urls.componentUrl)}
+    `);
+    } else {
+      // We started multiple servers, just tell the user about the control server,
+      // it serves out human-readable info on how to access the others.
+      const urls = getServerUrls(options, serverInfos.control.server);
+      logger.info(`Started multiple servers with different variants:
+      View the Polyserve console here: ${url.format(urls.serverUrl)}`);
+    }
   }
 }
