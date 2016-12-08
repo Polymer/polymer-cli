@@ -41,7 +41,7 @@ export class PrefetchTransform extends Transform {
   }
 
   pullUpDeps(file: File, deps: string[], type: 'import'|'prefetch') {
-    let contents = file.contents.toString();
+    let contents = file.contents!.toString();
     const ast = parse5.parse(contents);
     // parse5 always produces a <head> element
     const head = dom5.query(ast, dom5.predicates.hasTagName('head'))!;

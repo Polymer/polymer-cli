@@ -58,8 +58,9 @@ gulp.task('tslint', () =>
   gulp.src('src/**/*.ts')
     .pipe(tslint({
       configuration: 'tslint.json',
+      formatter: 'verbose',
     }))
-    .pipe(tslint.report('verbose')));
+    .pipe(tslint.report()));
 
 gulp.task('eslint', () =>
   gulp.src('test/**/*_test.js')
