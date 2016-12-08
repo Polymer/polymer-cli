@@ -12,7 +12,8 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {Command, CommandOptions, ProjectConfig} from './command';
+import {ProjectConfig} from 'polymer-project-config';
+import {Command, CommandOptions} from './command';
 
 export class InstallCommand implements Command {
   name = 'install';

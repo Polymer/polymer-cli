@@ -12,7 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {ArgDescriptor} from './commands/command';
+import {ArgDescriptor} from 'command-line-args';
 import {Environment} from './environment/environment';
 import {buildEnvironment} from './environments/environments';
 
