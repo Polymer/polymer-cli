@@ -77,7 +77,6 @@
     "yeoman-generator": "^0.23.3"
   },
   "devDependencies": {
-    "bower": "^1.7.9",
     "chai": "^3.5.0",
     "clang-format": "=1.0.45",
     "depcheck": "^0.6.3",
