@@ -15,7 +15,7 @@ let logger = logging.getLogger('cli.build.optimize-streams');
 export type FileCB = (error?: any, file?: File) => void;
 export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
-}
+};
 
 /**
  * GenericOptimizeStream is a generic optimization stream. It can be extended
