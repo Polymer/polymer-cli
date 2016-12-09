@@ -60,7 +60,7 @@ export class GenericOptimizeStream extends Transform {
       } catch (error) {
         logger.warn(
             `Unable to optimize ${this.validExtension} file ${file.path}`,
-            {err: error});
+            {err: error.message || error});
       }
     }
     callback(null, file);
