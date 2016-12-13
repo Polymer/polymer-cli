@@ -13,13 +13,13 @@
  */
 
 import * as logging from 'plylog';
+import {ProjectConfig} from 'polymer-project-config';
 
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
 import {BuildOptions} from '../build/build';
 
-import {ProjectConfig} from 'polymer-project-config';
 import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.build');
@@ -31,6 +31,13 @@ export class BuildCommand implements Command {
   description = 'Builds an application-style project';
 
   args = [
+    {
+      name: 'bundle',
+      defaultValue: false,
+      description: 'Combine build source and dependency files together into ' +
+          'a minimum set of bundles. Useful for reducing the number of ' +
+          'requests needed to serve your application.'
+    },
     {
       name: 'sw-precache-config',
       defaultValue: 'sw-precache-config.js',
@@ -58,6 +65,7 @@ export class BuildCommand implements Command {
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
+      bundle: options['bundle'],
       html: {},
       css: {},
       js: {},
