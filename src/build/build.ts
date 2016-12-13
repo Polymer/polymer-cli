@@ -19,7 +19,7 @@ import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
 
 import mergeStream = require('merge-stream');
-import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
+import {PolymerProject, addServiceWorker} from 'polymer-build';
 
 import {InlineCSSOptimizeStream, JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
@@ -30,12 +30,12 @@ import {parsePreCacheConfig} from './sw-precache';
 
 const logger = logging.getLogger('cli.build.build');
 
-const unbundledBuildDirectory = 'build/unbundled';
-const bundledBuildDirectory = 'build/bundled';
+const buildDirectory = 'build/';
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
+  bundle?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
   html?: {collapseWhitespace?: boolean; removeComments?: boolean};
   css?: {stripWhitespace?: boolean};
@@ -45,11 +45,8 @@ export interface BuildOptions {
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
   let polymerProject = new PolymerProject(config);
-
-  if (options.insertDependencyLinks) {
-    logger.debug(
-        `Additional dependency links will be inserted into application`);
-  }
+  let swPrecacheConfig = path.resolve(
+      config.root, options.swPrecacheConfig || 'sw-precache-config.js');
 
   // mix in optimization options from build command
   // TODO: let this be set by the user
@@ -59,10 +56,13 @@ export async function build(
     js: Object.assign({minify: true}, options.js),
   };
 
-  logger.info(`Preparing build...`);
-  await del([unbundledBuildDirectory, bundledBuildDirectory]);
+  if (options.insertDependencyLinks) {
+    logger.debug(
+        `Additional dependency links will be inserted into application`);
+  }
 
-  logger.info(`Building application...`);
+  logger.info(`Deleting build/ directory...`);
+  await del([buildDirectory]);
 
   logger.debug(`Reading source files...`);
   let sourcesStream =
@@ -88,66 +88,45 @@ export async function build(
           .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
           .pipe(polymerProject.rejoinHtml());
 
-  let buildStream = mergeStream(sourcesStream, depsStream);
+  let buildStream =
+      <NodeJS.ReadableStream>mergeStream(sourcesStream, depsStream)
+          .once('data', () => {
+            logger.debug('Analyzing build dependencies...');
+          });
 
-  let unbundledPhase = forkStream(buildStream)
-                           .once(
-                               'data',
-                               () => {
-                                 logger.info('Generating build/unbundled...');
-                               })
-                           .pipe(gulpif(
-                               options.insertDependencyLinks || false,
-                               new PrefetchTransform(polymerProject)))
-                           .pipe(dest(unbundledBuildDirectory));
+  if (options.bundle) {
+    buildStream = buildStream.pipe(polymerProject.bundler);
+  } else {
+    buildStream = buildStream.pipe(gulpif(
+        options.insertDependencyLinks || false,
+        new PrefetchTransform(polymerProject)));
+  }
 
-  let bundledPhase = forkStream(buildStream)
-                         .once(
-                             'data',
-                             () => {
-                               logger.info('Generating build/bundled...');
-                             })
-                         .pipe(polymerProject.bundler)
-                         .pipe(dest(bundledBuildDirectory));
+  buildStream = buildStream
+                    .once(
+                        'data',
+                        () => {
+                          logger.info('Generating build/ directory...');
+                        })
+                    .pipe(dest(buildDirectory));
 
-  let swPrecacheConfig = path.resolve(
-      config.root, options.swPrecacheConfig || 'sw-precache-config.js');
-  let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
+  // While the build is in progress, parse the sw precache config
+  const swConfig = await parsePreCacheConfig(swPrecacheConfig);
+  if (swConfig) {
+    logger.debug(`Service worker config found`, swConfig);
+  } else {
+    logger.debug(`No service worker configuration found at ${swPrecacheConfig
+                  }, continuing with defaults`);
+  }
 
-  loadSWConfig.then((swConfig) => {
-    if (swConfig) {
-      logger.debug(`Service worker config found`, swConfig);
-    } else {
-      logger.debug(`No service worker configuration found at ${swPrecacheConfig
-                   }, continuing with defaults`);
-    }
+  // Once the build stream is complete, create a service worker for the build
+  await waitFor(buildStream);
+  await addServiceWorker({
+    buildRoot: buildDirectory,
+    project: polymerProject,
+    swPrecacheConfig: swConfig || undefined,
+    bundled: options.bundle
   });
 
-  // Once the unbundled build stream is complete, create a service worker for
-  // the build
-  let unbundledPostProcessing =
-      Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
-        let swConfig: SWConfig|undefined = results[0] || undefined;
-        return addServiceWorker({
-          buildRoot: unbundledBuildDirectory,
-          project: polymerProject,
-          swPrecacheConfig: swConfig,
-        });
-      });
-
-  // Once the bundled build stream is complete, create a service worker for the
-  // build
-  let bundledPostProcessing =
-      Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
-        let swConfig: SWConfig|undefined = results[0] || undefined;
-        return addServiceWorker({
-          buildRoot: bundledBuildDirectory,
-          project: polymerProject,
-          swPrecacheConfig: swConfig,
-          bundled: true,
-        });
-      });
-
-  await Promise.all([unbundledPostProcessing, bundledPostProcessing]);
   logger.info('Build complete!');
 }
