@@ -105,6 +105,25 @@ export class CSSOptimizeStream extends GenericOptimizeStream {
 }
 
 /**
+ * InlineCSSOptimizeStream optimizes inlined CSS (found in HTML files) that
+ * passes through it (via css-slam).
+ */
+export class InlineCSSOptimizeStream extends GenericOptimizeStream {
+  constructor(options: CSSOptimizeOptions) {
+    super('css-slam', cssSlam.html, options);
+  }
+
+  _transform(file: File, encoding: string, callback: FileCB): void {
+    // css-slam will only be run if the `stripWhitespace` option is true.
+    // Because css-slam itself doesn't accept any options, we handle the
+    // option here before transforming.
+    if (this.optimizerOptions.stripWhitespace) {
+      super._transform(file, encoding, callback);
+    }
+  }
+}
+
+/**
  * HTMLOptimizeStream optimizes HTML files that pass through it
  * (via html-minifier).
  */
