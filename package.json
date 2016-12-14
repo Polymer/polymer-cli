@@ -61,7 +61,7 @@
     "plylog": "^0.4.0",
     "polylint": "^2.10.0",
     "polymer-analyzer": "2.0.0-alpha.18",
-    "polymer-build": "^0.6.0-alpha.1",
+    "polymer-build": "0.6.0-alpha.1",
     "polymer-project-config": "^1.0.0",
     "polyserve": "0.16.0-prerelease.6",
     "request": "^2.72.0",
