@@ -3,8 +3,7 @@
 ## Upcoming (Potentially Breaking)
 
 - Added `analyze` command
-- **TEMPORARY**: JS minification has been disabled to accommodate the new analyzer. It will be reenabled once the new analyzer is able to better read minified JavaScript.
-- Upgrade `polymer-build` to `v0.5.0`, which means the build command will now use the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer)! See [the polymer-build changelog](https://github.com/Polymer/polymer-build/blob/v0.5.0/CHANGELOG.md) for more information.
+- Upgrade `polymer-build` to `v0.6.0`, which means the build command will now use the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer)! See [the polymer-build changelog](https://github.com/Polymer/polymer-build/blob/v0.5.0/CHANGELOG.md) for more information.
 - `build`: Rename the `--include-dependencies` flag to `--extra-dependencies`
 - `polymer.json`: Rename the `includeDependencies` & `sourceGlobs` fields to `extraDependencies` & `sources`, respectively
 - Added an `install` command, which can install "variants" of Bower dependencies. TODO(justinfagnani): document variants.
