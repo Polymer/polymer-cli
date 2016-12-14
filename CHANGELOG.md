@@ -10,6 +10,7 @@
 - Added an `install` command, which can install "variants" of Bower dependencies. TODO(justinfagnani): document variants.
 - Added support for v7.x of Node.js, dropped support for v5.x. Please move to an [actively maintained version of Node.js](https://github.com/nodejs/LTS) for the best experience.
 - Upgrade [web-component-tester 6.0](https://github.com/Polymer/web-component-tester/blob/master/CHANGELOG.md) which brings a number of breaking changes to the `test` command.
+- `build`: Fix bug where CSS was not getting minified
 
 ## v0.17.0
 
