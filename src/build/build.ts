@@ -34,7 +34,7 @@ const buildDirectory = 'build/';
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
-  prefetchDepedencies?: boolean;
+  addPrefetchLinks?: boolean;
   bundle?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
   html?: {collapseWhitespace?: boolean; removeComments?: boolean};
@@ -87,7 +87,7 @@ export async function build(
     buildStream = buildStream.pipe(polymerProject.bundler);
   }
 
-  if (options.prefetchDepedencies) {
+  if (options.addPrefetchLinks) {
     buildStream = buildStream.pipe(new PrefetchTransform(polymerProject));
   }
 

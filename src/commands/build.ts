@@ -65,7 +65,7 @@ export class BuildCommand implements Command {
 
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
-      prefetchDepedencies: options['add-prefetch'],
+      addPrefetchLinks: options['add-prefetch'],
       bundle: options['bundle'],
       html: {},
       css: {},
