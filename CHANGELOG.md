@@ -2,14 +2,19 @@
 
 ## Upcoming (Potentially Breaking)
 
-- Added `analyze` command
-- Upgrade `polymer-build` to `v0.6.0`, which means the build command will now use the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer)! See [the polymer-build changelog](https://github.com/Polymer/polymer-build/blob/v0.5.0/CHANGELOG.md) for more information.
+## v0.18.0-alpha.8
+
+- **Added `analyze` command:** Generates a JSON blob of metadata about your element(s). Useful for tooling and analysis.
+- **Added `install` command:** Installs "variants" defined in your `bower.json`. TODO(justinfagnani): document variants.
+- Upgrade `polyserve to `v0.6.0-prerelease.6` to handle serving variants
+- Upgrade `web-component-tester` to `6.0.0-prerelease.1` to handle testing variants
+- Upgrade `polymer-build` to `v0.6.0-alpha.1`, which includes an upgrade to the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer).
 - `build`: Rename the `--include-dependencies` flag to `--extra-dependencies`
+- `build`: css is now minified
+- `build`: Lots of bug fixes due to the new polymer-build library and analyzer.
 - `polymer.json`: Rename the `includeDependencies` & `sourceGlobs` fields to `extraDependencies` & `sources`, respectively
-- Added an `install` command, which can install "variants" of Bower dependencies. TODO(justinfagnani): document variants.
 - Added support for v7.x of Node.js, dropped support for v5.x. Please move to an [actively maintained version of Node.js](https://github.com/nodejs/LTS) for the best experience.
 - Upgrade [web-component-tester 6.0](https://github.com/Polymer/web-component-tester/blob/master/CHANGELOG.md) which brings a number of breaking changes to the `test` command.
-- `build`: Fix bug where CSS was not getting minified
 
 ## v0.17.0
 
