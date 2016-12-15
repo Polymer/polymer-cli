@@ -45,9 +45,9 @@ export class BuildCommand implements Command {
           'used for service worker generation.'
     },
     {
-      name: 'add-prefetch',
+      name: 'insert-prefetch-links',
       type: Boolean,
-      description: 'Add dependency tree prefetching by inserting ' +
+      description: 'Add dependency prefetching by inserting ' +
           '`<link rel="prefetch">` tags into entrypoint and ' +
           '`<link rel="import">` tags into fragments and shell for all ' +
           'dependencies.'
@@ -65,7 +65,7 @@ export class BuildCommand implements Command {
 
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
-      addPrefetchLinks: options['add-prefetch'],
+      insertPrefetchLinks: options['insert-prefetch-links'],
       bundle: options['bundle'],
       html: {},
       css: {},
