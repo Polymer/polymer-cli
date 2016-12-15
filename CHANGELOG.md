@@ -2,7 +2,7 @@
 
 ## Upcoming (Potentially Breaking)
 
-## v0.18.0-alpha.8
+## v0.18.0-alpha.7
 
 - **Added `analyze` command:** Generates a JSON blob of metadata about your element(s). Useful for tooling and analysis.
 - **Added `install` command:** Installs "variants" defined in your `bower.json`.
