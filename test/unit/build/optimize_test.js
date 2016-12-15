@@ -126,7 +126,7 @@ suite('optimize-streams', () => {
       if (error) {
         return done(error);
       }
-      assert.notEqual(f.contents.toString().indexOf(expected), -1);
+      assert.include(f.contents.toString(), expected);
       done();
     });
   });
