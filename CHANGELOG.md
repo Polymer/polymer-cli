@@ -6,7 +6,7 @@
 
 - **Added `analyze` command:** Generates a JSON blob of metadata about your element(s). Useful for tooling and analysis.
 - **Added `install` command:** Installs "variants" defined in your `bower.json`.
-- Upgrade `polyserve to `v0.6.0-prerelease.6` to handle serving variants
+- Upgrade `polyserve` to `v0.6.0-prerelease.6` to handle serving variants
 - Upgrade `web-component-tester` to `6.0.0-prerelease.1` to handle testing variants
 - Upgrade `polymer-build` to `v0.6.0-alpha.1`, which includes an upgrade to the new [`polymer-analyzer`](https://github.com/Polymer/polymer-analyzer).
 - `build`: Rename the `--include-dependencies` flag to `--extra-dependencies`
