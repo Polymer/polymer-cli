@@ -12,12 +12,14 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import {transform as babelTransform, TransformOptions as BabelTransformOptions} from 'babel-core';
 import {css as cssSlam} from 'css-slam';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
 import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
 
+const babelPresetES2015 = require('babel-preset-es2015');
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -86,6 +88,26 @@ export class JSOptimizeStream extends GenericOptimizeStream {
   }
 }
 
+
+/**
+ * JSBabelStream transpiles Javascript down to work in older browsers, rewriting
+ * newer ECMAScript features to only use language features available in major
+ * browsers. If no options are given to the constructor, JSBabelStream will use
+ * a default "ES6 -> ES5" preset (configuration).
+ */
+const defaultBabelConfig = {
+  presets: [babelPresetES2015]
+};
+export class JSBabelStream extends GenericOptimizeStream {
+  constructor(options: BabelTransformOptions) {
+    let transform = (contents: string, options: BabelTransformOptions) => {
+      const bob = babelTransform(contents, options).code!;
+      return bob;
+    };
+    let config = options || defaultBabelConfig;
+    super('.js', transform, config);
+  }
+}
 
 /**
  * CSSOptimizeStream optimizes CSS files that pass through it (via css-slam).
