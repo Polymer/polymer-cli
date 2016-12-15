@@ -21,7 +21,7 @@ import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
-import {JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
+import {InlineCSSOptimizeStream, JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
 
 import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
@@ -70,6 +70,9 @@ export async function build(
           .pipe(polymerProject.splitHtml())
           .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
           .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
+          // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
+          // is properly being isolated by splitHtml() & rejoinHtml().
+          .pipe(gulpif(/\.html$/, new InlineCSSOptimizeStream(optimizeOptions.css)))
           .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
           .pipe(polymerProject.rejoinHtml());
 
@@ -79,6 +82,9 @@ export async function build(
           .pipe(polymerProject.splitHtml())
           .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
           .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
+          // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
+          // is properly being isolated by splitHtml() & rejoinHtml().
+          .pipe(gulpif(/\.html$/, new InlineCSSOptimizeStream(optimizeOptions.css)))
           .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
           .pipe(polymerProject.rejoinHtml());
 

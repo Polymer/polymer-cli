@@ -12,7 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {css as cssSlam} from 'css-slam';
+import * as cssSlam from 'css-slam';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
@@ -34,32 +34,34 @@ export type CSSOptimizeOptions = {
 /**
  * GenericOptimizeStream is a generic optimization stream. It can be extended
  * to create a new kind of specific file-type optimizer, or it can be used
- * directly to create an ad-hoc optimization stream for certain types of files.
+ * directly to create an ad-hoc optimization stream for different libraries.
+ * If the transform library throws an exception when run, the file will pass
+ * through unaffected.
  */
 export class GenericOptimizeStream extends Transform {
-  validExtension: string;
   optimizer: (content: string, options: any) => string;
+  optimizerName: string;
   optimizerOptions: any;
 
   constructor(
-      validExtension: string,
+      optimizerName: string,
       optimizer: (content: string, optimizerOptions: any) => string,
       optimizerOptions: any) {
     super({objectMode: true});
     this.optimizer = optimizer;
-    this.validExtension = validExtension;
+    this.optimizerName = optimizerName;
     this.optimizerOptions = optimizerOptions || {};
   }
 
   _transform(file: File, _encoding: string, callback: FileCB): void {
-    if (file.contents && file.path.endsWith(`${this.validExtension}`)) {
+    if (file.contents) {
       try {
         let contents = file.contents.toString();
         contents = this.optimizer(contents, this.optimizerOptions);
         file.contents = new Buffer(contents);
       } catch (error) {
         logger.warn(
-            `Unable to optimize ${this.validExtension} file ${file.path}`,
+            `${this.optimizerName}: Unable to optimize ${file.path}`,
             {err: error.message || error});
       }
     }
@@ -69,8 +71,6 @@ export class GenericOptimizeStream extends Transform {
 
 /**
  * JSOptimizeStream optimizes JS files that pass through it (via uglify).
- * If a file is not a `.js` file or if uglify throws an exception when run,
- * the file will pass through unaffected.
  */
 export class JSOptimizeStream extends GenericOptimizeStream {
   constructor(options: UglifyOptions) {
@@ -82,19 +82,16 @@ export class JSOptimizeStream extends GenericOptimizeStream {
     };
     // We automatically add the fromString option because it is required.
     let uglifyOptions = Object.assign({fromString: true}, options);
-    super('.js', uglifyOptimizer, uglifyOptions);
+    super('uglify-js', uglifyOptimizer, uglifyOptions);
   }
 }
 
-
 /**
- * CSSOptimizeStream optimizes CSS files that pass through it (via css-slam).
- * If a file is not a `.css` file or if css-slam throws an exception when run,
- * the file will pass through unaffected.
+ * CSSOptimizeStream optimizes CSS that pass through it (via css-slam).
  */
 export class CSSOptimizeStream extends GenericOptimizeStream {
   constructor(options: CSSOptimizeOptions) {
-    super('.css', cssSlam, options);
+    super('css-slam', cssSlam.css, options);
   }
 
   _transform(file: File, encoding: string, callback: FileCB): void {
@@ -107,14 +104,31 @@ export class CSSOptimizeStream extends GenericOptimizeStream {
   }
 }
 
+/**
+ * InlineCSSOptimizeStream optimizes inlined CSS (found in HTML files) that
+ * passes through it (via css-slam).
+ */
+export class InlineCSSOptimizeStream extends GenericOptimizeStream {
+  constructor(options: CSSOptimizeOptions) {
+    super('css-slam', cssSlam.html, options);
+  }
+
+  _transform(file: File, encoding: string, callback: FileCB): void {
+    // css-slam will only be run if the `stripWhitespace` option is true.
+    // Because css-slam itself doesn't accept any options, we handle the
+    // option here before transforming.
+    if (this.optimizerOptions.stripWhitespace) {
+      super._transform(file, encoding, callback);
+    }
+  }
+}
 
 /**
  * HTMLOptimizeStream optimizes HTML files that pass through it
- * (via html-minifier). If a file is not a `.html` file or if html-minifier
- * throws an exception when run, the file will pass through unaffected.
+ * (via html-minifier).
  */
 export class HTMLOptimizeStream extends GenericOptimizeStream {
   constructor(options: HTMLMinifierOptions) {
-    super('.html', htmlMinify, options);
+    super('html-minify', htmlMinify, options);
   }
 }

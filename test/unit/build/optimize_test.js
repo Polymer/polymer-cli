@@ -16,6 +16,7 @@ const optimizeStreams = require('../../../lib/build/optimize-streams');
 
 const JSOptimizeStream = optimizeStreams.JSOptimizeStream;
 const CSSOptimizeStream = optimizeStreams.CSSOptimizeStream;
+const InlineCSSOptimizeStream = optimizeStreams.InlineCSSOptimizeStream;
 const HTMLOptimizeStream = optimizeStreams.HTMLOptimizeStream;
 
 suite('optimize-streams', () => {
@@ -26,24 +27,6 @@ suite('optimize-streams', () => {
     });
     stream.on('error', cb);
   }
-
-  test('css', (done) => {
-    let stream = vfs.src([
-      {
-        path: 'foo.css',
-        contents: '/* comment */ selector { property: value; }',
-      },
-    ]);
-    let op = stream.pipe(new CSSOptimizeStream({stripWhitespace: true}));
-    assert.notEqual(stream, op, 'stream should be wrapped');
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), 'selector{property:value;}');
-      done();
-    });
-  });
 
   test('js', (done) => {
     let stream = vfs.src([
@@ -100,4 +83,52 @@ suite('optimize-streams', () => {
       done();
     });
   });
+
+  test('css', (done) => {
+    let stream = vfs.src([
+      {
+        path: 'foo.css',
+        contents: '/* comment */ selector { property: value; }',
+      },
+    ]);
+    let op = stream.pipe(new CSSOptimizeStream({stripWhitespace: true}));
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
+      }
+      assert.equal(f.contents.toString(), 'selector{property:value;}');
+      done();
+    });
+  });
+
+  test('inline css', (done) => {
+    let expected =`<style>foo{background:blue;}</style>`;
+    let stream = vfs.src([
+      {
+        path: 'foo.html',
+        contents: `
+          <!doctype html>
+          <html>
+            <head>
+              <style>
+                foo {
+                  background: blue;
+                }
+              </style>
+            </head>
+            <body></body>
+          </html>
+        `,
+      },
+    ], {cwdbase: true});
+    let op = stream.pipe(new InlineCSSOptimizeStream({stripWhitespace: true}));
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
+      }
+      assert.include(f.contents.toString(), expected);
+      done();
+    });
+  });
+
 });
