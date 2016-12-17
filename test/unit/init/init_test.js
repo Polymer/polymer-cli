@@ -15,7 +15,8 @@ const helpers = require('yeoman-test');
 const childProcess = require('child_process');
 const inquirer = require('inquirer');
 const YeomanEnvironment = require('yeoman-environment');
-const path = require('path');
+const fs = require('fs');
+const temp = require('temp').track();
 
 const polymerInit = require('../../../lib/init/init');
 
@@ -88,19 +89,74 @@ suite('init', () => {
   suite('promptGeneratorSelection', () => {
 
     let yeomanEnvMock;
+    const GENERATORS = [
+      {
+        generatorName: 'polymer-init-element:app',
+        metaName: 'polymer-init-element',
+        shortName: 'element',
+        description: 'A blank element template',
+        resolved: 'unknown',
+      },
+      {
+        generatorName: 'polymer-init-my-test-app:app',
+        metaName: 'polymer-init-my-test-app',
+        shortName: 'my-test-app',
+        description: 'my test app',
+      },
+      {
+        generatorName: 'polymer-init-polymer-starter-kit-custom-1:app',
+        metaName: 'polymer-init-polymer-starter-kit-psk-1',
+        shortName: 'psk-1',
+        description: 'PSK 1',
+      },
+      {
+        generatorName: 'polymer-init-polymer-starter-kit-custom-2:app',
+        metaName: 'generator-polymer-init-polymer-starter-kit-psk-2',
+        shortName: 'psk-2',
+        description: 'PSK 2',
+      },
+      {
+        generatorName: 'polymer-init-custom-build-1:app',
+        metaName: 'generator-polymer-init-custom-build-1',
+        shortName: 'custom-build-1',
+        description: 'custom build 1',
+      },
+      {
+        generatorName: 'polymer-init-custom-build-2:app',
+        metaName: 'polymer-init-custom-build-2',
+        shortName: 'custom-build-2',
+        description: 'custom build 2',
+      },
+      {
+        generatorName: 'polymer-init-custom-build-3:app',
+        metaName: 'custom-build-3',
+        shortName: 'custom-build-3',
+        description: 'custom build 3',
+      },
+    ];
 
     setup(() => {
+      let generators = {};
+
+      for (let g of GENERATORS) {
+        if (!g.resolved) {
+          let tmpDir = temp.mkdirSync();
+          let packageJsonPath = `${tmpDir}/package.json`;
+          fs.writeFileSync(packageJsonPath, JSON.stringify({
+            description: g.description,
+            name: g.metaName,
+          }));
+          g.resolved = tmpDir;
+        }
+
+        generators[g.generatorName] = {
+          resolved: g.resolved,
+          namespace: g.generatorName,
+        };
+      }
+
       yeomanEnvMock = createFakeEnv();
-      yeomanEnvMock.getGeneratorsMeta.returns({
-        'polymer-init-element:app': {
-          resolved: 'unknown',
-          namespace: 'polymer-init-element:app',
-        },
-        'polymer-init-my-test-app:app': {
-          resolved: path.resolve(__dirname, 'package.json'),
-          namespace: 'polymer-init-my-test-app:app',
-        },
-      });
+      yeomanEnvMock.getGeneratorsMeta.returns(generators);
     });
 
     test('works with the default yeoman environment', () => {
@@ -129,15 +185,15 @@ suite('init', () => {
         assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         let choices = promptStub.firstCall.args[0][0].choices;
-        assert.equal(choices.length, 2);
-        assert.equal(stripAnsi(choices[0].name), 'element - A blank element template');
-        assert.equal(choices[0].value, 'polymer-init-element:app');
-        assert.equal(choices[0].short, 'element');
+        assert.equal(choices.length, GENERATORS.length);
 
-        // custom generator's name and description parsed from package.json
-        assert.equal(stripAnsi(choices[1].name), 'my-test-app - dummy description');
-        assert.equal(choices[1].value, 'polymer-init-my-test-app:app');
-        assert.equal(choices[1].short, 'my-test-app');
+        for (let c of choices) {
+          let g = GENERATORS.find(x => x.generatorName === c.value);
+          assert.isDefined(g, `generator not found: ${c.value}`);
+          assert.oneOf(stripAnsi(c.name), [g.shortName, `${g.shortName} - ${g.description}`]);
+          assert.equal(c.value, g.generatorName);
+          assert.equal(c.short, g.shortName);
+        }
       });
     });
 
