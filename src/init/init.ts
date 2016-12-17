@@ -136,9 +136,9 @@ function getGeneratorMeta(
 
 /**
  * Extract the meaningful name from the full Yeoman generator name.
- * Strip the standard generator prefixes ("generator-" and "polymer-init-"),
- * and extract the remainder of the name (the first part of the string
- * before any colons).
+ * Strip the standard generator prefixes ("generator-", "polymer-init-",
+ * and "polymer-starter-kit-"), and extract the remainder of the name
+ * (the first part of the string before any colons).
  *
  * Examples:
  *
@@ -150,16 +150,18 @@ function getGeneratorMeta(
  *   'foo-bar:ccc'                        === 'foo-bar'
  */
 function getDisplayName(generatorName: string) {
-  // Breakdown of regular expression to extract name (group 3 in pattern):
+  // Breakdown of regular expression to extract name (group 4 in pattern):
   //
-  //  Pattern           | Meaning
-  //  -------------------------------------------------------------------
-  //  (generator-)?     | Group 1; Match "generator-"; Optional
-  //  (polymer-init-)?  | Group 2; Match "polymer-init-"; Optional
-  //  ([^:]+)           | Group 3; Match one or more characters != ':'
-  //  (:.*)?            | Group 4; Match ':' followed by anything; Optional
-  return generatorName.replace(/(generator-)?(polymer-init-)?([^:]+)(:.*)?/g,
-                               '$3');
+  // Pattern                 | Meaning
+  // -------------------------------------------------------------------
+  // (generator-)?           | Grp 1; Match "generator-"; Optional
+  // (polymer-init)?         | Grp 2; Match "polymer-init-"; Optional
+  // (polymer-starter-kit-)? | Grp 3; Match "polymer-starter-kit-"; Optional
+  // ([^:]+)                 | Grp 4; Match one or more characters != ":"
+  // (:.*)?                  | Grp 5; Match ":" followed by anything; Optional
+  return generatorName.replace(
+      /(generator-)?(polymer-init-)?(polymer-starter-kit-)?([^:]+)(:.*)?/g,
+      '$4');
 }
 
 /**
