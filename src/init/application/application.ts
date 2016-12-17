@@ -13,7 +13,9 @@
 
 import * as chalk from 'chalk';
 import * as path from 'path';
-import {Base} from 'yeoman-generator';
+import YeomanGenerator = require('yeoman-generator');
+const requireg = require('requireg');
+const Base: typeof YeomanGenerator.Base = requireg('yeoman-generator').Base;
 
 export class ApplicationGenerator extends Base {
   props: any;

@@ -12,7 +12,9 @@
  */
 
 import * as logging from 'plylog';
-import {Base} from 'yeoman-generator';
+import YeomanGenerator = require('yeoman-generator');
+const requireg = require('requireg');
+const Base: typeof YeomanGenerator.Base = requireg('yeoman-generator').Base;
 
 import {Github, RequestAPI} from '../github/github';
 
