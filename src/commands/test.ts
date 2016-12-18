@@ -14,6 +14,7 @@
 
 import {ProjectConfig} from 'polymer-project-config';
 import {Command, CommandOptions} from './command';
+const requireg = require('requireg');
 
 export class TestCommand implements Command {
   name = 'test';
@@ -127,7 +128,14 @@ export class TestCommand implements Command {
 
   run(_options: CommandOptions, _config: ProjectConfig): Promise<void> {
     // Defer dependency loading until this specific command is run
-    const wct = require('web-component-tester');
+    let wct;
+    try {
+      wct = requireg('web-component-tester');
+    } catch (e) {
+      return new Promise<void>((_, reject) => {
+        reject('Polymer test requires `web-component-tester` to be installed globally. Install with `npm install -g web-component-tester`');
+      });
+    }
 
     return wct.cli.run(process.env, process.argv.slice(3), process.stdout);
   }

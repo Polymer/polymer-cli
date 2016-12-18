@@ -2,6 +2,8 @@
 
 ## Upcoming (Potentially Breaking)
 
+- **Removed dependencies:** `web-component-tester`, `yeoman-generator` and `yeoman-environment` are no longer a direct dependency, install them globally.
+
 ## v0.18.0-alpha.7
 
 - **Added `analyze` command:** Generates a JSON blob of metadata about your element(s). Useful for tooling and analysis.

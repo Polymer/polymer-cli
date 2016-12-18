@@ -33,7 +33,14 @@ export class InitCommand implements Command {
 
   run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
     // Defer dependency loading until needed
-    const polymerInit = require('../init/init');
+    let polymerInit;
+    try {
+      polymerInit = require('../init/init');
+    } catch (e) {
+      return new Promise<void>((_, reject) => {
+        reject('Polymer init requires `yeoman-generator` and `yeoman-environment` to be installed globally. Install with `npm install -g yeoman-generator yeoman-environment`');
+      });
+    }
 
     const templateName = options['name'];
     if (templateName) {

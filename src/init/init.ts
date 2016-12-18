@@ -20,12 +20,11 @@ import * as logging from 'plylog';
 import findup = require('findup-sync');
 import {ApplicationGenerator} from '../init/application/application';
 import {ElementGenerator} from '../init/element/element';
-import * as YeomanEnvironment from 'yeoman-environment';
+import YeomanEnvironment = require('yeoman-environment');
+const requireg = require('requireg');
+const environment: typeof YeomanEnvironment = requireg('yeoman-environment');
 import {prompt, Question as InquirerQuestion} from 'inquirer';
 import {createGithubGenerator} from '../init/github';
-
-// import {Base} from 'yeoman-generator';
-
 
 const logger = logging.getLogger('init');
 
@@ -133,7 +132,7 @@ function getDisplayName(generatorName: string) {
  */
 function createYeomanEnvironment(): Promise<any> {
   return new Promise((resolve, reject) => {
-    const env = new YeomanEnvironment();
+    const env = new environment();
     env.registerStub(ElementGenerator, 'polymer-init-element:app');
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
     env.registerStub(shopGenerator, 'polymer-init-shop:app');
