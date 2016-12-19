@@ -257,8 +257,8 @@ By default the server listens to `localhost`. To listen to a different address u
 
 ## Templates and Generators
 
-Polymer-CLI initialize new projects with the `init` command, and includes
-a few of built-in templates.
+Polymer-CLI initializes new projects with the `init` command, and includes
+a few built-in templates.
 
 New templates can be distributed and installed via npm. Yeoman generators
 prefixed with `generator-polymer-init` will show up in the `polymer init`
