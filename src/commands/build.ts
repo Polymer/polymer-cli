@@ -32,6 +32,21 @@ export class BuildCommand implements Command {
 
   args = [
     {
+      name: 'js-minify',
+      type: Boolean,
+      description: 'minify inlined and external JavaScript.'
+    },
+    {
+      name: 'css-minify',
+      type: Boolean,
+      description: 'minify inlined and external CSS.'
+    },
+    {
+      name: 'html-minify',
+      type: Boolean,
+      description: 'minify HTML by removing comments and whitespace.'
+    },
+    {
       name: 'sw-precache-config',
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
@@ -44,11 +59,6 @@ export class BuildCommand implements Command {
           'additional `<link rel="prefetch">` tags into ' +
           'entrypoint and `<link rel="import">` tags into fragments and shell.'
     },
-    {
-      name: 'html.collapseWhitespace',
-      type: Boolean,
-      description: 'Collapse whitespace in HTML files'
-    }
   ];
 
   run(options: CommandOptions, config: ProjectConfig): Promise<any> {
@@ -58,13 +68,17 @@ export class BuildCommand implements Command {
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
-      html: {},
-      css: {},
-      js: {},
+      html: {
+        minify: !!options['html-minify'],
+      },
+      css: {
+        minify: !!options['css-minify'],
+      },
+      js: {
+        minify: !!options['js-minify'],
+      },
     };
-    if (options['html.collapseWhitespace']) {
-      buildOptions.html!.collapseWhitespace = true;
-    }
+
     logger.debug('building with options', buildOptions);
 
     if (options['env'] && options['env'].build) {

@@ -13,11 +13,11 @@
  */
 
 import * as cssSlam from 'css-slam';
+import * as gulpif from 'gulp-if';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
 import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
-
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -29,6 +29,11 @@ let logger = logging.getLogger('cli.build.optimize-streams');
 export type FileCB = (error?: any, file?: File) => void;
 export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
+};
+export interface OptimizeOptions {
+  htmlMinify?: HTMLMinifierOptions;
+  cssMinify?: CSSOptimizeOptions;
+  jsMinify?: UglifyOptions;
 };
 
 /**
@@ -132,3 +137,27 @@ export class HTMLOptimizeStream extends GenericOptimizeStream {
     super('html-minify', htmlMinify, options);
   }
 }
+
+/**
+ * Returns an array of optimization streams to use in your build, based on the
+ * OptimizeOptions given.
+ */
+export function getOptimizeStreams(optimizeOptions: OptimizeOptions) {
+  let streams = [];
+
+  // add optimizers
+  if (optimizeOptions.htmlMinify) {
+    streams.push(gulpif(/\.html$/, new HTMLOptimizeStream({collapseWhitespace: true, removeComments: true})));
+  }
+  if (optimizeOptions.cssMinify) {
+    streams.push(gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
+    // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
+    // is properly being isolated by splitHtml() & rejoinHtml().
+    streams.push(gulpif(/\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
+  }
+  if (optimizeOptions.jsMinify) {
+    streams.push(gulpif(/\.js$/, new JSOptimizeStream({fromString: true})));
+  }
+
+  return streams;
+};
