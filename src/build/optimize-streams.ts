@@ -13,11 +13,16 @@
  */
 
 import * as cssSlam from 'css-slam';
+import {transform as babelTransform, TransformOptions as BabelTransformOptions} from 'babel-core';
 import * as gulpif from 'gulp-if';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
 import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
+
+
+const babelPresetES2015 = require('babel-preset-es2015');
+const babelPresetES2015NoModules = babelPresetES2015.buildPreset({}, {modules: false});
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -34,6 +39,7 @@ export interface OptimizeOptions {
   htmlMinify?: HTMLMinifierOptions;
   cssMinify?: CSSOptimizeOptions;
   jsMinify?: UglifyOptions;
+  jsCompile?: BabelTransformOptions;
 };
 
 /**
@@ -90,6 +96,22 @@ export class JSOptimizeStream extends GenericOptimizeStream {
     super('uglify-js', uglifyOptimizer, uglifyOptions);
   }
 }
+
+/**
+ * JSBabelStream transpiles Javascript down to work in older browsers, rewriting
+ * newer ECMAScript features to only use language features available in major
+ * browsers. If no options are given to the constructor, JSBabelStream will use
+ * a default "ES6 -> ES5" preset (configuration).
+ */
+export class JSBabelStream extends GenericOptimizeStream {
+  constructor(config: BabelTransformOptions) {
+    let transform = (contents: string, options: BabelTransformOptions) => {
+      return babelTransform(contents, options).code!;
+    };
+    super('.js', transform, config);
+  }
+}
+
 
 /**
  * CSSOptimizeStream optimizes CSS that pass through it (via css-slam).
@@ -157,6 +179,9 @@ export function getOptimizeStreams(optimizeOptions: OptimizeOptions) {
   }
   if (optimizeOptions.jsMinify) {
     streams.push(gulpif(/\.js$/, new JSOptimizeStream({fromString: true})));
+  }
+  if (optimizeOptions.jsCompile) {
+    streams.push(gulpif(/\.js$/, new JSBabelStream({presets: [babelPresetES2015NoModules]})));
   }
 
   return streams;

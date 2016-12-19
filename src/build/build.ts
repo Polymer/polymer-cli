@@ -39,7 +39,7 @@ export interface BuildOptions {
   insertDependencyLinks?: boolean;
   html?: {minify: boolean};
   css?: {minify: boolean};
-  js?: {minify?: boolean};
+  js?: {minify?: boolean, compile?: boolean};
 }
 
 export async function build(
@@ -55,6 +55,7 @@ export async function build(
     htmlMinify: options.html && options.html.minify,
     cssMinify: options.css && options.css.minify,
     jsMinify: options.js && options.js.minify,
+    jsCompile: options.js && options.js.compile,
   };
 
   logger.info(`Preparing build...`);

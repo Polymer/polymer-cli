@@ -47,6 +47,13 @@ export class BuildCommand implements Command {
       description: 'minify HTML by removing comments and whitespace.'
     },
     {
+      name: 'js-compile',
+      type: Boolean,
+      description: 'Combine build source and dependency files together into ' +
+          'a minimum set of bundles. Useful for reducing the number of ' +
+          'requests needed to serve your application.'
+    },
+    {
       name: 'sw-precache-config',
       defaultValue: 'sw-precache-config.js',
       description: 'Path to an sw-precache configuration to be ' +
@@ -76,6 +83,7 @@ export class BuildCommand implements Command {
       },
       js: {
         minify: !!options['js-minify'],
+        compile: !!options['js-compile'],
       },
     };
 
