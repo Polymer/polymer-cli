@@ -1,6 +1,10 @@
 # Changelog
 
-## Upcoming (Potentially Breaking)
+## Upcoming
+
+## v0.18.0-alpha.8
+
+- Updated dependencies.
 
 ## v0.18.0-alpha.7
 
