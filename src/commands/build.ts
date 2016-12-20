@@ -45,11 +45,12 @@ export class BuildCommand implements Command {
           'used for service worker generation.'
     },
     {
-      name: 'insert-dependency-links',
+      name: 'insert-prefetch-links',
       type: Boolean,
-      description: 'Flatten dependency tree downloads by inserting ' +
-          'additional `<link rel="prefetch">` tags into ' +
-          'entrypoint and `<link rel="import">` tags into fragments and shell.'
+      description: 'Add dependency prefetching by inserting ' +
+          '`<link rel="prefetch">` tags into entrypoint and ' +
+          '`<link rel="import">` tags into fragments and shell for all ' +
+          'dependencies.'
     },
     {
       name: 'html.collapseWhitespace',
@@ -64,7 +65,7 @@ export class BuildCommand implements Command {
 
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
-      insertDependencyLinks: options['insert-dependency-links'],
+      insertPrefetchLinks: options['insert-prefetch-links'],
       bundle: options['bundle'],
       html: {},
       css: {},

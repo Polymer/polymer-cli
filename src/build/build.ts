@@ -34,7 +34,7 @@ const buildDirectory = 'build/';
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
-  insertDependencyLinks?: boolean;
+  insertPrefetchLinks?: boolean;
   bundle?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
   html?: {collapseWhitespace?: boolean; removeComments?: boolean};
@@ -55,11 +55,6 @@ export async function build(
     css: Object.assign({stripWhitespace: true}, options.css),
     js: Object.assign({minify: true}, options.js),
   };
-
-  if (options.insertDependencyLinks) {
-    logger.debug(
-        `Additional dependency links will be inserted into application`);
-  }
 
   logger.info(`Deleting build/ directory...`);
   await del([buildDirectory]);
@@ -96,10 +91,10 @@ export async function build(
 
   if (options.bundle) {
     buildStream = buildStream.pipe(polymerProject.bundler);
-  } else {
-    buildStream = buildStream.pipe(gulpif(
-        options.insertDependencyLinks || false,
-        new PrefetchTransform(polymerProject)));
+  }
+
+  if (options.insertPrefetchLinks) {
+    buildStream = buildStream.pipe(new PrefetchTransform(polymerProject));
   }
 
   buildStream = buildStream
