@@ -138,20 +138,20 @@ suite('init', () => {
     setup(() => {
       let generators = {};
 
-      for (let g of GENERATORS) {
-        if (!g.resolved) {
+      for (let generator of GENERATORS) {
+        if (!generator.resolved) {
           let tmpDir = temp.mkdirSync();
           let packageJsonPath = `${tmpDir}/package.json`;
           fs.writeFileSync(packageJsonPath, JSON.stringify({
-            description: g.description,
-            name: g.metaName,
+            description: generator.description,
+            name: generator.metaName,
           }));
-          g.resolved = tmpDir;
+          generator.resolved = tmpDir;
         }
 
-        generators[g.generatorName] = {
-          resolved: g.resolved,
-          namespace: g.generatorName,
+        generators[generator.generatorName] = {
+          resolved: generator.resolved,
+          namespace: generator.generatorName,
         };
       }
 
@@ -187,12 +187,12 @@ suite('init', () => {
         let choices = promptStub.firstCall.args[0][0].choices;
         assert.equal(choices.length, GENERATORS.length);
 
-        for (let c of choices) {
-          let g = GENERATORS.find(x => x.generatorName === c.value);
-          assert.isDefined(g, `generator not found: ${c.value}`);
-          assert.oneOf(stripAnsi(c.name), [g.shortName, `${g.shortName} - ${g.description}`]);
-          assert.equal(c.value, g.generatorName);
-          assert.equal(c.short, g.shortName);
+        for (let choice of choices) {
+          let generator = GENERATORS.find(generator => generator.generatorName === choice.value);
+          assert.isDefined(generator, `generator not found: ${choice.value}`);
+          assert.oneOf(stripAnsi(choice.name), [generator.shortName, `${generator.shortName} - ${generator.description}`]);
+          assert.equal(choice.value, generator.generatorName);
+          assert.equal(choice.short, generator.shortName);
         }
       });
     });
