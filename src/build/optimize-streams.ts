@@ -24,7 +24,7 @@ import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
 // or consider writing a custom declaration in the `custom_typings/` folder.
 import File = require('vinyl');
 
-let logger = logging.getLogger('cli.build.optimize-streams');
+const logger = logging.getLogger('cli.build.optimize-streams');
 
 export type FileCB = (error?: any, file?: File) => void;
 export type CSSOptimizeOptions = {
@@ -82,11 +82,11 @@ export class JSOptimizeStream extends GenericOptimizeStream {
     // uglify is special, in that it returns an object with a code property
     // instead of just a code string. We create a compliant optimizer here
     // that returns a string instead.
-    let uglifyOptimizer = (contents: string, options: UglifyOptions) => {
+    const uglifyOptimizer = (contents: string, options: UglifyOptions) => {
       return uglify(contents, options).code;
     };
     // We automatically add the fromString option because it is required.
-    let uglifyOptions = Object.assign({fromString: true}, options);
+    const uglifyOptions = Object.assign({fromString: true}, options);
     super('uglify-js', uglifyOptimizer, uglifyOptions);
   }
 }
@@ -143,7 +143,7 @@ export class HTMLOptimizeStream extends GenericOptimizeStream {
  * OptimizeOptions given.
  */
 export function getOptimizeStreams(optimizeOptions: OptimizeOptions) {
-  let streams = [];
+  const streams = [];
 
   // add optimizers
   if (optimizeOptions.htmlMinify) {
