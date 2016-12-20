@@ -22,7 +22,7 @@ import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
 
-import {getOptimizeStreams} from './optimize-streams';
+import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 
 import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
@@ -37,10 +37,8 @@ const bundledBuildDirectory = 'build/bundled';
 export interface BuildOptions {
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
-  html?: {minify: boolean};
-  css?: {minify: boolean};
-  js?: {minify?: boolean};
-}
+  optimize?: OptimizeOptions;
+};
 
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
@@ -51,12 +49,6 @@ export async function build(
         `Additional dependency links will be inserted into application`);
   }
 
-  const optimizeOptions = {
-    htmlMinify: options.html && options.html.minify,
-    cssMinify: options.css && options.css.minify,
-    jsMinify: options.js && options.js.minify,
-  };
-
   logger.info(`Preparing build...`);
   await del([unbundledBuildDirectory, bundledBuildDirectory]);
 
@@ -66,7 +58,7 @@ export async function build(
   const sourcesStream = [].concat.apply([], [
     polymerProject.sources(),
     polymerProject.splitHtml(),
-    getOptimizeStreams(optimizeOptions),
+    getOptimizeStreams(options.optimize),
     polymerProject.rejoinHtml()
   ]).reduce((a: NodeJS.ReadableStream, b: NodeJS.ReadWriteStream) => {
     return a.pipe(b);
@@ -76,7 +68,7 @@ export async function build(
   const depsStream = [].concat.apply([], [
     polymerProject.dependencies(),
     polymerProject.splitHtml(),
-    getOptimizeStreams(optimizeOptions),
+    getOptimizeStreams(options.optimize),
     polymerProject.rejoinHtml()
   ]).reduce((a: NodeJS.ReadableStream, b: NodeJS.ReadWriteStream) => {
     return a.pipe(b);

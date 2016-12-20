@@ -68,14 +68,16 @@ export class BuildCommand implements Command {
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
-      html: {
-        minify: !!options['html-minify'],
-      },
-      css: {
-        minify: !!options['css-minify'],
-      },
-      js: {
-        minify: !!options['js-minify'],
+      optimize: {
+        html: {
+          minify: !!options['html-minify'],
+        },
+        css: {
+          minify: !!options['css-minify'],
+        },
+        js: {
+          minify: !!options['js-minify'],
+        },
       },
     };
 
