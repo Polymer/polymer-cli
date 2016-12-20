@@ -44,8 +44,8 @@ export interface BuildOptions {
 
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
-  let polymerProject = new PolymerProject(config);
-  let swPrecacheConfig = path.resolve(
+  const polymerProject = new PolymerProject(config);
+  const swPrecacheConfig = path.resolve(
       config.root, options.swPrecacheConfig || 'sw-precache-config.js');
 
   // mix in optimization options from build command
@@ -83,11 +83,12 @@ export async function build(
           .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
           .pipe(polymerProject.rejoinHtml());
 
-  let buildStream =
-      <NodeJS.ReadableStream>mergeStream(sourcesStream, depsStream)
-          .once('data', () => {
-            logger.debug('Analyzing build dependencies...');
-          });
+  let buildStream: NodeJS.ReadableStream =
+      mergeStream(sourcesStream, depsStream);
+
+  buildStream.once('data', () => {
+    logger.debug('Analyzing build dependencies...');
+  });
 
   if (options.bundle) {
     buildStream = buildStream.pipe(polymerProject.bundler);
@@ -97,13 +98,12 @@ export async function build(
     buildStream = buildStream.pipe(new PrefetchTransform(polymerProject));
   }
 
-  buildStream = buildStream
-                    .once(
-                        'data',
-                        () => {
-                          logger.info('Generating build/ directory...');
-                        })
-                    .pipe(dest(buildDirectory));
+  buildStream.once('data', () => {
+    logger.info('Generating build/ directory...');
+  });
+
+  buildStream = buildStream.pipe(dest(buildDirectory));
+
 
   // While the build is in progress, parse the sw precache config
   const swConfig = await parsePreCacheConfig(swPrecacheConfig);
@@ -114,13 +114,16 @@ export async function build(
                   }, continuing with defaults`);
   }
 
-  // Once the build stream is complete, create a service worker for the build
+  // Now that the build stream has been set up, wait for it to complete.
   await waitFor(buildStream);
+
+  // addServiceWorker() reads from the file system, so we need to wait for
+  // the build stream to finish writing to disk before calling it.
   await addServiceWorker({
     buildRoot: buildDirectory,
     project: polymerProject,
     swPrecacheConfig: swConfig || undefined,
-    bundled: options.bundle
+    bundled: options.bundle,
   });
 
   logger.info('Build complete!');
