@@ -26,7 +26,7 @@ import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 
 import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
-import {waitFor} from './streams';
+import {waitFor, pipeStreams} from './streams';
 import {parsePreCacheConfig} from './sw-precache';
 
 const logger = logging.getLogger('cli.build.build');
@@ -38,7 +38,8 @@ export interface BuildOptions {
   swPrecacheConfig?: string;
   insertDependencyLinks?: boolean;
   optimize?: OptimizeOptions;
-};
+}
+;
 
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
@@ -55,24 +56,20 @@ export async function build(
   logger.info(`Building application...`);
 
   logger.debug(`Reading source files...`);
-  const sourcesStream = [].concat.apply([], [
+  const sourcesStream = pipeStreams([
     polymerProject.sources(),
     polymerProject.splitHtml(),
     getOptimizeStreams(options.optimize),
     polymerProject.rejoinHtml()
-  ]).reduce((a: NodeJS.ReadableStream, b: NodeJS.ReadWriteStream) => {
-    return a.pipe(b);
-  });
+  ]);
 
   logger.debug(`Reading dependencies...`);
-  const depsStream = [].concat.apply([], [
+  const depsStream = pipeStreams([
     polymerProject.dependencies(),
     polymerProject.splitHtml(),
     getOptimizeStreams(options.optimize),
     polymerProject.rejoinHtml()
-  ]).reduce((a: NodeJS.ReadableStream, b: NodeJS.ReadWriteStream) => {
-    return a.pipe(b);
-  });
+  ]);
 
   let buildStream = mergeStream(sourcesStream, depsStream);
 

@@ -13,13 +13,13 @@
  */
 
 import * as logging from 'plylog';
+import {ProjectConfig} from 'polymer-project-config';
 
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
 import {BuildOptions} from '../build/build';
 
-import {ProjectConfig} from 'polymer-project-config';
 import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.build');

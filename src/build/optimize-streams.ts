@@ -142,19 +142,25 @@ export class HTMLOptimizeStream extends GenericOptimizeStream {
  * Returns an array of optimization streams to use in your build, based on the
  * OptimizeOptions given.
  */
-export function getOptimizeStreams(options?: OptimizeOptions) {
+export function getOptimizeStreams(options?: OptimizeOptions):
+    NodeJS.ReadWriteStream[] {
   options = options || {};
   const streams = [];
 
   // add optimizers
   if (options.html && options.html.minify) {
-    streams.push(gulpif(/\.html$/, new HTMLOptimizeStream({collapseWhitespace: true, removeComments: true})));
+    streams.push(gulpif(
+        /\.html$/,
+        new HTMLOptimizeStream(
+            {collapseWhitespace: true, removeComments: true})));
   }
   if (options.css && options.css.minify) {
-    streams.push(gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
+    streams.push(
+        gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
     // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
     // is properly being isolated by splitHtml() & rejoinHtml().
-    streams.push(gulpif(/\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
+    streams.push(gulpif(
+        /\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
   }
   if (options.js && options.js.minify) {
     streams.push(gulpif(/\.js$/, new JSOptimizeStream({fromString: true})));
