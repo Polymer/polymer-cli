@@ -32,17 +32,17 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'js-minify',
+      name: 'js.minify',
       type: Boolean,
       description: 'minify inlined and external JavaScript.'
     },
     {
-      name: 'css-minify',
+      name: 'css.minify',
       type: Boolean,
       description: 'minify inlined and external CSS.'
     },
     {
-      name: 'html-minify',
+      name: 'html.minify',
       type: Boolean,
       description: 'minify HTML by removing comments and whitespace.'
     },
@@ -70,13 +70,13 @@ export class BuildCommand implements Command {
       insertDependencyLinks: options['insert-dependency-links'],
       optimize: {
         html: {
-          minify: !!options['html-minify'],
+          minify: !!options['html.minify'],
         },
         css: {
-          minify: !!options['css-minify'],
+          minify: !!options['css.minify'],
         },
         js: {
-          minify: !!options['js-minify'],
+          minify: !!options['js.minify'],
         },
       },
     };
