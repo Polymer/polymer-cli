@@ -156,12 +156,11 @@ function getDisplayName(generatorName: string) {
   // -------------------------------------------------------------------
   // (generator-)?           | Grp 1; Match "generator-"; Optional
   // (polymer-init)?         | Grp 2; Match "polymer-init-"; Optional
-  // (polymer-starter-kit-)? | Grp 3; Match "polymer-starter-kit-"; Optional
-  // ([^:]+)                 | Grp 4; Match one or more characters != ":"
-  // (:.*)?                  | Grp 5; Match ":" followed by anything; Optional
+  // ([^:]+)                 | Grp 3; Match one or more characters != ":"
+  // (:.*)?                  | Grp 4; Match ":" followed by anything; Optional
   return generatorName.replace(
-      /(generator-)?(polymer-init-)?(polymer-starter-kit-)?([^:]+)(:.*)?/g,
-      '$4');
+      /(generator-)?(polymer-init-)?([^:]+)(:.*)?/g,
+      '$3');
 }
 
 /**

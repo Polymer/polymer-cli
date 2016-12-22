@@ -105,14 +105,14 @@ suite('init', () => {
       },
       {
         generatorName: 'polymer-init-polymer-starter-kit-custom-1:app',
-        metaName: 'polymer-init-polymer-starter-kit-psk-1',
-        shortName: 'psk-1',
+        metaName: 'polymer-init-polymer-starter-kit-1',
+        shortName: 'polymer-starter-kit-1',
         description: 'PSK 1',
       },
       {
         generatorName: 'polymer-init-polymer-starter-kit-custom-2:app',
-        metaName: 'generator-polymer-init-polymer-starter-kit-psk-2',
-        shortName: 'psk-2',
+        metaName: 'generator-polymer-init-polymer-starter-kit-2',
+        shortName: 'polymer-starter-kit-2',
         description: 'PSK 2',
       },
       {
