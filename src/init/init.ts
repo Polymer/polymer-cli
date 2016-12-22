@@ -82,50 +82,86 @@ function checkIsMinGW(): boolean {
 function getGeneratorDescription(
     generator: YeomanEnvironment.GeneratorMeta,
     generatorName: string): GeneratorDescription {
-  const name = getDisplayName(generatorName);
-  let description: string = '';
+  const meta = getGeneratorMeta(generator.resolved, generatorName, '');
+  const displayName = getDisplayName(meta.name);
+  let description = meta.description;
 
-  if (templateDescriptions.hasOwnProperty(name)) {
-    description = templateDescriptions[name];
-  } else if (generator.resolved && generator.resolved !== 'unknown') {
-    try {
-      const metapath = findup('package.json', {cwd: generator.resolved});
-      const meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
-      description = meta.description;
-    } catch (error) {
-      if (error.message === 'not found') {
-        logger.debug('no package.json found for generator');
-      } else {
-        logger.debug('unable to read/parse package.json for generator', {
-          generator: generatorName,
-          err: error.message,
-        });
-      }
-    }
+  if (templateDescriptions.hasOwnProperty(displayName)) {
+    description = templateDescriptions[displayName];
   }
+
   // If a description exists, format it properly for the command-line
   if (description.length > 0) {
     description = chalk.dim(` - ${description}`);
   }
 
   return {
-    name: `${name}${description}`,
+    name: `${displayName}${description}`,
     value: generatorName,
     // inquirer is broken and doesn't print descriptions :(
     // keeping this so things work when it does
-    short: name,
+    short: displayName,
   };
 }
 
 /**
- * Extract the meaningful name from the full yeoman generator name
+ * Get the metadata of a generator from its package.json
+ */
+function getGeneratorMeta(
+    rootDir: string,
+    defaultName: string,
+    defaultDescription: string): {name: string, description: string} {
+  let name = defaultName;
+  let description = defaultDescription;
+
+  if (rootDir && rootDir !== 'unknown') {
+    try {
+      const metapath = findup('package.json', {cwd: rootDir});
+      const meta = JSON.parse(fs.readFileSync(metapath, 'utf8'));
+      description = meta.description || description;
+      name = meta.name || name;
+    } catch (error) {
+      if (error.message === 'not found') {
+        logger.debug('no package.json found for generator');
+      } else {
+        logger.debug('unable to read/parse package.json for generator', {
+          generator: defaultName,
+          err: error.message,
+        });
+      }
+    }
+  }
+  return {name, description};
+}
+
+/**
+ * Extract the meaningful name from the full Yeoman generator name.
+ * Strip the standard generator prefixes ("generator-", "polymer-init-",
+ * and "polymer-starter-kit-"), and extract the remainder of the name
+ * (the first part of the string before any colons).
+ *
+ * Examples:
+ *
+ *   'generator-polymer-init-foo'         === 'foo'
+ *   'polymer-init-foo'                   === 'foo'
+ *   'foo-bar'                            === 'foo-bar'
+ *   'generator-polymer-init-foo:aaa'     === 'foo'
+ *   'polymer-init-foo:bbb'               === 'foo'
+ *   'foo-bar:ccc'                        === 'foo-bar'
  */
 function getDisplayName(generatorName: string) {
-  let nameEnd = generatorName.indexOf(':');
-  if (nameEnd === -1) {
-    nameEnd = generatorName.length;
-  }
-  return generatorName.substring('polymer-init-'.length, nameEnd);
+  // Breakdown of regular expression to extract name (group 4 in pattern):
+  //
+  // Pattern                 | Meaning
+  // -------------------------------------------------------------------
+  // (generator-)?           | Grp 1; Match "generator-"; Optional
+  // (polymer-init)?         | Grp 2; Match "polymer-init-"; Optional
+  // (polymer-starter-kit-)? | Grp 3; Match "polymer-starter-kit-"; Optional
+  // ([^:]+)                 | Grp 4; Match one or more characters != ":"
+  // (:.*)?                  | Grp 5; Match ":" followed by anything; Optional
+  return generatorName.replace(
+      /(generator-)?(polymer-init-)?(polymer-starter-kit-)?([^:]+)(:.*)?/g,
+      '$4');
 }
 
 /**

@@ -37,7 +37,8 @@ export class InitCommand implements Command {
 
     const templateName = options['name'];
     if (templateName) {
-      const generatorName = `polymer-init-${templateName}:app`;
+      const subgen = (templateName.indexOf(':') !== -1) ? '' : ':app';
+      const generatorName = `polymer-init-${templateName}${subgen}`;
       logger.debug('template name provided', {
         generator: generatorName,
         template: templateName,

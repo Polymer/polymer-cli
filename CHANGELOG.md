@@ -19,6 +19,7 @@
 - `polymer.json`: Rename the `includeDependencies` & `sourceGlobs` fields to `extraDependencies` & `sources`, respectively
 - Added support for v7.x of Node.js, dropped support for v5.x. Please move to an [actively maintained version of Node.js](https://github.com/nodejs/LTS) for the best experience.
 - Upgrade [web-component-tester 6.0](https://github.com/Polymer/web-component-tester/blob/master/CHANGELOG.md) which brings a number of breaking changes to the `test` command.
+- `init`: Fix duplicate names for sub-generators in a directory
 
 ## v0.17.0
 
