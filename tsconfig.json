@@ -4,6 +4,7 @@
     "lib": ["es2016"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "isolatedModules": false,
     "declaration": false,
     "strictNullChecks": true,
