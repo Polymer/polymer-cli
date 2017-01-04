@@ -136,9 +136,9 @@ function getGeneratorMeta(
 
 /**
  * Extract the meaningful name from the full Yeoman generator name.
- * Strip the standard generator prefixes ("generator-", "polymer-init-",
- * and "polymer-starter-kit-"), and extract the remainder of the name
- * (the first part of the string before any colons).
+ * Strip the standard generator prefixes ("generator-" and "polymer-init-"),
+ * and extract the remainder of the name (the first part of the string before
+ * any colons).
  *
  * Examples:
  *
@@ -150,7 +150,7 @@ function getGeneratorMeta(
  *   'foo-bar:ccc'                        === 'foo-bar'
  */
 function getDisplayName(generatorName: string) {
-  // Breakdown of regular expression to extract name (group 4 in pattern):
+  // Breakdown of regular expression to extract name (group 3 in pattern):
   //
   // Pattern                 | Meaning
   // -------------------------------------------------------------------
