@@ -34,10 +34,10 @@ suite('init/github', () => {
       },
 
       repos: {
-        getReleases(options, cb) {
+        getReleases(options) {
           assert.equal(options.owner, 'PolymerLabs');
           assert.equal(options.repo, 'polykart');
-          cb(null, [{
+          return Promise.resolve([{
             tarball_url: 'http://foo.com/bar.tar',
           }]);
         },

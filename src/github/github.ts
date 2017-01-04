@@ -71,7 +71,6 @@ export class Github {
     this._owner = opts.owner;
     this._repo = opts.repo;
     this._github = opts.githubApi || new GitHubApi({
-                     version: '3.0.0',
                      protocol: 'https',
                    });
     if (this._token != null) {
@@ -83,83 +82,68 @@ export class Github {
     this._request = opts.requestApi || request;
   }
 
-  extractLatestRelease(outDir: string): Promise<void> {
+  async extractLatestRelease(outDir: string): Promise<void> {
+    const tarPipe = tar.extract(outDir, {
+      ignore: (_: any, header: any) => {
+        let splitPath = path.normalize(header.name).split(path.sep);
+        // ignore the top directory in the tarfile to unpack directly to
+        // the cwd
+        return splitPath.length < 1 || splitPath[1] === '';
+      },
+      map: (header: any) => {
+        let splitPath = path.normalize(header.name).split(path.sep);
+        let unprefixed = splitPath.slice(1).join(path.sep).trim();
+        // A ./ prefix is needed to unpack top-level files in the tar,
+        // otherwise they're just not written
+        header.name = path.join('.', unprefixed);
+        return header;
+      },
+    });
+    const release = await this.getLatestRelease();
+    const tarballUrl = release.tarball_url;
     return new Promise<void>((resolve, reject) => {
-      let tarPipe = tar.extract(outDir, {
-        ignore: (_: any, header: any) => {
-          let splitPath = path.normalize(header.name).split(path.sep);
-          // ignore the top directory in the tarfile to unpack directly to
-          // the cwd
-          return splitPath.length < 1 || splitPath[1] === '';
-        },
-        map: (header: any) => {
-          let splitPath = path.normalize(header.name).split(path.sep);
-          let unprefixed = splitPath.slice(1).join(path.sep).trim();
-          // A ./ prefix is needed to unpack top-level files in the tar,
-          // otherwise they're just not written
-          header.name = path.join('.', unprefixed);
-          return header;
-        },
-      });
-      this.getLatestRelease()
-          .then((release) => {
-            let tarballUrl = release.tarball_url;
-            this._request({
-                  url: tarballUrl,
-                  headers: {
-                    'User-Agent': 'request',
-                    'Authorization': (this._token) ? `token ${this._token}` :
-                                                     undefined,
-                  }
-                })
-                .on('response',
-                    function(response) {
-                      if (response.statusCode !== 200) {
-                        throw new GithubResponseError(
-                            response.statusCode, response.statusMessage);
-                      }
-                      logger.info('Unpacking template files');
-                    })
-                .pipe(gunzip())
-                .pipe(tarPipe)
-                // tar-fs/tar-stream do not send 'end' events, only 'finish'
-                // events
-                .on('finish',
-                    () => {
-                      logger.info('Finished writing template files');
-                      resolve();
-                    })
-                .on('error', (error: any) => {
-                  throw error;
-                });
+      this._request({
+            url: tarballUrl,
+            headers: {
+              'User-Agent': 'request',
+              'Authorization': (this._token) ? `token ${this._token}` :
+                                                undefined,
+            }
           })
-          .catch((error) => {
+          .on('response',
+              function(response) {
+                if (response.statusCode !== 200) {
+                  throw new GithubResponseError(
+                      response.statusCode, response.statusMessage);
+                }
+                logger.info('Unpacking template files');
+              })
+          .pipe(gunzip())
+          .pipe(tarPipe)
+          // tar-fs/tar-stream do not send 'end' events, only 'finish'
+          // events
+          .on('finish',
+              () => {
+                logger.info('Finished writing template files');
+                resolve();
+              })
+          .on('error', (error: any) => {
             reject(error);
           });
     });
   }
 
-  getLatestRelease(): Promise<GitHubApi.Release> {
-    return new Promise((resolve, reject) => {
-      this._github.repos.getReleases(
-          {
+  async getLatestRelease(): Promise<GitHubApi.Release> {
+    const releases = await this._github.repos.getReleases({
             owner: this._owner,
             repo: this._repo,
             per_page: 1,
-          },
-          (error, result) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-            if (result.length === 0) {
-              reject(new Error(
-                  `${this._owner}/${this._repo} has 0 releases. ` +
-                  'Cannot get latest release.'));
-              return;
-            }
-            resolve(result[0]);
-          });
-    });
+    }) as GitHubApi.Release[];
+    if (releases.length === 0) {
+      throw new Error(
+        `${this._owner}/${this._repo} has 0 releases. ` +
+        'Cannot get latest release.');
+    }
+    return releases[0];
   }
 }
