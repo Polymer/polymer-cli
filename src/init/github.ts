@@ -12,7 +12,7 @@
  */
 
 import * as logging from 'plylog';
-import {Base} from 'yeoman-generator';
+import Generator = require('yeoman-generator');
 
 import {Github, RequestAPI} from '../github/github';
 
@@ -29,14 +29,14 @@ export interface GithubGeneratorOptions {
 }
 
 export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
-    (typeof Base) {
+    (typeof Generator) {
   let requestApi = githubOptions.requestApi;
   let githubApi = githubOptions.githubApi;
   let githubToken = githubOptions.githubToken;
   let owner = githubOptions.owner;
   let repo = githubOptions.repo;
 
-  return class GithubGenerator extends Base {
+  return class GithubGenerator extends Generator {
     _github: Github;
 
     constructor(args: string|string[], options: any) {
