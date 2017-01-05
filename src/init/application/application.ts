@@ -23,6 +23,14 @@ export class ApplicationGenerator extends Generator {
     this.sourceRoot(path.join(__dirname, 'templates'));
   }
 
+  // This is necessary to prevent an exception in Yeoman when creating
+  // storage for generators registered as a stub and used in a folder
+  // with a package.json but with no name property.
+  // https://github.com/Polymer/polymer-cli/issues/186
+  rootGeneratorName(): string {
+    return 'ApplicationGenerator';
+  }
+
   initializing() {
     // Yeoman replaces dashes with spaces. We want dashes.
     this.appname = this.appname.replace(/\s+/g, '-');

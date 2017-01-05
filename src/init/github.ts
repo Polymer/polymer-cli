@@ -45,6 +45,10 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
           new Github({owner, repo, githubToken, githubApi, requestApi});
     }
 
+    // This is necessary to prevent an exception in Yeoman when creating
+    // storage for generators registered as a stub and used in a folder
+    // with a package.json but with no name property.
+    // https://github.com/Polymer/polymer-cli/issues/186
     rootGeneratorName(): string {
       return 'GithubGenerator';
     }

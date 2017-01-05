@@ -2,6 +2,9 @@
 
 ## Upcoming
 
+- Fixed a bug where `polymer init` would crash if run from a folder with a
+  package.json that's missing a name property. https://github.com/Polymer/polymer-cli/issues/186
+
 ## v0.18.0-alpha.8
 
 - Updated dependencies.
