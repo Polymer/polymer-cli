@@ -8,8 +8,8 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # Get npm 3
   - npm install -g npm
-  # install modules
-  - npm install
+  # install modules. Use --force to workaround permissions issues on Windows
+  - npm install --force
 
 # Post-install test scripts.
 test_script:
