@@ -13,9 +13,9 @@
 
 import * as chalk from 'chalk';
 import * as path from 'path';
-import {Base} from 'yeoman-generator';
+import Generator = require('yeoman-generator');
 
-export class ElementGenerator extends Base {
+export class ElementGenerator extends Generator {
   props: any;
 
   constructor(args: string|string[], options: any) {
