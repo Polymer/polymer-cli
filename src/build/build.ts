@@ -20,7 +20,7 @@ import {dest} from 'vinyl-fs';
 
 
 import mergeStream = require('merge-stream');
-import {PolymerProject, addServiceWorker, forkStream, SWConfig} from 'polymer-build';
+import {PolymerProject, addServiceWorker} from 'polymer-build';
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 
@@ -31,29 +31,23 @@ import {parsePreCacheConfig} from './sw-precache';
 
 const logger = logging.getLogger('cli.build.build');
 
-const unbundledBuildDirectory = 'build/unbundled';
-const bundledBuildDirectory = 'build/bundled';
+const buildDirectory = 'build/';
 
 export interface BuildOptions {
   swPrecacheConfig?: string;
-  insertDependencyLinks?: boolean;
+  insertPrefetchLinks?: boolean;
+  bundle?: boolean;
   optimize?: OptimizeOptions;
-}
-;
+};
 
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
-  let polymerProject = new PolymerProject(config);
+  const polymerProject = new PolymerProject(config);
+  const swPrecacheConfig = path.resolve(
+      config.root, options.swPrecacheConfig || 'sw-precache-config.js');
 
-  if (options.insertDependencyLinks) {
-    logger.debug(
-        `Additional dependency links will be inserted into application`);
-  }
-
-  logger.info(`Preparing build...`);
-  await del([unbundledBuildDirectory, bundledBuildDirectory]);
-
-  logger.info(`Building application...`);
+  logger.info(`Deleting build/ directory...`);
+  await del([buildDirectory]);
 
   logger.debug(`Reading source files...`);
   const sourcesStream = pipeStreams([
@@ -71,66 +65,48 @@ export async function build(
     polymerProject.rejoinHtml()
   ]);
 
-  let buildStream = mergeStream(sourcesStream, depsStream);
+  let buildStream: NodeJS.ReadableStream =
+      mergeStream(sourcesStream, depsStream);
 
-  let unbundledPhase = forkStream(buildStream)
-                           .once(
-                               'data',
-                               () => {
-                                 logger.info('Generating build/unbundled...');
-                               })
-                           .pipe(gulpif(
-                               options.insertDependencyLinks || false,
-                               new PrefetchTransform(polymerProject)))
-                           .pipe(dest(unbundledBuildDirectory));
-
-  let bundledPhase = forkStream(buildStream)
-                         .once(
-                             'data',
-                             () => {
-                               logger.info('Generating build/bundled...');
-                             })
-                         .pipe(polymerProject.bundler)
-                         .pipe(dest(bundledBuildDirectory));
-
-  let swPrecacheConfig = path.resolve(
-      config.root, options.swPrecacheConfig || 'sw-precache-config.js');
-  let loadSWConfig = parsePreCacheConfig(swPrecacheConfig);
-
-  loadSWConfig.then((swConfig) => {
-    if (swConfig) {
-      logger.debug(`Service worker config found`, swConfig);
-    } else {
-      logger.debug(`No service worker configuration found at ${swPrecacheConfig
-                   }, continuing with defaults`);
-    }
+  buildStream.once('data', () => {
+    logger.debug('Analyzing build dependencies...');
   });
 
-  // Once the unbundled build stream is complete, create a service worker for
-  // the build
-  let unbundledPostProcessing =
-      Promise.all([loadSWConfig, waitFor(unbundledPhase)]).then((results) => {
-        let swConfig: SWConfig|undefined = results[0] || undefined;
-        return addServiceWorker({
-          buildRoot: unbundledBuildDirectory,
-          project: polymerProject,
-          swPrecacheConfig: swConfig,
-        });
-      });
+  if (options.bundle) {
+    buildStream = buildStream.pipe(polymerProject.bundler);
+  }
 
-  // Once the bundled build stream is complete, create a service worker for the
-  // build
-  let bundledPostProcessing =
-      Promise.all([loadSWConfig, waitFor(bundledPhase)]).then((results) => {
-        let swConfig: SWConfig|undefined = results[0] || undefined;
-        return addServiceWorker({
-          buildRoot: bundledBuildDirectory,
-          project: polymerProject,
-          swPrecacheConfig: swConfig,
-          bundled: true,
-        });
-      });
+  if (options.insertPrefetchLinks) {
+    buildStream = buildStream.pipe(new PrefetchTransform(polymerProject));
+  }
 
-  await Promise.all([unbundledPostProcessing, bundledPostProcessing]);
+  buildStream.once('data', () => {
+    logger.info('Generating build/ directory...');
+  });
+
+  buildStream = buildStream.pipe(dest(buildDirectory));
+
+
+  // While the build is in progress, parse the sw precache config
+  const swConfig = await parsePreCacheConfig(swPrecacheConfig);
+  if (swConfig) {
+    logger.debug(`Service worker config found`, swConfig);
+  } else {
+    logger.debug(`No service worker configuration found at ${swPrecacheConfig
+                  }, continuing with defaults`);
+  }
+
+  // Now that the build stream has been set up, wait for it to complete.
+  await waitFor(buildStream);
+
+  // addServiceWorker() reads from the file system, so we need to wait for
+  // the build stream to finish writing to disk before calling it.
+  await addServiceWorker({
+    buildRoot: buildDirectory,
+    project: polymerProject,
+    swPrecacheConfig: swConfig || undefined,
+    bundled: options.bundle,
+  });
+
   logger.info('Build complete!');
 }

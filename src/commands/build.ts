@@ -32,19 +32,26 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'js.minify',
+      name: 'js-minify',
       type: Boolean,
       description: 'minify inlined and external JavaScript.'
     },
     {
-      name: 'css.minify',
+      name: 'css-minify',
       type: Boolean,
       description: 'minify inlined and external CSS.'
     },
     {
-      name: 'html.minify',
+      name: 'html-minify',
       type: Boolean,
       description: 'minify HTML by removing comments and whitespace.'
+    },
+    {
+      name: 'bundle',
+      defaultValue: false,
+      description: 'Combine build source and dependency files together into ' +
+          'a minimum set of bundles. Useful for reducing the number of ' +
+          'requests needed to serve your application.'
     },
     {
       name: 'sw-precache-config',
@@ -53,11 +60,12 @@ export class BuildCommand implements Command {
           'used for service worker generation.'
     },
     {
-      name: 'insert-dependency-links',
+      name: 'insert-prefetch-links',
       type: Boolean,
-      description: 'Flatten dependency tree downloads by inserting ' +
-          'additional `<link rel="prefetch">` tags into ' +
-          'entrypoint and `<link rel="import">` tags into fragments and shell.'
+      description: 'Add dependency prefetching by inserting ' +
+          '`<link rel="prefetch">` tags into entrypoint and ' +
+          '`<link rel="import">` tags into fragments and shell for all ' +
+          'dependencies.'
     },
   ];
 
@@ -67,16 +75,17 @@ export class BuildCommand implements Command {
 
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
-      insertDependencyLinks: options['insert-dependency-links'],
+      insertPrefetchLinks: options['insert-prefetch-links'],
+      bundle: options['bundle'],
       optimize: {
         html: {
-          minify: !!options['html.minify'],
+          minify: !!options['html-minify'],
         },
         css: {
-          minify: !!options['css.minify'],
+          minify: !!options['css-minify'],
         },
         js: {
-          minify: !!options['js.minify'],
+          minify: !!options['js-minify'],
         },
       },
     };
