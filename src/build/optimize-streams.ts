@@ -29,17 +29,16 @@ const babelPresetES2015NoModules = babelPresetES2015.buildPreset({}, {modules: f
 // or consider writing a custom declaration in the `custom_typings/` folder.
 import File = require('vinyl');
 
-let logger = logging.getLogger('cli.build.optimize-streams');
+const logger = logging.getLogger('cli.build.optimize-streams');
 
 export type FileCB = (error?: any, file?: File) => void;
 export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
 };
 export interface OptimizeOptions {
-  htmlMinify?: HTMLMinifierOptions;
-  cssMinify?: CSSOptimizeOptions;
-  jsMinify?: UglifyOptions;
-  jsCompile?: BabelTransformOptions;
+  html?: {minify: boolean};
+  css?: {minify: boolean};
+  js?: {minify?: boolean, compile: boolean};
 };
 
 /**
@@ -88,11 +87,11 @@ export class JSOptimizeStream extends GenericOptimizeStream {
     // uglify is special, in that it returns an object with a code property
     // instead of just a code string. We create a compliant optimizer here
     // that returns a string instead.
-    let uglifyOptimizer = (contents: string, options: UglifyOptions) => {
+    const uglifyOptimizer = (contents: string, options: UglifyOptions) => {
       return uglify(contents, options).code;
     };
     // We automatically add the fromString option because it is required.
-    let uglifyOptions = Object.assign({fromString: true}, options);
+    const uglifyOptions = Object.assign({fromString: true}, options);
     super('uglify-js', uglifyOptimizer, uglifyOptions);
   }
 }
@@ -164,23 +163,30 @@ export class HTMLOptimizeStream extends GenericOptimizeStream {
  * Returns an array of optimization streams to use in your build, based on the
  * OptimizeOptions given.
  */
-export function getOptimizeStreams(optimizeOptions: OptimizeOptions) {
-  let streams = [];
+export function getOptimizeStreams(options?: OptimizeOptions):
+    NodeJS.ReadWriteStream[] {
+  options = options || {};
+  const streams = [];
 
   // add optimizers
-  if (optimizeOptions.htmlMinify) {
-    streams.push(gulpif(/\.html$/, new HTMLOptimizeStream({collapseWhitespace: true, removeComments: true})));
+  if (options.html && options.html.minify) {
+    streams.push(gulpif(
+        /\.html$/,
+        new HTMLOptimizeStream(
+            {collapseWhitespace: true, removeComments: true})));
   }
-  if (optimizeOptions.cssMinify) {
-    streams.push(gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
+  if (options.css && options.css.minify) {
+    streams.push(
+        gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
     // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
     // is properly being isolated by splitHtml() & rejoinHtml().
-    streams.push(gulpif(/\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
+    streams.push(gulpif(
+        /\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
   }
-  if (optimizeOptions.jsMinify) {
+  if (options.js && options.js.minify) {
     streams.push(gulpif(/\.js$/, new JSOptimizeStream({fromString: true})));
   }
-  if (optimizeOptions.jsCompile) {
+  if (options.js && options.js.compile) {
     streams.push(gulpif(/\.js$/, new JSBabelStream({presets: [babelPresetES2015NoModules]})));
   }
 

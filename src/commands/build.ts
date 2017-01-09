@@ -13,13 +13,13 @@
  */
 
 import * as logging from 'plylog';
+import {ProjectConfig} from 'polymer-project-config';
 
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
 import {BuildOptions} from '../build/build';
 
-import {ProjectConfig} from 'polymer-project-config';
 import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.build');
@@ -32,17 +32,17 @@ export class BuildCommand implements Command {
 
   args = [
     {
-      name: 'js-minify',
+      name: 'js.minify',
       type: Boolean,
       description: 'minify inlined and external JavaScript.'
     },
     {
-      name: 'css-minify',
+      name: 'css.minify',
       type: Boolean,
       description: 'minify inlined and external CSS.'
     },
     {
-      name: 'html-minify',
+      name: 'html.minify',
       type: Boolean,
       description: 'minify HTML by removing comments and whitespace.'
     },
@@ -75,15 +75,17 @@ export class BuildCommand implements Command {
     let buildOptions: BuildOptions = {
       swPrecacheConfig: options['sw-precache-config'],
       insertDependencyLinks: options['insert-dependency-links'],
-      html: {
-        minify: !!options['html-minify'],
-      },
-      css: {
-        minify: !!options['css-minify'],
-      },
-      js: {
-        minify: !!options['js-minify'],
-        compile: !!options['js-compile'],
+      optimize: {
+        html: {
+          minify: !!options['html.minify'],
+        },
+        css: {
+          minify: !!options['css.minify'],
+        },
+        js: {
+          minify: !!options['js.minify'],
+          compile: !!options['js.compile'],
+        },
       },
     };
 
