@@ -38,9 +38,9 @@ export class BuildCommand implements Command {
           'older browsers.'
     },
     {
-      name: 'html-minify',
+      name: 'js-minify',
       type: Boolean,
-      description: 'minify HTML by removing comments and whitespace.'
+      description: 'minify JavaScript by removing comments and whitespace.'
     },
     {
       name: 'css-minify',
