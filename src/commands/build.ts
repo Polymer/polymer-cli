@@ -40,7 +40,7 @@ export class BuildCommand implements Command {
     {
       name: 'js-minify',
       type: Boolean,
-      description: 'minify JavaScript by removing comments and whitespace.'
+      description: 'minify inlined and external JavaScript.'
     },
     {
       name: 'css-minify',
