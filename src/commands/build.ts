@@ -48,7 +48,7 @@ export class BuildCommand implements Command {
       name: 'sw-precache-config',
       type: String,
       defaultValue: 'sw-precache-config.js',
-      description: 'Path to a file containing configuration options for ' +
+      description: 'Path to a file that exports configuration options for ' +
           'the generated service worker. These options match those supported ' +
           'by the sw-precache library. See ' +
           'https://github.com/GoogleChrome/sw-precache#options-parameter ' +
