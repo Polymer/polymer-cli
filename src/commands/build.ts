@@ -83,17 +83,15 @@ export class BuildCommand implements Command {
       swPrecacheConfig: options['sw-precache-config'],
       insertPrefetchLinks: options['insert-prefetch-links'],
       bundle: options['bundle'],
-      optimize: {
-        html: {
-          minify: !!options['html-minify'],
-        },
-        css: {
-          minify: !!options['css-minify'],
-        },
-        js: {
-          minify: !!options['js-minify'],
-          compile: !!options['js-compile'],
-        },
+      html: {
+        minify: !!options['html-minify'],
+      },
+      css: {
+        minify: !!options['css-minify'],
+      },
+      js: {
+        minify: !!options['js-minify'],
+        compile: !!options['js-compile'],
       },
     };
 

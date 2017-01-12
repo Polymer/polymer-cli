@@ -13,7 +13,6 @@
  */
 
 import * as del from 'del';
-import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
@@ -33,15 +32,16 @@ const logger = logging.getLogger('cli.build.build');
 
 const buildDirectory = 'build/';
 
-export interface BuildOptions {
+export interface BuildOptions extends OptimizeOptions {
   swPrecacheConfig?: string;
   insertPrefetchLinks?: boolean;
   bundle?: boolean;
-  optimize?: OptimizeOptions;
 };
 
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
+  const optimizeOptions:
+      OptimizeOptions = {css: options.css, js: options.js, html: options.html};
   const polymerProject = new PolymerProject(config);
   const swPrecacheConfig = path.resolve(
       config.root, options.swPrecacheConfig || 'sw-precache-config.js');
@@ -53,7 +53,7 @@ export async function build(
   const sourcesStream = pipeStreams([
     polymerProject.sources(),
     polymerProject.splitHtml(),
-    getOptimizeStreams(options.optimize),
+    getOptimizeStreams(optimizeOptions),
     polymerProject.rejoinHtml()
   ]);
 
@@ -61,7 +61,7 @@ export async function build(
   const depsStream = pipeStreams([
     polymerProject.dependencies(),
     polymerProject.splitHtml(),
-    getOptimizeStreams(options.optimize),
+    getOptimizeStreams(optimizeOptions),
     polymerProject.rejoinHtml()
   ]);
 
