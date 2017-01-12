@@ -13,7 +13,6 @@
  */
 
 import * as del from 'del';
-import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
