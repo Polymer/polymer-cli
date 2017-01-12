@@ -100,10 +100,6 @@ suite('optimize-streams', () => {
         `,
       },
     ], {cwdbase: true});
-    // const options = {
-    //   collapseWhitespace: true,
-    //   removeComments: true,
-    // };
     const op = pipeStreams([sourceStream, getOptimizeStreams({html: {minify: true}})]);
     testStream(op, (error, f) => {
       if (error) {
