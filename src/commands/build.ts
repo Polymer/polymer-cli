@@ -41,15 +41,16 @@ export class BuildCommand implements Command {
     {
       name: 'add-service-worker',
       type: Boolean,
-      description: 'Generate a service worker that will precache your files ' +
-          ' and assets on the client. Based on the sw-precache library.'
+      description: 'Generate a service worker for your application to ' +
+          'cache all files and assets on the client.'
     },
     {
-      name: 'service-worker-config',
+      name: 'sw-precache-config',
       type: String,
-      defaultValue: 'service-worker-config.js',
-      description: 'Path to a configuration file that exports a set of ' +
-          'additional service worker options. See ' +
+      defaultValue: 'sw-precache-config.js',
+      description: 'Path to a file containing configuration options for ' +
+          'the generated service worker. These options match those supported ' +
+          'by the sw-precache library. See ' +
           'https://github.com/GoogleChrome/sw-precache#options-parameter ' +
           'for a list of all supported options.'
     },
@@ -74,7 +75,7 @@ export class BuildCommand implements Command {
 
     let buildOptions: BuildOptions = {
       addServiceWorker: options['add-service-worker'],
-      serviceWorkerConfig: options['service-worker-config'],
+      swPrecacheConfig: options['sw-precache-config'],
       insertPrefetchLinks: options['insert-prefetch-links'],
       bundle: options['bundle'],
       html: {},

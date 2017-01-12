@@ -34,7 +34,7 @@ const buildDirectory = 'build/';
 
 export interface BuildOptions {
   addServiceWorker?: boolean;
-  serviceWorkerConfig?: string;
+  swPrecacheConfig?: string;
   insertPrefetchLinks?: boolean;
   bundle?: boolean;
   // TODO(fks) 07-21-2016: Fully complete these with available options
@@ -46,8 +46,6 @@ export interface BuildOptions {
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
   const polymerProject = new PolymerProject(config);
-  const swConfigPath = path.resolve(
-      config.root, options.serviceWorkerConfig || 'service-worker-config.js');
 
   // mix in optimization options from build command
   // TODO: let this be set by the user
@@ -109,9 +107,11 @@ export async function build(
   // If a service worker was requested, parse the service worker config file
   // while the build is in progress. Loading the config file during the build
   // saves the user ~300ms vs. loading it afterwards.
+  const swPrecacheConfigPath = path.resolve(
+      config.root, options.swPrecacheConfig || 'sw-precache-config.js');
   let swConfig: SWConfig|null = null;
   if (options.addServiceWorker) {
-    swConfig = await loadServiceWorkerConfig(swConfigPath);
+    swConfig = await loadServiceWorkerConfig(swPrecacheConfigPath);
   }
 
   // There is nothing left to do, so wait for the build stream to complete.
@@ -124,8 +124,8 @@ export async function build(
     if (swConfig) {
       logger.debug(`Service worker config found`, swConfig);
     } else {
-      logger.debug(`No service worker configuration found at ${swConfigPath
-                    }, continuing with defaults`);
+      logger.debug(`No service worker configuration found at ` +
+          `${swPrecacheConfigPath}, continuing with defaults`);
     }
     await addServiceWorker({
       buildRoot: buildDirectory,
