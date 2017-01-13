@@ -90,7 +90,7 @@ export class GenericOptimizeTransform extends Transform {
  */
 class JSBabelTransform extends GenericOptimizeTransform {
   constructor(config: BabelTransformOptions) {
-    let transform = (contents: string, options: BabelTransformOptions) => {
+    const transform = (contents: string, options: BabelTransformOptions) => {
       return babelTransform(contents, options).code!;
     };
     super('.js', transform, config);
