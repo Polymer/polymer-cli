@@ -12,12 +12,18 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import {transform as babelTransform, TransformOptions as BabelTransformOptions} from 'babel-core';
 import * as cssSlam from 'css-slam';
 import * as gulpif from 'gulp-if';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
-import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
+
+
+const babelPresetES2015 = require('babel-preset-es2015');
+const babiliPreset = require('babel-preset-babili');
+const babelPresetES2015NoModules =
+    babelPresetES2015.buildPreset({}, {modules: false});
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -33,17 +39,18 @@ export type CSSOptimizeOptions = {
 export interface OptimizeOptions {
   html?: {minify: boolean};
   css?: {minify: boolean};
-  js?: {minify?: boolean};
-};
+  js?: {minify?: boolean, compile?: boolean};
+}
+;
 
 /**
- * GenericOptimizeStream is a generic optimization stream. It can be extended
+ * GenericOptimizeTransform is a generic optimization stream. It can be extended
  * to create a new kind of specific file-type optimizer, or it can be used
  * directly to create an ad-hoc optimization stream for different libraries.
  * If the transform library throws an exception when run, the file will pass
  * through unaffected.
  */
-export class GenericOptimizeStream extends Transform {
+export class GenericOptimizeTransform extends Transform {
   optimizer: (content: string, options: any) => string;
   optimizerName: string;
   optimizerOptions: any;
@@ -75,26 +82,46 @@ export class GenericOptimizeStream extends Transform {
 }
 
 /**
- * JSOptimizeStream optimizes JS files that pass through it (via uglify).
+ * JSBabelTransform uses babel to transpile Javascript, most often rewriting
+ * newer ECMAScript features to only use language features available in major
+ * browsers. If no options are given to the constructor, JSBabelTransform will
+ * use
+ * a babel's default "ES6 -> ES5" preset.
  */
-export class JSOptimizeStream extends GenericOptimizeStream {
-  constructor(options: UglifyOptions) {
-    // uglify is special, in that it returns an object with a code property
-    // instead of just a code string. We create a compliant optimizer here
-    // that returns a string instead.
-    const uglifyOptimizer = (contents: string, options: UglifyOptions) => {
-      return uglify(contents, options).code;
+class JSBabelTransform extends GenericOptimizeTransform {
+  constructor(config: BabelTransformOptions) {
+    const transform = (contents: string, options: BabelTransformOptions) => {
+      return babelTransform(contents, options).code!;
     };
-    // We automatically add the fromString option because it is required.
-    const uglifyOptions = Object.assign({fromString: true}, options);
-    super('uglify-js', uglifyOptimizer, uglifyOptions);
+    super('.js', transform, config);
   }
 }
 
 /**
- * CSSOptimizeStream optimizes CSS that pass through it (via css-slam).
+ * A convinient stream that wraps JSBabelTransform in our default "compile"
+ * options.
  */
-export class CSSOptimizeStream extends GenericOptimizeStream {
+export class JSDefaultCompileTransform extends JSBabelTransform {
+  constructor() {
+    super({presets: [babelPresetES2015NoModules]});
+  }
+}
+
+/**
+ * A convinient stream that wraps JSBabelTransform in our default "minify"
+ * options. Yes, it's strange to use babel for minification, but our minifier
+ * babili is actually just a plugin for babel.
+ */
+export class JSDefaultMinifyTransform extends JSBabelTransform {
+  constructor() {
+    super({presets: [babiliPreset]});
+  }
+}
+
+/**
+ * CSSMinifyTransform minifies CSS that pass through it (via css-slam).
+ */
+export class CSSMinifyTransform extends GenericOptimizeTransform {
   constructor(options: CSSOptimizeOptions) {
     super('css-slam', cssSlam.css, options);
   }
@@ -110,10 +137,10 @@ export class CSSOptimizeStream extends GenericOptimizeStream {
 }
 
 /**
- * InlineCSSOptimizeStream optimizes inlined CSS (found in HTML files) that
+ * InlineCSSOptimizeTransform minifies inlined CSS (found in HTML files) that
  * passes through it (via css-slam).
  */
-export class InlineCSSOptimizeStream extends GenericOptimizeStream {
+export class InlineCSSOptimizeTransform extends GenericOptimizeTransform {
   constructor(options: CSSOptimizeOptions) {
     super('css-slam', cssSlam.html, options);
   }
@@ -129,10 +156,10 @@ export class InlineCSSOptimizeStream extends GenericOptimizeStream {
 }
 
 /**
- * HTMLOptimizeStream optimizes HTML files that pass through it
+ * HTMLOptimizeTransform minifies HTML files that pass through it
  * (via html-minifier).
  */
-export class HTMLOptimizeStream extends GenericOptimizeStream {
+export class HTMLOptimizeTransform extends GenericOptimizeTransform {
   constructor(options: HTMLMinifierOptions) {
     super('html-minify', htmlMinify, options);
   }
@@ -147,23 +174,28 @@ export function getOptimizeStreams(options?: OptimizeOptions):
   options = options || {};
   const streams = [];
 
-  // add optimizers
+  // compile ES6 JavaScript using babel
+  if (options.js && options.js.compile) {
+    streams.push(gulpif(/\.js$/, new JSDefaultCompileTransform()));
+  }
+
+  // minify code (minify should always be the last transform)
   if (options.html && options.html.minify) {
     streams.push(gulpif(
         /\.html$/,
-        new HTMLOptimizeStream(
+        new HTMLOptimizeTransform(
             {collapseWhitespace: true, removeComments: true})));
   }
   if (options.css && options.css.minify) {
     streams.push(
-        gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
-    // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
+        gulpif(/\.css$/, new CSSMinifyTransform({stripWhitespace: true})));
+    // TODO(fks): Remove this InlineCSSOptimizeTransform stream once CSS
     // is properly being isolated by splitHtml() & rejoinHtml().
     streams.push(gulpif(
-        /\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
+        /\.html$/, new InlineCSSOptimizeTransform({stripWhitespace: true})));
   }
   if (options.js && options.js.minify) {
-    streams.push(gulpif(/\.js$/, new JSOptimizeStream({fromString: true})));
+    streams.push(gulpif(/\.js$/, new JSDefaultMinifyTransform()));
   }
 
   return streams;

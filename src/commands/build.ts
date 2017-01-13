@@ -32,6 +32,12 @@ export class BuildCommand implements Command {
 
   args = [
     {
+      name: 'js-compile',
+      type: Boolean,
+      description: 'compile ES2015 JavaScript features down to ES5 for ' +
+          'older browsers.'
+    },
+    {
       name: 'js-minify',
       type: Boolean,
       description: 'minify inlined and external JavaScript.'
@@ -85,6 +91,7 @@ export class BuildCommand implements Command {
       },
       js: {
         minify: !!options['js-minify'],
+        compile: !!options['js-compile'],
       },
     };
 
