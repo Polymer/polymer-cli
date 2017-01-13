@@ -99,7 +99,7 @@ export async function build(
   // addServiceWorker() reads from the file system, so we need to wait for
   // the build stream to finish writing to disk before calling it.
   if (options.addServiceWorker) {
-    logger.debug(`Generating service worker...`);
+    logger.info(`Generating service worker...`);
     if (swConfig) {
       logger.debug(`Service worker config found`, swConfig);
     } else {
