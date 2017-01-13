@@ -39,7 +39,7 @@ export type CSSOptimizeOptions = {
 export interface OptimizeOptions {
   html?: {minify: boolean};
   css?: {minify: boolean};
-  js?: {minify?: boolean, compile: boolean};
+  js?: {minify?: boolean, compile?: boolean};
 }
 ;
 
