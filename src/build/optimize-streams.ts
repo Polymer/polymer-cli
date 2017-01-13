@@ -13,22 +13,27 @@
  */
 
 import * as cssSlam from 'css-slam';
+import * as gulpif from 'gulp-if';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
 import {minify as uglify, MinifyOptions as UglifyOptions} from 'uglify-js';
-
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
 // or consider writing a custom declaration in the `custom_typings/` folder.
 import File = require('vinyl');
 
-let logger = logging.getLogger('cli.build.optimize-streams');
+const logger = logging.getLogger('cli.build.optimize-streams');
 
 export type FileCB = (error?: any, file?: File) => void;
 export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
+};
+export interface OptimizeOptions {
+  html?: {minify: boolean};
+  css?: {minify: boolean};
+  js?: {minify?: boolean};
 };
 
 /**
@@ -77,11 +82,11 @@ export class JSOptimizeStream extends GenericOptimizeStream {
     // uglify is special, in that it returns an object with a code property
     // instead of just a code string. We create a compliant optimizer here
     // that returns a string instead.
-    let uglifyOptimizer = (contents: string, options: UglifyOptions) => {
+    const uglifyOptimizer = (contents: string, options: UglifyOptions) => {
       return uglify(contents, options).code;
     };
     // We automatically add the fromString option because it is required.
-    let uglifyOptions = Object.assign({fromString: true}, options);
+    const uglifyOptions = Object.assign({fromString: true}, options);
     super('uglify-js', uglifyOptimizer, uglifyOptions);
   }
 }
@@ -132,3 +137,34 @@ export class HTMLOptimizeStream extends GenericOptimizeStream {
     super('html-minify', htmlMinify, options);
   }
 }
+
+/**
+ * Returns an array of optimization streams to use in your build, based on the
+ * OptimizeOptions given.
+ */
+export function getOptimizeStreams(options?: OptimizeOptions):
+    NodeJS.ReadWriteStream[] {
+  options = options || {};
+  const streams = [];
+
+  // add optimizers
+  if (options.html && options.html.minify) {
+    streams.push(gulpif(
+        /\.html$/,
+        new HTMLOptimizeStream(
+            {collapseWhitespace: true, removeComments: true})));
+  }
+  if (options.css && options.css.minify) {
+    streams.push(
+        gulpif(/\.css$/, new CSSOptimizeStream({stripWhitespace: true})));
+    // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
+    // is properly being isolated by splitHtml() & rejoinHtml().
+    streams.push(gulpif(
+        /\.html$/, new InlineCSSOptimizeStream({stripWhitespace: true})));
+  }
+  if (options.js && options.js.minify) {
+    streams.push(gulpif(/\.js$/, new JSOptimizeStream({fromString: true})));
+  }
+
+  return streams;
+};
