@@ -13,74 +13,53 @@
  */
 
 import * as del from 'del';
-import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
-
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, SWConfig} from 'polymer-build';
 
-import {InlineCSSOptimizeStream, JSOptimizeStream, CSSOptimizeStream, HTMLOptimizeStream} from './optimize-streams';
-
+import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 import {ProjectConfig} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
-import {waitFor} from './streams';
+import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
 
 const logger = logging.getLogger('cli.build.build');
 
 const buildDirectory = 'build/';
 
-export interface BuildOptions {
+export interface BuildOptions extends OptimizeOptions {
   addServiceWorker?: boolean;
   swPrecacheConfig?: string;
   insertPrefetchLinks?: boolean;
   bundle?: boolean;
-  // TODO(fks) 07-21-2016: Fully complete these with available options
-  html?: {collapseWhitespace?: boolean; removeComments?: boolean};
-  css?: {stripWhitespace?: boolean};
-  js?: {minify?: boolean};
-}
+};
 
 export async function build(
     options: BuildOptions, config: ProjectConfig): Promise<void> {
+  const optimizeOptions:
+      OptimizeOptions = {css: options.css, js: options.js, html: options.html};
   const polymerProject = new PolymerProject(config);
-
-  // mix in optimization options from build command
-  // TODO: let this be set by the user
-  let optimizeOptions = {
-    html: Object.assign({removeComments: true}, options.html),
-    css: Object.assign({stripWhitespace: true}, options.css),
-    js: Object.assign({minify: true}, options.js),
-  };
 
   logger.info(`Deleting build/ directory...`);
   await del([buildDirectory]);
 
   logger.debug(`Reading source files...`);
-  let sourcesStream =
-      polymerProject.sources()
-          .pipe(polymerProject.splitHtml())
-          .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
-          .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
-          // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
-          // is properly being isolated by splitHtml() & rejoinHtml().
-          .pipe(gulpif(/\.html$/, new InlineCSSOptimizeStream(optimizeOptions.css)))
-          .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
-          .pipe(polymerProject.rejoinHtml());
+  const sourcesStream = pipeStreams([
+    polymerProject.sources(),
+    polymerProject.splitHtml(),
+    getOptimizeStreams(optimizeOptions),
+    polymerProject.rejoinHtml()
+  ]);
 
   logger.debug(`Reading dependencies...`);
-  let depsStream =
-      polymerProject.dependencies()
-          .pipe(polymerProject.splitHtml())
-          .pipe(gulpif(/\.js$/, new JSOptimizeStream(optimizeOptions.js)))
-          .pipe(gulpif(/\.css$/, new CSSOptimizeStream(optimizeOptions.css)))
-          // TODO(fks): Remove this InlineCSSOptimizeStream stream once CSS
-          // is properly being isolated by splitHtml() & rejoinHtml().
-          .pipe(gulpif(/\.html$/, new InlineCSSOptimizeStream(optimizeOptions.css)))
-          .pipe(gulpif(/\.html$/, new HTMLOptimizeStream(optimizeOptions.html)))
-          .pipe(polymerProject.rejoinHtml());
+  const depsStream = pipeStreams([
+    polymerProject.dependencies(),
+    polymerProject.splitHtml(),
+    getOptimizeStreams(optimizeOptions),
+    polymerProject.rejoinHtml()
+  ]);
 
   let buildStream: NodeJS.ReadableStream =
       mergeStream(sourcesStream, depsStream);

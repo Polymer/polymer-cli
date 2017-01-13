@@ -32,6 +32,27 @@ export class BuildCommand implements Command {
 
   args = [
     {
+      name: 'js-compile',
+      type: Boolean,
+      description: 'compile ES2015 JavaScript features down to ES5 for ' +
+          'older browsers.'
+    },
+    {
+      name: 'js-minify',
+      type: Boolean,
+      description: 'minify inlined and external JavaScript.'
+    },
+    {
+      name: 'css-minify',
+      type: Boolean,
+      description: 'minify inlined and external CSS.'
+    },
+    {
+      name: 'html-minify',
+      type: Boolean,
+      description: 'minify HTML by removing comments and whitespace.'
+    },
+    {
       name: 'bundle',
       defaultValue: false,
       description: 'Combine build source and dependency files together into ' +
@@ -62,11 +83,6 @@ export class BuildCommand implements Command {
           '`<link rel="import">` tags into fragments and shell for all ' +
           'dependencies.'
     },
-    {
-      name: 'html.collapseWhitespace',
-      type: Boolean,
-      description: 'Collapse whitespace in HTML files'
-    }
   ];
 
   run(options: CommandOptions, config: ProjectConfig): Promise<any> {
@@ -78,13 +94,18 @@ export class BuildCommand implements Command {
       swPrecacheConfig: options['sw-precache-config'],
       insertPrefetchLinks: options['insert-prefetch-links'],
       bundle: options['bundle'],
-      html: {},
-      css: {},
-      js: {},
+      html: {
+        minify: !!options['html-minify'],
+      },
+      css: {
+        minify: !!options['css-minify'],
+      },
+      js: {
+        minify: !!options['js-minify'],
+        compile: !!options['js-compile'],
+      },
     };
-    if (options['html.collapseWhitespace']) {
-      buildOptions.html!.collapseWhitespace = true;
-    }
+
     logger.debug('building with options', buildOptions);
 
     if (options['env'] && options['env'].build) {

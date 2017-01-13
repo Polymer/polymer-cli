@@ -12,12 +12,8 @@
 
 const assert = require('chai').assert;
 const vfs = require('vinyl-fs-fake');
-const optimizeStreams = require('../../../lib/build/optimize-streams');
-
-const JSOptimizeStream = optimizeStreams.JSOptimizeStream;
-const CSSOptimizeStream = optimizeStreams.CSSOptimizeStream;
-const InlineCSSOptimizeStream = optimizeStreams.InlineCSSOptimizeStream;
-const HTMLOptimizeStream = optimizeStreams.HTMLOptimizeStream;
+const getOptimizeStreams = require('../../../lib/build/optimize-streams').getOptimizeStreams;
+const pipeStreams = require('../../../lib/build/streams').pipeStreams;
 
 suite('optimize-streams', () => {
 
@@ -28,15 +24,32 @@ suite('optimize-streams', () => {
     stream.on('error', cb);
   }
 
-  test('js', (done) => {
-    let stream = vfs.src([
+  test('compile js', (done) => {
+    const expected = `var apple = 'apple';var banana = 'banana';`;
+    const sourceStream = vfs.src([
+      {
+        path: 'foo.js',
+        contents: `const apple = 'apple'; let banana = 'banana';`,
+      },
+    ]);
+    const op = pipeStreams([sourceStream, getOptimizeStreams({js: {compile: true}})]);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
+      }
+      assert.equal(f.contents.toString(), expected);
+      done();
+    });
+  });
+
+  test('minify js', (done) => {
+    const sourceStream = vfs.src([
       {
         path: 'foo.js',
         contents: 'var foo = 3',
       },
     ]);
-    let op = stream.pipe(new JSOptimizeStream({minify: true}));
-    assert.notEqual(stream, op);
+    const op = pipeStreams([sourceStream, getOptimizeStreams({js: {minify: true}})]);
     testStream(op, (error, f) => {
       if (error) {
         return done(error);
@@ -46,12 +59,29 @@ suite('optimize-streams', () => {
     });
   });
 
-  test('html', (done) => {
-    let expected =
+  test('minify js (es6)', (done) => {
+    const sourceStream = vfs.src([
+      {
+        path: 'foo.js',
+        contents: '[1,2,3].map(n => n + 1);',
+      },
+    ]);
+    const op = pipeStreams([sourceStream, getOptimizeStreams({js: {minify: true}})]);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
+      }
+      assert.equal(f.contents.toString(), '[1,2,3].map(a=>a+1);');
+      done();
+    });
+  });
+
+  test('minify html', (done) => {
+    const expected =
       `<!doctype html><style>foo {
             background: blue;
           }</style><script>document.registerElement(\'x-foo\', XFoo);</script><x-foo>bar</x-foo>`;
-    let stream = vfs.src([
+    const sourceStream = vfs.src([
       {
         path: 'foo.html',
         contents: `
@@ -70,11 +100,7 @@ suite('optimize-streams', () => {
         `,
       },
     ], {cwdbase: true});
-    let options = {
-      collapseWhitespace: true,
-      removeComments: true,
-    };
-    let op = stream.pipe(new HTMLOptimizeStream(options));
+    const op = pipeStreams([sourceStream, getOptimizeStreams({html: {minify: true}})]);
     testStream(op, (error, f) => {
       if (error) {
         return done(error);
@@ -84,14 +110,14 @@ suite('optimize-streams', () => {
     });
   });
 
-  test('css', (done) => {
-    let stream = vfs.src([
+  test('minify css', (done) => {
+    const sourceStream = vfs.src([
       {
         path: 'foo.css',
         contents: '/* comment */ selector { property: value; }',
       },
     ]);
-    let op = stream.pipe(new CSSOptimizeStream({stripWhitespace: true}));
+    const op = pipeStreams([sourceStream, getOptimizeStreams({css: {minify: true}})]);
     testStream(op, (error, f) => {
       if (error) {
         return done(error);
@@ -101,9 +127,9 @@ suite('optimize-streams', () => {
     });
   });
 
-  test('inline css', (done) => {
-    let expected =`<style>foo{background:blue;}</style>`;
-    let stream = vfs.src([
+  test('minify css (inlined)', (done) => {
+    const expected =`<style>foo{background:blue;}</style>`;
+    const sourceStream = vfs.src([
       {
         path: 'foo.html',
         contents: `
@@ -121,7 +147,7 @@ suite('optimize-streams', () => {
         `,
       },
     ], {cwdbase: true});
-    let op = stream.pipe(new InlineCSSOptimizeStream({stripWhitespace: true}));
+    const op = pipeStreams([sourceStream, getOptimizeStreams({css: {minify: true}})]);
     testStream(op, (error, f) => {
       if (error) {
         return done(error);
