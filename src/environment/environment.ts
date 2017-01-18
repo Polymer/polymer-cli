@@ -11,12 +11,10 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import {ProjectConfig} from 'polymer-project-config';
+import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 import {ServerOptions} from 'polyserve/lib/start_server';
-
-import {BuildOptions} from '../build/build';
 
 export interface Environment {
   serve(options: ServerOptions): Promise<any>;
-  build(options: BuildOptions, config: ProjectConfig): Promise<any>;
+  build(options: ProjectBuildOptions, config: ProjectConfig): Promise<any>;
 }
