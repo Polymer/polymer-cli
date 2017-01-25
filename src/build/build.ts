@@ -25,6 +25,7 @@ import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
 
 const logger = logging.getLogger('cli.build.build');
+export const mainBuildDirectoryName = 'build';
 
 export async function build(
     options: ProjectBuildOptions, config: ProjectConfig): Promise<void> {
@@ -34,7 +35,7 @@ export async function build(
 
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
-  const buildDirectory = `build/${options.name || ''}`;
+  const buildDirectory = path.join(mainBuildDirectoryName, options.name);
   logger.debug(`Building ${buildDirectory} with options`, options);
 
   const sourcesStream = pipeStreams([
@@ -63,7 +64,7 @@ export async function build(
   }
 
   buildStream.once('data', () => {
-    logger.info(`Generating ${buildDirectory}...`);
+    logger.info(`Building "${options.name}"...`);
   });
 
   // Finish the build stream by piping it into the final build directory.

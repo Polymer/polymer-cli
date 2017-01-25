@@ -15,7 +15,6 @@
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
-import * as del from 'del';
 import * as logging from 'plylog';
 import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
@@ -85,10 +84,13 @@ export class BuildCommand implements Command {
 
   async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    let build = require('../build/build').build;
-    const hasCLIArgumentsPassed = this.args.some(arg => {
-      return typeof options[arg.name] !== 'undefined';
-    });
+    let {build} = require('../build/build');
+    const {mainBuildDirectoryName} = require('../build/build');
+    const pathSeperator = require('path').sep;
+    const del = require('del');
+
+    // Validate our configuration, neccessary for a clean build
+    config.validate();
 
     // Support passing a custom build function via options.env
     if (options['env'] && options['env'].build) {
@@ -96,19 +98,21 @@ export class BuildCommand implements Command {
       build = options['env'].build;
     }
 
-    const mainBuildDirectory = 'build/';
-    logger.info(`Clearing ${mainBuildDirectory} directory...`);
-    await del([mainBuildDirectory]);
+    logger.info(`Clearing ${mainBuildDirectoryName}${pathSeperator} directory...`);
+    await del([mainBuildDirectoryName]);
 
     // If any the build command flags were passed as CLI arguments, generate
     // a single build based on those flags alone.
-    if (hasCLIArgumentsPassed) {
+    const hasCliArgumentsPassed = this.args.some((arg) => {
+      return typeof options[arg.name] !== 'undefined';
+    });
+    if (hasCliArgumentsPassed) {
       return build(
           {
-            addServiceWorker: options['add-service-worker'],
+            addServiceWorker: !!options['add-service-worker'],
             swPrecacheConfig: options['sw-precache-config'],
-            insertPrefetchLinks: options['insert-prefetch-links'],
-            bundle: options['bundle'],
+            insertPrefetchLinks: !!options['insert-prefetch-links'],
+            bundle: !!options['bundle'],
             html: {
               minify: !!options['html-minify'],
             },
@@ -123,18 +127,26 @@ export class BuildCommand implements Command {
           config);
     }
 
-    // If any builds were defined or configured via the project config,
-    // generate a build for each configuration.
-    if (config.builds) {
-      return Promise.all(
-          config.builds.map((buildOptions: ProjectBuildOptions, i: number) => {
-            buildOptions.name = buildOptions.name || `build-${i + 1}`;
-            return build(buildOptions, config);
-          }));
-    }
-
     // If no build configurations were passed via CLI flags or the polymer.json
     // file, generate a default build.
-    return build({}, config);
+    if (!config.builds) {
+      return build({}, config);
+    }
+
+    // If a single build was defined or configured via the project config,
+    // generate a build for that configuration.
+    if (config.builds.length === 1) {
+      return build(config.builds[0], config);
+    }
+
+    // If multiple builds were defined or configured via the project config,
+    // generate a build for each configuration. Because we are guarenteed to
+    // multiple builds here, make sure that each has a name (sub-directory).
+    return Promise.all(
+        config.builds.map((buildOptions: ProjectBuildOptions, i: number) => {
+          buildOptions.name = buildOptions.name || `build-${i + 1}`;
+          return build(buildOptions, config);
+        }));
+
   }
 }
