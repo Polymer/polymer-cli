@@ -2,8 +2,14 @@
 
 ## Upcoming
 
+
+## v0.18.0-alpha.9
+
 - Fixed a bug where `polymer init` would crash if run from a folder with a
   package.json that's missing a name property. https://github.com/Polymer/polymer-cli/issues/186
+- Fixed a bug where `polymer build` wouldn't analyze behaviors correctly.
+- Fixed a bug where `polymer test` would complain about the version of wct it was bundled with.
+- Updated dependencies.
 
 ## v0.18.0-alpha.8
 
