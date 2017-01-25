@@ -1,6 +1,6 @@
 {
   "name": "polymer-cli",
-  "version": "0.18.0-alpha.8",
+  "version": "0.18.0-alpha.9",
   "dependencies": {
     "@types/babel-core": {
       "version": "6.7.14",
