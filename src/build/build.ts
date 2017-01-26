@@ -38,14 +38,15 @@ export const mainBuildDirectoryName = 'build';
  */
 export async function build(
     options: ProjectBuildOptions, config: ProjectConfig): Promise<void> {
+  const buildName = options.name || 'default';
   const optimizeOptions:
       OptimizeOptions = {css: options.css, js: options.js, html: options.html};
   const polymerProject = new PolymerProject(config);
 
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
-  const buildDirectory = path.join(mainBuildDirectoryName, options.name);
-  logger.debug(`Building ${buildDirectory} with options`, options);
+  const buildDirectory = path.join(mainBuildDirectoryName, buildName);
+  logger.debug(`"${buildDirectory}": Building with options:`, options);
 
   const sourcesStream = pipeStreams([
     polymerProject.sources(),
@@ -73,7 +74,7 @@ export async function build(
   }
 
   buildStream.once('data', () => {
-    logger.info(`Building "${options.name}"...`);
+    logger.info(`(${buildName}) Building...`);
   });
 
   // Finish the build stream by piping it into the final build directory.
@@ -110,9 +111,6 @@ export async function build(
       bundled: options.bundle,
     });
   }
-  if (options.name) {
-    logger.info(`Build "${options.name}" complete!`);
-  } else {
-    logger.info(`Build complete!`);
-  }
+
+  logger.info(`(${buildName}) Build complete!`);
 }
