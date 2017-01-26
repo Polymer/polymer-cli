@@ -84,12 +84,14 @@ export class BuildCommand implements Command {
 
   async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    let {build} = require('../build/build');
-    const {mainBuildDirectoryName} = require('../build/build');
-    const pathSeperator = require('path').sep;
     const del = require('del');
+    const pathSeperator = require('path').sep;
+    const buildLib = require('../build/build');
+    let build = buildLib.build;
+    const mainBuildDirectoryName = buildLib.mainBuildDirectoryName;
 
-    // Validate our configuration, neccessary for a clean build
+    // Validate our configuration and exit if a problem is found.
+    // Neccessary for a clean build.
     config.validate();
 
     // Support passing a custom build function via options.env
@@ -98,14 +100,14 @@ export class BuildCommand implements Command {
       build = options['env'].build;
     }
 
-    logger.info(`Clearing ${mainBuildDirectoryName}${pathSeperator} directory...`);
+    logger.info(
+        `Clearing ${mainBuildDirectoryName}${pathSeperator} directory...`);
     await del([mainBuildDirectoryName]);
 
     // If any the build command flags were passed as CLI arguments, generate
     // a single build based on those flags alone.
-    const hasCliArgumentsPassed = this.args.some((arg) => {
-      return typeof options[arg.name] !== 'undefined';
-    });
+    const hasCliArgumentsPassed =
+        this.args.some((arg) => typeof options[arg.name] !== 'undefined');
     if (hasCliArgumentsPassed) {
       return build(
           {
@@ -140,13 +142,10 @@ export class BuildCommand implements Command {
     }
 
     // If multiple builds were defined or configured via the project config,
-    // generate a build for each configuration. Because we are guarenteed to
-    // multiple builds here, make sure that each has a name (sub-directory).
+    // generate a build for each configuration.
     return Promise.all(
-        config.builds.map((buildOptions: ProjectBuildOptions, i: number) => {
-          buildOptions.name = buildOptions.name || `build-${i + 1}`;
+        config.builds.map((buildOptions: ProjectBuildOptions) => {
           return build(buildOptions, config);
         }));
-
   }
 }
