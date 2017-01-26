@@ -27,6 +27,15 @@ import {loadServiceWorkerConfig} from './load-config';
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
 
+/**
+ * Generate a single build based on the given `options` ProjectBuildOptions.
+ * Note that this function is only concerned with that single build, and does
+ * not care about the collection of builds defined on the config.
+ *
+ * TODO(fks) 01-26-2017: Generate multiple builds with a single PolymerProject
+ * instance. Currently blocked because splitHtml() & rejoinHtml() cannot be run
+ * on multiple streams in parallel. See: https://github.com/Polymer/polymer-build/issues/113
+ */
 export async function build(
     options: ProjectBuildOptions, config: ProjectConfig): Promise<void> {
   const optimizeOptions:
