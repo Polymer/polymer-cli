@@ -12,13 +12,11 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import * as logging from 'plylog';
-import {ProjectConfig} from 'polymer-project-config';
-
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
-import {BuildOptions} from '../build/build';
+import * as logging from 'plylog';
+import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
 import {Command, CommandOptions} from './command';
 
@@ -54,7 +52,7 @@ export class BuildCommand implements Command {
     },
     {
       name: 'bundle',
-      defaultValue: false,
+      type: Boolean,
       description: 'Combine build source and dependency files together into ' +
           'a minimum set of bundles. Useful for reducing the number of ' +
           'requests needed to serve your application.'
@@ -68,7 +66,6 @@ export class BuildCommand implements Command {
     {
       name: 'sw-precache-config',
       type: String,
-      defaultValue: 'sw-precache-config.js',
       description: 'Path to a file that exports configuration options for ' +
           'the generated service worker. These options match those supported ' +
           'by the sw-precache library. See ' +
@@ -85,36 +82,70 @@ export class BuildCommand implements Command {
     },
   ];
 
-  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    const build = require('../build/build').build;
+    const del = require('del');
+    const pathSeperator = require('path').sep;
+    const buildLib = require('../build/build');
+    let build = buildLib.build;
+    const mainBuildDirectoryName = buildLib.mainBuildDirectoryName;
 
-    let buildOptions: BuildOptions = {
-      addServiceWorker: options['add-service-worker'],
-      swPrecacheConfig: options['sw-precache-config'],
-      insertPrefetchLinks: options['insert-prefetch-links'],
-      bundle: options['bundle'],
-      html: {
-        minify: !!options['html-minify'],
-      },
-      css: {
-        minify: !!options['css-minify'],
-      },
-      js: {
-        minify: !!options['js-minify'],
-        compile: !!options['js-compile'],
-      },
-    };
+    // Validate our configuration and exit if a problem is found.
+    // Neccessary for a clean build.
+    config.validate();
 
-    logger.debug('building with options', buildOptions);
-
+    // Support passing a custom build function via options.env
     if (options['env'] && options['env'].build) {
-      logger.debug('env.build() found in options');
-      logger.debug('building via env.build()...');
-      return options['env'].build(buildOptions, config);
+      logger.debug('build function passed in options, using that for build');
+      build = options['env'].build;
     }
 
-    logger.debug('building via standard build()...');
-    return build(buildOptions, config);
+    logger.info(
+        `Clearing ${mainBuildDirectoryName}${pathSeperator} directory...`);
+    await del([mainBuildDirectoryName]);
+
+    // If any the build command flags were passed as CLI arguments, generate
+    // a single build based on those flags alone.
+    const hasCliArgumentsPassed =
+        this.args.some((arg) => typeof options[arg.name] !== 'undefined');
+    if (hasCliArgumentsPassed) {
+      return build(
+          {
+            addServiceWorker: !!options['add-service-worker'],
+            swPrecacheConfig: options['sw-precache-config'],
+            insertPrefetchLinks: !!options['insert-prefetch-links'],
+            bundle: !!options['bundle'],
+            html: {
+              minify: !!options['html-minify'],
+            },
+            css: {
+              minify: !!options['css-minify'],
+            },
+            js: {
+              minify: !!options['js-minify'],
+              compile: !!options['js-compile'],
+            },
+          },
+          config);
+    }
+
+    // If no build configurations were passed via CLI flags or the polymer.json
+    // file, generate a default build.
+    if (!config.builds) {
+      return build({}, config);
+    }
+
+    // If a single build was defined or configured via the project config,
+    // generate a build for that configuration.
+    if (config.builds.length === 1) {
+      return build(config.builds[0], config);
+    }
+
+    // If multiple builds were defined or configured via the project config,
+    // generate a build for each configuration.
+    return Promise.all(
+        config.builds.map((buildOptions: ProjectBuildOptions) => {
+          return build(buildOptions, config);
+        }));
   }
 }

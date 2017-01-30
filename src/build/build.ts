@@ -12,7 +12,6 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import * as del from 'del';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
@@ -20,32 +19,35 @@ import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, SWConfig} from 'polymer-build';
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
-import {ProjectConfig} from 'polymer-project-config';
+import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
 
 const logger = logging.getLogger('cli.build.build');
+export const mainBuildDirectoryName = 'build';
 
-const buildDirectory = 'build/';
-
-export interface BuildOptions extends OptimizeOptions {
-  addServiceWorker?: boolean;
-  swPrecacheConfig?: string;
-  insertPrefetchLinks?: boolean;
-  bundle?: boolean;
-};
-
+/**
+ * Generate a single build based on the given `options` ProjectBuildOptions.
+ * Note that this function is only concerned with that single build, and does
+ * not care about the collection of builds defined on the config.
+ *
+ * TODO(fks) 01-26-2017: Generate multiple builds with a single PolymerProject
+ * instance. Currently blocked because splitHtml() & rejoinHtml() cannot be run
+ * on multiple streams in parallel. See: https://github.com/Polymer/polymer-build/issues/113
+ */
 export async function build(
-    options: BuildOptions, config: ProjectConfig): Promise<void> {
+    options: ProjectBuildOptions, config: ProjectConfig): Promise<void> {
+  const buildName = options.name || 'default';
   const optimizeOptions:
       OptimizeOptions = {css: options.css, js: options.js, html: options.html};
   const polymerProject = new PolymerProject(config);
 
-  logger.info(`Deleting build/ directory...`);
-  await del([buildDirectory]);
+  // If no name is provided, write directly to the build/ directory.
+  // If a build name is provided, write to that subdirectory.
+  const buildDirectory = path.join(mainBuildDirectoryName, buildName);
+  logger.debug(`"${buildDirectory}": Building with options:`, options);
 
-  logger.debug(`Reading source files...`);
   const sourcesStream = pipeStreams([
     polymerProject.sources(),
     polymerProject.splitHtml(),
@@ -53,7 +55,6 @@ export async function build(
     polymerProject.rejoinHtml()
   ]);
 
-  logger.debug(`Reading dependencies...`);
   const depsStream = pipeStreams([
     polymerProject.dependencies(),
     polymerProject.splitHtml(),
@@ -64,10 +65,6 @@ export async function build(
   let buildStream: NodeJS.ReadableStream =
       mergeStream(sourcesStream, depsStream);
 
-  buildStream.once('data', () => {
-    logger.debug('Analyzing build dependencies...');
-  });
-
   if (options.bundle) {
     buildStream = buildStream.pipe(polymerProject.bundler);
   }
@@ -77,7 +74,7 @@ export async function build(
   }
 
   buildStream.once('data', () => {
-    logger.info('Generating build/ directory...');
+    logger.info(`(${buildName}) Building...`);
   });
 
   // Finish the build stream by piping it into the final build directory.
@@ -99,11 +96,12 @@ export async function build(
   // addServiceWorker() reads from the file system, so we need to wait for
   // the build stream to finish writing to disk before calling it.
   if (options.addServiceWorker) {
-    logger.info(`Generating service worker...`);
+    logger.debug(`Generating service worker...`);
     if (swConfig) {
       logger.debug(`Service worker config found`, swConfig);
     } else {
-      logger.debug(`No service worker configuration found at ` +
+      logger.debug(
+          `No service worker configuration found at ` +
           `${swPrecacheConfigPath}, continuing with defaults`);
     }
     await addServiceWorker({
@@ -114,5 +112,5 @@ export async function build(
     });
   }
 
-  logger.info('Build complete!');
+  logger.info(`(${buildName}) Build complete!`);
 }
