@@ -12,7 +12,7 @@
  */
 
 import * as logging from 'plylog';
-import {Base} from 'yeoman-generator';
+import Generator = require('yeoman-generator');
 
 import {Github, RequestAPI} from '../github/github';
 
@@ -29,14 +29,14 @@ export interface GithubGeneratorOptions {
 }
 
 export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
-    (typeof Base) {
+    (typeof Generator) {
   let requestApi = githubOptions.requestApi;
   let githubApi = githubOptions.githubApi;
   let githubToken = githubOptions.githubToken;
   let owner = githubOptions.owner;
   let repo = githubOptions.repo;
 
-  return class GithubGenerator extends Base {
+  return class GithubGenerator extends Generator {
     _github: Github;
 
     constructor(args: string|string[], options: any) {
@@ -45,6 +45,10 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
           new Github({owner, repo, githubToken, githubApi, requestApi});
     }
 
+    // This is necessary to prevent an exception in Yeoman when creating
+    // storage for generators registered as a stub and used in a folder
+    // with a package.json but with no name property.
+    // https://github.com/Polymer/polymer-cli/issues/186
     rootGeneratorName(): string {
       return 'GithubGenerator';
     }

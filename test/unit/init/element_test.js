@@ -9,6 +9,9 @@
 
 'use strict';
 
+const assert = require('chai').assert;
+const fs = require('fs-extra');
+const path = require('path');
 const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const ElementGenerator
@@ -27,5 +30,25 @@ suite('init/element', () => {
       });
 
   });
+
+  test('works when package.json with no name is present', (done) => {
+
+    helpers
+      .run(ElementGenerator)
+      .inTmpDir((dir) => {
+        fs.copySync(
+          path.join(__dirname, 'github-test-data/package.json'),
+          path.join(dir, 'package.json')
+        );
+      })
+      .on('error', (error) => {
+        assert.fail();
+        done();
+      })
+      .on('end', (a) => {
+        done();
+      });
+  });
+
 
 });

@@ -6,6 +6,14 @@
   - Multiple builds can now be defined in your project's `polymer.json`.
   - **Previously default behaviors (minifying JavaScript, generating service workers, etc) are now turned off by default.**
 
+## v0.18.0-alpha.9
+
+- Fixed a bug where `polymer init` would crash if run from a folder with a
+  package.json that's missing a name property. https://github.com/Polymer/polymer-cli/issues/186
+- Fixed a bug where `polymer build` wouldn't analyze behaviors correctly.
+- Fixed a bug where `polymer test` would complain about the version of wct it was bundled with.
+- Updated dependencies.
+
 ## v0.18.0-alpha.8
 
 - Updated dependencies.
@@ -23,6 +31,7 @@
 - `polymer.json`: Rename the `includeDependencies` & `sourceGlobs` fields to `extraDependencies` & `sources`, respectively
 - Added support for v7.x of Node.js, dropped support for v5.x. Please move to an [actively maintained version of Node.js](https://github.com/nodejs/LTS) for the best experience.
 - Upgrade [web-component-tester 6.0](https://github.com/Polymer/web-component-tester/blob/master/CHANGELOG.md) which brings a number of breaking changes to the `test` command.
+- `init`: Fix duplicate names for sub-generators in a directory
 
 ## v0.17.0
 

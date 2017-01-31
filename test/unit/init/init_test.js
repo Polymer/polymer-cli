@@ -15,6 +15,8 @@ const helpers = require('yeoman-test');
 const childProcess = require('child_process');
 const inquirer = require('inquirer');
 const YeomanEnvironment = require('yeoman-environment');
+const fs = require('fs');
+const temp = require('temp').track();
 
 const polymerInit = require('../../../lib/init/init');
 
@@ -87,15 +89,74 @@ suite('init', () => {
   suite('promptGeneratorSelection', () => {
 
     let yeomanEnvMock;
+    const GENERATORS = [
+      {
+        generatorName: 'polymer-init-element:app',
+        metaName: 'polymer-init-element',
+        shortName: 'element',
+        description: 'A blank element template',
+        resolved: 'unknown',
+      },
+      {
+        generatorName: 'polymer-init-my-test-app:app',
+        metaName: 'polymer-init-my-test-app',
+        shortName: 'my-test-app',
+        description: 'my test app',
+      },
+      {
+        generatorName: 'polymer-init-polymer-starter-kit-custom-1:app',
+        metaName: 'polymer-init-polymer-starter-kit-1',
+        shortName: 'polymer-starter-kit-1',
+        description: 'PSK 1',
+      },
+      {
+        generatorName: 'polymer-init-polymer-starter-kit-custom-2:app',
+        metaName: 'generator-polymer-init-polymer-starter-kit-2',
+        shortName: 'polymer-starter-kit-2',
+        description: 'PSK 2',
+      },
+      {
+        generatorName: 'polymer-init-custom-build-1:app',
+        metaName: 'generator-polymer-init-custom-build-1',
+        shortName: 'custom-build-1',
+        description: 'custom build 1',
+      },
+      {
+        generatorName: 'polymer-init-custom-build-2:app',
+        metaName: 'polymer-init-custom-build-2',
+        shortName: 'custom-build-2',
+        description: 'custom build 2',
+      },
+      {
+        generatorName: 'polymer-init-custom-build-3:app',
+        metaName: 'custom-build-3',
+        shortName: 'custom-build-3',
+        description: 'custom build 3',
+      },
+    ];
 
     setup(() => {
+      let generators = {};
+
+      for (let generator of GENERATORS) {
+        if (!generator.resolved) {
+          let tmpDir = temp.mkdirSync();
+          let packageJsonPath = `${tmpDir}/package.json`;
+          fs.writeFileSync(packageJsonPath, JSON.stringify({
+            description: generator.description,
+            name: generator.metaName,
+          }));
+          generator.resolved = tmpDir;
+        }
+
+        generators[generator.generatorName] = {
+          resolved: generator.resolved,
+          namespace: generator.generatorName,
+        };
+      }
+
       yeomanEnvMock = createFakeEnv();
-      yeomanEnvMock.getGeneratorsMeta.returns({
-        'polymer-init-element:app': {
-          resolved: 'unknown',
-          namespace: 'polymer-init-element:app',
-        },
-      });
+      yeomanEnvMock.getGeneratorsMeta.returns(generators);
     });
 
     test('works with the default yeoman environment', () => {
@@ -124,10 +185,15 @@ suite('init', () => {
         assert.equal(error.message, 'Template TEST not found');
       }).then(() => {
         let choices = promptStub.firstCall.args[0][0].choices;
-        assert.equal(choices.length, 1);
-        assert.equal(stripAnsi(choices[0].name), 'element - A blank element template');
-        assert.equal(choices[0].value, 'polymer-init-element:app');
-        assert.equal(choices[0].short, 'element');
+        assert.equal(choices.length, GENERATORS.length);
+
+        for (let choice of choices) {
+          let generator = GENERATORS.find(generator => generator.generatorName === choice.value);
+          assert.isDefined(generator, `generator not found: ${choice.value}`);
+          assert.oneOf(stripAnsi(choice.name), [generator.shortName, `${generator.shortName} - ${generator.description}`]);
+          assert.equal(choice.value, generator.generatorName);
+          assert.equal(choice.short, generator.shortName);
+        }
       });
     });
 

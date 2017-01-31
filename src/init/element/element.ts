@@ -13,14 +13,22 @@
 
 import * as chalk from 'chalk';
 import * as path from 'path';
-import {Base} from 'yeoman-generator';
+import Generator = require('yeoman-generator');
 
-export class ElementGenerator extends Base {
+export class ElementGenerator extends Generator {
   props: any;
 
   constructor(args: string|string[], options: any) {
     super(args, options);
     this.sourceRoot(path.join(__dirname, 'templates'));
+  }
+
+  // This is necessary to prevent an exception in Yeoman when creating
+  // storage for generators registered as a stub and used in a folder
+  // with a package.json but with no name property.
+  // https://github.com/Polymer/polymer-cli/issues/186
+  rootGeneratorName(): string {
+    return 'ElementGenerator';
   }
 
   initializing() {
