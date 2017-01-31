@@ -15,11 +15,11 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import {ProjectConfig} from 'polymer-project-config';
+import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 import {ServerOptions} from 'polyserve/lib/start_server';
 import * as temp from 'temp';
 
-import {build, BuildOptions} from '../build/build';
+import {build} from '../build/build';
 import {Environment} from '../environment/environment';
 import {Github} from '../github/github';
 
@@ -29,7 +29,7 @@ const REYSERVE_FILES = ['app.yaml', 'reyserve.py', 'http2push.py'];
 
 
 export class ReyServe implements Environment {
-  build(opts: BuildOptions, config: ProjectConfig): Promise<any> {
+  build(opts: ProjectBuildOptions, config: ProjectConfig): Promise<any> {
     const bundled = path.join(process.cwd(), 'build/bundled');
     const unbundled = path.join(process.cwd(), 'build/unbundled');
     const reyserveFiles = temp.mkdirSync('reyserve');

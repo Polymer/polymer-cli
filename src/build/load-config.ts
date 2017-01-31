@@ -17,9 +17,9 @@ import * as fs from 'fs';
 import * as logging from 'plylog';
 import {SWConfig} from 'polymer-build';
 
-let logger = logging.getLogger('cli.build.sw-precache');
+let logger = logging.getLogger('cli.build.load-config');
 
-export function parsePreCacheConfig(configFile: string):
+export function loadServiceWorkerConfig(configFile: string):
     Promise<SWConfig|null> {
   return new Promise<SWConfig|null>((resolve, _reject) => {
     fs.stat(configFile, (statError) => {
