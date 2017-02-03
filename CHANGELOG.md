@@ -5,6 +5,7 @@
 - **New `build` Behavior**: New build options have been added to give you more control over the generated build. These options can be defined in your project's `polymer.json`, or via CLI flags. Run `polymer build --help` to see a list of new supported CLI flags.
   - Multiple builds can now be defined in your project's `polymer.json`.
   - **Previously default behaviors (minifying JavaScript, generating service workers, etc) are now turned off by default.**
+- `init`: Add "polymer-starter-kit-2.0" template.
 
 ## v0.18.0-alpha.9
 
