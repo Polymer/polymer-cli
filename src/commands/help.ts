@@ -15,8 +15,10 @@
 import * as chalk from 'chalk';
 import * as commandLineUsage from 'command-line-usage';
 import * as logging from 'plylog';
-import {globalArguments} from '../args';
 import {ProjectConfig} from 'polymer-project-config';
+
+import {globalArguments} from '../args';
+
 import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.help');

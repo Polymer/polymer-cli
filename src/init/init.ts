@@ -43,14 +43,17 @@ const templateDescriptions: {[name: string]: string} = {
   'shop': 'The "Shop" Progressive Web App demo',
 };
 
+// TODO: Add Shop "^2.0.0" generator once Polymer 2.0 Shop template is released.
 let shopGenerator = createGithubGenerator({
   owner: 'Polymer',
   repo: 'shop',
+  semverRange: '^1.0.0',
 });
-
+// TODO: Add Shop "^3.0.0" generator once Polymer 2.0 PSK template is released.
 let pskGenerator = createGithubGenerator({
   owner: 'PolymerElements',
   repo: 'polymer-starter-kit',
+  semverRange: '^2.0.0',
 });
 
 /**

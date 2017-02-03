@@ -15,6 +15,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as logging from 'plylog';
+import * as semver from 'semver';
 
 import request = require('request');
 import GitHubApi = require('github');
@@ -29,7 +30,7 @@ export type RequestAPI = request.RequestAPI<
     request.CoreOptions,
     request.RequiredUriUrl>;
 
-class GithubResponseError extends Error {
+export class GithubResponseError extends Error {
   name = 'GithubResponseError';
   statusCode?: number;
   statusMessage?: string;
@@ -82,7 +83,12 @@ export class Github {
     this._request = opts.requestApi || request;
   }
 
-  async extractLatestRelease(outDir: string): Promise<void> {
+  /**
+   * Given a Github tarball URL, download and extract it into the outDir
+   * directory.
+   */
+  async extractReleaseTarball(tarballUrl: string, outDir: string):
+      Promise<void> {
     const tarPipe = tar.extract(outDir, {
       ignore: (_: any, header: any) => {
         let splitPath = path.normalize(header.name).split(path.sep);
@@ -99,51 +105,59 @@ export class Github {
         return header;
       },
     });
-    const release = await this.getLatestRelease();
-    const tarballUrl = release.tarball_url;
     return new Promise<void>((resolve, reject) => {
       this._request({
             url: tarballUrl,
             headers: {
               'User-Agent': 'request',
               'Authorization': (this._token) ? `token ${this._token}` :
-                                                undefined,
+                                               undefined,
             }
           })
           .on('response',
               function(response) {
                 if (response.statusCode !== 200) {
-                  throw new GithubResponseError(
-                      response.statusCode, response.statusMessage);
+                  reject(new GithubResponseError(
+                      response.statusCode, response.statusMessage));
+                  return;
                 }
                 logger.info('Unpacking template files');
               })
+          .on('error', reject)
           .pipe(gunzip())
+          .on('error', reject)
           .pipe(tarPipe)
-          // tar-fs/tar-stream do not send 'end' events, only 'finish'
-          // events
-          .on('finish',
-              () => {
-                logger.info('Finished writing template files');
-                resolve();
-              })
-          .on('error', (error: any) => {
-            reject(error);
+          .on('error', reject)
+          .on('finish', () => {
+            logger.info('Finished writing template files');
+            resolve();
           });
     });
   }
 
-  async getLatestRelease(): Promise<GitHubApi.Release> {
-    const releases = await this._github.repos.getReleases({
-            owner: this._owner,
-            repo: this._repo,
-            per_page: 1,
-    }) as GitHubApi.Release[];
-    if (releases.length === 0) {
-      throw new Error(
-        `${this._owner}/${this._repo} has 0 releases. ` +
-        'Cannot get latest release.');
+  /**
+   * Get all Github releases and match their tag names against the given semver
+   * range. Return the release with the latest possible match.
+   */
+  async getSemverRelease(semverRange: string): Promise<GitHubApi.Release> {
+    // Note that we only see the 100 most recent releases. If we ever release
+    // enough versions that this becomes a concern, we'll need to improve this
+    // call to request multiple pages of results.
+    const releases: GitHubApi.Release[] = await this._github.repos.getReleases({
+      owner: this._owner,
+      repo: this._repo,
+      per_page: 100,
+    });
+    const validReleaseVersions =
+        releases.filter((r) => semver.valid(r.tag_name)).map((r) => r.tag_name);
+    const maxSatisfyingReleaseVersion =
+        semver.maxSatisfying(validReleaseVersions, semverRange);
+    const maxSatisfyingRelease =
+        releases.find((r) => r.tag_name === maxSatisfyingReleaseVersion);
+    if (!maxSatisfyingRelease) {
+      throw new Error(`${this._owner}/${this._repo
+                      } has no releases matching ${semverRange}.`);
     }
-    return releases[0];
+    return maxSatisfyingRelease;
   }
 }

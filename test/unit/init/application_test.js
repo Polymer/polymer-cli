@@ -35,11 +35,8 @@ suite('init/application', () => {
 
     helpers
       .run(ApplicationGenerator)
-      .inTmpDir((dir) => {
-        fs.copySync(
-          path.join(__dirname, 'github-test-data/package.json'),
-          path.join(dir, 'package.json')
-        );
+      .inTmpDir((tempDir) => {
+        fs.writeFileSync(path.join(tempDir, 'package.json'), '{}');
       })
       .on('error', (error) => {
         assert.fail();
