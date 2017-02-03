@@ -15,6 +15,12 @@ import * as chalk from 'chalk';
 import * as path from 'path';
 import Generator = require('yeoman-generator');
 
+/**
+ * Returns a Yeoman Generator constructor that can be passed to yeoman to be
+ * run. A "template name" argument is required to choose the correct
+ * `/templates` directory name to generate from.
+ * (Ex: "polymer-2.x" to generate the `templates/polymer-2x` template directory)
+ */
 export function createApplicationGenerator(templateName: string):
     (typeof Generator) {
   return class ApplicationGenerator extends Generator {
