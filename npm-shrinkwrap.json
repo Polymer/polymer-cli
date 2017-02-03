@@ -304,7 +304,7 @@
     },
     "@types/semver": {
       "version": "5.3.30",
-      "from": "@types/semver@>=5.3.30 <6.0.0",
+      "from": "@types/semver@latest",
       "resolved": "https://registry.npmjs.org/@types/semver/-/semver-5.3.30.tgz"
     },
     "@types/serve-static": {
@@ -4805,7 +4805,7 @@
     },
     "semver": {
       "version": "5.3.0",
-      "from": "semver@>=2.0.0 <3.0.0||>=3.0.0 <4.0.0||>=4.0.0 <5.0.0||>=5.0.0 <6.0.0",
+      "from": "semver@latest",
       "resolved": "https://registry.npmjs.org/semver/-/semver-5.3.0.tgz"
     },
     "semver-diff": {

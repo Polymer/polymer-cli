@@ -13,13 +13,15 @@
  */
 
 import * as logging from 'plylog';
+import {ProjectConfig} from 'polymer-project-config';
 import {args as polyserveArgs} from 'polyserve/lib/args';
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
 import {ServerOptions} from 'polyserve/lib/start_server';
+
 import {Environment} from '../environment/environment';
-import {ProjectConfig} from 'polymer-project-config';
+
 import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.serve');
@@ -91,8 +93,8 @@ export class ServeCommand implements Command {
       reusable components: ${url.format(urls.componentUrl)}
     `);
     } else {
-      // We started multiple servers, just tell the user about the control server,
-      // it serves out human-readable info on how to access the others.
+      // We started multiple servers, just tell the user about the control
+      // server, it serves out human-readable info on how to access the others.
       const urls = getServerUrls(options, serverInfos.control.server);
       logger.info(`Started multiple servers with different variants:
       View the Polyserve console here: ${url.format(urls.serverUrl)}`);
