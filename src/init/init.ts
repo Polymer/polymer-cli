@@ -43,6 +43,16 @@ const templateDescriptions: {[name: string]: string} = {
   'shop': 'The "Shop" Progressive Web App demo',
 };
 
+let shopGenerator = createGithubGenerator({
+  owner: 'Polymer',
+  repo: 'shop',
+});
+
+let pskGenerator = createGithubGenerator({
+  owner: 'PolymerElements',
+  repo: 'polymer-starter-kit',
+});
+
 /**
  * Check if the current shell environment is MinGW. MinGW can't handle some
  * yeoman features, so we can use this check to downgrade gracefully.
@@ -98,8 +108,9 @@ function getGeneratorDescription(
  * Get the metadata of a generator from its package.json
  */
 function getGeneratorMeta(
-    rootDir: string, defaultName: string, defaultDescription: string):
-    {name: string, description: string} {
+    rootDir: string,
+    defaultName: string,
+    defaultDescription: string): {name: string, description: string} {
   let name = defaultName;
   let description = defaultDescription;
 
@@ -148,7 +159,8 @@ function getDisplayName(generatorName: string) {
   // ([^:]+)                 | Grp 3; Match one or more characters != ":"
   // (:.*)?                  | Grp 4; Match ":" followed by anything; Optional
   return generatorName.replace(
-      /(generator-)?(polymer-init-)?([^:]+)(:.*)?/g, '$3');
+      /(generator-)?(polymer-init-)?([^:]+)(:.*)?/g,
+      '$3');
 }
 
 /**
@@ -157,29 +169,10 @@ function getDisplayName(generatorName: string) {
 function createYeomanEnvironment(): Promise<any> {
   return new Promise((resolve, reject) => {
     const env = new YeomanEnvironment();
-    // Element Template
     env.registerStub(ElementGenerator, 'polymer-init-element:app');
-    // Application Template
     env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
-    // Shop Template
-    // TODO: Add Shop ^2.0.0 generator once Shop for Polymer 2.0 template is released
-    env.registerStub(
-        createGithubGenerator({
-          owner: 'Polymer',
-          repo: 'shop',
-          semverRange: '^1.0.0',
-        }),
-        'polymer-init-shop:app');
-    // Polymer Starter Kit Template
-    // TODO: Add Shop ^3.0.0 generator once PSK for Polymer 2.0 template is released
-    env.registerStub(
-        createGithubGenerator({
-          owner: 'PolymerElements',
-          repo: 'polymer-starter-kit',
-          semverRange: '^2.0.0',
-        }),
-        'polymer-init-starter-kit:app');
-
+    env.registerStub(shopGenerator, 'polymer-init-shop:app');
+    env.registerStub(pskGenerator, 'polymer-init-starter-kit:app');
     env.lookup((error?: Error) => {
       if (error) {
         reject(error);
