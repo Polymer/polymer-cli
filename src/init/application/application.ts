@@ -15,90 +15,93 @@ import * as chalk from 'chalk';
 import * as path from 'path';
 import Generator = require('yeoman-generator');
 
-export class ApplicationGenerator extends Generator {
-  props: any;
+export function createApplicationGenerator(templateName: string):
+    (typeof Generator) {
+  return class ApplicationGenerator extends Generator {
+    props: any;
 
-  constructor(args: string|string[], options: any) {
-    super(args, options);
-    this.sourceRoot(path.join(__dirname, 'templates'));
-  }
+    constructor(args: string|string[], options: any) {
+      super(args, options);
+      this.sourceRoot(path.join(__dirname, 'templates', templateName));
+    }
 
-  // This is necessary to prevent an exception in Yeoman when creating
-  // storage for generators registered as a stub and used in a folder
-  // with a package.json but with no name property.
-  // https://github.com/Polymer/polymer-cli/issues/186
-  rootGeneratorName(): string {
-    return 'ApplicationGenerator';
-  }
+    // This is necessary to prevent an exception in Yeoman when creating
+    // storage for generators registered as a stub and used in a folder
+    // with a package.json but with no name property.
+    // https://github.com/Polymer/polymer-cli/issues/186
+    rootGeneratorName(): string {
+      return 'ApplicationGenerator';
+    }
 
-  initializing() {
-    // Yeoman replaces dashes with spaces. We want dashes.
-    this.appname = this.appname.replace(/\s+/g, '-');
-  }
+    initializing() {
+      // Yeoman replaces dashes with spaces. We want dashes.
+      this.appname = this.appname.replace(/\s+/g, '-');
+    }
 
-  async prompting(): Promise<void> {
-    const prompts = [
-      {
-        name: 'name',
-        type: 'input',
-        message: `Application name`,
-        default: this.appname,
-      },
-      {
-        type: 'input',
-        name: 'elementName',
-        message: `Main element name`,
-        default: (answers: any) => `${answers.name}-app`,
-        validate: (name: string) => {
-          let nameContainsHyphen = name.includes('-');
-          if (!nameContainsHyphen) {
-            this.log(
-                '\nUh oh, custom elements must include a hyphen in ' +
-                'their name. Please try again.');
-          }
-          return nameContainsHyphen;
+    async prompting(): Promise<void> {
+      const prompts = [
+        {
+          name: 'name',
+          type: 'input',
+          message: `Application name`,
+          default: this.appname,
         },
-      },
-      {
-        type: 'input',
-        name: 'description',
-        message: 'Brief description of the application',
-      },
-    ];
+        {
+          type: 'input',
+          name: 'elementName',
+          message: `Main element name`,
+          default: (answers: any) => `${answers.name}-app`,
+          validate: (name: string) => {
+            let nameContainsHyphen = name.includes('-');
+            if (!nameContainsHyphen) {
+              this.log(
+                  '\nUh oh, custom elements must include a hyphen in ' +
+                  'their name. Please try again.');
+            }
+            return nameContainsHyphen;
+          },
+        },
+        {
+          type: 'input',
+          name: 'description',
+          message: 'Brief description of the application',
+        },
+      ];
 
-    this.props = await this.prompt(prompts);
-  }
+      this.props = await this.prompt(prompts);
+    }
 
-  writing() {
-    const elementName = this.props.elementName;
+    writing() {
+      const elementName = this.props.elementName;
 
-    this.fs.copyTpl(
-        `${this.templatePath()}/**/?(.)!(_)*`,
-        this.destinationPath(),
-        this.props);
+      this.fs.copyTpl(
+          `${this.templatePath()}/**/?(.)!(_)*`,
+          this.destinationPath(),
+          this.props);
 
-    this.fs.copyTpl(
-        this.templatePath('src/_element/_element.html'),
-        `src/${elementName}/${elementName}.html`,
-        this.props);
+      this.fs.copyTpl(
+          this.templatePath('src/_element/_element.html'),
+          `src/${elementName}/${elementName}.html`,
+          this.props);
 
-    this.fs.copyTpl(
-        this.templatePath('test/_element/_element_test.html'),
-        `test/${elementName}/${elementName}_test.html`,
-        this.props);
-  }
+      this.fs.copyTpl(
+          this.templatePath('test/_element/_element_test.html'),
+          `test/${elementName}/${elementName}_test.html`,
+          this.props);
+    }
 
-  install() {
-    this.log(chalk.bold('\nProject generated!'));
-    this.log('Installing dependencies...');
-    this.installDependencies({
-      npm: false,
-    });
-  }
+    install() {
+      this.log(chalk.bold('\nProject generated!'));
+      this.log('Installing dependencies...');
+      this.installDependencies({
+        npm: false,
+      });
+    }
 
-  end() {
-    this.log(chalk.bold('\nSetup Complete!'));
-    this.log(
-        'Check out your new project README for information about what to do next.\n');
-  }
+    end() {
+      this.log(chalk.bold('\nSetup Complete!'));
+      this.log(
+          'Check out your new project README for information about what to do next.\n');
+    }
+  };
 }

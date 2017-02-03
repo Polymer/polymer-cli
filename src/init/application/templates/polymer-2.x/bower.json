@@ -1,0 +1,15 @@
+{
+  "name": "<%= name %>",
+<% if (description) { -%>  "description": "<%= description %>",
+<% } -%>
+  "main": "index.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#2.0-preview"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#2.0-preview",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#2.0-preview",
+    "web-component-tester": "v6.0.0-prerelease.5",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#v1"
+  }
+}

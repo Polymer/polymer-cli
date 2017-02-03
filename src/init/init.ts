@@ -18,14 +18,12 @@ import * as fs from 'fs';
 import * as logging from 'plylog';
 
 import findup = require('findup-sync');
-import {ApplicationGenerator} from '../init/application/application';
-import {ElementGenerator} from '../init/element/element';
 import * as YeomanEnvironment from 'yeoman-environment';
 import {prompt, Question as InquirerQuestion} from 'inquirer';
+import {createApplicationGenerator} from '../init/application/application';
+import {createElementGenerator} from '../init/element/element';
 import {createGithubGenerator} from '../init/github';
-
-// import {Base} from 'yeoman-generator';
-
+import Generator = require('yeoman-generator');
 
 const logger = logging.getLogger('init');
 
@@ -35,23 +33,55 @@ interface GeneratorDescription {
   short: string;
 }
 
-const templateDescriptions: {[name: string]: string} = {
-  'element': 'A blank element template',
-  'application': 'A blank application template',
-  'starter-kit':
-      'A starter application template, with navigation and "PRPL pattern" loading',
-  'shop': 'The "Shop" Progressive Web App demo',
+interface GeneratorInfo {
+  id: string;
+  description: string;
+  generator: typeof Generator;
+}
+
+const localGenerators: {[name: string]: GeneratorInfo} = {
+  'polymer-1-element': {
+    id: 'polymer-init-polymer-1-element:app',
+    description: 'A simple Polymer 1.0 element template',
+    generator: createElementGenerator('polymer-1.x'),
+  },
+  'polymer-2-element': {
+    id: 'polymer-init-polymer-2-element:app',
+    description: 'A simple Polymer 2.0 element template',
+    generator: createElementGenerator('polymer-2.x'),
+  },
+  'polymer-1-application': {
+    id: 'polymer-init-polymer-1-application:app',
+    description: 'A simple Polymer 1.0 application template',
+    generator: createApplicationGenerator('polymer-1.x'),
+  },
+  'polymer-2-application': {
+    id: 'polymer-init-polymer-2-application:app',
+    description: 'A simple Polymer 2.0 application',
+    generator: createApplicationGenerator('polymer-2.x'),
+  },
+  // TODO: Add Shop "^2.0.0" generator once Polymer 2.0 Shop template is
+  // released.
+  'starter-kit': {
+    id: 'polymer-init-starter-kit:app',
+    description:
+        'A starter application template, with navigation and "PRPL pattern" loading',
+    generator: createGithubGenerator({
+      owner: 'PolymerElements',
+      repo: 'polymer-starter-kit',
+    }),
+  },
+  // TODO: Add Shop "^3.0.0" generator once Polymer 2.0 PSK template is
+  // released.
+  'shop': {
+    id: 'polymer-init-shop:app',
+    description: 'The "Shop" Progressive Web App demo',
+    generator: createGithubGenerator({
+      owner: 'Polymer',
+      repo: 'shop',
+    }),
+  },
 };
-
-let shopGenerator = createGithubGenerator({
-  owner: 'Polymer',
-  repo: 'shop',
-});
-
-let pskGenerator = createGithubGenerator({
-  owner: 'PolymerElements',
-  repo: 'polymer-starter-kit',
-});
 
 /**
  * Check if the current shell environment is MinGW. MinGW can't handle some
@@ -86,8 +116,8 @@ function getGeneratorDescription(
   const displayName = getDisplayName(meta.name);
   let description = meta.description;
 
-  if (templateDescriptions.hasOwnProperty(displayName)) {
-    description = templateDescriptions[displayName];
+  if (localGenerators.hasOwnProperty(displayName)) {
+    description = localGenerators[displayName].description;
   }
 
   // If a description exists, format it properly for the command-line
@@ -108,9 +138,8 @@ function getGeneratorDescription(
  * Get the metadata of a generator from its package.json
  */
 function getGeneratorMeta(
-    rootDir: string,
-    defaultName: string,
-    defaultDescription: string): {name: string, description: string} {
+    rootDir: string, defaultName: string, defaultDescription: string):
+    {name: string, description: string} {
   let name = defaultName;
   let description = defaultDescription;
 
@@ -159,8 +188,7 @@ function getDisplayName(generatorName: string) {
   // ([^:]+)                 | Grp 3; Match one or more characters != ":"
   // (:.*)?                  | Grp 4; Match ":" followed by anything; Optional
   return generatorName.replace(
-      /(generator-)?(polymer-init-)?([^:]+)(:.*)?/g,
-      '$3');
+      /(generator-)?(polymer-init-)?([^:]+)(:.*)?/g, '$3');
 }
 
 /**
@@ -169,10 +197,10 @@ function getDisplayName(generatorName: string) {
 function createYeomanEnvironment(): Promise<any> {
   return new Promise((resolve, reject) => {
     const env = new YeomanEnvironment();
-    env.registerStub(ElementGenerator, 'polymer-init-element:app');
-    env.registerStub(ApplicationGenerator, 'polymer-init-application:app');
-    env.registerStub(shopGenerator, 'polymer-init-shop:app');
-    env.registerStub(pskGenerator, 'polymer-init-starter-kit:app');
+    Object.keys(localGenerators).forEach((generatorName) => {
+      const generatorInfo = localGenerators[generatorName];
+      env.registerStub(generatorInfo.generator, generatorInfo.id);
+    });
     env.lookup((error?: Error) => {
       if (error) {
         reject(error);
@@ -190,10 +218,10 @@ function createYeomanEnvironment(): Promise<any> {
  */
 function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
   const generators = env.getGeneratorsMeta();
-  const polymerInitGenerators = Object.keys(generators).filter((k) => {
+  const allGeneratorNames = Object.keys(generators).filter((k) => {
     return k.startsWith('polymer-init') && k !== 'polymer-init:app';
   });
-  const choices = polymerInitGenerators.map((generatorName: string) => {
+  const choices = allGeneratorNames.map((generatorName: string) => {
     const generator = generators[generatorName];
     return getGeneratorDescription(generator, generatorName);
   });
