@@ -10,95 +10,86 @@
 'use strict';
 
 const assert = require('chai').assert;
-const fs = require('fs-extra');
-const path = require('path');
-const yoAssert = require('yeoman-assert');
+const sinon = require('sinon');
 const helpers = require('yeoman-test');
 
 const createGithubGenerator
   = require('../../../lib/init/github').createGithubGenerator;
 
+/**
+ * This small helper function wraps createGithubGenerator() so that we may add a
+ * callback to access the github generator before it is run by Yeoman. Yeoman
+ * doesn't give us this option otherwise (it takes a generator constructor and
+ * creates the generator itself, internally).
+ */
+function createTestGenerator(generatorOptions, generatorWillRun) {
+  return function TestGenerator(args, options) {
+    const GithubGenerator = createGithubGenerator(generatorOptions);
+    const githubGenerator = new GithubGenerator(args, options);
+    generatorWillRun(githubGenerator);
+    return githubGenerator;
+  }
+}
+
 suite('init/github', () => {
 
-  test('untars a release', (done) => {
-    let mockRequestApi = (options) => {
-      assert.equal(options.url, 'http://foo.com/bar.tar');
-      return fs.createReadStream(
-        path.join(__dirname, 'github-test-data/test_tarball.tgz'));
+  suite('createGithubGenerator()', () => {
+
+    const semverMatchingRelease = {
+      tarball_url: 'MATCHING_RELEASE_TARBALL_URL',
+      tag_name: 'MATCHING_RELEASE_TAG_NAME',
     };
 
-    let mockGithubApi = {
-      authenticate(options) {
-        assert.equal(options.type, 'oauth');
-        assert.equal(options.token, 'token-token');
-      },
+    test('returns a generator that untars the latest release when no semver range is given', (done) => {
+      let getSemverReleaseStub;
+      let extractReleaseTarballStub;
 
-      repos: {
-        getReleases(options) {
-          assert.equal(options.owner, 'PolymerLabs');
-          assert.equal(options.repo, 'polykart');
-          return Promise.resolve([{
-            tarball_url: 'http://foo.com/bar.tar',
-          }]);
-        },
-      },
-    };
+      const TestGenerator = createTestGenerator({
+        owner: 'Polymer',
+        repo: 'shop',
+      }, function setupGeneratorStubs(generator) {
+        getSemverReleaseStub = sinon
+            .stub(generator._github, 'getSemverRelease')
+            .returns(Promise.resolve(semverMatchingRelease));
+        extractReleaseTarballStub = sinon
+            .stub(generator._github, 'extractReleaseTarball')
+            .returns(Promise.resolve());
+      });
 
-    let generator = new createGithubGenerator({
-      requestApi: mockRequestApi,
-      githubApi: mockGithubApi,
-      githubToken: 'token-token',
-      owner: 'PolymerLabs',
-      repo: 'polykart',
+      helpers.run(TestGenerator)
+        .on('end', (a) => {
+          assert.isOk(getSemverReleaseStub.calledWith('*'));
+          assert.isOk(extractReleaseTarballStub.calledWith(semverMatchingRelease.tarball_url));
+          done();
+        });
     });
 
-    helpers.run(generator)
-      .on('end', (a) => {
-        yoAssert.file(['file1.txt']);
-        done();
+    test('returns a generator that untars the latest matching release when a semver range is given', (done) => {
+      const testSemverRange = '^v123.456.789';
+      let getSemverReleaseStub;
+      let extractReleaseTarballStub;
+
+      const TestGenerator = createTestGenerator({
+        owner: 'Polymer',
+        repo: 'shop',
+        semverRange: testSemverRange,
+      }, function setupGeneratorStubs(generator) {
+        getSemverReleaseStub = sinon
+            .stub(generator._github, 'getSemverRelease')
+            .returns(Promise.resolve(semverMatchingRelease));
+        extractReleaseTarballStub = sinon
+            .stub(generator._github, 'extractReleaseTarball')
+            .returns(Promise.resolve());
       });
-  });
 
-  test('works when package.json with no name is present', (done) => {
-    let mockRequestApi = (options) => {
-      throw new Error('should have errored earlier');
-    };
-
-    let mockGithubApi = {
-      authenticate(options) {
-      },
-
-      repos: {
-        getReleases(options, cb) {
-          // If we got to this point, the test passed. Abort.
-          throw new Error('expected');
-        },
-      },
-    };
-
-    let generator = new createGithubGenerator({
-      requestApi: mockRequestApi,
-      githubApi: mockGithubApi,
-      githubToken: 'token-token',
-      owner: 'PolymerLabs',
-      repo: 'polykart',
+      helpers.run(TestGenerator)
+        .on('end', (a) => {
+          assert.isOk(getSemverReleaseStub.calledWith(testSemverRange));
+          assert.isOk(extractReleaseTarballStub.calledWith(semverMatchingRelease.tarball_url));
+          done();
+        });
     });
 
-    helpers.run(generator)
-      .inTmpDir((dir) => {
-        fs.copySync(
-          path.join(__dirname, 'github-test-data/package.json'),
-          path.join(dir, 'package.json')
-        );
-      })
-      .on('error', (error) => {
-        assert.equal(error.message, 'expected');
-        done();
-      })
-      .on('end', (a) => {
-        assert.fail();
-        done();
-      });
   });
 
 });

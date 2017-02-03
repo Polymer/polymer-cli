@@ -69,6 +69,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
     generator: createGithubGenerator({
       owner: 'PolymerElements',
       repo: 'polymer-starter-kit',
+      semverRange: '^2.0.0',
     }),
   },
   // TODO: Add Shop "^3.0.0" generator once Polymer 2.0 PSK template is
@@ -79,6 +80,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
     generator: createGithubGenerator({
       owner: 'Polymer',
       repo: 'shop',
+      semverRange: '^1.0.0',
     }),
   },
 };

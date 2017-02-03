@@ -14,35 +14,30 @@
 import * as logging from 'plylog';
 import Generator = require('yeoman-generator');
 
-import {Github, RequestAPI} from '../github/github';
-
-import GitHubApi = require('github');
+import {Github} from '../github/github';
 
 const logger = logging.getLogger('cli.init');
 
 export interface GithubGeneratorOptions {
-  requestApi?: RequestAPI;
-  githubApi?: GitHubApi;
   githubToken?: string;
   owner: string;
   repo: string;
+  semverRange?: string;
 }
 
 export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
     (typeof Generator) {
-  let requestApi = githubOptions.requestApi;
-  let githubApi = githubOptions.githubApi;
-  let githubToken = githubOptions.githubToken;
-  let owner = githubOptions.owner;
-  let repo = githubOptions.repo;
+  const githubToken = githubOptions.githubToken;
+  const owner = githubOptions.owner;
+  const repo = githubOptions.repo;
+  const semverRange = githubOptions.semverRange || '*';
 
   return class GithubGenerator extends Generator {
     _github: Github;
 
     constructor(args: string|string[], options: any) {
       super(args, options);
-      this._github =
-          new Github({owner, repo, githubToken, githubApi, requestApi});
+      this._github = new Github({owner, repo, githubToken});
     }
 
     // This is necessary to prevent an exception in Yeoman when creating
@@ -55,9 +50,23 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
 
     async writing(): Promise<void> {
       const done = this.async();
-      logger.info(`Downloading latest release of ${owner}/${repo}`);
+      let release;
+
+      logger.info(
+          (semverRange === '*') ?
+              `Finding latest release of ${owner}/${repo}` :
+              `Finding latest ${semverRange} release of ${owner}/${repo}`);
       try {
-        await this._github.extractLatestRelease(this.destinationRoot());
+        release = await this._github.getSemverRelease(semverRange);
+      } catch (error) {
+        done(error);
+        return;
+      }
+
+      logger.info(`Downloading ${release.tag_name} of ${owner}/${repo}`);
+      try {
+        await this._github.extractReleaseTarball(
+            release.tarball_url, this.destinationRoot());
         done();
       } catch (error) {
         logger.error(`Could not download release from ${owner}/${repo}`);
