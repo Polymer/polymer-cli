@@ -1,0 +1,8 @@
+{
+  "name": "<%= name %>",
+  "short_name": "<%= name %>",
+<% if (description) { -%>  "description": "<%= description %>",
+<% } -%>
+  "start_url": "/",
+  "display": "standalone"
+}

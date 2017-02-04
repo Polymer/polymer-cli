@@ -14,27 +14,50 @@ const fs = require('fs-extra');
 const path = require('path');
 const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
-const ElementGenerator
-  = require('../../../lib/init/element/element').ElementGenerator;
+
+const createElementGenerator
+  = require('../../../lib/init/element/element').createElementGenerator;
 
 suite('init/element', () => {
 
-  test('creates expected files while ignoring filenames with dangling underscores', (done) => {
-
+  test('creates expected 1.x files while passed the 1.x template name', (done) => {
+    const TestGenerator = createElementGenerator('polymer-1.x');
     helpers
-      .run(ElementGenerator)
+      .run(TestGenerator)
+      .withPrompts({name: 'foobar-element'})
       .on('end', (a) => {
         yoAssert.file(['bower.json']);
+        yoAssert.fileContent('foobar-element.html', 'Polymer({');
+        done();
+      });
+  });
+
+  test('creates expected 2.x files while passed the 2.x template name', (done) => {
+    const TestGenerator = createElementGenerator('polymer-2.x');
+    helpers
+      .run(TestGenerator)
+      .withPrompts({name: 'foobar-element'})
+      .on('end', (a) => {
+        yoAssert.file(['bower.json']);
+        yoAssert.fileContent('foobar-element.html', 'class MyElement extends Polymer.Element');
+        done();
+      });
+  });
+
+  test('ignoring filenames with dangling underscores when generating templates', (done) => {
+    const TestGenerator = createElementGenerator('polymer-1.x');
+    helpers
+      .run(TestGenerator)
+      .on('end', (a) => {
         yoAssert.noFile(['_element.html']);
         done();
       });
-
   });
 
   test('works when package.json with no name is present', (done) => {
-
+    const TestGenerator = createElementGenerator('polymer-1.x');
     helpers
-      .run(ElementGenerator)
+      .run(TestGenerator)
       .inTmpDir((tempDir) => {
         fs.writeFileSync(path.join(tempDir, 'package.json'), '{}');
       })
