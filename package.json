@@ -31,7 +31,6 @@
     "@types/html-minifier": "^1.1.30",
     "@types/inquirer": "0.0.32",
     "@types/merge-stream": "^1.0.28",
-    "@types/node": "0.0.2",
     "@types/parse5": "^2.2.33",
     "@types/request": "0.0.36",
     "@types/semver": "^5.3.30",
