@@ -13,6 +13,9 @@
  */
 
 import {ProjectConfig} from 'polymer-project-config';
+
+import {install as installTypeOnly} from '../install/install';
+
 import {Command, CommandOptions} from './command';
 
 export class InstallCommand implements Command {
@@ -37,7 +40,8 @@ export class InstallCommand implements Command {
   ];
 
   async run(options: CommandOptions, _config: ProjectConfig): Promise<void> {
-    const install = require('../install/install').install;
+    const install =
+        require('../install/install').install as typeof installTypeOnly;
     await install(options);
   }
 }

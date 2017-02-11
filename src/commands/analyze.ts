@@ -14,6 +14,9 @@
 
 import * as logging from 'plylog';
 import {ProjectConfig} from 'polymer-project-config';
+
+import {analyze as analyzeTypeOnly} from '../analyze/analyze';
+
 import {Command, CommandOptions} from './command';
 
 const logger = logging.getLogger('cli.command.analyze');
@@ -31,7 +34,8 @@ export class AnalyzeCommand implements Command {
   }];
 
   async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
-    const analyze = require('../analyze/analyze').analyze;
+    const analyze =
+        require('../analyze/analyze').analyze as typeof analyzeTypeOnly;
     const root = config.root;
     const inputs = options['input'];
 

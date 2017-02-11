@@ -14,11 +14,13 @@
 
 import * as logging from 'plylog';
 import {ProjectConfig} from 'polymer-project-config';
+import * as polyserveTypeOnly from 'polyserve';
 import {args as polyserveArgs} from 'polyserve/lib/args';
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
 import {ServerOptions} from 'polyserve/lib/start_server';
+import * as urlTypeOnly from 'url';
 
 import {Environment} from '../environment/environment';
 
@@ -35,10 +37,10 @@ export class ServeCommand implements Command {
 
   async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    const polyserve = require('polyserve');
+    const polyserve = require('polyserve') as typeof polyserveTypeOnly;
     const startServers = polyserve.startServers;
     const getServerUrls = polyserve.getServerUrls;
-    const url = require('url');
+    const url = require('url') as typeof urlTypeOnly;
 
     let openPath: string|undefined;
     if (config.entrypoint && config.shell) {

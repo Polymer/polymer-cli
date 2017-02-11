@@ -280,7 +280,7 @@ export async function runGenerator(
  * Prompt the user to select a generator. When the user
  * selects a generator, run it.
  */
-export async function promptGeneratorSelection(options: {[name: string]: any}):
+export async function promptGeneratorSelection(options?: {[name: string]: any}):
     Promise<void> {
   options = options || {};
   const env = await(options['env'] || createYeomanEnvironment());

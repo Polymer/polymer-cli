@@ -15,6 +15,9 @@
 import {ArgDescriptor} from 'command-line-args';
 import * as logging from 'plylog';
 import {ProjectConfig} from 'polymer-project-config';
+
+import * as polymerInitTypeOnly from '../init/init';
+
 import {Command, CommandOptions} from './command';
 
 let logger = logging.getLogger('cli.command.init');
@@ -33,7 +36,7 @@ export class InitCommand implements Command {
 
   run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
     // Defer dependency loading until needed
-    const polymerInit = require('../init/init');
+    const polymerInit = require('../init/init') as typeof polymerInitTypeOnly;
 
     const templateName = options['name'];
     if (templateName) {

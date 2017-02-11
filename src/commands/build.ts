@@ -15,8 +15,12 @@
 // Only import type definitions here, otherwise this line will be included in
 // the JS output, triggering  the entire build library & its dependencies to
 // be loaded and parsed.
+import * as delTypeOnly from 'del';
+import * as path from 'path';
 import * as logging from 'plylog';
 import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
+
+import * as buildLibTypeOnly from '../build/build';
 
 import {Command, CommandOptions} from './command';
 
@@ -84,9 +88,8 @@ export class BuildCommand implements Command {
 
   async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    const del = require('del');
-    const pathSeperator = require('path').sep;
-    const buildLib = require('../build/build');
+    const del = require('del') as typeof delTypeOnly;
+    const buildLib = require('../build/build') as typeof buildLibTypeOnly;
     let build = buildLib.build;
     const mainBuildDirectoryName = buildLib.mainBuildDirectoryName;
 
@@ -100,8 +103,7 @@ export class BuildCommand implements Command {
       build = options['env'].build;
     }
 
-    logger.info(
-        `Clearing ${mainBuildDirectoryName}${pathSeperator} directory...`);
+    logger.info(`Clearing ${mainBuildDirectoryName}${path.sep} directory...`);
     await del([mainBuildDirectoryName]);
 
     // If any the build command flags were passed as CLI arguments, generate
