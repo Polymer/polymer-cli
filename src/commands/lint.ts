@@ -24,7 +24,7 @@ import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-re
 import {Severity, Warning} from 'polymer-analyzer/lib/warning/warning';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
-import * as lintLib from 'polymer-linter';
+import * as lintLibTypeOnly from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {Command, CommandOptions} from './command';
@@ -39,12 +39,12 @@ export class LintCommand implements Command {
   args = [];
 
   async run(_options: CommandOptions, config: ProjectConfig): Promise<any> {
-    // Defer dependency loading until this specific command is run
-    // const polylint = require('polymer-lint');
+    // Defer dependency loading until this specific command is run.
+    const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
 
     const lintOptions = config.lint;
     if (!lintOptions) {
-      logger.warn(`Linter is configured through polymer.json. e.g.:
+      logger.warn(`linting is configured through polymer.json. e.g.:
 
 {
   "lint": {
