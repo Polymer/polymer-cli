@@ -14,7 +14,6 @@
     "build": "gulp build",
     "test": "gulp lint test && gulp test:integration",
     "test:smoke": "gulp test",
-    "prepublish": "npm run build && npm test",
     "format": "find src test | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
   "repository": {
@@ -65,8 +64,8 @@
     "polylint": "^2.10.0",
     "polymer-analyzer": "2.0.0-alpha.24",
     "polymer-build": "^0.8.0",
-    "polymer-project-config": "^1.2.0",
-    "polyserve": "0.16.0",
+    "polymer-project-config": "^2.0.0",
+    "polyserve": "^0.16.0",
     "request": "^2.72.0",
     "resolve": "^1.1.7",
     "semver": "^5.3.0",

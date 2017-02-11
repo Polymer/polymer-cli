@@ -17,8 +17,14 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
-import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
+import {Analyzer} from 'polymer-analyzer';
+import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
+import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
+import {Severity, Warning} from 'polymer-analyzer/lib/warning/warning';
+import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
+import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
+import * as lintLib from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {Command, CommandOptions} from './command';
@@ -30,104 +36,54 @@ export class LintCommand implements Command {
 
   description = 'Lints the project';
 
-  args = [
-    {
-      name: 'input',
-      type: String,
-      alias: 'i',
-      defaultOption: true,
-      multiple: true,
-      description: 'Files and/or folders to lint. Exclusive. Defaults to cwd.'
-    },
-    {
-      name: 'policy',
-      type: String,
-      alias: 'p',
-      description: 'Your jsconf.json policy file.',
-      defaultValue: false
-    },
-    {
-      name: 'config-file',
-      type: String,
-      defaultValue: 'bower.json',
-      description: (
-          'If inputs are specified, look for `config-field` in this JSON file.')
-    },
-    {
-      name: 'config-field',
-      type: String,
-      defaultValue: 'main',
-      description:
-          ('If config-file is used for inputs, this field determines which ' +
-           'file(s) are linted.')
-    },
-    {
-      name: 'follow-dependencies',
-      type: Boolean,
-      description:
-          ('Follow through and lint dependencies. This is default behavior ' +
-           'when linting your entire application via the entrypoint, shell, ' +
-           'and fragment arguments.')
-    },
-    {
-      name: 'no-follow-dependencies',
-      type: Boolean,
-      description:
-          ('Only lint the files provided, ignoring dependencies. This is ' +
-           'default behavior when linting a specific list of files provided ' +
-           'via the input argument.')
-    }
-  ];
+  args = [];
 
-  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(_options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    const polylint = require('polylint/lib/cli');
+    // const polylint = require('polymer-lint');
 
-    let lintFiles: string[] = options['input'];
-    if (!lintFiles) {
-      lintFiles = [];
-      if (config.entrypoint)
-        lintFiles.push(config.entrypoint);
-      if (config.shell)
-        lintFiles.push(config.shell);
-      if (config.fragments)
-        lintFiles = lintFiles.concat(config.fragments);
-      lintFiles = lintFiles.map((p) => p.substring(config.root.length));
+    const lintOptions = config.lint;
+    if (!lintOptions) {
+      logger.warn(`Linter is configured through polymer.json. e.g.:
+
+{
+  "lint": {
+    "rules": ["polymer-2"]
+  }
+}`);
+      return;
     }
 
-    if (lintFiles.length === 0) {
-      logger.warn(
-          'No inputs specified. Please use the --input, --entrypoint, ' +
-          '--shell or --fragment flags');
-      let argsCli = commandLineArgs(this.args);
-      console.info(argsCli.getUsage({
-        title: `polymer ${this.name}`,
-        description: this.description,
-      }));
-      return Promise.resolve();
-    }
+    const rules = lintLib.registry.getRules(lintOptions.rules);
+    const filter = new WarningFilter({
+      warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
+      minimumSeverity: Severity.WARNING
+    });
 
-    // Default to false if input files are provided, otherwise default to true
-    let followDependencies = !options['input'];
-    if (options['follow-dependencies']) {
-      followDependencies = true;
-    } else if (options['no-follow-dependencies']) {
-      followDependencies = false;
-    }
 
-    return polylint
-        .runWithOptions({
-          input: lintFiles,
-          root: config.root,
-          // TODO: read into config
-          bowerdir: 'bower_components',
-          policy: options['policy'],
-          'config-file': options['config-file'],
-          'config-field': options['config-field'],
-          // NOTE: `no-recursion` has the opposite behavior of
-          // `follow-dependencies`
-          'no-recursion': !followDependencies,
-        })
-        .then(() => undefined);
+    const analyzer = new Analyzer({
+      urlLoader: new FSUrlLoader(config.root),
+      urlResolver: new PackageUrlResolver(),
+    });
+
+    const linter = new lintLib.Linter(rules, analyzer);
+
+    const warnings = await linter.lintPackage();
+
+    const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
+
+    // TODO: Make verbosity and color configurable.
+    const printer = new WarningPrinter(
+        process.stdout, {analyzer: analyzer, verbosity: 'full', color: true});
+    await printer.printWarnings(filtered);
+
+    process.exitCode = this._getExitCode(filtered);
+  }
+
+  private _getExitCode(filteredWarnings: Warning[]) {
+    if (filteredWarnings.length === 0) {
+      return 0;
+    }
+    return 1;
   }
 }
