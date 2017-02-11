@@ -53,7 +53,7 @@ export function createElementGenerator(templateName: string):
           default:
               this.appname + (this.appname.includes('-') ? '' : '-element'),
           validate: (name: string) => {
-            let nameContainsHyphen = name.includes('-');
+            const nameContainsHyphen = name.includes('-');
             if (!nameContainsHyphen) {
               this.log(
                   '\nUh oh, custom elements must include a hyphen in ' +

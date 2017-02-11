@@ -28,7 +28,7 @@ import {Environment} from '../environment/environment';
 
 import {Command, CommandOptions} from './command';
 
-let logger = logging.getLogger('cli.command.serve');
+const logger = logging.getLogger('cli.command.serve');
 
 export class ServeCommand implements Command {
   name = 'serve';
@@ -93,7 +93,8 @@ export class ServeCommand implements Command {
       const urls = getServerUrls(options, mainlineServer.server);
       logger.info(
           `Files in this directory are available under the following URLs
-      applications: ${url.format(urls.serverUrl)}
+      applications: ${url
+              .format(urls.serverUrl)}
       reusable components: ${url.format(urls.componentUrl)}
     `);
     } else {

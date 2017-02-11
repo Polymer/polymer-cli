@@ -14,7 +14,8 @@
     "build": "gulp build",
     "test": "gulp lint test && gulp test:integration",
     "test:smoke": "gulp test",
-    "format": "find src test gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
+    "format": "find src test gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i",
+    "prepublishOnly": "npm run build && npm test"
   },
   "repository": {
     "type": "git",
@@ -83,6 +84,7 @@
   "devDependencies": {
     "@types/fs-extra": "0.0.37",
     "@types/node": "^6",
+    "@polymer/tools-common": "^1.0.1",
     "chai": "^3.5.0",
     "clang-format": "=1.0.45",
     "depcheck": "^0.6.3",

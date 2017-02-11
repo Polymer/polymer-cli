@@ -25,7 +25,7 @@ import * as polymerInitTypeOnly from '../init/init';
 
 import {Command, CommandOptions} from './command';
 
-let logger = logging.getLogger('cli.command.init');
+const logger = logging.getLogger('cli.command.init');
 
 export class InitCommand implements Command {
   name = 'init';

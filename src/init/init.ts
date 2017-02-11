@@ -98,7 +98,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
  * yeoman features, so we can use this check to downgrade gracefully.
  */
 function checkIsMinGW(): boolean {
-  let isWindows = /^win/.test(process.platform);
+  const isWindows = /^win/.test(process.platform);
   if (!isWindows) {
     return false;
   }
@@ -106,7 +106,7 @@ function checkIsMinGW(): boolean {
   // uname might not exist if using cmd or powershell,
   // which would throw an exception
   try {
-    let uname = execSync('uname -s').toString();
+    const uname = execSync('uname -s').toString();
     return !!/^mingw/i.test(uname);
   } catch (error) {
     logger.debug(

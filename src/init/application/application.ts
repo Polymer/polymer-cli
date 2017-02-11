@@ -58,7 +58,7 @@ export function createApplicationGenerator(templateName: string):
           message: `Main element name`,
           default: (answers: any) => `${answers.name}-app`,
           validate: (name: string) => {
-            let nameContainsHyphen = name.includes('-');
+            const nameContainsHyphen = name.includes('-');
             if (!nameContainsHyphen) {
               this.log(
                   '\nUh oh, custom elements must include a hyphen in ' +

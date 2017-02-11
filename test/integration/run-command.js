@@ -39,11 +39,11 @@ function runCommand(path, args, options) {
              if (code !== 0) {
                reject(new Error(
                    `Error running ${path} with args ${
-                                                      args
-                                                    }. Got exit code: ${
-                                                                        code
+               args
+               }. Got exit code: ${
+               code
                                                                       }`));
-               return;
+                                                                      return;
              }
              resolve(contents);
            });
@@ -57,14 +57,15 @@ function runCommand(path, args, options) {
           if (!options.failureExpected) {
             console.log(
                 `Output of failed command 'node ${
-                                                  path
-                                                } ${
-                                                    args.join(' ')
-                                                  }' in directory ${
-                                                                    options.cwd
+            path
+            } ${
+            args.join(' ')
+            }' in directory ${
+            options.cwd
                                                                   }`);
-            console.log(out);
-            throw err;
+                                                                  console.log(
+                                                                      out);
+                                                                  throw err;
           } else {
             throw out;
           }
@@ -100,5 +101,5 @@ function pipesToString(stdout, stderr) {
 }
 
 module.exports = {
-  runCommand,
+    runCommand,
 };
