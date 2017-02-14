@@ -12,13 +12,20 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-// Only import type definitions here, otherwise this line will be included in
-// the JS output, triggering  the entire build library & its dependencies to
-// be loaded and parsed.
+// Be careful with these imports. As much as possible should be deferred until
+// the command is actually run, in order to minimize startup time from loading
+// unused code. Any imports that are only used as types will be removed from the
+// output JS and so not result in a require() statement.
+
+import * as delTypeOnly from 'del';
+import * as pathTypeOnly from 'path';
 import * as logging from 'plylog';
 import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
+import * as buildLibTypeOnly from '../build/build';
+
 import {Command, CommandOptions} from './command';
+
 
 let logger = logging.getLogger('cli.command.build');
 
@@ -84,9 +91,9 @@ export class BuildCommand implements Command {
 
   async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run
-    const del = require('del');
-    const pathSeperator = require('path').sep;
-    const buildLib = require('../build/build');
+    const del = require('del') as typeof delTypeOnly;
+    const buildLib = require('../build/build') as typeof buildLibTypeOnly;
+    const path = require('path') as typeof pathTypeOnly;
     let build = buildLib.build;
     const mainBuildDirectoryName = buildLib.mainBuildDirectoryName;
 
@@ -100,8 +107,7 @@ export class BuildCommand implements Command {
       build = options['env'].build;
     }
 
-    logger.info(
-        `Clearing ${mainBuildDirectoryName}${pathSeperator} directory...`);
+    logger.info(`Clearing ${mainBuildDirectoryName}${path.sep} directory...`);
     await del([mainBuildDirectoryName]);
 
     // If any the build command flags were passed as CLI arguments, generate

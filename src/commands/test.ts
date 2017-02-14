@@ -12,7 +12,14 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+// Be careful with these imports. As much as possible should be deferred until
+// the command is actually run, in order to minimize startup time from loading
+// unused code. Any imports that are only used as types will be removed from the
+// output JS and so not result in a require() statement.
+
 import {ProjectConfig} from 'polymer-project-config';
+import * as wctTypeOnly from 'web-component-tester';
+
 import {Command, CommandOptions} from './command';
 
 export class TestCommand implements Command {
@@ -127,7 +134,7 @@ export class TestCommand implements Command {
 
   run(_options: CommandOptions, _config: ProjectConfig): Promise<void> {
     // Defer dependency loading until this specific command is run
-    const wct = require('web-component-tester');
+    const wct = require('web-component-tester') as typeof wctTypeOnly;
 
     return wct.cli.run(process.env, process.argv.slice(3), process.stdout);
   }

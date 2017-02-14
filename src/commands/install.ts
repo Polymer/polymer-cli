@@ -12,7 +12,15 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+// Be careful with these imports. As much as possible should be deferred until
+// the command is actually run, in order to minimize startup time from loading
+// unused code. Any imports that are only used as types will be removed from the
+// output JS and so not result in a require() statement.
+
 import {ProjectConfig} from 'polymer-project-config';
+
+import {install as installTypeOnly} from '../install/install';
+
 import {Command, CommandOptions} from './command';
 
 export class InstallCommand implements Command {
@@ -37,7 +45,9 @@ export class InstallCommand implements Command {
   ];
 
   async run(options: CommandOptions, _config: ProjectConfig): Promise<void> {
-    const install = require('../install/install').install;
+    // Defer dependency loading until this specific command is run
+    const install =
+        require('../install/install').install as typeof installTypeOnly;
     await install(options);
   }
 }
