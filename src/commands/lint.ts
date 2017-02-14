@@ -94,6 +94,7 @@ export class LintCommand implements Command {
     "rules": ["polymer-2"]
   }
 }`);
+      process.exitCode = 1;
       return;
     }
 
