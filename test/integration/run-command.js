@@ -43,7 +43,7 @@ function runCommand(path, args, options) {
     });
   }).catch((err) => {
     return contents.then((out) => {
-      console.log(`Output of failed command 'node ${path} ${args}' in directory ${options.cwd}`);
+      console.log(`Output of failed command 'node ${path} ${args.join(' ')}' in directory ${options.cwd}`);
       console.log(out);
       throw err;
     });
