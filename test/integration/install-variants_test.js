@@ -20,6 +20,8 @@ suite('install-variants', function() {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
+  this.timeout(90 * 1000);
+
   test('installs variants', (done) => {
     const fixturePath = path.join(__dirname, './fixtures/install-variants');
 
@@ -29,7 +31,7 @@ suite('install-variants', function() {
           assert.fail(err);
           done(err);
         }
-        runCommand(binPath, ['install', '--variants', '--offline'], {cwd: tmpPath}).then(() => {
+        runCommand(binPath, ['install', '--variants'], {cwd: tmpPath}).then(() => {
           const mainDir = path.join(tmpPath, 'bower_components');
           assert.isTrue(fs.statSync(mainDir).isDirectory());
 
