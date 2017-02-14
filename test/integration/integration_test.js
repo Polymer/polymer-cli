@@ -35,7 +35,6 @@ suite('integration tests', function() {
   suite('init templates', () => {
 
     // TODO(#562): enable test commands.
-    // TODO(rictic): run linter once new linter lands.
     test('test the polymer 1.x application template', () => {
       let dir;
       return runGenerator(createApplicationGenerator('polymer-1.x'))
@@ -43,7 +42,7 @@ suite('integration tests', function() {
         .toPromise()
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], {cwd: dir}))
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
@@ -55,7 +54,7 @@ suite('integration tests', function() {
         .toPromise()
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
@@ -67,7 +66,7 @@ suite('integration tests', function() {
         .toPromise()
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}));
     });
 
@@ -78,8 +77,7 @@ suite('integration tests', function() {
         .toPromise()
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-        // TODO(rictic): reenable with new linter.
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}));
     });
 
@@ -95,7 +93,7 @@ suite('integration tests', function() {
         .toPromise()
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], {cwd: dir}))
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
@@ -112,7 +110,7 @@ suite('integration tests', function() {
         .toPromise()
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
@@ -142,8 +140,7 @@ suite('integration tests', function() {
       const dir = path.join(tspDir, 'polymer-1-app');
 
       return runCommand(binPath, ['install'], {cwd: dir})
-        // TODO(fks): reenable with new linter.
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
@@ -152,8 +149,7 @@ suite('integration tests', function() {
       const dir = path.join(tspDir, 'polymer-2-app');
 
       return runCommand(binPath, ['install'], {cwd: dir})
-        // TODO(fks): reenable with new linter.
-        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
