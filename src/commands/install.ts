@@ -45,6 +45,7 @@ export class InstallCommand implements Command {
   ];
 
   async run(options: CommandOptions, _config: ProjectConfig): Promise<void> {
+    // Defer dependency loading until this specific command is run
     const install =
         require('../install/install').install as typeof installTypeOnly;
     await install(options);
