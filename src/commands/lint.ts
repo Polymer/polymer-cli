@@ -17,7 +17,9 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
+import * as chalk from 'chalk';
 import {ArgDescriptor} from 'command-line-args';
+import * as commandLineUsage from 'command-line-usage';
 import * as logging from 'plylog';
 import {Analyzer} from 'polymer-analyzer';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
@@ -72,14 +74,10 @@ export class LintCommand implements Command {
    *   - --fix
    */
 
-  /**
-   * TODO(rictic): expose rules and rulecollections off the lint registry so
-   *   that we can print their descriptions in the help menu.
-   */
-
   async run(options: Options, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run.
     const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
+    this._loadPlugins(config);
 
     const lintOptions: Partial<typeof config.lint> = (config.lint || {});
 
@@ -121,6 +119,47 @@ export class LintCommand implements Command {
     await printer.printWarnings(filtered);
 
     process.exitCode = this._getExitCode(filtered);
+  }
+
+  extraUsageGroups(config: ProjectConfig): commandLineUsage.UsageGroup[] {
+    const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
+    this._loadPlugins(config);
+    let collectionsDocs = [];
+    for (const collection of lintLib.registry.allRuleCollections()) {
+      collectionsDocs.push(`  ${chalk.bold(collection.code)}: ${this._indent(
+          collection.description)}`);
+    }
+    let rulesDocs = [];
+    for (const rule of lintLib.registry.allRules()) {
+      rulesDocs.push(
+          `  ${chalk.bold(rule.code)}: ${this._indent(rule.description)}`);
+    }
+    return [
+      {
+        header: 'Lint Rule Collections',
+        content: collectionsDocs.join('\n\n'),
+        raw: true
+      },
+      {header: 'Lint Rules', content: rulesDocs.join('\n\n'), raw: true}
+    ];
+  }
+
+  private _indent(description: string) {
+    return description.split('\n')
+        .map((line, idx) => {
+          if (idx === 0) {
+            return line;
+          }
+          if (line.length === 0) {
+            return line;
+          }
+          return '      ' + line;
+        })
+        .join('\n');
+  }
+
+  private _loadPlugins(_config: ProjectConfig) {
+    // TODO(rictic): implement.
   }
 
   private async _lint(

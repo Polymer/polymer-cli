@@ -83,18 +83,21 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  generateCommandUsage(command: Command) {
-    return commandLineUsage([
+  generateCommandUsage(command: Command, config: ProjectConfig) {
+    const extraUsageGroups =
+        command.extraUsageGroups ? command.extraUsageGroups(config) : [];
+    const usageGroups: commandLineUsage.UsageGroup[] = [
       {
         header: `polymer ${command.name}`,
         content: command.description,
       },
       {header: 'Command Options', optionList: command.args},
       {header: 'Global Options', optionList: globalArguments},
-    ]);
+    ];
+    return commandLineUsage(usageGroups.concat(extraUsageGroups));
   }
 
-  run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
+  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
     return new Promise<any>((resolve, _) => {
       const commandName: string = options['command'];
       if (!commandName) {
@@ -114,7 +117,7 @@ export class HelpCommand implements Command {
       }
 
       logger.debug(`printing help for command '${commandName}'...`);
-      console.log(this.generateCommandUsage(command));
+      console.log(this.generateCommandUsage(command, config));
       resolve(null);
     });
   }

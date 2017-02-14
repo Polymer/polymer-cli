@@ -13,6 +13,7 @@
  */
 
 import {ArgDescriptor} from 'command-line-args';
+import {UsageGroup} from 'command-line-usage';
 import {ProjectConfig} from 'polymer-project-config';
 
 export type CommandOptions = {
@@ -24,4 +25,5 @@ export interface Command {
   description: string;
   args: ArgDescriptor[];
   run(options: CommandOptions, config: ProjectConfig): Promise<any>;
+  extraUsageGroups?(config: ProjectConfig): UsageGroup[];
 }
