@@ -40,6 +40,10 @@ function runCommand(path, args, options) {
       resolve();
     });
   }).catch((err) => {
+    // If the command was successful there's no need to print anything to the
+    // console, but if it failed then its output is probably helpful.
+    // Print out the output, then reject the final result with the original
+    // error.
     return contents.then((out) => {
       console.log(`Output of failed command 'node ${path} ${args.join(' ')}' in directory ${options.cwd}`);
       console.log(out);
@@ -48,6 +52,14 @@ function runCommand(path, args, options) {
   });
 }
 
+/**
+ * Reads the two streams and produces a promise of their combined output as a
+ * string.
+ *
+ * @param {NodeJS.ReadableStream} stdout
+ * @param {NodeJS.ReadableStream} stderr
+ * @return {Promise<string>}
+ */
 function pipesToString(stdout, stderr) {
   let string = ''
   const promises = [];
