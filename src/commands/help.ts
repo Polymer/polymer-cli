@@ -34,16 +34,16 @@ const CLI_TITLE = chalk.bold.underline('Polymer-CLI');
 const CLI_DESCRIPTION = 'The multi-tool for Polymer projects';
 const CLI_USAGE = 'Usage: \`polymer <command> [options ...]\`';
 
-// clang-format off - keep the custom white space here to help readibility
-const HELP_HEADER = '\n' + b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
-    b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + CLI_TITLE + '\n' +
-    b(' /\\  /   ') + m('/\\  /') + b('\\  /\\ ') + '\n' + b('/__\\/   ') +
-    m('/__\\/  ') + b('\\/__\\') + '  ' + CLI_DESCRIPTION + '\n' +
-    b('\\  /\\  ') + m('/\\  /   ') + b('/\\  /') + '\n' + b(' \\/__\\') +
-    m('/__\\/   ') + b('/__\\/ ') + '  ' + CLI_USAGE + '\n' + b('  \\  ') +
-    m('/\\  /   ') + b('/\\  /  ') + '\n' + b('   \\') + m('/__\\/   ') +
-    b('/__\\/   ') + '\n';
-// clang-format on
+const HELP_HEADER = `
+   ${b('/\\˜˜/')}   ${m('/\\˜˜/')}${b('\\')}
+  ${b('/__\\/')}   ${m('/__\\/')}${b('_\_\\')}    ${CLI_TITLE}
+ ${b('/\\  /')}   ${m('/\\  /')}${b('\\  /\\')}
+${b('/__\\/')}   ${m('/__\\/')}  ${b('\\/__\\')}  ${CLI_DESCRIPTION}
+${b('\\  /\\')}  ${m('/\\  /')}   ${b('/\\  /')}
+ ${b('\\/__\\')}${m('/__\\/')}   ${b('/__\\/')}   ${CLI_USAGE}
+  ${b('\\')}  ${m('/\\  /')}   ${b('/\\  /')}
+   ${b('\\')}${m('/__\\/')}   ${b('/__\\/')}
+`;
 
 export class HelpCommand implements Command {
   name = 'help';
