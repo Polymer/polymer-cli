@@ -33,7 +33,6 @@ const PSKGenerator = createGithubGenerator({
 suite('integration tests', function() {
 
   const binPath = path.join(__dirname, '../../', 'bin', 'polymer.js');
-  const bowerPath = path.join(__dirname, '../../', 'node_modules', '.bin', 'bower');
 
   // Extend timeout limit to 90 seconds for slower systems
   this.timeout(90000);
@@ -45,7 +44,7 @@ suite('integration tests', function() {
       .withPrompts({ name: 'my-app' }) // Mock the prompt answers
       .toPromise()
       .then((_dir) => { dir = _dir })
-      .then(() => runCommand(bowerPath, ['install'], {cwd: dir}))
+      .then(() => runCommand(binPath, ['install'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
       .then(() => runCommand(binPath, ['build'], {cwd: dir}));
@@ -57,7 +56,7 @@ suite('integration tests', function() {
       .withPrompts({ name: 'my-app' }) // Mock the prompt answers
       .toPromise()
       .then((_dir) => { dir = _dir })
-      .then(() => runCommand(bowerPath, ['install'], { cwd: dir }))
+      .then(() => runCommand(binPath, ['install'], { cwd: dir }))
       // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // TODO(fks?): look into why tests are failing here
@@ -71,7 +70,7 @@ suite('integration tests', function() {
       .withPrompts({ name: 'my-element' }) // Mock the prompt answers
       .toPromise()
       .then((_dir) => { dir = _dir })
-      .then(() => runCommand(bowerPath, ['install'], { cwd: dir }))
+      .then(() => runCommand(binPath, ['install'], { cwd: dir }))
       // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // TODO(fks?): look into why tests are failing here
@@ -84,7 +83,7 @@ suite('integration tests', function() {
       .withPrompts({ name: 'my-element' }) // Mock the prompt answers
       .toPromise()
       .then((_dir) => { dir = _dir })
-      .then(() => runCommand(bowerPath, ['install'], { cwd: dir }))
+      .then(() => runCommand(binPath, ['install'], { cwd: dir }))
       // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}));
@@ -95,7 +94,7 @@ suite('integration tests', function() {
     return runGenerator(ShopGenerator)
       .toPromise()
       .then((_dir) => { dir = _dir })
-      .then(() => runCommand(bowerPath, ['install'], {cwd: dir}))
+      .then(() => runCommand(binPath, ['install'], {cwd: dir}))
       // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
@@ -107,7 +106,7 @@ suite('integration tests', function() {
     return runGenerator(PSKGenerator)
       .toPromise()
       .then((_dir) => { dir = _dir })
-      .then(() => runCommand(bowerPath, ['install'], { cwd: dir }))
+      .then(() => runCommand(binPath, ['install'], { cwd: dir }))
       // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
