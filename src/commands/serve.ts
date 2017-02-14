@@ -12,13 +12,15 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+// Be careful with these imports. As much as possible should be deferred until
+// the command is actually run, in order to minimize startup time from loading
+// unused code. Any imports that are only used as types will be removed from the
+// output JS and so not result in a require() statement.
+
 import * as logging from 'plylog';
 import {ProjectConfig} from 'polymer-project-config';
 import * as polyserveTypeOnly from 'polyserve';
 import {args as polyserveArgs} from 'polyserve/lib/args';
-// Only import type definitions here, otherwise this line will be included in
-// the JS output, triggering  the entire build library & its dependencies to
-// be loaded and parsed.
 import {ServerOptions} from 'polyserve/lib/start_server';
 import * as urlTypeOnly from 'url';
 

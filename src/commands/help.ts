@@ -12,6 +12,11 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+// Be careful with these imports. As much as possible should be deferred until
+// the command is actually run, in order to minimize startup time from loading
+// unused code. Any imports that are only used as types will be removed from the
+// output JS and so not result in a require() statement.
+
 import * as chalk from 'chalk';
 import * as commandLineUsage from 'command-line-usage';
 import * as logging from 'plylog';
@@ -30,15 +35,14 @@ const CLI_DESCRIPTION = 'The multi-tool for Polymer projects';
 const CLI_USAGE = 'Usage: \`polymer <command> [options ...]\`';
 
 // clang-format off - keep the custom white space here to help readibility
-const HELP_HEADER = '\n' +
-  b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
-  b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + CLI_TITLE + '\n' +
-  b(' /\\  /   ') + m('/\\  /') + b('\\  /\\ ') + '\n' +
-  b('/__\\/   ') + m('/__\\/  ') + b('\\/__\\') + '  ' + CLI_DESCRIPTION + '\n' +
-  b('\\  /\\  ') + m('/\\  /   ') + b('/\\  /') + '\n' +
-  b(' \\/__\\') + m('/__\\/   ') + b('/__\\/ ') + '  ' + CLI_USAGE + '\n' +
-  b('  \\  ') + m('/\\  /   ') + b('/\\  /  ') + '\n' +
-  b('   \\') + m('/__\\/   ') + b('/__\\/   ') + '\n';
+const HELP_HEADER = '\n' + b('   /\\˜˜/   ') + m('/\\˜˜/') + b('\\   ') + '\n' +
+    b('  /__\\/   ') + m('/__\\/') + b('__\\  ') + '  ' + CLI_TITLE + '\n' +
+    b(' /\\  /   ') + m('/\\  /') + b('\\  /\\ ') + '\n' + b('/__\\/   ') +
+    m('/__\\/  ') + b('\\/__\\') + '  ' + CLI_DESCRIPTION + '\n' +
+    b('\\  /\\  ') + m('/\\  /   ') + b('/\\  /') + '\n' + b(' \\/__\\') +
+    m('/__\\/   ') + b('/__\\/ ') + '  ' + CLI_USAGE + '\n' + b('  \\  ') +
+    m('/\\  /   ') + b('/\\  /  ') + '\n' + b('   \\') + m('/__\\/   ') +
+    b('/__\\/   ') + '\n';
 // clang-format on
 
 export class HelpCommand implements Command {
