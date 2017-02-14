@@ -91,6 +91,7 @@
     "gulp-mocha": "^3.0.1",
     "gulp-tslint": "^7.0.1",
     "gulp-typescript": "^3.0.0",
+    "memory-streams": "^0.1.0",
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.4",
     "tslint": "^4.0.2",

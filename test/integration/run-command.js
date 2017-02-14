@@ -17,9 +17,14 @@ const childProcess = require('child_process');
  * which will reject/resolve with the result of the command.
  */
 function runCommand(path, args, options) {
+  let contents;
   return new Promise((resolve, reject) => {
     let commandError;
+    options.silent = true;
     const forkedProcess = childProcess.fork(path, args, options);
+
+    forkedProcess.stdout
+    contents = pipesToString(forkedProcess.stdout, forkedProcess.stderr);
 
     // listen for errors as they may prevent the exit event from firing
     forkedProcess.on('error', (error) => { commandError = error });
@@ -30,11 +35,37 @@ function runCommand(path, args, options) {
         return;
       }
       if (code !== 0) {
-        reject(new Error('exit code: ' + code));
+        reject(new Error(
+          `Error running ${path} with args ${args}. Got exit code: ${code}`));
         return;
       }
       resolve();
     });
+  }).catch((err) => {
+    return contents.then((out) => {
+      console.log(`Output of failed command 'node ${path} ${args}' in directory ${options.cwd}`);
+      console.log(out);
+      throw err;
+    });
+  });
+}
+
+function pipesToString(stdout, stderr) {
+  let string = ''
+  const promises = [];
+  for (const stream of [stdout, stderr]) {
+    stream.setEncoding('utf8');
+    stream.on('data', function(chunk) {
+      string += chunk;
+    });
+
+    promises.push(new Promise((resolve) => {
+      stream.on('end', resolve);
+    }));
+  }
+
+  return Promise.all(promises).then(() => {
+    return string;
   });
 }
 
