@@ -13,7 +13,7 @@
     "lint": "gulp lint",
     "build": "gulp build",
     "test": "gulp lint test && gulp test:integration",
-    "test:smoke": "gulp lint test",
+    "test:smoke": "gulp test",
     "prepublish": "npm run build && npm test",
     "format": "find src test | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
