@@ -22,8 +22,6 @@ function runCommand(path, args, options) {
     let commandError;
     options.silent = true;
     const forkedProcess = childProcess.fork(path, args, options);
-
-    forkedProcess.stdout
     contents = pipesToString(forkedProcess.stdout, forkedProcess.stderr);
 
     // listen for errors as they may prevent the exit event from firing

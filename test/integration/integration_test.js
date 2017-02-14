@@ -37,7 +37,8 @@ suite('integration tests', function() {
   // Extend timeout limit to 90 seconds for slower systems
   this.timeout(90000);
 
-  // TODO(https://github.com/Polymer/polymer-cli/issues/562): these tests are broken.
+  // TODO(#562): enable test commands.
+  // TODO(rictic): run linter once new linter lands.
   test('test the polymer 1.x application template', () => {
     let dir;
     return runGenerator(createApplicationGenerator('polymer-1.x'))
@@ -57,9 +58,7 @@ suite('integration tests', function() {
       .toPromise()
       .then((_dir) => { dir = _dir })
       .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-      // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
-      // TODO(fks?): look into why tests are failing here
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
       .then(() => runCommand(binPath, ['build'], {cwd: dir}));
   });
@@ -71,9 +70,7 @@ suite('integration tests', function() {
       .toPromise()
       .then((_dir) => { dir = _dir })
       .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-      // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
-      // TODO(fks?): look into why tests are failing here
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}));
   });
 
@@ -95,7 +92,6 @@ suite('integration tests', function() {
       .toPromise()
       .then((_dir) => { dir = _dir })
       .then(() => runCommand(binPath, ['install'], {cwd: dir}))
-      // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
       .then(() => runCommand(binPath, ['build'], {cwd: dir}));
@@ -107,7 +103,6 @@ suite('integration tests', function() {
       .toPromise()
       .then((_dir) => { dir = _dir })
       .then(() => runCommand(binPath, ['install'], { cwd: dir }))
-      // TODO(rictic): reenable with new linter.
       // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
       // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
       .then(() => runCommand(binPath, ['build'], {cwd: dir}));
