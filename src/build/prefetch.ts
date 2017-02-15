@@ -16,10 +16,9 @@ import * as dom5 from 'dom5';
 import * as parse5 from 'parse5';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {DepsIndex, PolymerProject, StreamAnalyzer} from 'polymer-build';
+import {BuildAnalyzer, DepsIndex, PolymerProject} from 'polymer-build';
 import {ProjectConfig} from 'polymer-project-config';
 import {Transform} from 'stream';
-
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -31,7 +30,7 @@ let logger = logging.getLogger('cli.build.prefech');
 export class PrefetchTransform extends Transform {
   config: ProjectConfig;
   fileMap: Map<string, File>;
-  analyzer: StreamAnalyzer;
+  analyzer: BuildAnalyzer;
 
   constructor(project: PolymerProject) {
     super({objectMode: true});
