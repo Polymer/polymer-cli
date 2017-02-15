@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "0.0.37",
+    "@types/node": "^4.2.2",
     "chai": "^3.5.0",
     "clang-format": "=1.0.45",
     "depcheck": "^0.6.3",
@@ -92,7 +93,7 @@
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.4",
     "tslint": "^4.0.2",
-    "typescript": "^2.1.4",
+    "typescript": "^2.2.0",
     "vinyl-fs-fake": "^1.1.0",
     "yeoman-assert": "^2.2.1",
     "yeoman-test": "^1.1.0"
