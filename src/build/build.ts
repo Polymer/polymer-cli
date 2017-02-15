@@ -16,7 +16,7 @@ import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
-import {PolymerProject, addServiceWorker, SWConfig} from 'polymer-build';
+import {PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
@@ -49,18 +49,20 @@ export async function build(
   const buildDirectory = path.join(mainBuildDirectoryName, buildName);
   logger.debug(`"${buildDirectory}": Building with options:`, options);
 
+  const sourceSplitter = new HtmlSplitter();
   const sourcesStream = pipeStreams([
     polymerProject.sources(),
-    polymerProject.splitHtml(),
+    sourceSplitter.split(),
     getOptimizeStreams(optimizeOptions),
-    polymerProject.rejoinHtml()
+    sourceSplitter.rejoin()
   ]);
 
+  const depsSplitter = new HtmlSplitter();
   const depsStream = pipeStreams([
     polymerProject.dependencies(),
-    polymerProject.splitHtml(),
+    depsSplitter.split(),
     getOptimizeStreams(optimizeOptions),
-    polymerProject.rejoinHtml()
+    depsSplitter.rejoin()
   ]);
 
   let buildStream: NodeJS.ReadableStream =
