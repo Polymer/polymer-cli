@@ -94,6 +94,7 @@
     "memory-streams": "^0.1.0",
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.4",
+    "tmp": "0.0.31",
     "tslint": "^4.0.2",
     "typescript": "^2.2.0",
     "vinyl-fs-fake": "^1.1.0",
