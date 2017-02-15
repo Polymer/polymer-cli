@@ -20,19 +20,11 @@
 import * as chalkTypeOnly from 'chalk';
 import {ArgDescriptor} from 'command-line-args';
 import {UsageGroup} from 'command-line-usage';
-import * as logging from 'plylog';
-import {Analyzer as AnalyzerTypeOnly} from 'polymer-analyzer';
-import {FSUrlLoader as FSUrlLoaderTypeOnly} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
-import {PackageUrlResolver as PackageUrlResolverTypeOnly} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
-import {Severity as SeverityTypeOnly, Warning} from 'polymer-analyzer/lib/warning/warning';
-import {WarningFilter as WarningFilterTypeOnly} from 'polymer-analyzer/lib/warning/warning-filter';
-import {WarningPrinter as WarningPrinterTypeOnly} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLibTypeOnly from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
+import * as lintImplementationTypeOnly from '../lint/lint';
 
 import {Command} from './command';
-
-const logger = logging.getLogger('cli.lint');
 
 export interface Options {
   rules?: string[];
@@ -77,64 +69,12 @@ export class LintCommand implements Command {
    */
 
   async run(options: Options, config: ProjectConfig): Promise<any> {
-    // Defer dependency loading until this specific command is run.
-    const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
-    const Analyzer: typeof AnalyzerTypeOnly =
-        require('polymer-analyzer').Analyzer;
-    const FSUrlLoader: typeof FSUrlLoaderTypeOnly =
-        require('polymer-analyzer/lib/url-loader/fs-url-loader').FSUrlLoader;
-    const PackageUrlResolver: typeof PackageUrlResolverTypeOnly =
-        require('polymer-analyzer/lib/url-loader/package-url-resolver')
-            .PackageUrlResolver;
-    const Severity: typeof SeverityTypeOnly =
-        require('polymer-analyzer/lib/warning/warning').Severity;
-    const WarningFilter: typeof WarningFilterTypeOnly =
-        require('polymer-analyzer/lib/warning/warning-filter').WarningFilter;
-    const WarningPrinter: typeof WarningPrinterTypeOnly =
-        require('polymer-analyzer/lib/warning/warning-printer').WarningPrinter;
-
     this._loadPlugins(config);
 
-    const lintOptions: Partial<typeof config.lint> = (config.lint || {});
-
-    const ruleCodes = options.rules || lintOptions.rules;
-    if (ruleCodes === undefined) {
-      logger.warn(
-          `You must state which lint rules to use. You can use --rules, ` +
-          `but for a project it's best to use polymer.json. e.g.
-
-{
-  "lint": {
-    "rules": ["polymer-2"]
-  }
-}`);
-      process.exitCode = 1;
-      return;
-    }
-
-    const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
-    const filter = new WarningFilter({
-      warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
-      minimumSeverity: Severity.WARNING
-    });
-
-
-    const analyzer = new Analyzer({
-      urlLoader: new FSUrlLoader(config.root),
-      urlResolver: new PackageUrlResolver(),
-    });
-
-    const linter = new lintLib.Linter(rules, analyzer);
-
-    const warnings = await this._lint(linter, options.input);
-
-    const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
-
-    const printer = new WarningPrinter(
-        process.stdout, {analyzer: analyzer, verbosity: 'full', color: true});
-    await printer.printWarnings(filtered);
-
-    process.exitCode = this._getExitCode(filtered);
+    // Defer dependency loading until this specific command is run.
+    const lintImplementation: typeof lintImplementationTypeOnly =
+        require('../lint/lint');
+    return lintImplementation.lint(options, config);
   }
 
   extraUsageGroups(config: ProjectConfig): UsageGroup[] {
@@ -177,22 +117,5 @@ export class LintCommand implements Command {
 
   private _loadPlugins(_config: ProjectConfig) {
     // TODO(rictic): implement.
-  }
-
-  private async _lint(
-      linter: lintLibTypeOnly.Linter,
-      input: string[]|undefined): Promise<Warning[]> {
-    if (input) {
-      return linter.lint(input);
-    } else {
-      return linter.lintPackage();
-    }
-  }
-
-  private _getExitCode(filteredWarnings: Warning[]) {
-    if (filteredWarnings.length === 0) {
-      return 0;
-    }
-    return 1;
   }
 }

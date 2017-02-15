@@ -14,7 +14,8 @@
     "build": "gulp build",
     "test": "gulp lint test && gulp test:integration",
     "test:smoke": "gulp test",
-    "format": "find src test | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
+    "format": "find src test | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i",
+    "prepublish": "npm test"
   },
   "repository": {
     "type": "git",
