@@ -44,7 +44,7 @@ export class LintCommand implements Command {
   // legacy-lint.ts. Also update the README.
   name = 'experimental-lint';
 
-  description = 'Scans';
+  description = 'Identifies potential errors in your code.';
 
   args: ArgDescriptor[] = [
     {
