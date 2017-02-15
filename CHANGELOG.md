@@ -7,7 +7,7 @@
   - **Previously default behaviors (minifying JavaScript, generating service workers, etc) are now turned off by default.**
 - `init`: Add new 2.0 polymer element & application templates.
 - Update dependencies.
-- **New `lint` Implementation**: now configurable with per-project rulesets, either on CLI or in your polymer.json. Specify "polymer-2", "polymer-2-hybrid", or "polymer-1" to customize the lint warnings that you receive. Run `polymer help lint` for more detail.
+- **New `lint` Implementation**: now configurable with per-project rulesets, either on CLI or in your polymer.json. Will soon replace the `lint` command, for now run it as `polymer experimental-lint`. Specify "polymer-2", "polymer-2-hybrid", or "polymer-1" to customize the lint warnings that you receive. Run `polymer help experimental-lint` for more detail.
 
 ## v0.18.0-alpha.9
 

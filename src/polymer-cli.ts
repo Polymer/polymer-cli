@@ -23,6 +23,7 @@ import {Command} from './commands/command';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
 import {InstallCommand} from './commands/install';
+import {LintCommand as LegacyLintCommand} from './commands/legacy-lint';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
@@ -108,6 +109,7 @@ export class PolymerCli {
     this.addCommand(new InitCommand());
     this.addCommand(new InstallCommand());
     this.addCommand(new LintCommand());
+    this.addCommand(new LegacyLintCommand());
     this.addCommand(new ServeCommand());
     this.addCommand(new TestCommand());
   }
