@@ -17,16 +17,16 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
-import * as chalk from 'chalk';
+import * as chalkTypeOnly from 'chalk';
 import {ArgDescriptor} from 'command-line-args';
-import * as commandLineUsage from 'command-line-usage';
+import {UsageGroup} from 'command-line-usage';
 import * as logging from 'plylog';
-import {Analyzer} from 'polymer-analyzer';
-import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
-import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
-import {Severity, Warning} from 'polymer-analyzer/lib/warning/warning';
-import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
-import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
+import {Analyzer as AnalyzerTypeOnly} from 'polymer-analyzer';
+import {FSUrlLoader as FSUrlLoaderTypeOnly} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
+import {PackageUrlResolver as PackageUrlResolverTypeOnly} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
+import {Severity as SeverityTypeOnly, Warning} from 'polymer-analyzer/lib/warning/warning';
+import {WarningFilter as WarningFilterTypeOnly} from 'polymer-analyzer/lib/warning/warning-filter';
+import {WarningPrinter as WarningPrinterTypeOnly} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLibTypeOnly from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
 
@@ -79,6 +79,20 @@ export class LintCommand implements Command {
   async run(options: Options, config: ProjectConfig): Promise<any> {
     // Defer dependency loading until this specific command is run.
     const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
+    const Analyzer: typeof AnalyzerTypeOnly =
+        require('polymer-analyzer').Analyzer;
+    const FSUrlLoader: typeof FSUrlLoaderTypeOnly =
+        require('polymer-analyzer/lib/url-loader/fs-url-loader').FSUrlLoader;
+    const PackageUrlResolver: typeof PackageUrlResolverTypeOnly =
+        require('polymer-analyzer/lib/url-loader/package-url-resolver')
+            .PackageUrlResolver;
+    const Severity: typeof SeverityTypeOnly =
+        require('polymer-analyzer/lib/warning/warning').Severity;
+    const WarningFilter: typeof WarningFilterTypeOnly =
+        require('polymer-analyzer/lib/warning/warning-filter').WarningFilter;
+    const WarningPrinter: typeof WarningPrinterTypeOnly =
+        require('polymer-analyzer/lib/warning/warning-printer').WarningPrinter;
+
     this._loadPlugins(config);
 
     const lintOptions: Partial<typeof config.lint> = (config.lint || {});
@@ -123,8 +137,9 @@ export class LintCommand implements Command {
     process.exitCode = this._getExitCode(filtered);
   }
 
-  extraUsageGroups(config: ProjectConfig): commandLineUsage.UsageGroup[] {
+  extraUsageGroups(config: ProjectConfig): UsageGroup[] {
     const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
+    const chalk: typeof chalkTypeOnly = require('chalk');
     this._loadPlugins(config);
     let collectionsDocs = [];
     for (const collection of lintLib.registry.allRuleCollections) {
