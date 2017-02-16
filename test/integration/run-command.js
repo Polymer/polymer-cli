@@ -15,6 +15,9 @@ const childProcess = require('child_process');
 /**
  * Run the given command as a forked child process, and return a promise
  * which will reject/resolve with the result of the command.
+ *
+ * If the command succeeds the promise will be resolved with the stdout+stderr
+ * of the command, as a string.
  */
 function runCommand(path, args, options) {
   let contents;
@@ -37,7 +40,7 @@ function runCommand(path, args, options) {
           `Error running ${path} with args ${args}. Got exit code: ${code}`));
         return;
       }
-      resolve();
+      resolve(contents);
     });
   }).catch((err) => {
     // If the command was successful there's no need to print anything to the
