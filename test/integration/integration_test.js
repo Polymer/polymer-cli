@@ -28,12 +28,12 @@ const githubToken = '8d8622bf09bb1d85cb411b5e475a35e742a7ce35';
 const ShopGenerator = createGithubGenerator({
   owner: 'Polymer',
   repo: 'shop',
-  githubToken
+  githubToken,
 });
 const PSKGenerator = createGithubGenerator({
   owner: 'PolymerElements',
   repo: 'polymer-starter-kit',
-  githubToken
+  githubToken,
 });
 
 suite('integration tests', function() {
