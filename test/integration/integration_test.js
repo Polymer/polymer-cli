@@ -21,13 +21,19 @@ const createApplicationGenerator
   = require('../../lib/init/application/application').createApplicationGenerator;
 const createElementGenerator
   = require('../../lib/init/element/element').createElementGenerator;
+
+// A zero priveledge github token of a nonce account, used for quota.
+const githubToken = '8d8622bf09bb1d85cb411b5e475a35e742a7ce35';
+
 const ShopGenerator = createGithubGenerator({
   owner: 'Polymer',
   repo: 'shop',
+  githubToken
 });
 const PSKGenerator = createGithubGenerator({
   owner: 'PolymerElements',
   repo: 'polymer-starter-kit',
+  githubToken
 });
 
 suite('integration tests', function() {
