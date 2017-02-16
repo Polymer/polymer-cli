@@ -20,9 +20,9 @@ suite('install-variants', function() {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
-  this.timeout(90 * 1000);
+  this.timeout(5 * 1000);
 
-  test('installs variants', (done) => {
+  test.only('installs variants', (done) => {
     const fixturePath = path.join(__dirname, './fixtures/install-variants');
 
     tmp.dir((err, tmpPath, cleanup) => {
@@ -34,8 +34,8 @@ suite('install-variants', function() {
 
         const env = {};
         for (const envVar of Object.keys(process.env)) {
-          if (envVar.startsWith('bower_')) {
-            env[envVar] = '';
+          if (!envVar.startsWith('bower_')) {
+            env[envVar] = process.env[envVar];
           }
         }
         runCommand(binPath, ['install', '--variants', '--offline'], { cwd: tmpPath, env }).then(() => {
