@@ -22,7 +22,7 @@ suite('install-variants', function() {
 
   this.timeout(5 * 1000);
 
-  test.only('installs variants', (done) => {
+  test('installs variants', (done) => {
     const fixturePath = path.join(__dirname, './fixtures/install-variants');
 
     tmp.dir((err, tmpPath, cleanup) => {
@@ -36,6 +36,8 @@ suite('install-variants', function() {
         for (const envVar of Object.keys(process.env)) {
           if (!envVar.startsWith('bower_')) {
             env[envVar] = process.env[envVar];
+          } else {
+            env[envVar] = '';
           }
         }
         runCommand(binPath, ['install', '--variants', '--offline'], { cwd: tmpPath, env }).then(() => {
