@@ -1,12 +1,15 @@
+import * as chalk from 'chalk';
 import * as logging from 'plylog';
 import {Analyzer} from 'polymer-analyzer';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
-import {Severity, Warning} from 'polymer-analyzer/lib/warning/warning';
+import {Severity} from 'polymer-analyzer/lib/warning/warning';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
+import {CommandFailure} from '../commands/command';
+
 import {Options} from '../commands/lint';
 
 const logger = logging.getLogger('cli.lint');
@@ -25,8 +28,7 @@ export async function lint(options: Options, config: ProjectConfig) {
     "rules": ["polymer-2"]
   }
 }`);
-    process.exitCode = 1;
-    return;
+    throw new CommandFailure(1);
   }
 
   const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
@@ -43,7 +45,12 @@ export async function lint(options: Options, config: ProjectConfig) {
 
   const linter = new lintLib.Linter(rules, analyzer);
 
-  const warnings = await _lint(linter, options.input);
+  let warnings;
+  if (options.input) {
+    warnings = await linter.lint(options.input);
+  } else {
+    warnings = await linter.lintPackage();
+  }
 
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
@@ -51,21 +58,21 @@ export async function lint(options: Options, config: ProjectConfig) {
       process.stdout, {analyzer: analyzer, verbosity: 'full', color: true});
   await printer.printWarnings(filtered);
 
-  process.exitCode = _getExitCode(filtered);
-}
-
-async function _lint(linter: lintLib.Linter, input: string[]|undefined):
-    Promise<Warning[]> {
-      if (input) {
-        return linter.lint(input);
-      } else {
-        return linter.lintPackage();
-      }
+  if (filtered.length > 0) {
+    let message = '';
+    const errors = filtered.filter((w) => w.severity === Severity.ERROR);
+    const warnings = filtered.filter((w) => w.severity === Severity.WARNING);
+    const infos = filtered.filter((w) => w.severity === Severity.INFO);
+    if (errors.length > 0) {
+      message += ` ${errors.length} ${chalk.red('errors')}`;
     }
-
-function _getExitCode(filteredWarnings: Warning[]) {
-  if (filteredWarnings.length === 0) {
-    return 0;
+    if (warnings.length > 0) {
+      message += ` ${warnings.length} ${chalk.yellow('warnings')}`;
+    }
+    if (infos.length > 0) {
+      message += ` ${infos.length} ${chalk.green('info')} messages`;
+    }
+    console.log(`\n\nFound ${message}.`);
+    throw new CommandFailure(1);
   }
-  return 1;
 }

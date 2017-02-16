@@ -27,3 +27,13 @@ export interface Command {
   run(options: CommandOptions, config: ProjectConfig): Promise<any>;
   extraUsageGroups?(config: ProjectConfig): UsageGroup[];
 }
+
+/**
+ * Running a command may reject with a CommandFailure to indicate that there
+ * was an error but it has already been reported to the user, and the CLI
+ * should exit with the given exit code.
+ */
+export class CommandFailure {
+  constructor(public exitCode: number) {
+  }
+}

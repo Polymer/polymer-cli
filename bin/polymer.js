@@ -30,6 +30,9 @@ resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
   let args = process.argv.slice(2);
   let cli = new lib.PolymerCli(args);
   cli.run().catch((err) => {
+    if (err && err.constructor && err.constructor.name === 'CommandFailure') {
+      process.exit(err.exitCode);
+    }
     logger.error(`cli runtime exception: ${err}`);
     if (err.stack) {
       logger.error(err.stack);
