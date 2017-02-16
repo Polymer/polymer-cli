@@ -119,4 +119,45 @@ suite('integration tests', function() {
 
   });
 
+  // TODO(fks): Two things are needed to unskip these tests:
+  //   1. Make the tools-sample-projects repo public
+  //   2. Create a new release when the add-projects branch/pr is merged
+  suite.skip('tools-sample-projects templates', () => {
+
+    let tspDir;
+
+    suiteSetup(() => {
+      const TSPGenerator = createGithubGenerator({
+        owner: 'Polymer',
+        repo: 'tools-sample-projects',
+        githubToken,
+      });
+
+      return runGenerator(TSPGenerator)
+        .toPromise()
+        .then((dir) => { tspDir = dir });
+    });
+
+    test('test the "polymer-1-app" template', () => {
+      const dir = path.join(tspDir, 'polymer-1-app');
+
+      return runCommand(binPath, ['install'], {cwd: dir})
+        // TODO(fks): reenable with new linter.
+        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['build'], {cwd: dir}));
+    });
+
+    test('test the "polymer-2-app" template', () => {
+      const dir = path.join(tspDir, 'polymer-2-app');
+
+      return runCommand(binPath, ['install'], {cwd: dir})
+        // TODO(fks): reenable with new linter.
+        // .then(() => runCommand(binPath, ['lint'], {cwd: dir}))
+        // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
+        .then(() => runCommand(binPath, ['build'], {cwd: dir}));
+    });
+
+  });
+
 });
