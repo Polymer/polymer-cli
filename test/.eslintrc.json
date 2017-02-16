@@ -7,7 +7,17 @@
     "es6": true
   },
   "rules": {
-    "comma-dangle": [2, "always-multiline"],
-    "no-unused-vars": [2, { "vars": "all", "args": "none" }]
+    "no-console": 0,
+    "comma-dangle": [
+      2,
+      "always-multiline"
+    ],
+    "no-unused-vars": [
+      2,
+      {
+        "vars": "all",
+        "args": "none"
+      }
+    ]
   }
 }
