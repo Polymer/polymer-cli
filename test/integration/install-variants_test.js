@@ -32,6 +32,7 @@ suite('install-variants', function() {
           done(err);
         }
 
+        console.log(process.env);
         const env = {};
         for (const envVar of Object.keys(process.env)) {
           if (!envVar.startsWith('bower_')) {
