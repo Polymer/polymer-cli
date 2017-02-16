@@ -32,7 +32,15 @@ suite('install-variants', function() {
           done(err);
         }
 
-        runCommand(binPath, ['install', '--variants'], { cwd: tmpPath, env }).then(() => {
+        const env = {};
+        for (const envVar of Object.keys(process.env)) {
+          if (!envVar.startsWith('bower_')) {
+            env[envVar] = process.env[envVar];
+          } else {
+            env[envVar] = '';
+          }
+        }
+        runCommand(binPath, ['install', '--variants', '--offline'], { cwd: tmpPath, env }).then(() => {
           const mainDir = path.join(tmpPath, 'bower_components');
           assert.isTrue(fs.statSync(mainDir).isDirectory());
 
