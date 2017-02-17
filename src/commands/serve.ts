@@ -37,7 +37,7 @@ export class ServeCommand implements Command {
 
   args = polyserveArgs;
 
-  async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, config: ProjectConfig) {
     // Defer dependency loading until this specific command is run
     const polyserve = require('polyserve') as typeof polyserveTypeOnly;
     const startServers = polyserve.startServers;

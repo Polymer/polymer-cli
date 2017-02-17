@@ -17,117 +17,105 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
-import * as commandLineArgs from 'command-line-args';
-import * as logging from 'plylog';
+import * as chalkTypeOnly from 'chalk';
+import {ArgDescriptor} from 'command-line-args';
+import {UsageGroup} from 'command-line-usage';
+import * as lintLibTypeOnly from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
+import * as lintImplementationTypeOnly from '../lint/lint';
 
-import {Command, CommandOptions} from './command';
+import {Command} from './command';
 
-const logger = logging.getLogger('cli.lint');
+export interface Options {
+  rules?: string[];
+  input?: string[];
+}
 
 export class LintCommand implements Command {
-  name = 'lint';
+  // TODO(rictic): rename to 'lint' here and elsewhere, delete
+  // legacy-lint.ts. Also update the README.
+  name = 'experimental-lint';
 
-  description = 'Lints the project';
+  description = 'Identifies potential errors in your code.';
 
-  args = [
+  args: ArgDescriptor[] = [
     {
       name: 'input',
       type: String,
       alias: 'i',
       defaultOption: true,
       multiple: true,
-      description: 'Files and/or folders to lint. Exclusive. Defaults to cwd.'
+      description: 'Files to lint. If given, these files will be the only ' +
+          'ones linted, otherwise all files in the project will be linted.'
     },
     {
-      name: 'policy',
+      name: 'rules',
       type: String,
-      alias: 'p',
-      description: 'Your jsconf.json policy file.',
-      defaultValue: false
-    },
-    {
-      name: 'config-file',
-      type: String,
-      defaultValue: 'bower.json',
-      description: (
-          'If inputs are specified, look for `config-field` in this JSON file.')
-    },
-    {
-      name: 'config-field',
-      type: String,
-      defaultValue: 'main',
-      description:
-          ('If config-file is used for inputs, this field determines which ' +
-           'file(s) are linted.')
-    },
-    {
-      name: 'follow-dependencies',
-      type: Boolean,
-      description:
-          ('Follow through and lint dependencies. This is default behavior ' +
-           'when linting your entire application via the entrypoint, shell, ' +
-           'and fragment arguments.')
-    },
-    {
-      name: 'no-follow-dependencies',
-      type: Boolean,
-      description:
-          ('Only lint the files provided, ignoring dependencies. This is ' +
-           'default behavior when linting a specific list of files provided ' +
-           'via the input argument.')
+      alias: 'r',
+      multiple: true,
+      description: 'The lint rules/rule collections to apply. ' +
+          'See `polymer help lint` for a list of rules.',
     }
   ];
 
-  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
-    // Defer dependency loading until this specific command is run
-    const polylint = require('polylint/lib/cli');
+  /**
+   * TODO(rictic): things to make configurable:
+   *   - lint warning verbosity
+   *   - whether to use color (also: can we autodetect if color is supported?)
+   *   - add option for input files to polymer.json
+   *   - modules to load that can register new rules
+   *   - --watch
+   *   - --fix
+   */
 
-    let lintFiles: string[] = options['input'];
-    if (!lintFiles) {
-      lintFiles = [];
-      if (config.entrypoint)
-        lintFiles.push(config.entrypoint);
-      if (config.shell)
-        lintFiles.push(config.shell);
-      if (config.fragments)
-        lintFiles = lintFiles.concat(config.fragments);
-      lintFiles = lintFiles.map((p) => p.substring(config.root.length));
+  async run(options: Options, config: ProjectConfig) {
+    this._loadPlugins(config);
+
+    // Defer dependency loading until this specific command is run.
+    const lintImplementation: typeof lintImplementationTypeOnly =
+        require('../lint/lint');
+    return lintImplementation.lint(options, config);
+  }
+
+  extraUsageGroups(config: ProjectConfig): UsageGroup[] {
+    const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
+    const chalk: typeof chalkTypeOnly = require('chalk');
+    this._loadPlugins(config);
+    let collectionsDocs = [];
+    for (const collection of lintLib.registry.allRuleCollections) {
+      collectionsDocs.push(`  ${chalk.bold(collection.code)}: ${this._indent(
+          collection.description)}`);
     }
-
-    if (lintFiles.length === 0) {
-      logger.warn(
-          'No inputs specified. Please use the --input, --entrypoint, ' +
-          '--shell or --fragment flags');
-      let argsCli = commandLineArgs(this.args);
-      console.info(argsCli.getUsage({
-        title: `polymer ${this.name}`,
-        description: this.description,
-      }));
-      return Promise.resolve();
+    let rulesDocs = [];
+    for (const rule of lintLib.registry.allRules) {
+      rulesDocs.push(
+          `  ${chalk.bold(rule.code)}: ${this._indent(rule.description)}`);
     }
+    return [
+      {
+        header: 'Lint Rule Collections',
+        content: collectionsDocs.join('\n\n'),
+        raw: true
+      },
+      {header: 'Lint Rules', content: rulesDocs.join('\n\n'), raw: true}
+    ];
+  }
 
-    // Default to false if input files are provided, otherwise default to true
-    let followDependencies = !options['input'];
-    if (options['follow-dependencies']) {
-      followDependencies = true;
-    } else if (options['no-follow-dependencies']) {
-      followDependencies = false;
-    }
-
-    return polylint
-        .runWithOptions({
-          input: lintFiles,
-          root: config.root,
-          // TODO: read into config
-          bowerdir: 'bower_components',
-          policy: options['policy'],
-          'config-file': options['config-file'],
-          'config-field': options['config-field'],
-          // NOTE: `no-recursion` has the opposite behavior of
-          // `follow-dependencies`
-          'no-recursion': !followDependencies,
+  private _indent(description: string) {
+    return description.split('\n')
+        .map((line, idx) => {
+          if (idx === 0) {
+            return line;
+          }
+          if (line.length === 0) {
+            return line;
+          }
+          return '      ' + line;
         })
-        .then(() => undefined);
+        .join('\n');
+  }
+
+  private _loadPlugins(_config: ProjectConfig) {
+    // TODO(rictic): implement.
   }
 }

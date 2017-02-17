@@ -48,9 +48,13 @@ function runCommand(path, args, options) {
     // Print out the output, then reject the final result with the original
     // error.
     return contents.then((out) => {
-      console.log(`Output of failed command 'node ${path} ${args.join(' ')}' in directory ${options.cwd}`);
-      console.log(out);
-      throw err;
+      if (!options.failureExpected) {
+        console.log(`Output of failed command 'node ${path} ${args.join(' ')}' in directory ${options.cwd}`);
+        console.log(out);
+        throw err;
+      } else {
+        throw out;
+      }
     });
   });
 }

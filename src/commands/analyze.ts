@@ -38,7 +38,7 @@ export class AnalyzeCommand implements Command {
     multiple: true,
   }];
 
-  async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, config: ProjectConfig) {
     const analyze =
         require('../analyze/analyze').analyze as typeof analyzeTypeOnly;
     const root = config.root;

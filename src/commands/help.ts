@@ -83,39 +83,37 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  generateCommandUsage(command: Command) {
-    return commandLineUsage([
+  generateCommandUsage(command: Command, config: ProjectConfig) {
+    const extraUsageGroups =
+        command.extraUsageGroups ? command.extraUsageGroups(config) : [];
+    const usageGroups: commandLineUsage.UsageGroup[] = [
       {
         header: `polymer ${command.name}`,
         content: command.description,
       },
       {header: 'Command Options', optionList: command.args},
       {header: 'Global Options', optionList: globalArguments},
-    ]);
+    ];
+    return commandLineUsage(usageGroups.concat(extraUsageGroups));
   }
 
-  run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
-    return new Promise<any>((resolve, _) => {
-      const commandName: string = options['command'];
-      if (!commandName) {
-        logger.debug(
-            'no command given, printing general help...', {options: options});
-        console.log(this.generateGeneralUsage());
-        resolve(null);
-        return;
-      }
+  async run(options: CommandOptions, config: ProjectConfig) {
+    const commandName: string = options['command'];
+    if (!commandName) {
+      logger.debug(
+          'no command given, printing general help...', {options: options});
+      console.log(this.generateGeneralUsage());
+      return;
+    }
 
-      let command = this.commands.get(commandName);
-      if (!command) {
-        logger.error(`'${commandName}' is not an available command.`);
-        console.log(this.generateGeneralUsage());
-        resolve(null);
-        return;
-      }
+    let command = this.commands.get(commandName);
+    if (!command) {
+      logger.error(`'${commandName}' is not an available command.`);
+      console.log(this.generateGeneralUsage());
+      return;
+    }
 
-      logger.debug(`printing help for command '${commandName}'...`);
-      console.log(this.generateCommandUsage(command));
-      resolve(null);
-    });
+    logger.debug(`printing help for command '${commandName}'...`);
+    console.log(this.generateCommandUsage(command, config));
   }
 }
