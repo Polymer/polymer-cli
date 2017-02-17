@@ -121,10 +121,7 @@ suite('integration tests', function() {
 
   });
 
-  // TODO(fks): Two things are needed to unskip these tests:
-  //   1. Make the tools-sample-projects repo public
-  //   2. Create a new release when the add-projects branch/pr is merged
-  suite.skip('tools-sample-projects templates', () => {
+  suite('tools-sample-projects templates', () => {
 
     let tspDir;
 
