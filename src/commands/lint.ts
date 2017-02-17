@@ -68,7 +68,7 @@ export class LintCommand implements Command {
    *   - --fix
    */
 
-  async run(options: Options, config: ProjectConfig): Promise<any> {
+  async run(options: Options, config: ProjectConfig) {
     this._loadPlugins(config);
 
     // Defer dependency loading until this specific command is run.

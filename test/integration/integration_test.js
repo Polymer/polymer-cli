@@ -113,8 +113,8 @@ suite('integration tests', function() {
         .then((_dir) => { dir = _dir })
         .then(() => runCommand(binPath, ['install'], { cwd: dir }))
         .then(() => runCommand(
-          binPath, ['experimental-lint', '--rules=polymer-2-hybrid'],
-          {cwd: dir}))
+            binPath, ['experimental-lint', '--rules=polymer-2-hybrid'],
+            { cwd: dir }))
         // .then(() => runCommand(binPath, ['test'], {cwd: dir}))
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });

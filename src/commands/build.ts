@@ -89,7 +89,7 @@ export class BuildCommand implements Command {
     },
   ];
 
-  async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, config: ProjectConfig) {
     // Defer dependency loading until this specific command is run
     const del = require('del') as typeof delTypeOnly;
     const buildLib = require('../build/build') as typeof buildLibTypeOnly;
@@ -149,9 +149,10 @@ export class BuildCommand implements Command {
 
     // If multiple builds were defined or configured via the project config,
     // generate a build for each configuration.
-    return Promise.all(
-        config.builds.map((buildOptions: ProjectBuildOptions) => {
+    return Promise
+        .all(config.builds.map((buildOptions: ProjectBuildOptions) => {
           return build(buildOptions, config);
-        }));
+        }))
+        .then(() => undefined);
   }
 }

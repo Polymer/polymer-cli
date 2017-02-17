@@ -79,7 +79,7 @@ export class LintCommand implements Command {
     }
   ];
 
-  run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, config: ProjectConfig) {
     // Defer dependency loading until this specific command is run
     const polylint = require('polylint/lib/cli');
 

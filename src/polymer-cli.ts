@@ -119,7 +119,7 @@ export class PolymerCli {
     this.commands.set(command.name, command);
   }
 
-  run(): Promise<any> {
+  async run() {
     const helpCommand = this.commands.get('help')!;
     const commandNames = Array.from(this.commands.keys());
     let parsedArgs: ParsedCommand;

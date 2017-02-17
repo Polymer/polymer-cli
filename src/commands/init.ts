@@ -39,7 +39,7 @@ export class InitCommand implements Command {
     defaultOption: true,
   }];
 
-  run(options: CommandOptions, _config: ProjectConfig): Promise<any> {
+  async run(options: CommandOptions, _config: ProjectConfig) {
     // Defer dependency loading until needed
     const polymerInit = require('../init/init') as typeof polymerInitTypeOnly;
 

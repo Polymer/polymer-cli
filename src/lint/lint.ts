@@ -8,7 +8,7 @@ import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
-import {CommandFailure} from '../commands/command';
+import {CommandResult} from '../commands/command';
 
 import {Options} from '../commands/lint';
 
@@ -28,7 +28,7 @@ export async function lint(options: Options, config: ProjectConfig) {
     "rules": ["polymer-2"]
   }
 }`);
-    throw new CommandFailure(1);
+    return new CommandResult(1);
   }
 
   const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
@@ -73,6 +73,6 @@ export async function lint(options: Options, config: ProjectConfig) {
       message += ` ${infos.length} ${chalk.green('info')} messages`;
     }
     console.log(`\n\nFound ${message}.`);
-    throw new CommandFailure(1);
+    return new CommandResult(1);
   }
 }

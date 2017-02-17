@@ -24,16 +24,15 @@ export interface Command {
   name: string;
   description: string;
   args: ArgDescriptor[];
-  run(options: CommandOptions, config: ProjectConfig): Promise<any>;
+  run(options: CommandOptions,
+      config: ProjectConfig): Promise<CommandResult|void>;
   extraUsageGroups?(config: ProjectConfig): UsageGroup[];
 }
 
 /**
- * Running a command may reject with a CommandFailure to indicate that there
- * was an error but it has already been reported to the user, and the CLI
- * should exit with the given exit code.
+ * A command may return a CommandResult to indicate an exit code.
  */
-export class CommandFailure {
+export class CommandResult {
   constructor(public exitCode: number) {
   }
 }
