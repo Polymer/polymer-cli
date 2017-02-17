@@ -20,6 +20,8 @@ suite('install-variants', function() {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
+  this.timeout(5 * 1000);
+
   test('installs variants', (done) => {
     const fixturePath = path.join(__dirname, './fixtures/install-variants');
 
@@ -29,7 +31,9 @@ suite('install-variants', function() {
           assert.fail(err);
           done(err);
         }
-        runCommand(binPath, ['install', '--variants', '--offline'], {cwd: tmpPath}).then(() => {
+
+        const env = envExcludingBowerVars();
+        runCommand(binPath, ['install', '--variants', '--offline'], { cwd: tmpPath, env }).then(() => {
           const mainDir = path.join(tmpPath, 'bower_components');
           assert.isTrue(fs.statSync(mainDir).isDirectory());
 
@@ -47,3 +51,21 @@ suite('install-variants', function() {
   });
 
 });
+
+/**
+ * Constructs a version of process.env with all bower_* keys blanked out.
+ *
+ * This is to override the bower cache options on travis so that our local
+ * cache is used in fixtures/install-variants/bower_cache
+ */
+function envExcludingBowerVars() {
+  const env = {};
+  for (const envVar of Object.keys(process.env)) {
+    if (!envVar.startsWith('bower_')) {
+      env[envVar] = process.env[envVar];
+    } else {
+      env[envVar] = '';
+    }
+  }
+  return env;
+}

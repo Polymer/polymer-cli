@@ -12,7 +12,8 @@
   "scripts": {
     "lint": "gulp lint",
     "build": "gulp build",
-    "test": "gulp lint test",
+    "test": "gulp lint test && gulp test:integration",
+    "test:smoke": "gulp test",
     "prepublish": "npm run build && npm test",
     "format": "find src test | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
@@ -90,8 +91,10 @@
     "gulp-mocha": "^3.0.1",
     "gulp-tslint": "^7.0.1",
     "gulp-typescript": "^3.0.0",
+    "memory-streams": "^0.1.0",
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.4",
+    "tmp": "0.0.31",
     "tslint": "^4.0.2",
     "typescript": "^2.2.0",
     "vinyl-fs-fake": "^1.1.0",
