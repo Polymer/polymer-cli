@@ -26,6 +26,10 @@ export interface Command {
   args: ArgDescriptor[];
   run(options: CommandOptions,
       config: ProjectConfig): Promise<CommandResult|void>;
+
+  /**
+   * Documentation to append onto the output of `polymer help commandName`.
+   */
   extraUsageGroups?(config: ProjectConfig): UsageGroup[];
 }
 
