@@ -13,12 +13,25 @@
  */
 process.title = 'polymer';
 
-const resolve = require('resolve');
-const updateNotifier = require('update-notifier');
-const packageJson = require('../package.json');
-const logging = require('plylog');
+// Note! For this error message to be effective this file must not use >ES5
+// syntax, and it must run this before importing anything else, as other
+// node modules may use >=ES6 syntax.
 
-const logger = logging.getLogger('cli.main');
+var semver = require('semver');
+// Early exit if the user's node version is too low.
+if (!semver.satisfies(process.version, '>=4')) {
+  console.log(
+      'Polymer CLI requires at least Node v4. ' +
+      'You have ' + process.version + '.');
+  process.exit(1);
+}
+
+var resolve = require('resolve');
+var updateNotifier = require('update-notifier');
+var packageJson = require('../package.json');
+var logging = require('plylog');
+
+var logger = logging.getLogger('cli.main');
 
 // Update Notifier: Asynchronously check for package updates and, if needed,
 // notify on the next time the CLI is run.
@@ -26,15 +39,15 @@ const logger = logging.getLogger('cli.main');
 updateNotifier({pkg: packageJson}).notify();
 
 resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
-  let lib = path ? require(path) : require('..');
-  let args = process.argv.slice(2);
-  let cli = new lib.PolymerCli(args);
-  cli.run().then((result) => {
+  var lib = path ? require(path) : require('..');
+  var args = process.argv.slice(2);
+  var cli = new lib.PolymerCli(args);
+  cli.run().then(function (result) {
     if (result && result.constructor && result.constructor.name === 'CommandResult') {
       process.exit(result.exitCode);
     }
-  }, (err) => {
-    logger.error(`cli runtime exception: ${err}`);
+  }, function (err) {
+    logger.error('cli runtime exception: ' + err);
     if (err.stack) {
       logger.error(err.stack);
     }
