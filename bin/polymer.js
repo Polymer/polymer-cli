@@ -26,31 +26,5 @@ if (!semver.satisfies(process.version, '>=4')) {
   process.exit(1);
 }
 
-var resolve = require('resolve');
-var updateNotifier = require('update-notifier');
-var packageJson = require('../package.json');
-var logging = require('plylog');
-
-var logger = logging.getLogger('cli.main');
-
-// Update Notifier: Asynchronously check for package updates and, if needed,
-// notify on the next time the CLI is run.
-// See https://github.com/yeoman/update-notifier#how for how this works.
-updateNotifier({pkg: packageJson}).notify();
-
-resolve('polymer-cli', {basedir: process.cwd()}, function(error, path) {
-  var lib = path ? require(path) : require('..');
-  var args = process.argv.slice(2);
-  var cli = new lib.PolymerCli(args);
-  cli.run().then(function (result) {
-    if (result && result.constructor && result.constructor.name === 'CommandResult') {
-      process.exit(result.exitCode);
-    }
-  }, function (err) {
-    logger.error('cli runtime exception: ' + err);
-    if (err.stack) {
-      logger.error(err.stack);
-    }
-    process.exit(1);
-  });
-});
+// Ok, safe to use ES6.
+require('../lib/run');
