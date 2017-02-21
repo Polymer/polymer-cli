@@ -2,9 +2,12 @@
 
 ## Upcoming
 
+## v0.18.0-pre.10 [02-21-2017]
+
 - **New `build` Behavior**: New build options have been added to give you more control over the generated build. These options can be defined in your project's `polymer.json`, or via CLI flags. Run `polymer build --help` to see a list of new supported CLI flags.
-  - Multiple builds can now be defined in your project's `polymer.json`.
   - **Previously default behaviors (minifying JavaScript, generating service workers, etc) are now turned off by default.**
+  - Multiple builds can now be defined in your project's `polymer.json`. See [the latest documentation](https://github.com/Polymer/docs/blob/ff74953fa93ad41d659a6f5a14c5f7072368edbd/app/2.0/docs/tools/polymer-json.md#builds) for information on configuring your project build(s).
+  - Run `polymer help
 - `init`: Add new 2.0 polymer element & application templates.
 - Update dependencies.
 - **New `experimental-lint` command**: configurable with per-project rulesets, either with cli args or in your polymer.json. Will soon replace the `lint` command, for now run it as `polymer experimental-lint`. Specify "polymer-2", "polymer-2-hybrid", or "polymer-1" to customize the lint warnings that you receive. Run `polymer help experimental-lint` for more detail.
