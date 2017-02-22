@@ -15,7 +15,7 @@
 import {Analyzer} from 'polymer-analyzer';
 import {Elements} from 'polymer-analyzer/lib/elements-format';
 import {generateElementMetadata} from 'polymer-analyzer/lib/generate-elements';
-import {Element} from 'polymer-analyzer/lib/model/model';
+import {Feature} from 'polymer-analyzer/lib/model/model';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
 
@@ -26,15 +26,15 @@ export async function analyze(
     urlResolver: new PackageUrlResolver(),
   });
 
-  const elements = new Set<Element>();
-  const isInDependency = /(\b|\/|\\)(bower_components|node_modules)(\/|\\)/;
+  const isInTests = /(\b|\/|\\)(test)(\/|\\)/;
+  const isNotTest = (f: Feature) =>
+      f.sourceRange != null && !isInTests.test(f.sourceRange.file);
 
-  for (const input of inputs) {
-    const document = await analyzer.analyze(input);
-    const docElements =
-        Array.from(document.getByKind('element'))
-            .filter((e: Element) => !isInDependency.test(e.sourceRange.file));
-    docElements.forEach((e) => elements.add(e));
+  if (inputs == null || inputs.length === 0) {
+    const _package = await analyzer.analyzePackage();
+    return generateElementMetadata(_package, '', isNotTest);
+  } else {
+    const documents = await Promise.all(inputs.map((i) => analyzer.analyze(i)));
+    return generateElementMetadata(documents, '', isNotTest);
   }
-  return generateElementMetadata(Array.from(elements), '');
 }
