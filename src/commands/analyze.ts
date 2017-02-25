@@ -17,14 +17,11 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
-import * as logging from 'plylog';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {analyze as analyzeTypeOnly} from '../analyze/analyze';
 
 import {Command, CommandOptions} from './command';
-
-const logger = logging.getLogger('cli.command.analyze');
 
 export class AnalyzeCommand implements Command {
   name = 'analyze';
@@ -33,7 +30,8 @@ export class AnalyzeCommand implements Command {
 
   args = [{
     name: 'input',
-    description: 'The files to analyze',
+    description:
+        'The files to analyze, or none to analyze the current directory as a package',
     defaultOption: true,
     multiple: true,
   }];
@@ -41,14 +39,8 @@ export class AnalyzeCommand implements Command {
   async run(options: CommandOptions, config: ProjectConfig) {
     const analyze =
         require('../analyze/analyze').analyze as typeof analyzeTypeOnly;
-    const root = config.root;
-    const inputs = options['input'];
-
-    if (!options || !options['input']) {
-      logger.debug('no inputs given');
-      return;
-    }
-    const metadata = await analyze(root, inputs);
+    const metadata = await analyze(config.root, options['input']);
     process.stdout.write(JSON.stringify(metadata, null, 2));
+    process.stdout.write('\n');
   }
 }
