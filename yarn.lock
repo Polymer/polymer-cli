@@ -108,6 +108,10 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/fast-levenshtein@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@types/fast-levenshtein/-/fast-levenshtein-0.0.1.tgz#3a3615cf173645c8fca58d051e4e32824e4bd286"
+
 "@types/findup-sync@^0.3.29":
   version "0.3.29"
   resolved "https://registry.yarnpkg.com/@types/findup-sync/-/findup-sync-0.3.29.tgz#ec0c80597e5ed157282207e762ca7254cad57632"
@@ -230,6 +234,10 @@
 "@types/node@6.0.*", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
   version "6.0.63"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.63.tgz#e08acbbd5946e0e95990b1c76f3ce5b7882a48eb"
+
+"@types/node@^4.2.3":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-4.2.3.tgz#4405d19dcabae1fb0dfc9f267c8de5c114d47ce9"
 
 "@types/nomnom@0.0.28":
   version "0.0.28"
@@ -2203,7 +2211,7 @@ dom5@^1.0.2, dom5@^1.1.0, dom5@^1.3.1:
     clone "^1.0.2"
     parse5 "^1.4.1"
 
-dom5@^2.0.0, dom5@^2.0.1:
+dom5@^2.0.0, dom5@^2.0.1, dom5@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/dom5/-/dom5-2.1.0.tgz#a7adac6724062b862a410cdbc6ca488d34772831"
   dependencies:
@@ -2711,7 +2719,7 @@ fancy-log@^1.1.0:
     chalk "^1.1.1"
     time-stamp "^1.0.0"
 
-fast-levenshtein@~2.0.4:
+fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
 
@@ -4969,9 +4977,9 @@ polylint@^2.10.0:
     path-is-absolute "^1.0.0"
     plylog "^0.4.0"
 
-polymer-analyzer@2.0.0-alpha.27:
-  version "2.0.0-alpha.27"
-  resolved "https://registry.yarnpkg.com/polymer-analyzer/-/polymer-analyzer-2.0.0-alpha.27.tgz#04bb1542264163b4c61d602610ed1939e006dd8c"
+polymer-analyzer@2.0.0-alpha.30:
+  version "2.0.0-alpha.30"
+  resolved "https://registry.yarnpkg.com/polymer-analyzer/-/polymer-analyzer-2.0.0-alpha.30.tgz#0e6904d9a09470d14cc3426dc8573eda11583716"
   dependencies:
     "@types/chai-subset" "^1.3.0"
     "@types/chalk" "^0.4.30"
@@ -4988,7 +4996,7 @@ polymer-analyzer@2.0.0-alpha.27:
     clone "^2.0.0"
     cssbeautify "^0.3.1"
     doctrine "^2.0.0"
-    dom5 "^2.0.0"
+    dom5 "^2.1.0"
     escodegen "^1.7.0"
     espree "^3.1.7"
     estraverse "^3.1.0"
@@ -4999,10 +5007,11 @@ polymer-analyzer@2.0.0-alpha.27:
     strip-indent "^2.0.0"
     typescript "^2.2.0"
 
-polymer-build@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-0.8.2.tgz#8f35db60e0e7abc7801fdd0565d79ab4f6d576dc"
+polymer-build@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-0.8.3.tgz#2dce1b22549b4eaf711184548229c7e104c8be0d"
   dependencies:
+    "@types/node" "^4.2.3"
     "@types/parse5" "^2.2.32"
     "@types/vinyl" "^1.1.29"
     "@types/vinyl-fs" "0.0.28"
@@ -5010,17 +5019,18 @@ polymer-build@^0.8.2:
     multipipe "^1.0.2"
     parse5 "^2.2.2"
     plylog "^0.4.0"
-    polymer-analyzer "2.0.0-alpha.27"
-    polymer-bundler "2.0.0-pre.7"
+    polymer-analyzer "2.0.0-alpha.30"
+    polymer-bundler "2.0.0-pre.8"
     polymer-project-config "^2.0.0"
     sw-precache "^4.2.0"
     vinyl "^1.1.1"
     vinyl-fs "^2.4.3"
 
-polymer-bundler@2.0.0-pre.7:
-  version "2.0.0-pre.7"
-  resolved "https://registry.yarnpkg.com/polymer-bundler/-/polymer-bundler-2.0.0-pre.7.tgz#f45b0993573ef7281f882fa7028247af7dab198c"
+polymer-bundler@2.0.0-pre.8:
+  version "2.0.0-pre.8"
+  resolved "https://registry.yarnpkg.com/polymer-bundler/-/polymer-bundler-2.0.0-pre.8.tgz#39cb49d0ca9433f81b7ea4e0c8aae353aec91eee"
   dependencies:
+    clone "^2.1.0"
     command-line-args "^3.0.1"
     command-line-usage "^3.0.3"
     dom5 "^2.0.0"
@@ -5029,16 +5039,19 @@ polymer-bundler@2.0.0-pre.7:
     nopt "^3.0.1"
     parse5 "^2.2.2"
     path-posix "^1.0.0"
-    polymer-analyzer "2.0.0-alpha.27"
+    polymer-analyzer "2.0.0-alpha.30"
 
-polymer-linter@0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/polymer-linter/-/polymer-linter-0.1.4.tgz#5529d5e1168d22ebf708aa802449d43277bc9c92"
+polymer-linter@0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/polymer-linter/-/polymer-linter-0.1.5.tgz#7161c40e09ee4f597689047a245d61812ba1093d"
   dependencies:
+    "@types/fast-levenshtein" "0.0.1"
     "@types/node" "4.0.30"
+    "@types/parse5" "^2.2.34"
     dom5 "^2.0.0"
+    fast-levenshtein "^2.0.6"
     parse5 "^2.2.1"
-    polymer-analyzer "2.0.0-alpha.27"
+    polymer-analyzer "2.0.0-alpha.30"
     strip-indent "^2.0.0"
 
 polymer-project-config@^2.0.0:
@@ -6139,9 +6152,11 @@ ternary-stream@^2.0.1:
     merge-stream "^1.0.0"
     through2 "^2.0.1"
 
-"test-fixture@github:polymerelements/test-fixture":
-  version "2.0.1"
-  resolved "https://codeload.github.com/polymerelements/test-fixture/tar.gz/f72f0ff4e83b83b0157afed664f560da91d20f31"
+test-fixture@PolymerElements/test-fixture:
+  version "3.0.0-rc.1"
+  resolved "https://codeload.github.com/PolymerElements/test-fixture/tar.gz/eb86ce25c850bb20523d47a55d07235f0fad5858"
+  dependencies:
+    web-component-tester "^6.0.0-prerelease.5"
 
 test-value@^1.1.0:
   version "1.1.0"
@@ -6418,13 +6433,9 @@ upper-case@^1.1.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/upper-case/-/upper-case-1.1.3.tgz#f6b4501c2ec4cdd26ba78be7222961de77621598"
 
-urijs@1.16.1:
+urijs@1.16.1, urijs@^1.16.1:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.16.1.tgz#859ad31890f5f9528727be89f1932c94fb4731e2"
-
-urijs@^1.16.1:
-  version "1.18.7"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.18.7.tgz#613ee4194452fe66b872d62468946df93a941492"
 
 url-parse-lax@^1.0.0:
   version "1.0.0"
