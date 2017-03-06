@@ -60,16 +60,24 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
     description: 'A simple Polymer 2.0 application',
     generator: createApplicationGenerator('polymer-2.x'),
   },
-  // TODO: Add Shop "^2.0.0" generator once Polymer 2.0 Shop template is
-  // released.
-  'starter-kit': {
-    id: 'polymer-init-starter-kit:app',
+  'polymer-1-starter-kit': {
+    id: 'polymer-init-polymer-1-starter-kit:app',
     description:
-        'A starter application template, with navigation and "PRPL pattern" loading',
+        'A Polymer 1.x starter application template, with navigation and "PRPL pattern" loading',
     generator: createGithubGenerator({
       owner: 'PolymerElements',
       repo: 'polymer-starter-kit',
       semverRange: '^2.0.0',
+    }),
+  },
+  'polymer-2-starter-kit': {
+    id: 'polymer-init-polymer-2-starter-kit:app',
+    description:
+        'A Polymer 2.x starter application template, with navigation and "PRPL pattern" loading',
+    generator: createGithubGenerator({
+      owner: 'PolymerElements',
+      repo: 'polymer-starter-kit',
+      semverRange: '^3.0.0',
     }),
   },
   // TODO: Add Shop "^3.0.0" generator once Polymer 2.0 PSK template is
