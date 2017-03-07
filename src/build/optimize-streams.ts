@@ -66,6 +66,16 @@ export class GenericOptimizeTransform extends Transform {
   }
 
   _transform(file: File, _encoding: string, callback: FileCB): void {
+    // TODO(fks) 03-07-2017: This is a quick fix to make sure that
+    // "webcomponentsjs" files aren't compiled down to ES5, because they contain
+    // an important ES6 shim to make custom elements possible. Remove/refactor
+    // when we have a better plan for excluding some files from optimization.
+    if (!file.path || file.path.indexOf('webcomponentsjs/') >= 0 ||
+        file.path.indexOf('webcomponentsjs\\') >= 0) {
+      callback(null, file);
+      return;
+    }
+
     if (file.contents) {
       try {
         let contents = file.contents.toString();
