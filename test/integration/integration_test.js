@@ -100,7 +100,10 @@ suite('integration tests', function() {
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
 
-    test('test the Polymer 1.x "starter-kit" template', () => {
+    // TODO(justinfagnani): consider removing these integration tests
+    // or checking in the contents so that we're not subject to the
+    // other repo changing
+    test.skip('test the Polymer 1.x "starter-kit" template', () => {
       let dir;
       const PSKGenerator = createGithubGenerator({
         owner: 'PolymerElements',
@@ -120,7 +123,10 @@ suite('integration tests', function() {
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
 
-    test('test the Polymer 2.x "starter-kit" template', () => {
+    // TODO(justinfagnani): consider removing these integration tests
+    // or checking in the contents so that we're not subject to the
+    // other repo changing
+    test.skip('test the Polymer 2.x "starter-kit" template', () => {
       let dir;
       const PSKGenerator = createGithubGenerator({
         owner: 'PolymerElements',
