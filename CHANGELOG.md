@@ -1,6 +1,10 @@
 # Changelog
 
-## Upcoming
+<!--## Upcoming-->
+
+## v0.18.0-pre.11 [03-03-2017]
+
+- Bump of our dependencies, including large improvements to `polymer analyze` and `polymer experimental-lint`.
 
 ## v0.18.0-pre.10 [02-21-2017]
 
