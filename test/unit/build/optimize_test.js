@@ -42,6 +42,43 @@ suite('optimize-streams', () => {
     });
   });
 
+  test('does not compile webcomponents.js files (windows)', (done) => {
+    const es6Contents = `const apple = 'apple';`;
+    const sourceStream = vfs.src([
+      {
+        path: 'A:\\project\\bower_components\\webcomponentsjs\\webcomponents-es5-loader.js',
+        contents: es6Contents,
+      },
+    ]);
+    const op = pipeStreams([sourceStream, getOptimizeStreams({js: {compile: true}})]);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
+      }
+      assert.equal(f.contents.toString(), es6Contents);
+      done();
+    });
+  });
+
+  test('does not compile webcomponents.js files (unix)', (done) => {
+    const es6Contents = `const apple = 'apple';`;
+    const sourceStream = vfs.src([
+      {
+        path: '/project/bower_components/webcomponentsjs/webcomponents-es5-loader.js',
+        contents: es6Contents,
+      },
+    ]);
+    const op = pipeStreams([sourceStream, getOptimizeStreams({js: {compile: true}})]);
+    testStream(op, (error, f) => {
+      if (error) {
+        return done(error);
+      }
+      assert.equal(f.contents.toString(), es6Contents);
+      done();
+    });
+  });
+
+
   test('minify js', (done) => {
     const sourceStream = vfs.src([
       {
