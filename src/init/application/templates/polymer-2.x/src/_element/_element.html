@@ -13,13 +13,11 @@
   <script>
     class MyApplication extends Polymer.Element {
       static get is() { return '<%= elementName %>'; }
-      static get config() {
+      static get properties() {
         return {
-          properties: {
-            prop1: {
-              type: String,
-              value: '<%= elementName %>'
-            }
+          prop1: {
+            type: String,
+            value: '<%= elementName %>'
           }
         };
       }
