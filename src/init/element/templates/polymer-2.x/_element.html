@@ -20,13 +20,11 @@
   <script>
     class MyElement extends Polymer.Element {
       static get is() { return '<%= name %>'; }
-      static get config() {
+      static get properties() {
         return {
-          properties: {
-            prop1: {
-              type: String,
-              value: '<%= name %>'
-            }
+          prop1: {
+            type: String,
+            value: '<%= name %>'
           }
         };
       }
