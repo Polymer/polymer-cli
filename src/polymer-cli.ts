@@ -12,6 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import {sep as pathSeperator} from 'path';
 import * as commandLineArgs from 'command-line-args';
 import * as logging from 'plylog';
 import {ProjectConfig, ProjectOptions} from 'polymer-project-config';
@@ -102,6 +103,17 @@ export class PolymerCli {
         logger.debug('no polymer.json file found, no config loaded');
       }
     }
+
+    // This is a quick fix to make sure that "webcomponentsjs" files are
+    // included in every build, since some are imported dynamically in a way
+    // that our analyzer cannot detect.
+    // TODO(fks) 03-07-2017: Remove/refactor when we have a better plan for
+    // support (either here or inside of polymer-project-config).
+    this.defaultConfigOptions = this.defaultConfigOptions || {};
+    this.defaultConfigOptions.extraDependencies =
+        this.defaultConfigOptions.extraDependencies || [];
+    this.defaultConfigOptions.extraDependencies.push(
+        `bower_components${pathSeperator}webcomponentsjs${pathSeperator}*.js`);
 
     this.addCommand(new AnalyzeCommand());
     this.addCommand(new BuildCommand());

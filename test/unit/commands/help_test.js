@@ -10,13 +10,16 @@
 
 'use strict';
 
+const path = require('path');
 const assert = require('chai').assert;
 const ProjectConfig = require('polymer-project-config').ProjectConfig;
 const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 const sinon = require('sinon');
 
 suite('help', () => {
-  const defaultConfig = new ProjectConfig();
+  const expectedDefaultConfig = new ProjectConfig({
+    extraDependencies: [path.resolve('bower_components/webcomponentsjs/*.js')],
+  });
 
   test('displays help for a specific command when called with that command', () => {
     let cli = new PolymerCli(['help', 'build']);
@@ -26,7 +29,7 @@ suite('help', () => {
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(
       helpCommandSpy.firstCall.args,
-      [{command: 'build'}, defaultConfig]
+      [{command: 'build'}, expectedDefaultConfig]
     );
   });
 
@@ -36,7 +39,7 @@ suite('help', () => {
     let helpCommandSpy = sinon.spy(helpCommand, 'run');
     cli.run();
     assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, defaultConfig]);
+    assert.deepEqual(helpCommandSpy.firstCall.args, [{}, expectedDefaultConfig]);
   });
 
 });

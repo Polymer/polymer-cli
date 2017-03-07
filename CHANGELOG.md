@@ -3,6 +3,7 @@
 ## Upcoming
 
 - Add PSK 3.0 (Polymer 2.0 Polymer Starter Kit) template to the init command.
+- Automatically include un-optimized `webcomponentsjs` polyfills in builds.
 
 ## v0.18.0-pre.10 [02-21-2017]
 
