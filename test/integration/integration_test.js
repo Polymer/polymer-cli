@@ -100,7 +100,10 @@ suite('integration tests', function() {
         .then(() => runCommand(binPath, ['build'], {cwd: dir}));
     });
 
-    test('test the "starter-kit" template', () => {
+    // TODO(justinfagnani): consider removing these integration tests
+    // or checking in the contents so that we're not subject to the
+    // other repo changing
+    test.skip('test the "starter-kit" template', () => {
       let dir;
       const PSKGenerator = createGithubGenerator({
         owner: 'PolymerElements',
@@ -121,7 +124,10 @@ suite('integration tests', function() {
 
   });
 
-  suite('tools-sample-projects templates', () => {
+  // TODO(justinfagnani): consider removing these integration tests
+  // or checking in the contents so that we're not subject to the
+  // other repo changing
+  suite.skip('tools-sample-projects templates', () => {
 
     let tspDir;
 
