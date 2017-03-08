@@ -1,9 +1,14 @@
 # Changelog
 
-## Upcoming
+<!--## Upcoming-->
+
+## v0.18.0-pre.11 [03-07-2017]
 
 - Add PSK 3.0 (Polymer 2.0 Polymer Starter Kit) template to the init command.
 - Automatically include un-optimized `webcomponentsjs` polyfills in builds.
+- Update Polymer Analyzer, Polymer Bundler and Polymer Linter dependencies
+  - Bundles now include optimizations specified in builds.
+  - Much more detailed output of `analyze` command.
 
 ## v0.18.0-pre.10 [02-21-2017]
 
