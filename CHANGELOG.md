@@ -1,6 +1,8 @@
 # Changelog
 
-<!--## Upcoming-->
+## Upcoming
+
+- When running `polymer build` and compiling JS to ES5, we will also rewrite script includes of `webcomponents-loader.js` to `webcomponents-es5-loader.js`.
 
 ## v0.18.0-pre.11 [03-07-2017]
 
