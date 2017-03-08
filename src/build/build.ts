@@ -15,6 +15,7 @@
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
+
 import mergeStream = require('merge-stream');
 import {PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
@@ -23,9 +24,11 @@ import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
+import {UseES5WebcomponentsLoader} from './rewrite-webcomponents-loader';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
+
 
 /**
  * Generate a single build based on the given `options` ProjectBuildOptions.
@@ -74,6 +77,11 @@ export async function build(
 
   if (options.insertPrefetchLinks) {
     buildStream = buildStream.pipe(new PrefetchTransform(polymerProject));
+  }
+
+  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
+  if (compiledToES5) {
+    buildStream = buildStream.pipe(new UseES5WebcomponentsLoader());
   }
 
   buildStream.once('data', () => {
