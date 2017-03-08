@@ -33,6 +33,7 @@ suite('install-variants', function() {
         }
 
         const env = envExcludingBowerVars();
+        console.log('env', env);
         runCommand(binPath, ['install', '--variants', '--offline'], { cwd: tmpPath, env }).then(() => {
           const mainDir = path.join(tmpPath, 'bower_components');
           assert.isTrue(fs.statSync(mainDir).isDirectory());

@@ -46,7 +46,7 @@ gulp.task('test', ['build'], () =>
 );
 
 gulp.task('test:integration', ['build'], () =>
-  gulp.src(['test/integration/**/*_test.js'], {read: false})
+  gulp.src(['test/integration/install-variants_test.js'], {read: false})
       .pipe(mocha({
         ui: 'tdd',
         reporter: 'spec',
