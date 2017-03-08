@@ -1,10 +1,10 @@
 # Changelog
 
-## Upcoming
+## v0.18.0-pre.13 [03-08-2017]
 
 - When running `polymer build` and compiling JS to ES5, we will also rewrite script includes of `webcomponents-loader.js` to `webcomponents-es5-loader.js`.
 
-## v0.18.0-pre.11 [03-07-2017]
+## v0.18.0-pre.12 [03-07-2017]
 
 - Add PSK 3.0 (Polymer 2.0 Polymer Starter Kit) template to the init command.
 - Automatically include un-optimized `webcomponentsjs` polyfills in builds.
