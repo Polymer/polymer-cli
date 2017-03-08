@@ -33,7 +33,8 @@ suite('install-variants', function() {
         }
 
         const env = envExcludingBowerVars();
-        console.log('env', env);
+        console.log('env only Bower:', envOnlyBowerVars());
+        console.log('env no Bower:', env);
         runCommand(binPath, ['install', '--variants', '--offline'], { cwd: tmpPath, env }).then(() => {
           const mainDir = path.join(tmpPath, 'bower_components');
           assert.isTrue(fs.statSync(mainDir).isDirectory());
@@ -63,6 +64,18 @@ function envExcludingBowerVars() {
   const env = {};
   for (const envVar of Object.keys(process.env)) {
     if (!envVar.startsWith('bower_')) {
+      env[envVar] = process.env[envVar];
+    } else {
+      env[envVar] = '';
+    }
+  }
+  return env;
+}
+
+function envOnlyBowerVars() {
+  const env = {};
+  for (const envVar of Object.keys(process.env)) {
+    if (envVar.startsWith('bower_')) {
       env[envVar] = process.env[envVar];
     } else {
       env[envVar] = '';
