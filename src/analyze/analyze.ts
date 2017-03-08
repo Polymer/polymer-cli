@@ -13,14 +13,14 @@
  */
 
 import {Analyzer} from 'polymer-analyzer';
-import {Elements} from 'polymer-analyzer/lib/elements-format';
-import {generateElementMetadata} from 'polymer-analyzer/lib/generate-elements';
+import {Analysis} from 'polymer-analyzer/lib/analysis-format';
+import {generateAnalysis} from 'polymer-analyzer/lib/generate-analysis';
 import {Feature} from 'polymer-analyzer/lib/model/model';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
 
 export async function analyze(
-    root: string, inputs: string[]): Promise<Elements|undefined> {
+    root: string, inputs: string[]): Promise<Analysis|undefined> {
   const analyzer = new Analyzer({
     urlLoader: new FSUrlLoader(root),
     urlResolver: new PackageUrlResolver(),
@@ -32,9 +32,9 @@ export async function analyze(
 
   if (inputs == null || inputs.length === 0) {
     const _package = await analyzer.analyzePackage();
-    return generateElementMetadata(_package, '', isNotTest);
+    return generateAnalysis(_package, '', isNotTest);
   } else {
     const documents = await Promise.all(inputs.map((i) => analyzer.analyze(i)));
-    return generateElementMetadata(documents, '', isNotTest);
+    return generateAnalysis(documents, '', isNotTest);
   }
 }
