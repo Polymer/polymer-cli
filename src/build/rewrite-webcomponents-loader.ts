@@ -17,6 +17,12 @@ const scriptIncludeWebcomponentsLoader = p.AND(
     p.hasTagName('script'),
     attrValueMatches('src', /\bwebcomponents-loader\.js$/));
 
+/**
+ * When compiling ES6 classes down to ES5 we need to include a special form of
+ * the webcomponents loader to be compatible with native custom elements.
+ *
+ * TODO(rictic): test this.
+ */
 export class UseES5WebcomponentsLoader extends stream.Transform {
   constructor() {
     super({objectMode: true});
