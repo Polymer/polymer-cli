@@ -63,7 +63,6 @@
     "merge-stream": "^1.0.1",
     "parse5": "^2.2.3",
     "plylog": "^0.4.0",
-    "polylint": "^2.10.0",
     "polymer-analyzer": "2.0.0-alpha.31",
     "polymer-build": "^0.8.4",
     "polymer-linter": "0.1.6",
