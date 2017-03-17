@@ -1,4 +1,6 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<!--<link rel="import" href="../polymer/lib/elements/dom-if.html">-->
+<!--<link rel="import" href="../polymer/lib/elements/dom-repeat.html">-->
 
 <dom-module id="<%= elementName %>">
   <template>
@@ -11,6 +13,7 @@
   </template>
 
   <script>
+    /** @polymerElement */
     class MyApplication extends Polymer.Element {
       static get is() { return '<%= elementName %>'; }
       static get properties() {
