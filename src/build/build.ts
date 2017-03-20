@@ -72,7 +72,7 @@ export async function build(
       mergeStream(sourcesStream, depsStream);
 
   if (options.bundle) {
-    buildStream = buildStream.pipe(polymerProject.bundler);
+    buildStream = buildStream.pipe(polymerProject.bundler());
   }
 
   if (options.insertPrefetchLinks) {

@@ -212,13 +212,25 @@ specified in the `"variants"` property of `bower.json`. See
 
 ### lint
 
-With a `polymer.json` file:
+Add a "lint" section to your `polymer.json` file at the root of your project:
+
+```json
+{
+  "lint": {
+    "rules": [
+      "polymer-2-hybrid"
+    ]
+  }
+}
+```
+
+Then just
 
     $ polymer lint
 
-Specifying a file to lint:
+You can also list specific files to lint and rules to use on the command line:
 
-    $ polymer lint index.html
+    $ polymer lint --rules polymer-2-hybrid --input ./my-element.html
 
 ### test
 

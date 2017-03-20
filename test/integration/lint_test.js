@@ -31,24 +31,24 @@ suite('polymer lint', function() {
 
   test('handles a simple correct case', () => {
     const cwd = path.join(fixturePath, 'lint-simple');
-    return runCommand(binPath, ['experimental-lint'], {cwd});
+    return runCommand(binPath, ['lint'], {cwd});
   });
 
   test('fails when rules are not specified', () => {
     const cwd = path.join(fixturePath, 'lint-no-polymer-json');
     const result = runCommand(
-        binPath, ['experimental-lint'], { cwd, failureExpected: true });
+        binPath, ['lint'], { cwd, failureExpected: true });
     return invertPromise(result);
   });
 
   test('takes rules from the command line', () => {
     const cwd = path.join(fixturePath, 'lint-no-polymer-json');
-    return runCommand(binPath, ['experimental-lint', '--rules=polymer-2-hybrid'], {cwd});
+    return runCommand(binPath, ['lint', '--rules=polymer-2-hybrid'], {cwd});
   });
 
   test('fails when lint errors are found', () => {
     const cwd = path.join(fixturePath, 'lint-with-error');
-    const result = runCommand(binPath, ['experimental-lint'], {cwd, failureExpected: true});
+    const result = runCommand(binPath, ['lint'], {cwd, failureExpected: true});
     return invertPromise(result).then((output) => {
       assert.include(
           output, '<style> tags should not be direct children of <dom-module>');
