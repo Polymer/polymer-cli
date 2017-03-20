@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+<!--## Unreleased-->
+
+## v0.18.0-pre.14 [03-20-2017]
 
 - The experimental linter has graduated to be the new default. Removed `polymer experimental-lint` command. `polymer lint` now runs [polymer-linter](https://github.com/Polymer/polymer-linter). See the README and `polymer lint --help` for more info.
 
