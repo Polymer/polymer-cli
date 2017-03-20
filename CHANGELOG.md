@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The experimental linter has graduated to be the new default. Removed `polymer experimental-lint` command. `polymer lint` now runs [polymer-linter](https://github.com/Polymer/polymer-linter). See the README and `polymer lint --help` for more info.
+
 ## v0.18.0-pre.13 [03-08-2017]
 
 - When running `polymer build` and compiling JS to ES5, we will also rewrite script includes of `webcomponents-loader.js` to `webcomponents-es5-loader.js`.
