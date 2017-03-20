@@ -1,5 +1,6 @@
 {
   "storage":{
-      "packages":"./bower_cache"
+    "packages": "./bower_cache",
+    "registry": "./bower-registry"
   }
 }
