@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.18.0-pre.13 [03-10-2017]
+
+- polymer-2 generated unit tests should pass
+
 ## v0.18.0-pre.13 [03-08-2017]
 
 - When running `polymer build` and compiling JS to ES5, we will also rewrite script includes of `webcomponents-loader.js` to `webcomponents-es5-loader.js`.
