@@ -13,9 +13,15 @@ const attrValueMatches = (attrName: string, regex: RegExp) => {
 };
 
 const p = dom5.predicates;
+const loaderRegex = /\bwebcomponents-loader\.js$/;
+const linkPreloadWebcomponentsLoader = p.AND(
+    p.hasTagName('link'),
+    p.hasAttrValue('rel', 'preload'),
+    p.hasAttrValue('as', 'script'),
+    attrValueMatches('href', loaderRegex));
 const scriptIncludeWebcomponentsLoader = p.AND(
     p.hasTagName('script'),
-    attrValueMatches('src', /\bwebcomponents-loader\.js$/));
+    attrValueMatches('src', loaderRegex));
 
 /**
  * When compiling ES6 classes down to ES5 we need to include a special form of
@@ -54,14 +60,22 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
       return;
     }
     const parsed = parse5.parse(contents);
+    const link = dom5.nodeWalk(parsed, linkPreloadWebcomponentsLoader);
     const script = dom5.nodeWalk(parsed, scriptIncludeWebcomponentsLoader);
-    if (!script) {
+    if (!link && !script) {
       callback(null, file);
       return;
     }
-    const scriptPath = dom5.getAttribute(script, 'src')!;
-    const es5Url = url.resolve(scriptPath, 'webcomponents-es5-loader.js');
-    dom5.setAttribute(script, 'src', es5Url);
+    if (link) {
+      const linkPath = dom5.getAttribute(link, 'href')!;
+      const es5Url = url.resolve(linkPath, 'webcomponents-es5-loader.js');
+      dom5.setAttribute(link, 'href', es5Url);
+    }
+    if (script) {
+      const scriptPath = dom5.getAttribute(script, 'src')!;
+      const es5Url = url.resolve(scriptPath, 'webcomponents-es5-loader.js');
+      dom5.setAttribute(script, 'src', es5Url);
+    }
     const correctedFile = file.clone();
     correctedFile.contents = new Buffer(parse5.serialize(parsed), 'utf-8');
     callback(null, correctedFile);
