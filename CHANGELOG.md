@@ -4,7 +4,7 @@
 
 ## v0.18.0-pre.15 [03-22-2017]
 
-- `build`: Update automatic `webcomponentsjs` polyfilling to use `custom-elements-es5-adapter.js` instead of broken `webcomponents-es5-loader.js`. Fixes compiled, bundled builds in Chrome.
+- `build`: Update automatic `webcomponentsjs` polyfilling to use `custom-elements-es5-adapter.js` instead of broken `webcomponents-es5-loader.js`. Fixes compiled, bundled builds in Chrome. (See #605)
 
 ## v0.18.0-pre.14 [03-20-2017]
 
