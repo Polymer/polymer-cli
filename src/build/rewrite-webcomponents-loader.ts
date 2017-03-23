@@ -59,9 +59,12 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
       callback(null, file);
       return;
     }
+
     const scriptPath = dom5.getAttribute(script, 'src')!;
-    const es5Url = url.resolve(scriptPath, 'webcomponents-es5-loader.js');
-    dom5.setAttribute(script, 'src', es5Url);
+    const scriptUrl = url.resolve(scriptPath, 'custom-elements-es5-adapter.js');
+    const es5AdapterScript = parse5.parseFragment(`<script src="${scriptUrl}"></script>`);
+    dom5.insertBefore(script.parentNode!, script, es5AdapterScript);
+
     const correctedFile = file.clone();
     correctedFile.contents = new Buffer(parse5.serialize(parsed), 'utf-8');
     callback(null, correctedFile);
