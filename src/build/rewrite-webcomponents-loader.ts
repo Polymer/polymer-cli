@@ -15,7 +15,7 @@ const attrValueMatches = (attrName: string, regex: RegExp) => {
 
 const webcomponentsLoaderMatcher = predicates.AND(
     predicates.hasTagName('script'),
-    attrValueMatches('src', /\bwebcomponents-loader\.js$/));
+    attrValueMatches('src', /\bwebcomponents\-(loader|lite)\.js$/));
 const headMatcher = predicates.hasTagName('head');
 const bodyMatcher = predicates.hasTagName('body');
 const scriptMatcher = predicates.AND(
