@@ -1,6 +1,7 @@
 # Changelog
 
 <!--## Unreleased-->
+- `build`: Update automatic `webcomponentsjs` polyfilling to move it and all affected elements following it into the body so that the `custom-elements-es5-adapter.js` can work properly in IE11. (See [#627](https://github.com/Polymer/polymer-cli/issues/627))
 
 ## v0.18.0-pre.15 [03-22-2017]
 
