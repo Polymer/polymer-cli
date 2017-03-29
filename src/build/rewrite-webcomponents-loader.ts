@@ -13,9 +13,10 @@ const attrValueMatches = (attrName: string, regex: RegExp) => {
   };
 };
 
+const webcomponentsLoaderRegex = /\bwebcomponents\-(loader|lite)\.js$/;
 const webcomponentsLoaderMatcher = predicates.AND(
     predicates.hasTagName('script'),
-    attrValueMatches('src', /\bwebcomponents\-(loader|lite)\.js$/));
+    attrValueMatches('src', webcomponentsLoaderRegex));
 const headMatcher = predicates.hasTagName('head');
 const bodyMatcher = predicates.hasTagName('body');
 const scriptMatcher = predicates.AND(
@@ -41,8 +42,8 @@ const styleMatcher = predicates.AND(
  * When compiling ES6 classes down to ES5 we need to include a special form of
  * the webcomponents loader to be compatible with native custom elements. This
  * includes moving the loader script element and all relevent siblings
- * following it into the body so that the <ES5 polyfill can be properly
- * injected.
+ * following it into the body so that the Custom Elements ES5 adapter can be
+ * properly injected.
  *
  * NOTE(fks) 03-28-2017: Comments are not currently moved to the body, which
  * means relevent comments may be left behind in the head. This is fine for now,
@@ -77,10 +78,12 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
         stream.on('error', reject);
       });
     }
-    if (!/webcomponents-loader\.js/.test(contents)) {
+
+    if (!webcomponentsLoaderRegex.test(contents)) {
       callback(null, file);
       return;
     }
+
     const parsed = parse5.parse(contents);
     const script = dom5.nodeWalk(parsed, webcomponentsLoaderMatcher);
     if (!script) {
@@ -88,7 +91,8 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
       return;
     }
 
-    // Collect important dom references & create fragments for injection
+    // Collect important dom references & create fragment for injection
+    const correctedFile = file.clone();
     const bodyElement = dom5.query(parsed, bodyMatcher)!;
     const headElement = dom5.query(parsed, headMatcher)!;
     const loaderScriptUrl = dom5.getAttribute(script, 'src')!;
@@ -113,28 +117,33 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
 </div>
 `);
 
-    // Get references to all relevent siblings following the "loader" script
-    const loaderScriptSiblings = dom5.queryAll(
+    // If script is in the body, just insert the es5 adapter script before it
+    if (dom5.nodeWalkAncestors(script, bodyMatcher)) {
+      dom5.insertBefore(bodyElement, script, es5AdapterScript);
+      correctedFile.contents = new Buffer(parse5.serialize(parsed), 'utf-8');
+      callback(null, correctedFile);
+      return;
+    }
+
+    // otherwise we need to move the webcomponents-loader/webcomponents-lite
+    // loader down to the body so that the es5 adaperter script shim will work
+    const scriptSiblings = dom5.queryAll(
         script.parentNode!,
         dom5.predicates.OR(scriptMatcher, styleMatcher, linkMatcher));
-    const siblingsAfterLoader =
-        loaderScriptSiblings.splice(loaderScriptSiblings.indexOf(script));
+    const scriptSiblingsFollowing =
+        scriptSiblings.splice(scriptSiblings.indexOf(script));
     dom5.insertBefore(headElement, script, loaderMovedComment);
-
-    // Move all neccessary elements from <head> to the top of <body>, preserving
-    // order
     if (!bodyElement.childNodes) {
       bodyElement.childNodes = [];
     }
-    for (let i = 1, len = siblingsAfterLoader.length; i <= len; i++) {
-      const releventScript = siblingsAfterLoader[len - i];
+    for (let i = 1, len = scriptSiblingsFollowing.length; i <= len; i++) {
+      const releventScript = scriptSiblingsFollowing[len - i];
       dom5.insertBefore(
           bodyElement, bodyElement.childNodes[0] || null, releventScript);
     }
     dom5.insertBefore(
         bodyElement, bodyElement.childNodes[0] || null, es5AdapterScript);
 
-    const correctedFile = file.clone();
     correctedFile.contents = new Buffer(parse5.serialize(parsed), 'utf-8');
     callback(null, correctedFile);
   }
