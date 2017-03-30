@@ -129,8 +129,8 @@ export class JSDefaultMinifyTransform extends JSBabelTransform {
         let options = JSON.parse(String(readFileSync('.babelrc')));
         logger.info('Using .babelrc configuration');
         super(options);
-      } catch(err) {
-        logger.error('Error loading .babelrc configuration: '+(err.message || ''));
+      } catch (err) {
+        logger.error('Error loading .babelrc configuration: ' + (err.message || ''));
         super({presets: [babiliPreset]});
       }
     } else {
