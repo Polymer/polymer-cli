@@ -124,13 +124,12 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    if(!accessSync('.babelrc')){
-      try{
-        var options = JSON.parse(String(readFileSync('.babelrc')));
+    if (!accessSync('.babelrc')) {
+      try {
+        let options = JSON.parse(String(readFileSync('.babelrc')));
         logger.info('Using .babelrc configuration');
         super(options);
-      }
-      catch(err){
+      } catch(err) {
         logger.error('Error loading .babelrc configuration: '+(err.message || ''));
         super({presets: [babiliPreset]});
       }
