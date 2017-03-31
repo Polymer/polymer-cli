@@ -13,7 +13,7 @@ const attrValueMatches = (attrName: string, regex: RegExp) => {
   };
 };
 
-const webcomponentsLoaderRegex = /\bwebcomponents\-(loader|lite)\.js$/;
+const webcomponentsLoaderRegex = /\bwebcomponents\-(loader|lite)\.js\b/;
 const webcomponentsLoaderMatcher = predicates.AND(
     predicates.hasTagName('script'),
     attrValueMatches('src', webcomponentsLoaderRegex));
