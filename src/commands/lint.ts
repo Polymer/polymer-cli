@@ -83,8 +83,9 @@ export class LintCommand implements Command {
     this._loadPlugins(config);
     let collectionsDocs = [];
     for (const collection of lintLib.registry.allRuleCollections) {
-      collectionsDocs.push(`  ${chalk.bold(collection.code)}: ${this._indent(
-          collection.description)}`);
+      collectionsDocs.push(`  ${
+                                chalk.bold(collection.code)
+                              }: ${this._indent(collection.description)}`);
     }
     let rulesDocs = [];
     for (const rule of lintLib.registry.allRules) {
