@@ -2,6 +2,9 @@
 
 <!--## Unreleased-->
 
+- `build`: Added `--app-push-manifest`/`addPushManifest` option for generating a [`push-manifest.json`](https://github.com/GoogleChrome/http2-push-manifest) file for your project.
+
+
 ## v0.18.0-pre.15 [03-22-2017]
 
 - `build`: Update automatic `webcomponentsjs` polyfilling to use `custom-elements-es5-adapter.js` instead of broken `webcomponents-es5-loader.js`. Fixes compiled, bundled builds in Chrome. (See [#605](https://github.com/Polymer/polymer-cli/issues/605))
