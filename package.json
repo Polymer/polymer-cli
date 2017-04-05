@@ -34,6 +34,7 @@
     "@types/parse5": "^2.2.33",
     "@types/request": "0.0.39",
     "@types/resolve": "0.0.4",
+    "@types/rimraf": "^0.0.28",
     "@types/semver": "^5.3.30",
     "@types/temp": "^0.8.28",
     "@types/uglify-js": "^2.6.28",

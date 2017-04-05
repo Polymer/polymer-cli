@@ -18,6 +18,7 @@ import * as logging from 'plylog';
 import * as semver from 'semver';
 
 import request = require('request');
+import rimraf = require('rimraf');
 import GitHubApi = require('github');
 
 const gunzip = require('gunzip-maybe');
@@ -132,6 +133,43 @@ export class Github {
             logger.info('Finished writing template files');
             resolve();
           });
+    });
+  }
+
+  /**
+   * Given an extracted or cloed github directory, unlink files specified by
+   * .polymerignore, and then finally .polymerignore file itself.  This should
+   * fail silently if .polymerignore does not exist.
+   * .polymerignore format:
+   * - Each line is a glob pattern (both * and ** are respected).
+   * - Empty lines are ignored.
+   * - Lines that begin with # are ignored.
+   * - Lines that begin with / are considered to be paths at the root of the
+   *   project.
+   */
+  filterPolymerignore(outDir: string) {
+    // Read filters.
+    let filters: Array<string> = [];
+    let ignoreFile = path.join(outDir, '.polymerignore');
+    try {
+      filters = fs.readFileSync(ignoreFile, 'utf8').split('\n');
+    } catch (err) {
+      // File not found
+    }
+    filters.push('/.polymerignore');
+
+    // Find file matches and remove them.
+    filters.forEach((filter) => {
+        filter = filter.trim();
+        if (!filter || filter.startsWith('#')) {
+            return;
+        }
+        if (filter.startsWith('/')) {
+            filter = filter.substring(1);
+        } else {
+            filter = path.join('**', filter);
+        }
+        rimraf.sync(path.join(outDir, filter));
     });
   }
 
