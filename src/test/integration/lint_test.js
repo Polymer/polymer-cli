@@ -14,7 +14,7 @@ const path = require('path');
 
 const runCommand = require('./run-command').runCommand;
 
-const fixturePath = path.join(__dirname, './fixtures/');
+const fixturePath = path.join(__dirname, '../../../test-fixtures/');
 
 function invertPromise(p) {
   return p.then((v) => {
@@ -25,7 +25,7 @@ function invertPromise(p) {
 
 suite('polymer lint', function() {
 
-  const binPath = path.join(__dirname, '../../bin/polymer.js');
+  const binPath = path.join(__dirname, '../../../bin/polymer.js');
 
   this.timeout(2 * 1000);
 

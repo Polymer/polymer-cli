@@ -12,8 +12,8 @@
 
 const assert = require('chai').assert;
 const vfs = require('vinyl-fs-fake');
-const getOptimizeStreams = require('../../../lib/build/optimize-streams').getOptimizeStreams;
-const pipeStreams = require('../../../lib/build/streams').pipeStreams;
+const getOptimizeStreams = require('../../../../lib/build/optimize-streams').getOptimizeStreams;
+const pipeStreams = require('../../../../lib/build/streams').pipeStreams;
 
 suite('optimize-streams', () => {
 

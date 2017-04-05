@@ -11,8 +11,8 @@
 
 const assert = require('chai').assert;
 const sinon = require('sinon');
-const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
-const polymerInit = require('../../../lib/init/init');
+const PolymerCli = require('../../../../lib/polymer-cli').PolymerCli;
+const polymerInit = require('../../../../lib/init/init');
 
 suite('init', () => {
   let sandbox;

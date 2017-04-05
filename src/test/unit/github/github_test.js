@@ -16,7 +16,7 @@ const path = require('path');
 const temp = require('temp').track();
 const PassThrough = require('stream').PassThrough;
 
-const GithubModule = require('../../../lib/github/github');
+const GithubModule = require('../../../../lib/github/github');
 const Github = GithubModule.Github;
 const GithubResponseError = GithubModule.GithubResponseError;
 

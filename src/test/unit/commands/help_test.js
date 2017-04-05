@@ -13,7 +13,7 @@
 const path = require('path');
 const assert = require('chai').assert;
 const ProjectConfig = require('polymer-project-config').ProjectConfig;
-const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
+const PolymerCli = require('../../../../lib/polymer-cli').PolymerCli;
 const sinon = require('sinon');
 
 suite('help', () => {

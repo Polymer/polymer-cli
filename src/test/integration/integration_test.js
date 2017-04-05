@@ -12,14 +12,14 @@
 const path = require('path');
 const runGenerator = require('yeoman-test').run;
 const createGithubGenerator
-  = require('../../lib/init/github').createGithubGenerator;
+  = require('../../../lib/init/github').createGithubGenerator;
 const runCommand = require('./run-command').runCommand;
 
 // Template Generators
 const createApplicationGenerator
-  = require('../../lib/init/application/application').createApplicationGenerator;
+  = require('../../../lib/init/application/application').createApplicationGenerator;
 const createElementGenerator
-  = require('../../lib/init/element/element').createElementGenerator;
+  = require('../../../lib/init/element/element').createElementGenerator;
 
 // A zero priveledge github token of a nonce account, used for quota.
 const githubToken = '8d8622bf09bb1d85cb411b5e475a35e742a7ce35';
@@ -27,7 +27,7 @@ const githubToken = '8d8622bf09bb1d85cb411b5e475a35e742a7ce35';
 
 suite('integration tests', function() {
 
-  const binPath = path.join(__dirname, '../../', 'bin', 'polymer.js');
+  const binPath = path.join(__dirname, '../../../', 'bin', 'polymer.js');
 
   // Extend timeout limit to 90 seconds for slower systems
   this.timeout(120000);

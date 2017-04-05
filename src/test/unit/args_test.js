@@ -11,8 +11,8 @@
 
 const assert = require('chai').assert;
 
-const argsLib = require('../../lib/args');
-const cliLib = require('../../lib/polymer-cli');
+const argsLib = require('../../../lib/args');
+const cliLib = require('../../../lib/polymer-cli');
 
 suite('args', () => {
 

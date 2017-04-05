@@ -16,7 +16,7 @@ const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 
 const createElementGenerator
-  = require('../../../lib/init/element/element').createElementGenerator;
+  = require('../../../../lib/init/element/element').createElementGenerator;
 
 suite('init/element', () => {
 

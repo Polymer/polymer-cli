@@ -14,7 +14,7 @@ const sinon = require('sinon');
 const helpers = require('yeoman-test');
 
 const createGithubGenerator
-  = require('../../../lib/init/github').createGithubGenerator;
+  = require('../../../../lib/init/github').createGithubGenerator;
 
 /**
  * This small helper function wraps createGithubGenerator() so that we may add a

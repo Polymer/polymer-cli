@@ -18,7 +18,7 @@ const YeomanEnvironment = require('yeoman-environment');
 const fs = require('fs');
 const temp = require('temp').track();
 
-const polymerInit = require('../../../lib/init/init');
+const polymerInit = require('../../../../lib/init/init');
 
 var isPlatformWin = /^win/.test(process.platform);
 

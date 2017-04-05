@@ -13,7 +13,7 @@
 const assert = require('chai').assert;
 const path = require('path');
 
-const loadServiceWorkerConfig = require('../../../lib/build/load-config').loadServiceWorkerConfig;
+const loadServiceWorkerConfig = require('../../../../lib/build/load-config').loadServiceWorkerConfig;
 
 suite('load-config', () => {
   suite('loadServiceWorkerConfig()', () => {

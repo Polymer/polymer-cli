@@ -16,7 +16,7 @@ const yoAssert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 
 const createApplicationGenerator
-  = require('../../../lib/init/application/application').createApplicationGenerator;
+  = require('../../../../lib/init/application/application').createApplicationGenerator;
 
 suite('init/application', () => {
 

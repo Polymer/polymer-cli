@@ -11,7 +11,7 @@
 
 const assert = require('chai').assert;
 
-const polymerInstall = require('../../../lib/install/install');
+const polymerInstall = require('../../../../lib/install/install');
 
 suite('install', () => {
 
