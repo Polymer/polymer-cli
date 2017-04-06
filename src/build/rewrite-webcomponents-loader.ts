@@ -62,7 +62,8 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
 
     const scriptPath = dom5.getAttribute(script, 'src')!;
     const scriptUrl = url.resolve(scriptPath, 'custom-elements-es5-adapter.js');
-    const es5AdapterScript = parse5.parseFragment(`<script src="${scriptUrl}"></script>`);
+    const es5AdapterScript =
+        parse5.parseFragment(`<script src="${scriptUrl}"></script>`);
     dom5.insertBefore(script.parentNode!, script, es5AdapterScript);
 
     const correctedFile = file.clone();

@@ -91,9 +91,9 @@ export class ServeCommand implements Command {
     if (serverInfos.kind === 'mainline') {
       const mainlineServer = serverInfos;
       const urls = getServerUrls(options, mainlineServer.server);
-      logger.info(`Files in this directory are available under the following URLs
-      applications: ${
-                    url.format(urls.serverUrl)}
+      logger.info(
+          `Files in this directory are available under the following URLs
+      applications: ${url.format(urls.serverUrl)}
       reusable components: ${url.format(urls.componentUrl)}
     `);
     } else {
