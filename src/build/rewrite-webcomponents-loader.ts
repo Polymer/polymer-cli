@@ -15,8 +15,7 @@ const attrValueMatches = (attrName: string, regex: RegExp) => {
 
 const webcomponentsLoaderRegex = /\bwebcomponents\-(loader|lite)\.js\b/;
 const webcomponentsLoaderMatcher = p.AND(
-    p.hasTagName('script'),
-    attrValueMatches('src', webcomponentsLoaderRegex));
+    p.hasTagName('script'), attrValueMatches('src', webcomponentsLoaderRegex));
 const headMatcher = p.hasTagName('head');
 const bodyMatcher = p.hasTagName('body');
 const scriptMatcher = p.AND(
@@ -28,14 +27,10 @@ const scriptMatcher = p.AND(
         p.hasAttrValue('type', 'application/javascript')));
 const linkMatcher = p.AND(
     p.hasTagName('link'),
-    p.OR(
-        p.hasAttrValue('rel', 'import'),
-        p.hasAttrValue('rel', 'stylesheet')));
+    p.OR(p.hasAttrValue('rel', 'import'), p.hasAttrValue('rel', 'stylesheet')));
 const styleMatcher = p.AND(
     p.hasTagName('style'),
-    p.OR(
-        p.NOT(p.hasAttr('type')),
-        p.hasAttrValue('type', 'text/css')));
+    p.OR(p.NOT(p.hasAttr('type')), p.hasAttrValue('type', 'text/css')));
 
 
 /**
@@ -78,12 +73,10 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
         stream.on('error', reject);
       });
     }
-
     if (!webcomponentsLoaderRegex.test(contents)) {
       callback(null, file);
       return;
     }
-
     const parsed = parse5.parse(contents);
     const script = dom5.nodeWalk(parsed, webcomponentsLoaderMatcher);
     if (!script) {
@@ -91,10 +84,10 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
       return;
     }
 
-    // Collect important dom references & create fragment for injection
+    // Collect important dom references & create fragments for injection
     const correctedFile = file.clone();
-    const bodyElement = dom5.query(parsed, bodyMatcher)!;
     const headElement = dom5.query(parsed, headMatcher)!;
+    const bodyElement = dom5.query(parsed, bodyMatcher)!;
     const loaderScriptUrl = dom5.getAttribute(script, 'src')!;
     const adapterScriptUrl =
         url.resolve(loaderScriptUrl, 'custom-elements-es5-adapter.js');
@@ -116,8 +109,11 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
   <script type="text/javascript" src="${adapterScriptUrl}"></script>
 </div>
 `);
+    if (!bodyElement.childNodes) {
+      bodyElement.childNodes = [];
+    }
 
-    // If script is in the body, just insert the es5 adapter script before it
+    // If script is already in the body, just insert the shim right before it.
     if (dom5.nodeWalkAncestors(script, bodyMatcher)) {
       dom5.insertBefore(bodyElement, script, es5AdapterScript);
       correctedFile.contents = new Buffer(parse5.serialize(parsed), 'utf-8');
@@ -125,22 +121,26 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
       return;
     }
 
-    // otherwise we need to move the webcomponents-loader/webcomponents-lite
-    // loader down to the body so that the es5 adaperter script shim will work
-    const scriptSiblings = dom5.queryAll(
-        script.parentNode!,
-        p.OR(scriptMatcher, styleMatcher, linkMatcher));
-    const scriptSiblingsFollowing =
-        scriptSiblings.splice(scriptSiblings.indexOf(script));
+    // Otherwise we need to move the webcomponents-loader/webcomponents-lite
+    // loader down to the body so that the es5 adaperter script shim will work.
+    // Any following scripts, styles, and imports need to be moved down to the
+    // body as well to preserve ordering.
+    const orderSensitiveSiblings = dom5.queryAll(
+        script.parentNode!, p.OR(scriptMatcher, styleMatcher, linkMatcher));
+    const scriptIndex = orderSensitiveSiblings.indexOf(script);
+    const afterScriptSiblings = orderSensitiveSiblings.slice(scriptIndex);
+
+
+    // Insert a "loader moved" comment fragment into the head.
     dom5.insertBefore(headElement, script, loaderMovedComment);
-    if (!bodyElement.childNodes) {
-      bodyElement.childNodes = [];
-    }
-    for (let i = 1, len = scriptSiblingsFollowing.length; i <= len; i++) {
-      const releventScript = scriptSiblingsFollowing[len - i];
+    // Move elements to the top of the body in reverse order, so that the
+    // first moved element is prepended last, preserving the original order.
+    afterScriptSiblings.reverse();
+    for (const releventScript of afterScriptSiblings) {
       dom5.insertBefore(
           bodyElement, bodyElement.childNodes[0] || null, releventScript);
     }
+    // Finally, inject the es5-adapter shim at the top of the body.
     dom5.insertBefore(
         bodyElement, bodyElement.childNodes[0] || null, es5AdapterScript);
 
