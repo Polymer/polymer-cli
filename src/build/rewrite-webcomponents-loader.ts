@@ -1,5 +1,5 @@
 import * as dom5 from 'dom5';
-import {predicates} from 'dom5';
+import {predicates as p} from 'dom5';
 import * as parse5 from 'parse5';
 import * as stream from 'stream';
 import * as url from 'url';
@@ -14,28 +14,28 @@ const attrValueMatches = (attrName: string, regex: RegExp) => {
 };
 
 const webcomponentsLoaderRegex = /\bwebcomponents\-(loader|lite)\.js\b/;
-const webcomponentsLoaderMatcher = predicates.AND(
-    predicates.hasTagName('script'),
+const webcomponentsLoaderMatcher = p.AND(
+    p.hasTagName('script'),
     attrValueMatches('src', webcomponentsLoaderRegex));
-const headMatcher = predicates.hasTagName('head');
-const bodyMatcher = predicates.hasTagName('body');
-const scriptMatcher = predicates.AND(
-    predicates.hasTagName('script'),
-    predicates.OR(
+const headMatcher = p.hasTagName('head');
+const bodyMatcher = p.hasTagName('body');
+const scriptMatcher = p.AND(
+    p.hasTagName('script'),
+    p.OR(
         webcomponentsLoaderMatcher,
-        predicates.NOT(predicates.hasAttr('type')),
-        predicates.hasAttrValue('type', 'text/javascript'),
-        predicates.hasAttrValue('type', 'application/javascript')));
-const linkMatcher = predicates.AND(
-    predicates.hasTagName('link'),
-    predicates.OR(
-        predicates.hasAttrValue('rel', 'import'),
-        predicates.hasAttrValue('rel', 'stylesheet')));
-const styleMatcher = predicates.AND(
-    predicates.hasTagName('style'),
-    predicates.OR(
-        predicates.NOT(predicates.hasAttr('type')),
-        predicates.hasAttrValue('type', 'text/css')));
+        p.NOT(p.hasAttr('type')),
+        p.hasAttrValue('type', 'text/javascript'),
+        p.hasAttrValue('type', 'application/javascript')));
+const linkMatcher = p.AND(
+    p.hasTagName('link'),
+    p.OR(
+        p.hasAttrValue('rel', 'import'),
+        p.hasAttrValue('rel', 'stylesheet')));
+const styleMatcher = p.AND(
+    p.hasTagName('style'),
+    p.OR(
+        p.NOT(p.hasAttr('type')),
+        p.hasAttrValue('type', 'text/css')));
 
 
 /**
@@ -129,7 +129,7 @@ export class UseES5WebcomponentsLoader extends stream.Transform {
     // loader down to the body so that the es5 adaperter script shim will work
     const scriptSiblings = dom5.queryAll(
         script.parentNode!,
-        dom5.predicates.OR(scriptMatcher, styleMatcher, linkMatcher));
+        p.OR(scriptMatcher, styleMatcher, linkMatcher));
     const scriptSiblingsFollowing =
         scriptSiblings.splice(scriptSiblings.indexOf(script));
     dom5.insertBefore(headElement, script, loaderMovedComment);
