@@ -17,7 +17,7 @@ import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
 
 import mergeStream = require('merge-stream');
-import {PolymerProject, addServiceWorker, addPushManifest, SWConfig, HtmlSplitter} from 'polymer-build';
+import {PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
@@ -88,6 +88,10 @@ export async function build(
     logger.info(`(${buildName}) Building...`);
   });
 
+  if (options.addPushManifest) {
+    buildStream = buildStream.pipe(polymerProject.addPushManifest());
+  }
+
   // Finish the build stream by piping it into the final build directory.
   buildStream = buildStream.pipe(dest(buildDirectory));
 
@@ -104,10 +108,6 @@ export async function build(
   // There is nothing left to do, so wait for the build stream to complete.
   await waitFor(buildStream);
 
-  // Collect any final build steps that read from the final application as
-  // written to disk.
-  const onFinishBuildSteps = [];
-
   if (options.addServiceWorker) {
     logger.debug(`Generating service worker...`);
     if (swConfig) {
@@ -117,24 +117,13 @@ export async function build(
           `No service worker configuration found at ` +
           `${swPrecacheConfigPath}, continuing with defaults`);
     }
-    onFinishBuildSteps.push(addServiceWorker({
+    await addServiceWorker({
       buildRoot: buildDirectory,
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
       bundled: options.bundle,
-    }));
+    });
   }
-
-  if (options.addPushManifest) {
-    logger.debug(`Generating push manifest...`);
-    onFinishBuildSteps.push(addPushManifest({
-      buildRoot: buildDirectory,
-      project: polymerProject,
-    }));
-  }
-
-  // Perform any final build steps.
-  await Promise.all(onFinishBuildSteps);
 
   logger.info(`(${buildName}) Build complete!`);
 }
