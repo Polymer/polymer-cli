@@ -155,8 +155,10 @@ export class Github {
     const maxSatisfyingRelease =
         releases.find((r) => r.tag_name === maxSatisfyingReleaseVersion);
     if (!maxSatisfyingRelease) {
-      throw new Error(`${this._owner}/${this._repo
-                      } has no releases matching ${semverRange}.`);
+      throw new Error(
+          `${this._owner}/${this._repo} has no releases matching ${
+                                                                   semverRange
+                                                                 }.`);
     }
     return maxSatisfyingRelease;
   }

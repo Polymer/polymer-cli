@@ -1,10 +1,11 @@
 /*
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt The complete set of authors may be found
+ * at http://polymer.github.io/AUTHORS.txt The complete set of contributors may
+ * be found at http://polymer.github.io/CONTRIBUTORS.txt Code distributed by
+ * Google as part of the polymer project is also subject to an additional IP
+ * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
 'use strict';
@@ -23,12 +24,16 @@ const GithubResponseError = GithubModule.GithubResponseError;
 suite('github/github', () => {
 
   suite('tokenFromFile()', () => {
-    test.skip('returns a token from file if that file exists', () => {
-      // not currently in use, add tests if put back into use
-    });
-    test.skip('returns null if token file cannot be read', () => {
-      // not currently in use, add tests if put back into use
-    });
+    test.skip(
+        'returns a token from file if that file exists',
+        () => {
+            // not currently in use, add tests if put back into use
+        });
+    test.skip(
+        'returns null if token file cannot be read',
+        () => {
+            // not currently in use, add tests if put back into use
+        });
   });
 
   suite('extractReleaseTarball()', () => {
@@ -39,7 +44,7 @@ suite('github/github', () => {
       const mockRequestApi = (options) => {
         requestedUrl = options.url;
         return fs.createReadStream(
-        path.join(__dirname, 'github-test-data/test_tarball.tgz'));
+            path.join(__dirname, 'github-test-data/test_tarball.tgz'));
       };
       const github = new Github({
         owner: 'TEST_OWNER',
@@ -58,8 +63,8 @@ suite('github/github', () => {
         const readStream = new PassThrough();
         setTimeout(() => {
           readStream.emit('response', {
-          statusCode: 404,
-          statusMessage: 'TEST MESSAGE - 404',
+            statusCode: 404,
+            statusMessage: 'TEST MESSAGE - 404',
           });
         }, 10);
         return readStream;
@@ -71,12 +76,14 @@ suite('github/github', () => {
       });
       const tmpDir = temp.mkdirSync();
       return github.extractReleaseTarball('http://foo.com/bar.tar', tmpDir)
-        .then(() => {
-          throw new Error('GithubResponseError expected');
-        }).catch((err) => {
-          assert.instanceOf(err, GithubResponseError);
-          assert.equal(err.message, 'unexpected response: 404 TEST MESSAGE - 404');
-        });
+          .then(() => {
+            throw new Error('GithubResponseError expected');
+          })
+          .catch((err) => {
+            assert.instanceOf(err, GithubResponseError);
+            assert.equal(
+                err.message, 'unexpected response: 404 TEST MESSAGE - 404');
+          });
     });
 
   });
@@ -113,52 +120,56 @@ suite('github/github', () => {
     test('calls the github API with correct params', () => {
       getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('*')
-        .then(() => {
-          assert.isOk(getReleasesStub.calledWithExactly({
-            owner: 'TEST_OWNER',
-            repo: 'TEST_REPO',
-            per_page: 100,
-          }));
-        });
+      return github.getSemverRelease('*').then(() => {
+        assert.isOk(getReleasesStub.calledWithExactly({
+          owner: 'TEST_OWNER',
+          repo: 'TEST_REPO',
+          per_page: 100,
+        }));
+      });
     });
 
-    test('resolves with latest semver release that matches the range: *', () => {
-      getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
+    test(
+        'resolves with latest semver release that matches the range: *', () => {
+          getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('*')
-        .then((release) => {
-          assert.deepEqual(release, {tag_name: 'v2.1.0'});
+          return github.getSemverRelease('*').then((release) => {
+            assert.deepEqual(release, {tag_name: 'v2.1.0'});
+          });
         });
-    });
 
-    test('resolves with latest semver release that matches the range: ^v1.0.0', () => {
-      getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
+    test(
+        'resolves with latest semver release that matches the range: ^v1.0.0',
+        () => {
+          getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('^v1.0.0')
-        .then((release) => {
-          assert.deepEqual(release, {tag_name: 'v1.2.1'});
+          return github.getSemverRelease('^v1.0.0').then((release) => {
+            assert.deepEqual(release, {tag_name: 'v1.2.1'});
+          });
         });
-    });
 
-    test('resolves with latest semver release that matches the range: ^v2.0.0', () => {
-      getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
+    test(
+        'resolves with latest semver release that matches the range: ^v2.0.0',
+        () => {
+          getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('^v2.0.0')
-        .then((release) => {
-          assert.deepEqual(release, {tag_name: 'v2.1.0'});
+          return github.getSemverRelease('^v2.0.0').then((release) => {
+            assert.deepEqual(release, {tag_name: 'v2.1.0'});
+          });
         });
-    });
 
     test('rejects with an error if no matching releases are found', () => {
       getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
       return github.getSemverRelease('^v3.0.0')
-        .then(() => {
-          throw new Error('Error expected');
-        }).catch((err) => {
-          assert.equal(err.message, 'TEST_OWNER/TEST_REPO has no releases matching ^v3.0.0.');
-        });
+          .then(() => {
+            throw new Error('Error expected');
+          })
+          .catch((err) => {
+            assert.equal(
+                err.message,
+                'TEST_OWNER/TEST_REPO has no releases matching ^v3.0.0.');
+          });
     });
   });
 
