@@ -1,7 +1,7 @@
 # Changelog
 
 <!--## Unreleased-->
-
+- `init`: Init template elements now properly inherit from the given element/app name.
 - `build`: Fixed a bug where `--insert-prefetch-links` would generate 404ing imports.
 
 ## v0.18.0-pre.15 [03-22-2017]

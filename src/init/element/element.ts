@@ -70,6 +70,8 @@ export function createElementGenerator(templateName: string):
       ];
 
       this.props = await this.prompt(prompts);
+      this.props.elementClassName = this.props.elementName.replace(
+          /(^|\W)+(.)/g, (_match, _p0, p1) => p1.toUpperCase());
     }
 
     writing() {
