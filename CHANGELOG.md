@@ -3,6 +3,7 @@
 <!--## Unreleased-->
 
 - `build`: Fixed a bug where `--insert-prefetch-links` would generate 404ing imports.
+- `init`: Updates polymer 2.0 application & element tests to improve and fix broken tests
 
 ## v0.18.0-pre.15 [03-22-2017]
 
