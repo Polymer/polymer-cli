@@ -90,11 +90,6 @@ export async function build(
 
   if (options.addPushManifest) {
     buildStream = buildStream.pipe(polymerProject.addPushManifest());
-    if (!options.addServiceWorker) {
-      logger.warn('Push manifest generated without a service worker. ' +
-      'HTTP2/Push relies on service workers to prevent duplicate file ' +
-      'requests and pushes. See `polymer help build` for more information.');
-    }
   }
 
   // Finish the build stream by piping it into the final build directory.

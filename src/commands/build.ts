@@ -73,10 +73,8 @@ export class BuildCommand implements Command {
     {
       name: 'add-push-manifest',
       type: Boolean,
-      description: 'Generate an application push manifest for HTTP2 ' +
-          'push-enabled servers to read. Must be used with a service worker ' +
-          '(`--add-service-worker`) to prevent unneccesary duplicate file ' +
-          'requests and pushes.'
+      description: 'Generate a push manifest for your application for http2' +
+          'push-enabled servers to read.'
     },
     {
       name: 'sw-precache-config',
