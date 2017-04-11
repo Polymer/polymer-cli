@@ -3,7 +3,8 @@
 <!--## Unreleased-->
 
 - `build`: Fixed a bug where `--insert-prefetch-links` would generate 404ing imports.
-- `init`: For `polymer-2-element` template, remove iron-component-page from the served `index.html` file.
+- `init`: For `polymer-2-element` template, remove iron-component-page from the served `index.html` file until it can support Polymer 2.0 class-based elements.
+
 ## v0.18.0-pre.15 [03-22-2017]
 
 - `build`: Update automatic `webcomponentsjs` polyfilling to use `custom-elements-es5-adapter.js` instead of broken `webcomponents-es5-loader.js`. Fixes compiled, bundled builds in Chrome. (See [#605](https://github.com/Polymer/polymer-cli/issues/605))
