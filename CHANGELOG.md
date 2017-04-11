@@ -2,8 +2,9 @@
 
 <!--## Unreleased-->
 
-- `build`: Added `--app-push-manifest`/`addPushManifest` option for generating a [`push-manifest.json`](https://github.com/GoogleChrome/http2-push-manifest) file for your project.
-
+- `build`: Added `--add-push-manifest`/`addPushManifest` option for generating a [`push-manifest.json`](https://github.com/GoogleChrome/http2-push-manifest) file for your project.
+- `build`: Fixed a bug where `--insert-prefetch-links` would generate 404ing imports.
+- `init`: Updates polymer 2.0 application & element tests to improve and fix broken tests
 
 ## v0.18.0-pre.15 [03-22-2017]
 

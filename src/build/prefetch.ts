@@ -17,6 +17,7 @@ import * as parse5 from 'parse5';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {BuildAnalyzer, DepsIndex, PolymerProject} from 'polymer-build';
+import {urlFromPath} from 'polymer-build/lib/path-transformers';
 import {ProjectConfig} from 'polymer-project-config';
 import {Transform} from 'stream';
 
@@ -36,26 +37,11 @@ export class PrefetchTransform extends Transform {
     this.fileMap = new Map<string, File>();
   }
 
-  pullUpDeps(file: File, deps: string[], type: 'import'|'prefetch') {
-    let contents = file.contents!.toString();
-    const ast = parse5.parse(contents);
-    // parse5 always produces a <head> element
-    const head = dom5.query(ast, dom5.predicates.hasTagName('head'))!;
-    for (let dep of deps) {
-      if (dep.startsWith(this.config.root)) {
-        dep = path.relative(file.dirname, dep);
-      }
-      // prefetched deps should be absolute, as they will be in the main file
-      if (type === 'prefetch') {
-        dep = path.join('/', dep);
-      }
-      const link = dom5.constructors.element('link');
-      dom5.setAttribute(link, 'rel', type);
-      dom5.setAttribute(link, 'href', dep);
-      dom5.append(head, link);
-    }
-    contents = parse5.serialize(ast);
-    file.contents = new Buffer(contents);
+  pullUpDeps(file: File, deps: string[], rel: 'import'|'prefetch') {
+    const contents = file.contents!.toString();
+    const url = urlFromPath(this.config.root, file.path);
+    const updated = createLinks(contents, url, deps, rel);
+    file.contents = new Buffer(updated);
   }
 
   _transform(
@@ -120,4 +106,34 @@ export class PrefetchTransform extends Transform {
       done();
     });
   }
+}
+
+/**
+ * Returns the given HTML updated with import or prefetch links for the given
+ * dependencies. The given url and deps are expected to be project-relative
+ * URLs (e.g. "index.html" or "src/view.html").
+ *
+ * When rel is prefetch, we assume we have the top-level entry point (which can
+ * be served from any URL), and output absolute URLs. Otherwise we output
+ * relative URLs.
+ */
+export function createLinks(
+    html: string, url: string, deps: string[], rel: 'import'|'prefetch'):
+    string {
+  const ast = parse5.parse(html);
+  // parse5 always produces a <head> element.
+  const head = dom5.query(ast, dom5.predicates.hasTagName('head'))!;
+  for (const dep of deps) {
+    let href;
+    if (rel === 'prefetch') {
+      href = '/' + dep;
+    } else {
+      href = path.posix.relative(path.posix.dirname(url), dep);
+    }
+    const link = dom5.constructors.element('link');
+    dom5.setAttribute(link, 'rel', rel);
+    dom5.setAttribute(link, 'href', href);
+    dom5.append(head, link);
+  }
+  return parse5.serialize(ast);
 }
