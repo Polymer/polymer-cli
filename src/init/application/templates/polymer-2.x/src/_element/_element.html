@@ -11,7 +11,7 @@
   </template>
 
   <script>
-    class MyApplication extends Polymer.Element {
+    class <%= elementClassName %> extends Polymer.Element {
       static get is() { return '<%= elementName %>'; }
       static get properties() {
         return {
@@ -23,6 +23,6 @@
       }
     }
 
-    window.customElements.define(MyApplication.is, MyApplication);
+    window.customElements.define(<%= elementClassName %>.is, <%= elementClassName %>);
   </script>
 </dom-module>

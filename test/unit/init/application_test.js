@@ -46,7 +46,7 @@ suite('init/application', () => {
               yoAssert.file(['bower.json']);
               yoAssert.fileContent(
                   'src/foobar-app/foobar-app.html',
-                  'class MyApplication extends Polymer.Element');
+                  'class FoobarApp extends Polymer.Element');
               done();
             });
       });
