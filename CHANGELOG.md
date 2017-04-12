@@ -6,6 +6,7 @@
 - `init`: Init template elements now properly inherit from the given element/app name.
 - `init`: For `polymer-2-element` template, remove iron-component-page from the served `index.html` file until it can support Polymer 2.0 class-based elements.
 - `init`: Updates polymer 2.0 application & element tests to improve and fix broken tests
+- `init`: Updates template READMEs
 
 ## v0.18.0-pre.15 [03-22-2017]
 
