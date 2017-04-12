@@ -4,6 +4,9 @@
 
 - `build`: Added `--add-push-manifest`/`addPushManifest` option for generating a [`push-manifest.json`](https://github.com/GoogleChrome/http2-push-manifest) file for your project.
 - `build`: Fixed a bug where `--insert-prefetch-links` would generate 404ing imports.
+- `build`: Update automatic `webcomponentsjs` polyfilling to move it and all affected elements following it into the body so that the `custom-elements-es5-adapter.js` can work properly in IE11. (See [#627](https://github.com/Polymer/polymer-cli/issues/627))
+- `init`: Init template elements now properly inherit from the given element/app name.
+- `init`: For `polymer-2-element` template, remove iron-component-page from the served `index.html` file until it can support Polymer 2.0 class-based elements.
 - `init`: Updates polymer 2.0 application & element tests to improve and fix broken tests
 
 ## v0.18.0-pre.15 [03-22-2017]
