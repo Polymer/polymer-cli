@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt The complete set of authors may be found
+ * at http://polymer.github.io/AUTHORS.txt The complete set of contributors may
+ * be found at http://polymer.github.io/CONTRIBUTORS.txt Code distributed by
+ * Google as part of the polymer project is also subject to an additional IP
+ * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 'use strict';
 
@@ -23,7 +24,8 @@ const polymerInit = require('../../../lib/init/init');
 var isPlatformWin = /^win/.test(process.platform);
 
 function stripAnsi(str) {
-  let ansiRegex = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+  let ansiRegex =
+      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
   return str.replace(ansiRegex, '');
 }
 
@@ -54,9 +56,10 @@ suite('init', () => {
         [GENERATOR_NAME]: GENERATOR_NAME,
       });
 
-      return polymerInit.runGenerator(GENERATOR_NAME, {env: yeomanEnv}).then(() => {
-        assert.isOk(yeomanEnv.run.calledWith(GENERATOR_NAME));
-      });
+      return polymerInit.runGenerator(GENERATOR_NAME, {env: yeomanEnv})
+          .then(() => {
+            assert.isOk(yeomanEnv.run.calledWith(GENERATOR_NAME));
+          });
     });
 
     test('fails if an unknown generator is requested', () => {
@@ -66,22 +69,34 @@ suite('init', () => {
         'TEST-GENERATOR': 'TEST-GENERATOR',
       });
 
-      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME, {env: yeomanEnv}).then(() => {
-        throw new Error('The promise should have been rejected before it got here');
-      }, (error) => {
-        assert.equal(error.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
-      });
+      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME, {env: yeomanEnv})
+          .then(
+              () => {
+                throw new Error(
+                    'The promise should have been rejected before it got here');
+              },
+              (error) => {
+                assert.equal(
+                    error.message,
+                    `Template ${UNKNOWN_GENERATOR_NAME} not found`);
+              });
     });
 
     test('works with the default yeoman environment', () => {
       // Note: Do not use a fake Yeoman environment in this test so that we get
       // coverage of the case where env isn't specified.
       const UNKNOWN_GENERATOR_NAME = 'UNKNOWN-GENERATOR';
-      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME).then(() => {
-        throw new Error('The promise should have been rejected before it got here');
-      }, (error) => {
-        assert.equal(error.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
-      });
+      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME)
+          .then(
+              () => {
+                throw new Error(
+                    'The promise should have been rejected before it got here');
+              },
+              (error) => {
+                assert.equal(
+                    error.message,
+                    `Template ${UNKNOWN_GENERATOR_NAME} not found`);
+              });
     });
 
   });
@@ -160,7 +175,9 @@ suite('init', () => {
     });
 
     test('works with the default yeoman environment', () => {
-      sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
+      sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({
+        generatorName: 'TEST',
+      }));
       polymerInit.runGenerator = function(name, options) {};
       return polymerInit.promptGeneratorSelection().catch((error) => {
         assert.equal(error.message, 'Template TEST not found');
@@ -168,76 +185,108 @@ suite('init', () => {
     });
 
     test('prompts with a list to get generatorName property from user', () => {
-      let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
-      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
-        assert.equal(error.message, 'Template TEST not found');
-      }).then(() => {
-        assert.isTrue(promptStub.calledOnce);
-        assert.equal(promptStub.firstCall.args[0][0].type, 'list');
-        assert.equal(promptStub.firstCall.args[0][0].name, 'generatorName');
-        assert.equal(promptStub.firstCall.args[0][0].message,  'Which starter template would you like to use?');
-      });
+      let promptStub = sandbox.stub(inquirer, 'prompt')
+                           .returns(Promise.resolve({generatorName: 'TEST'}));
+      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock})
+          .catch((error) => {
+            assert.equal(error.message, 'Template TEST not found');
+          })
+          .then(() => {
+            assert.isTrue(promptStub.calledOnce);
+            assert.equal(promptStub.firstCall.args[0][0].type, 'list');
+            assert.equal(promptStub.firstCall.args[0][0].name, 'generatorName');
+            assert.equal(
+                promptStub.firstCall.args[0][0].message,
+                'Which starter template would you like to use?');
+          });
     });
 
     test('prompts with a list of all registered generators', () => {
-      let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
-      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
-        assert.equal(error.message, 'Template TEST not found');
-      }).then(() => {
-        let choices = promptStub.firstCall.args[0][0].choices;
-        assert.equal(choices.length, GENERATORS.length);
+      let promptStub = sandbox.stub(inquirer, 'prompt')
+                           .returns(Promise.resolve({generatorName: 'TEST'}));
+      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock})
+          .catch((error) => {
+            assert.equal(error.message, 'Template TEST not found');
+          })
+          .then(() => {
+            let choices = promptStub.firstCall.args[0][0].choices;
+            assert.equal(choices.length, GENERATORS.length);
 
-        for (let choice of choices) {
-          let generator = GENERATORS.find(generator => generator.generatorName === choice.value);
-          assert.isDefined(generator, `generator not found: ${choice.value}`);
-          assert.oneOf(stripAnsi(choice.name), [generator.shortName, `${generator.shortName} - ${generator.description}`]);
-          assert.equal(choice.value, generator.generatorName);
-          assert.equal(choice.short, generator.shortName);
-        }
-      });
+            for (let choice of choices) {
+              let generator = GENERATORS.find(
+                  generator => generator.generatorName === choice.value);
+              assert.isDefined(
+                  generator, `generator not found: ${choice.value}`);
+              assert.oneOf(stripAnsi(choice.name), [
+                generator.shortName,
+                `${generator.shortName} - ${generator.description}`,
+              ]);
+              assert.equal(choice.value, generator.generatorName);
+              assert.equal(choice.short, generator.shortName);
+            }
+          });
     });
 
-    test('includes user-provided generators in the list when properly installed/registered', () => {
-      let yeomanEnv = new YeomanEnvironment();
-      let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
-      helpers.registerDependencies(yeomanEnv, [[helpers.createDummyGenerator(), 'polymer-init-custom-template:app']]);
-      return polymerInit.promptGeneratorSelection({env: yeomanEnv}).catch((error) => {
-        assert.equal(error.message, 'Template TEST not found');
-      }).then(() => {
-        assert.isTrue(promptStub.calledOnce);
-        let choices = promptStub.firstCall.args[0][0].choices;
-        let customGeneratorChoice = choices[choices.length-1];
-        assert.equal(stripAnsi(customGeneratorChoice.name), 'custom-template');
-        assert.equal(customGeneratorChoice.value, 'polymer-init-custom-template:app');
-        assert.equal(customGeneratorChoice.short, 'custom-template');
-      });
-    });
+    test(
+        'includes user-provided generators in the list when properly installed/registered',
+        () => {
+          let yeomanEnv = new YeomanEnvironment();
+          let promptStub =
+              sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({
+                generatorName: 'TEST',
+              }));
+          helpers.registerDependencies(yeomanEnv, [[
+                                         helpers.createDummyGenerator(),
+                                         'polymer-init-custom-template:app',
+                                       ]]);
+          return polymerInit.promptGeneratorSelection({env: yeomanEnv})
+              .catch((error) => {
+                assert.equal(error.message, 'Template TEST not found');
+              })
+              .then(() => {
+                assert.isTrue(promptStub.calledOnce);
+                let choices = promptStub.firstCall.args[0][0].choices;
+                let customGeneratorChoice = choices[choices.length - 1];
+                assert.equal(
+                    stripAnsi(customGeneratorChoice.name), 'custom-template');
+                assert.equal(
+                    customGeneratorChoice.value,
+                    'polymer-init-custom-template:app');
+                assert.equal(customGeneratorChoice.short, 'custom-template');
+              });
+        });
 
     test('prompts the user with a list', () => {
-      let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
+      let promptStub = sandbox.stub(inquirer, 'prompt')
+                           .returns(Promise.resolve({generatorName: 'TEST'}));
 
-      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
-        assert.equal(error.message, 'Template TEST not found');
-      }).then(() => {
-        assert.isTrue(promptStub.calledOnce);
-        assert.equal(promptStub.firstCall.args[0][0].type, 'list');
-      });
+      return polymerInit.promptGeneratorSelection({env: yeomanEnvMock})
+          .catch((error) => {
+            assert.equal(error.message, 'Template TEST not found');
+          })
+          .then(() => {
+            assert.isTrue(promptStub.calledOnce);
+            assert.equal(promptStub.firstCall.args[0][0].type, 'list');
+          });
     });
 
     if (isPlatformWin) {
-
       test('prompts with a rawlist if being used in MinGW shell', () => {
-        let promptStub = sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({generatorName: 'TEST'}));
-        sandbox.stub(childProcess, 'execSync').withArgs('uname -s').returns('mingw');
+        let promptStub = sandbox.stub(inquirer, 'prompt')
+                             .returns(Promise.resolve({generatorName: 'TEST'}));
+        sandbox.stub(childProcess, 'execSync')
+            .withArgs('uname -s')
+            .returns('mingw');
 
-        return polymerInit.promptGeneratorSelection({env: yeomanEnvMock}).catch((error) => {
-          assert.equal(error.message, 'Template TEST not found');
-        }).then(() => {
-          assert.isTrue(promptStub.calledOnce);
-          assert.equal(promptStub.firstCall.args[0][0].type, 'rawlist');
-        });
+        return polymerInit.promptGeneratorSelection({env: yeomanEnvMock})
+            .catch((error) => {
+              assert.equal(error.message, 'Template TEST not found');
+            })
+            .then(() => {
+              assert.isTrue(promptStub.calledOnce);
+              assert.equal(promptStub.firstCall.args[0][0].type, 'rawlist');
+            });
       });
-
     }
 
   });

@@ -1,11 +1,12 @@
 /**
  * @license
  * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt The complete set of authors may be found
+ * at http://polymer.github.io/AUTHORS.txt The complete set of contributors may
+ * be found at http://polymer.github.io/CONTRIBUTORS.txt Code distributed by
+ * Google as part of the polymer project is also subject to an additional IP
+ * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 'use strict';
 
@@ -19,31 +20,34 @@ suite('args', () => {
   suite('mergeArguments', () => {
 
     test('merges argument lists', () => {
-      const merged = argsLib.mergeArguments([[
-        {
-          name: 'one',
-          description: 'description one',
-          group: 'group one',
-        },
-        {
-          name: 'two',
-          type: String,
-          description: 'description two',
-          group: 'group two',
-        },
-      ],[
-        {
-          name: 'two',
-          description: 'description two modified',
-          group: 'group two',
-          multiple: true,
-        },
-        {
-          name: 'three',
-          description: 'description three',
-          group: 'group three',
-        },
-      ]]);
+      const merged = argsLib.mergeArguments([
+        [
+          {
+            name: 'one',
+            description: 'description one',
+            group: 'group one',
+          },
+          {
+            name: 'two',
+            type: String,
+            description: 'description two',
+            group: 'group two',
+          },
+        ],
+        [
+          {
+            name: 'two',
+            description: 'description two modified',
+            group: 'group two',
+            multiple: true,
+          },
+          {
+            name: 'three',
+            description: 'description three',
+            group: 'group three',
+          },
+        ],
+      ]);
       assert.deepEqual(merged, [
         {
           name: 'one',
@@ -80,8 +84,10 @@ suite('args', () => {
         for (const arg of command.args) {
           const name = arg.name;
           if (arg.defaultOption) {
-            assert.isNull(defaultOption, `multiple default options for ` +
-              `${command.name}: ${defaultOption} and ${name}`);
+            assert.isNull(
+                defaultOption,
+                `multiple default options for ` +
+                    `${command.name}: ${defaultOption} and ${name}`);
             defaultOption = name;
           }
           const globalArg = globals.get(name);
@@ -90,8 +96,10 @@ suite('args', () => {
               const commandValue = arg[prop];
               const globalValue = globalArg[prop];
               if (globalValue) {
-                assert.equal(globalValue, commandValue,
-                  `conflicting values for ${command.name} ${name}.${prop}`);
+                assert.equal(
+                    globalValue,
+                    commandValue,
+                    `conflicting values for ${command.name} ${name}.${prop}`);
               }
             }
           }
