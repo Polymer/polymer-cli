@@ -252,6 +252,10 @@ Use `index.html` as the entrypoint, or read from `polymer.json`:
 
 While the build command should support most projects, some users will need greater control over their build pipeline. If that's you, check out the [polymer-build](https://github.com/Polymer/polymer-build) library. Polymer-build can be called and customized programmatically, giving you much greater control than the CLI can provide. Visit the repo for usage information and examples.
 
+#### --js-compile
+
+When your application uses the `--js-compile` CLI flag (or polymer.json config property) your application is compiled from ES6 to ES5. For this to work properly, some older browsers need the `custom-elements-es5-adapter.js` shim in addition to the `webcomponents-loader.js`/`webcomponents-lite.js` polyfill. The build process will automatically inject this ES5 adapter into your application when `--js-compile` is enabled so that your application works as expected on older browsers.
+
 
 ### serve
 
