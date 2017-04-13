@@ -33,7 +33,7 @@
           assert.equal(element.prop1, '<%= name %>');
           var elementShadowRoot = element.shadowRoot;
           var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.outerHTML, '<h2>Hello <%= name %>!</h2>');
+          assert.equal(elementHeader.innerHTML, 'Hello <%= name %>!');
         });
 
         test('setting a property on the element works', function() {
@@ -42,7 +42,7 @@
           assert.equal(element.prop1, 'new-prop1');
           var elementShadowRoot = element.shadowRoot;
           var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.outerHTML, '<h2>Hello new-prop1!</h2>');
+          assert.equal(elementHeader.innerHTML, 'Hello new-prop1!');
         });
 
       });
