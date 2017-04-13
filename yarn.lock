@@ -219,17 +219,17 @@
     "@types/bluebird" "*"
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^4.0.30", "@types/node@^4.2.3":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-4.2.3.tgz#4405d19dcabae1fb0dfc9f267c8de5c114d47ce9"
+"@types/node@*", "@types/node@6.0.*", "@types/node@^6", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
+  version "6.0.65"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
 
 "@types/node@4.0.30":
   version "4.0.30"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.0.30.tgz#553f490ed3030311620f88003e7abfc0edcb301e"
 
-"@types/node@6.0.*", "@types/node@^6", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
-  version "6.0.65"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
+"@types/node@^4.0.30", "@types/node@^4.2.3":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-4.2.3.tgz#4405d19dcabae1fb0dfc9f267c8de5c114d47ce9"
 
 "@types/nomnom@0.0.28":
   version "0.0.28"
@@ -5200,9 +5200,9 @@ polyserve@0.16.0-prerelease.9:
     spdy "^3.3.3"
     ua-parser-js "^0.7.12"
 
-polyserve@^0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/polyserve/-/polyserve-0.16.0.tgz#2c0012724195514aedbb1f1aab9ebe2c6f9f96f3"
+polyserve@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/polyserve/-/polyserve-0.17.0.tgz#4d199a9145e134620f9c0c61dffa2fac866551b5"
   dependencies:
     "@types/babel-core" "^6.7.14"
     "@types/content-type" "^1.0.33"
