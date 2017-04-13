@@ -71,6 +71,12 @@ export class BuildCommand implements Command {
           'cache all files and assets on the client.'
     },
     {
+      name: 'add-push-manifest',
+      type: Boolean,
+      description: 'Generate a push manifest for your application for http2' +
+          'push-enabled servers to read.'
+    },
+    {
       name: 'sw-precache-config',
       type: String,
       description: 'Path to a file that exports configuration options for ' +
@@ -118,6 +124,7 @@ export class BuildCommand implements Command {
       return build(
           {
             addServiceWorker: !!options['add-service-worker'],
+            addPushManifest: !!options['add-push-manifest'],
             swPrecacheConfig: options['sw-precache-config'],
             insertPrefetchLinks: !!options['insert-prefetch-links'],
             bundle: !!options['bundle'],

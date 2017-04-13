@@ -5086,9 +5086,9 @@ polymer-analyzer@2.0.0-alpha.34:
     strip-indent "^2.0.0"
     typescript "^2.2.0"
 
-polymer-build@0.9.1:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-0.9.1.tgz#e3971aec554d42edd187e7284fc10d63c669e44e"
+polymer-build@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.0.0.tgz#ab16d78681d7a72ff17b9b215035470dab178385"
   dependencies:
     "@types/node" "^4.2.3"
     "@types/parse5" "^2.2.32"
@@ -5140,6 +5140,15 @@ polymer-linter@1.0.1:
 polymer-project-config@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-2.0.1.tgz#95f262fa6246c09d92e49914232543722255fc17"
+  dependencies:
+    "@types/node" "^6.0.41"
+    jsonschema "^1.1.1"
+    minimatch-all "^1.1.0"
+    plylog "^0.5.0"
+
+polymer-project-config@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-2.1.0.tgz#8ee3fea5bcb38ca945fa5688e6ccd751e4f942c0"
   dependencies:
     "@types/node" "^6.0.41"
     jsonschema "^1.1.1"
@@ -6315,9 +6324,9 @@ ternary-stream@^2.0.1:
     merge-stream "^1.0.0"
     through2 "^2.0.1"
 
-"test-fixture@github:polymerelements/test-fixture":
+test-fixture@PolymerElements/test-fixture:
   version "3.0.0-rc.1"
-  resolved "https://codeload.github.com/polymerelements/test-fixture/tar.gz/eb86ce25c850bb20523d47a55d07235f0fad5858"
+  resolved "https://codeload.github.com/PolymerElements/test-fixture/tar.gz/26118ef0467501c33c02316e7016a2837baba10f"
   dependencies:
     web-component-tester "^6.0.0-prerelease.5"
 
@@ -6619,13 +6628,9 @@ upper-case@^1.1.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/upper-case/-/upper-case-1.1.3.tgz#f6b4501c2ec4cdd26ba78be7222961de77621598"
 
-urijs@1.16.1:
+urijs@1.16.1, urijs@^1.16.1:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.16.1.tgz#859ad31890f5f9528727be89f1932c94fb4731e2"
-
-urijs@^1.16.1:
-  version "1.18.9"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.18.9.tgz#06d503d4f1907dcbd906fbd808b38457ec40dee6"
 
 url-parse-lax@^1.0.0:
   version "1.0.0"
