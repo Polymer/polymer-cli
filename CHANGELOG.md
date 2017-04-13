@@ -10,6 +10,7 @@
 - `init`: Update polymer 2.0 application & element tests to improve and fix broken tests
 - `init`: Update polymer 1.x application & element template WCT dependency to `^6.0.0-prerelease.5`.
 - `init`: Update polymer application & element READMEs
+- `serve`: Update to polyserve@v0.17.0 to support autocompilation when serving to Chromium, Edge browsers
 - [Breaking] Remove Node v4 support: Node v4 is no longer in Active LTS, so as per the [Polymer Tools Node.js Support Policy](https://www.polymer-project.org/2.0/docs/tools/node-support) the Polymer CLI will not support Node v4. Please update to Node v6 or later to continue using the latest verisons of Polymer tooling.
 
 ## v0.18.0-pre.15 [03-22-2017]
