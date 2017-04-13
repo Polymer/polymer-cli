@@ -18,9 +18,8 @@ $ polymer serve
 $ polymer build
 ```
 
-This will create a `build/` folder with `bundled/` and `unbundled/` sub-folders
-containing a bundled (Vulcanized) and unbundled builds, both run through HTML,
-CSS, and JS optimizers.
+This will create a `build/` folder with `default/` and `bower_components/` sub-folders
+containing a unbundled build, run through HTML, CSS, and JS optimizers. New build options have been added to give you more control over the generated build. These options can be defined in your project's `polymer.json`, or via CLI flags. Run `polymer build --help` to see a list of new supported CLI flags.
 
 You can serve the built versions by giving `polymer serve` a folder to serve
 from:
