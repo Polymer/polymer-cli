@@ -24,7 +24,6 @@ import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
-import {InjectES5Adapter} from './rewrite-webcomponents-loader';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
@@ -81,7 +80,8 @@ export async function build(
 
   const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
   if (compiledToES5) {
-    buildStream = buildStream.pipe(new InjectES5Adapter());
+    buildStream =
+        buildStream.pipe(polymerProject.addCustomElementsEs5Adapter());
   }
 
   buildStream.once('data', () => {
