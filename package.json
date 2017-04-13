@@ -4,7 +4,7 @@
   "description": "A commandline tool for Polymer projects",
   "main": "lib/polymer-cli.js",
   "engines": {
-    "node": ">=4.0"
+    "node": ">=6.0"
   },
   "bin": {
     "polymer": "bin/polymer.js"
@@ -82,7 +82,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "0.0.37",
-    "@types/node": "^4.2.2",
+    "@types/node": "^6",
     "chai": "^3.5.0",
     "clang-format": "=1.0.45",
     "depcheck": "^0.6.3",
