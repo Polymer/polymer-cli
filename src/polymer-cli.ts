@@ -55,7 +55,7 @@ process.on('unhandledRejection', (error: any) => {
  */
 function parseCLIArgs(commandOptions: any): {[name: string]: string} {
   commandOptions = commandOptions && commandOptions['_all'];
-  let parsedOptions = Object.assign({}, commandOptions);
+  const parsedOptions = Object.assign({}, commandOptions);
 
   if (commandOptions['extra-dependencies']) {
     parsedOptions.extraDependencies = commandOptions['extra-dependencies'];

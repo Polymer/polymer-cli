@@ -17,7 +17,7 @@ import * as fs from 'fs';
 import * as logging from 'plylog';
 import {SWConfig} from 'polymer-build';
 
-let logger = logging.getLogger('cli.build.load-config');
+const logger = logging.getLogger('cli.build.load-config');
 
 export function loadServiceWorkerConfig(configFile: string):
     Promise<SWConfig|null> {

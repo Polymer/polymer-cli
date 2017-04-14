@@ -38,11 +38,9 @@ function runCommand(path, args, options) {
              }
              if (code !== 0) {
                reject(new Error(
-                   `Error running ${path} with args ${
-                                                      args
-                                                    }. Got exit code: ${
-                                                                        code
-                                                                      }`));
+                   `Error running ${path} with args ${args}. ` +
+                   `Got exit code: ${code}`));
+
                return;
              }
              resolve(contents);
@@ -56,13 +54,8 @@ function runCommand(path, args, options) {
         return contents.then((out) => {
           if (!options.failureExpected) {
             console.log(
-                `Output of failed command 'node ${
-                                                  path
-                                                } ${
-                                                    args.join(' ')
-                                                  }' in directory ${
-                                                                    options.cwd
-                                                                  }`);
+                `Output of failed command 'node ${path} ${args.join(' ')}' ` +
+                `in directory ${options.cwd}`);
             console.log(out);
             throw err;
           } else {

@@ -81,13 +81,13 @@ export class LintCommand implements Command {
     const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
     const chalk: typeof chalkTypeOnly = require('chalk');
     this._loadPlugins(config);
-    let collectionsDocs = [];
+    const collectionsDocs = [];
     for (const collection of lintLib.registry.allRuleCollections) {
       collectionsDocs.push(`  ${
                                 chalk.bold(collection.code)
                               }: ${this._indent(collection.description)}`);
     }
-    let rulesDocs = [];
+    const rulesDocs = [];
     for (const rule of lintLib.registry.allRules) {
       rulesDocs.push(
           `  ${chalk.bold(rule.code)}: ${this._indent(rule.description)}`);

@@ -83,8 +83,9 @@
   "devDependencies": {
     "@types/fs-extra": "0.0.37",
     "@types/node": "^6",
+    "@polymer/tools-common": "^1.0.1",
     "chai": "^3.5.0",
-    "clang-format": "=1.0.45",
+    "clang-format": "=1.0.48",
     "depcheck": "^0.6.3",
     "fs-extra": "^2.0.0",
     "gulp": "^3.9.1",

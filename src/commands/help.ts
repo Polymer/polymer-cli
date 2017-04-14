@@ -26,7 +26,7 @@ import {globalArguments} from '../args';
 
 import {Command, CommandOptions} from './command';
 
-let logger = logging.getLogger('cli.command.help');
+const logger = logging.getLogger('cli.command.help');
 
 const b = chalk.blue;
 const m = chalk.magenta;
@@ -106,7 +106,7 @@ export class HelpCommand implements Command {
       return;
     }
 
-    let command = this.commands.get(commandName);
+    const command = this.commands.get(commandName);
     if (!command) {
       logger.error(`'${commandName}' is not an available command.`);
       console.log(this.generateGeneralUsage());

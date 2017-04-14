@@ -28,7 +28,7 @@ import {Environment} from '../environment/environment';
 
 import {Command, CommandOptions} from './command';
 
-let logger = logging.getLogger('cli.command.serve');
+const logger = logging.getLogger('cli.command.serve');
 
 export class ServeCommand implements Command {
   name = 'serve';
