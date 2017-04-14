@@ -84,7 +84,7 @@ export class LintCommand implements Command {
     const collectionsDocs = [];
     for (const collection of lintLib.registry.allRuleCollections) {
       collectionsDocs.push(`  ${
-      chalk.bold(collection.code)
+                                chalk.bold(collection.code)
                               }: ${this._indent(collection.description)}`);
     }
     const rulesDocs = [];

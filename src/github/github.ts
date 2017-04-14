@@ -157,7 +157,7 @@ export class Github {
     if (!maxSatisfyingRelease) {
       throw new Error(
           `${this._owner}/${this._repo} has no releases matching ${
-      semverRange
+                                                                   semverRange
                                                                  }.`);
     }
     return maxSatisfyingRelease;
