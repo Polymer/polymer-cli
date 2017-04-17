@@ -12,8 +12,9 @@
   "scripts": {
     "lint": "gulp lint",
     "build": "gulp build",
-    "test": "gulp lint test && gulp test:integration",
+    "test": "gulp lint test",
     "test:smoke": "gulp test",
+    "test:integration": "gulp test:integration",
     "format": "find src test gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
   },
   "repository": {
