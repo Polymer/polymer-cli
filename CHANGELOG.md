@@ -2,6 +2,21 @@
 
 ## v0.18.0 [04-13-2017]
 
+v0.18.0 contains our latest work to support both Polymer 1.x & 2.0 projects. There are a bunch of big new features included in this update, as well as several breaking changes since the latest version. Here is a quick summary of the major changes for anyone who is updating from our previous `latest`/`v0.17.0` version:
+
+- **New Polymer 2.0 Templates**: `polymer init` has added new Polymer 2.0 templates for starter elements, applications, and our latest Polymer Starter Kit & Shop applications. Run `polymer init` to see the whole list.
+- **Updated `lint` Command**: `polymer lint` is now powered by our newest version of [polymer-linter](https://github.com/Polymer/polymer-linter). The new linter can show you the exact location of any problems in your code, and is much more configurable. Run `polymer help lint` for more information.
+- **Updated `build` Command**: `polymer build` is now powered by our newest version of [polymer-build](https://github.com/Polymer/polymer-linter), which provides even more optimizations and features for customizing your build. Run `polymer help build` for more information.
+- **New Build Output**: The biggest change to `polymer build` behavior is that it no longer defaults to outputting two, optimized build targets. The new default behavior is to generate a single `/build/default` directory with all configurable optimizations turned off by default. To customize your build(s) and include different optimizations, you can either include CLI flags (like `--js-compile`) or custom polymer.json build configurations. See the latest [polymer.json "builds"](https://www.polymer-project.org/2.0/docs/tools/polymer-json#builds) specification for more information.
+- **New `analyze` Command:** Generates a JSON blob of metadata about your element(s). This can be useful to have for tooling and analysis.
+- **New `install` Command:** Like `bower install`, but with support for installing "variants" as defined in your `bower.json`. See [the glossary](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) for more information.
+- Remove Node v4 support: Node v4 is no longer in Active LTS, so as per the [Polymer Tools Node.js Support Policy](https://www.polymer-project.org/2.0/docs/tools/node-support) the Polymer CLI will not support Node v4 going forward. Please update to Node v6 or later to continue using the latest verisons of Polymer tooling.
+
+<details>
+  <summary><strong>See the Full v0.18.0 Pre-Release Changelog</strong></summary><p>
+
+#### v0.18.0 [04-13-2017]
+
 - `build`: Add `--add-push-manifest`/`addPushManifest` option for generating a [`push-manifest.json`](https://github.com/GoogleChrome/http2-push-manifest) file for your project.
 - `build`: Fix a bug where `--insert-prefetch-links` would generate 404ing imports.
 - `build`: Update automatic `webcomponentsjs` polyfilling to move it and all affected elements following it into the body so that the `custom-elements-es5-adapter.js` can work properly in IE11. (See [#627](https://github.com/Polymer/polymer-cli/issues/627))
@@ -13,19 +28,19 @@
 - `serve`: Update to polyserve@v0.17.0 to support autocompilation when serving to Chromium, Edge browsers.
 - [Breaking] Remove Node v4 support: Node v4 is no longer in Active LTS, so as per the [Polymer Tools Node.js Support Policy](https://www.polymer-project.org/2.0/docs/tools/node-support) the Polymer CLI will not support Node v4. Please update to Node v6 or later to continue using the latest verisons of Polymer tooling.
 
-## v0.18.0-pre.15 [03-22-2017]
+#### v0.18.0-pre.15 [03-22-2017]
 
 - `build`: Update automatic `webcomponentsjs` polyfilling to use `custom-elements-es5-adapter.js` instead of broken `webcomponents-es5-loader.js`. Fixes compiled, bundled builds in Chrome. (See [#605](https://github.com/Polymer/polymer-cli/issues/605))
 
-## v0.18.0-pre.14 [03-20-2017]
+#### v0.18.0-pre.14 [03-20-2017]
 
 - The experimental linter has graduated to be the new default. Removed `polymer experimental-lint` command. `polymer lint` now runs [polymer-linter](https://github.com/Polymer/polymer-linter). See the README and `polymer lint --help` for more info.
 
-## v0.18.0-pre.13 [03-08-2017]
+#### v0.18.0-pre.13 [03-08-2017]
 
 - When running `polymer build` and compiling JS to ES5, we will also rewrite script includes of `webcomponents-loader.js` to `webcomponents-es5-loader.js`.
 
-## v0.18.0-pre.12 [03-07-2017]
+#### v0.18.0-pre.12 [03-07-2017]
 
 - Add PSK 3.0 (Polymer 2.0 Polymer Starter Kit) template to the init command.
 - Automatically include un-optimized `webcomponentsjs` polyfills in builds.
@@ -33,7 +48,7 @@
   - Bundles now include optimizations specified in builds.
   - Much more detailed output of `analyze` command.
 
-## v0.18.0-pre.10 [02-21-2017]
+#### v0.18.0-pre.10 [02-21-2017]
 
 - **New `build` Behavior**: New build options have been added to give you more control over the generated build. These options can be defined in your project's `polymer.json`, or via CLI flags. Run `polymer build --help` to see a list of new supported CLI flags.
   - **Previously default behaviors (minifying JavaScript, generating service workers, etc) are now turned off by default.**
@@ -42,7 +57,7 @@
 - Update dependencies.
 - **New `experimental-lint` command**: configurable with per-project rulesets, either with cli args or in your polymer.json. Will soon replace the `lint` command, for now run it as `polymer experimental-lint`. Specify "polymer-2", "polymer-2-hybrid", or "polymer-1" to customize the lint warnings that you receive. Run `polymer help experimental-lint` for more detail.
 
-## v0.18.0-alpha.9
+#### v0.18.0-alpha.9
 
 - Fixed a bug where `polymer init` would crash if run from a folder with a
   package.json that's missing a name property. https://github.com/Polymer/polymer-cli/issues/186
@@ -50,11 +65,11 @@
 - Fixed a bug where `polymer test` would complain about the version of wct it was bundled with.
 - Updated dependencies.
 
-## v0.18.0-alpha.8
+#### v0.18.0-alpha.8
 
 - Updated dependencies.
 
-## v0.18.0-alpha.7
+#### v0.18.0-alpha.7
 
 - **Added `analyze` command:** Generates a JSON blob of metadata about your element(s). Useful for tooling and analysis.
 - **Added `install` command:** Installs "variants" defined in your `bower.json`.
@@ -68,6 +83,8 @@
 - Added support for v7.x of Node.js, dropped support for v5.x. Please move to an [actively maintained version of Node.js](https://github.com/nodejs/LTS) for the best experience.
 - Upgrade [web-component-tester 6.0](https://github.com/Polymer/web-component-tester/blob/master/CHANGELOG.md) which brings a number of breaking changes to the `test` command.
 - `init`: Fix duplicate names for sub-generators in a directory
+
+</p></details>
 
 ## v0.17.0
 
