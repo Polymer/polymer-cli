@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `serve` now respects the `entrypoint` configured in `polymer.json`.
+
 ## v0.18.0 [04-13-2017]
 
 v0.18.0 contains our latest work to support both Polymer 1.x & 2.0 projects. There are a bunch of big new features included in this update, as well as several breaking changes since the latest version. Here is a quick summary of the major changes for anyone who is updating from our previous `latest`/`v0.17.0` version:

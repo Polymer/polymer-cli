@@ -61,6 +61,7 @@ export class ServeCommand implements Command {
 
     const serverOptions: ServerOptions = {
       root: options['root'],
+      entrypoint: config.entrypoint,
       compile: options['compile'],
       port: options['port'],
       hostname: options['hostname'],
