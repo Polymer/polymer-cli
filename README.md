@@ -46,14 +46,14 @@ Below is an example of a simple `polymer.json` application configuration:
     "src/app-home.html",
     "src/app-view-1.html",
     "src/app-view-2.html",
-    "src/app-view-3.html",
+    "src/app-view-3.html"
   ],
-  "sources": [
+  "sourceGlobs": [
     "src/**/*",
     "images/**/*",
     "bower.json"
   ],
-  "includeDependencies": [
+  "extraDependencies": [
     "bower_components/additional-files-to-include-in-build/**/*",
     "bower_components/webcomponentsjs/webcomponents-lite.js"
   ]
@@ -95,7 +95,7 @@ Run `polymer help serve` for the full list of available options.
 
 ### `polymer lint [--rules RULE_SET] [options...]`
 
-Lint your project for common errors. Specify a set of linting rules via the `--rules` command option or your `polymer.json` configuration. To make sure you always use the correct rule set, we reccomend adding a "lint" section to your polymer.json like so:
+Lint your project for common errors. Specify a set of linting rules via the `--rules` command option or your `polymer.json` configuration. To make sure you always use the correct rule set, we recommend adding a "lint" section to your polymer.json like so:
 
 ```json
 "lint": {
