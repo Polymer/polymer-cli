@@ -28,7 +28,7 @@ $ yarn add global polymer-cli
 $ npm install -g polymer-cli
 ```
 
-For best results and a faster installation, we recommend installing with [yarn](https://yarnpkg.com/en/).
+For best results and a faster installation, we recom,end installing with [yarn](https://yarnpkg.com/en/).
 
 ## Configuration
 
@@ -48,7 +48,7 @@ Below is an example of a simple `polymer.json` application configuration:
     "src/app-view-2.html",
     "src/app-view-3.html"
   ],
-  "sourceGlobs": [
+  "sources": [
     "src/**/*",
     "images/**/*",
     "bower.json"
