@@ -7,10 +7,10 @@ The command-line tool for Polymer projects and Web Components.
 
 ## Features
 
-  - **init** - Initialize a Polymer project from custom templates
+  - **init** - Create a new Polymer project from pre-configured starter templates
   - **install** - Install bower dependencies as well as [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) for testing
   - **serve**	- Serve elements and applications locally
-  - **lint** - Lint a project to catch errors before your users
+  - **lint** - Lint a project to catch errors before your users do
   - **test** - Test your project with [`web-component-tester`](https://github.com/Polymer/web-component-tester/)
   - **build**	- Build an application optimized for production
   - **analyze** - Generate an analyzed JSON representation of your element or application
@@ -80,7 +80,7 @@ Run `polymer init` to choose a template from a list of all installed templates. 
 
 Install your dependencies, similar to running `bower install`.
 
-If the `--variants` option is provided, the command will also search your project's `bower.json` for  a `"variants"` property and install any [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) listed there as well as well. This is useful if you need to test your elements against multiple versions of Polymer and/or sets of dependencies.
+If the `--variants` option is provided, the command will also search your project's `bower.json` for a `"variants"` property and install any [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) listed there as well as well. This is useful if you need to test your elements against multiple versions of Polymer and/or sets of dependencies.
 
 
 ### `polymer serve [options...]`
