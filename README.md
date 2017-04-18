@@ -28,7 +28,7 @@ $ yarn add global polymer-cli
 $ npm install -g polymer-cli
 ```
 
-For best results and a faster installation, we reccomend installing with [yarn](https://yarnpkg.com/en/).
+For best results and a faster installation, we recommend installing with [yarn](https://yarnpkg.com/en/).
 
 ## Configuration
 
