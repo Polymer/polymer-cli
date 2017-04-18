@@ -9,8 +9,8 @@ The command-line tool for Polymer projects and Web Components.
 
   - **init** - Create a new Polymer project from pre-configured starter templates
   - **install** - Install bower dependencies as well as [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) for testing
-  - **serve**	- Serve elements and applications locally
-  - **lint** - Lint a project to catch errors before your users do
+  - **serve**	- Serve elements and applications during development
+  - **lint** - Lint a project to find and diagnose errors quickly
   - **test** - Test your project with [`web-component-tester`](https://github.com/Polymer/web-component-tester/)
   - **build**	- Build an application optimized for production
   - **analyze** - Generate an analyzed JSON representation of your element or application
@@ -23,17 +23,18 @@ The command-line tool for Polymer projects and Web Components.
 ## Installation
 
 ```bash
-$ npm install -g polymer-cli
-# or...
 $ yarn add global polymer-cli
+# or...
+$ npm install -g polymer-cli
 ```
 
+For best results and a faster installation, we reccomend installing with [yarn](https://yarnpkg.com/en/).
 
 ## Configuration
 
 An application can be configured for all commands via global flags: `--entrypoint`, `--shell`, etc.
 
-We recommend saving your configuration to a `polymer.json` configuration file in your project so that they can be read automatically for every command. Other project settings, like build and lint rules, can also be defined here. Read the [polymer.json spec](https://www.polymer-project.org/2.0/docs/tools/polymer-json) for a full list of all supported configurations.
+We recommend saving your configuration to a `polymer.json` configuration file in your project so that they can be read automatically for every command. Other project settings, like build and lint rules, can also be defined here. Read the [polymer.json spec](https://www.polymer-project.org/2.0/docs/tools/polymer-json) for a full list of all supported fields.
 
 Below is an example of a simple `polymer.json` application configuration:
 
@@ -67,7 +68,7 @@ Below is an example of a simple `polymer.json` application configuration:
 Run `polymer help` to get a helpful list of supported commands. Pass it a command name (ex: `polymer help serve`) to get detailed information about that command and the options it supports.
 
 
-### `polymer init [TEMPLATE]`
+### `polymer init`
 
 Initializes a Polymer project from one of several templates. Pre-bundled templates range from just bare-bones to fully featured applications like the [Polymer Starter Kit](https://github.com/PolymerElements/polymer-starter-kit).
 
@@ -87,14 +88,14 @@ If the `--variants` option is provided, the command will also search your projec
 
 Start a development server designed for serving Polymer & Web Component projects. Applications are served as-is, while elements are served from a special route where it can properly reference its dependencies.
 
+Additionally, the development server will automatically use [Babel](https://babeljs.io) to transpile any ES6 code down to ES5 for browsers that don't have native support for important ES6 features like classes.
+
 Run `polymer help serve` for the full list of available options.
 
 
 ### `polymer lint [--rules RULE_SET] [options...]`
 
-Lint your project for common errors. Provide a set of linting rules via either your `polymer.json` configuration file or the `--rules` command option.
-
-For example, if you wanted to lint a Polymer 2.0 Hybrid element, you would run `polymer lint --rules polymer-2-hybrid`. To make sure the correct rule set is always used, you should add the following field to your `polymer.json`:
+Lint your project for common errors. Specify a set of linting rules via the `--rules` command option or your `polymer.json` configuration. To make sure you always use the correct rule set, we reccomend adding a "lint" section to your polymer.json like so:
 
 ```json
 "lint": {
@@ -104,7 +105,7 @@ For example, if you wanted to lint a Polymer 2.0 Hybrid element, you would run `
 },
 ```
 
-Run `polymer help lint` for the full list of available options.
+Run `polymer help lint` for the full list of available options and rule sets.
 
 
 ### `polymer test [options...]`
@@ -116,9 +117,9 @@ Run `polymer help test` for the full list of available options.
 
 ### `polymer build [options...]`
 
-Build a Polymer application for production. This includes support for site optimizations like code bundling, minification, and ES6 compilation to run on older browsers.
+Build a Polymer application for production. This includes support for optimizations like code bundling, minification, and ES6 compilation to run on older browsers.
 
-Most optimizations and production enhancements are disabled by default. To make sure the correct build enhancements are always used, you can provide a set of build configurations via the ["builds"](https://www.polymer-project.org/2.0/docs/tools/polymer-json#builds) field of your `polymer.json` file:
+Most optimizations are disabled by default. To make sure the correct build enhancements are always used, you can provide a set of build configurations via the ["builds"](https://www.polymer-project.org/2.0/docs/tools/polymer-json#builds) field of your `polymer.json` file:
 
 ```json
 "builds": [{
