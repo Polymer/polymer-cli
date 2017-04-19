@@ -88,6 +88,49 @@ suite('github/github', () => {
 
   });
 
+  suite('removeUnwantedFiles()', () => {
+
+    function makeDirStruct(files) {
+      const tmpDir = temp.mkdirSync();
+      files.forEach((file) => {
+        const nodes = file.split('/');
+        let tmpPath = tmpDir;
+        nodes.forEach((node, index) => {
+          tmpPath = path.join(tmpPath, node);
+          if (fs.existsSync(tmpPath)) {
+            return;
+          }
+          if (index === nodes.length - 1) {
+            fs.writeFileSync(tmpPath, '');
+          } else {
+            fs.mkdirSync(tmpPath);
+          }
+        })
+      });
+      return tmpDir;
+    }
+
+    test('removes correct files', () => {
+      const tmpDir = makeDirStruct([
+        '.gitattributes',
+        '.github/CONTRIBUTING',
+        '.gitignore',
+        '.travis.yml',
+        'README',
+        'src/base.js',
+      ]);
+      const github = new Github({
+        owner: 'TEST_OWNER',
+        repo: 'TEST_REPO',
+      });
+      github.removeUnwantedFiles(tmpDir);
+      assert.deepEqual(
+          fs.readdirSync(tmpDir), ['.gitignore', 'README', 'src']);
+      assert.deepEqual(fs.readdirSync(path.join(tmpDir, 'src')), ['base.js']);
+    });
+
+  });
+
   suite('getSemverRelease()', () => {
 
     let getReleasesStub;
