@@ -69,7 +69,7 @@ Run `polymer init` to choose a template from a list of all installed templates. 
 
 Install your dependencies, similar to running `bower install`.
 
-If the `--variants` option is provided, the command will also search your project's `bower.json` for a `"variants"` property and install any [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) listed there as well as well. This is useful if you need to test your elements against multiple versions of Polymer and/or sets of dependencies.
+If the `--variants` option is provided, the command will also search your project's `bower.json` for a `"variants"` property and install any dependency variants listed there. [Dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) describe alternative sets of dependencies to install alongside your normal `bower_components/` folder. Other CLI commands like `polymer test` and `polymer serve` are able to read these alternative dependency sets and test/serve them in parallel. This is especially useful if you need to test your elements against multiple versions of Polymer and/or other dependencies.
 
 
 ### `polymer serve [options...]`
