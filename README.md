@@ -8,7 +8,7 @@ The command-line tool for Polymer projects and Web Components.
 ## Features
 
   - **init** - Create a new Polymer project from pre-configured starter templates
-  - **install** - Install bower dependencies as well as [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) for testing
+  - **install** - Install dependencies and [dependency variants](https://www.polymer-project.org/2.0/docs/glossary#dependency-variants) via Bower
   - **serve**	- Serve elements and applications during development
   - **lint** - Lint a project to find and diagnose errors quickly
   - **test** - Test your project with [`web-component-tester`](https://github.com/Polymer/web-component-tester/)
