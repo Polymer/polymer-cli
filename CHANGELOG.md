@@ -3,6 +3,7 @@
 ## Unreleased
 
 - `serve` now respects the `entrypoint` configured in `polymer.json`.
+- Update Node.js version pre-run check to match current Node.js version support.
 
 ## v0.18.0 [04-13-2017]
 

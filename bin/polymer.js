@@ -13,18 +13,25 @@
  */
 process.title = 'polymer';
 
-// Note! For this error message to be effective this file must not use >ES5
-// syntax, and it must run this before importing anything else, as other
-// node modules may use >=ES6 syntax.
+/*
+ * NOTE: The contents of this file should work on as many version of Node.js
+ * as possible. This means it *can not* use any >ES5 syntax and features.
+ * Other files, which may use >=ES2015 syntax, should only be loaded
+ * asynchronously after this version check has been performed.
+ */
 
+// NOTE 04-21-2017: Confirmed "semver" supports Node versions as low as 0.10
 var semver = require('semver');
-// Early exit if the user's node version is too low.
-if (!semver.satisfies(process.version, '>=4')) {
+
+// Exit early if the user's node version is too low.
+if (!semver.satisfies(process.version, '>=6')) {
   console.log(
-      'Polymer CLI requires at least Node v4. ' +
-      'You have ' + process.version + '.');
+      'Polymer CLI requires at least Node v6. ' +
+      'You have ' + process.version + '.\n' +
+      'See https://www.polymer-project.org/2.0/docs/tools/node-support ' +
+      'for details.');
   process.exit(1);
 }
 
-// Ok, safe to use ES6.
+// Ok, safe to load ES2015.
 require('../lib/run');
