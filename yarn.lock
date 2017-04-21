@@ -234,15 +234,15 @@
     "@types/bluebird" "*"
     "@types/node" "*"
 
-"@types/node@*", "@types/node@6.0.*", "@types/node@^6", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
+"@types/node@*", "@types/node@6.0.*", "@types/node@=6.0.65", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
   version "6.0.65"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
 
-"@types/node@4.0.30":
+"@types/node@4.0.30", "@types/node@^4.0.30":
   version "4.0.30"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.0.30.tgz#553f490ed3030311620f88003e7abfc0edcb301e"
 
-"@types/node@^4.0.30", "@types/node@^4.2.3":
+"@types/node@^4.2.3":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.2.3.tgz#4405d19dcabae1fb0dfc9f267c8de5c114d47ce9"
 
@@ -466,12 +466,6 @@
 "@types/vinyl@*", "@types/vinyl@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/vinyl/-/vinyl-2.0.0.tgz#fd213bf7f4136dde21fe1895500b12c186f8c268"
-  dependencies:
-    "@types/node" "*"
-
-"@types/vinyl@^1.1.29":
-  version "1.2.30"
-  resolved "https://registry.yarnpkg.com/@types/vinyl/-/vinyl-1.2.30.tgz#9115c0c45c40c575738906be9fb4df6f5b9e5013"
   dependencies:
     "@types/node" "*"
 
@@ -5178,13 +5172,13 @@ polymer-analyzer@2.0.0-alpha.34:
     strip-indent "^2.0.0"
     typescript "^2.2.0"
 
-polymer-build@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.0.0.tgz#ab16d78681d7a72ff17b9b215035470dab178385"
+polymer-build@1.1.0, polymer-build@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.1.0.tgz#909050868db9bc913a068ab14b96995c5201e0b5"
   dependencies:
     "@types/node" "^4.2.3"
     "@types/parse5" "^2.2.32"
-    "@types/vinyl" "^1.1.29"
+    "@types/vinyl" "^2.0.0"
     "@types/vinyl-fs" "0.0.28"
     dom5 "^2.0.1"
     multipipe "^1.0.2"
@@ -5292,9 +5286,9 @@ polyserve@0.16.0-prerelease.9:
     spdy "^3.3.3"
     ua-parser-js "^0.7.12"
 
-polyserve@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/polyserve/-/polyserve-0.17.0.tgz#4d199a9145e134620f9c0c61dffa2fac866551b5"
+polyserve@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/polyserve/-/polyserve-0.18.0.tgz#6eaf6c1e2ad0eae2d1a30b123a5aabba7cc0225c"
   dependencies:
     "@types/babel-core" "^6.7.14"
     "@types/content-type" "^1.0.33"
@@ -5341,6 +5335,7 @@ polyserve@^0.17.0:
     opn "^3.0.2"
     parse5 "^2.2.3"
     pem "^1.8.3"
+    polymer-build "^1.1.0"
     resolve "^1.0.0"
     send "^0.14.1"
     spdy "^3.3.3"
