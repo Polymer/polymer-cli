@@ -3,6 +3,7 @@
 ## Unreleased
 
 - `serve` now respects the `entrypoint` configured in `polymer.json`.
+- Remove global command-line behavior to run a locally install version of the CLI if it existed in the current working directory. This unexpected behavior was never documented but some users could be running an incorrect version of the CLI as a result.
 
 ## v0.18.0 [04-13-2017]
 

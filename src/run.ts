@@ -13,24 +13,20 @@
  */
 
 import * as logging from 'plylog';
-import * as resolve from 'resolve';
 import * as updateNotifier from 'update-notifier';
-import * as cliTypeOnly from './polymer-cli';
+import {PolymerCli} from './polymer-cli';
 
 const packageJson = require('../package.json');
-
 const logger = logging.getLogger('cli.main');
-
 
 // Update Notifier: Asynchronously check for package updates and, if needed,
 // notify on the next time the CLI is run.
-// See https://github.com/yeoman/update-notifier#how for how this works.
+// See https://github.com/yeoman/update-notifier#how for info on how this works.
 updateNotifier({pkg: packageJson}).notify();
 
-resolve('polymer-cli', {basedir: process.cwd()}, async(_error, path) => {
-  const lib: typeof cliTypeOnly = path ? require(path) : require('..');
+(async() => {
   const args = process.argv.slice(2);
-  const cli = new lib.PolymerCli(args);
+  const cli = new PolymerCli(args);
   try {
     const result = await cli.run();
     if (result && result.constructor &&
@@ -44,4 +40,4 @@ resolve('polymer-cli', {basedir: process.cwd()}, async(_error, path) => {
     }
     process.exit(1);
   }
-});
+})();
