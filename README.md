@@ -44,7 +44,7 @@ Here's a brief summary of the configuration options you can use to describe your
   - `root` (Defaults to current working directory): The web root of your application, can be a subfolder of your project directory.
   - `sources` (Defaults to `src/**/*`): The source files in your application.
 
-Configuration can be passed for all commands via the global CLI: `--entrypoint`, `--shell`, etc. However we recommend saving your configuration to a `polymer.json` configuration file in your project. This guarantees a single shared configuration that will be read automatically for every command. Other project settings, like build and lint rules, can also be defined here.
+Configuration can be passed to all commands via global CLI flags: `--entrypoint`, `--shell`, etc. However we recommend saving your configuration to a `polymer.json` configuration file in your project. This guarantees a single shared configuration that will be read automatically for every command. Other project settings, like build and lint rules, can also be defined here.
 
 Read the [polymer.json spec](https://www.polymer-project.org/2.0/docs/tools/polymer-json) for a full list of all supported fields with examples.
 
@@ -56,13 +56,13 @@ Read the [polymer.json spec](https://www.polymer-project.org/2.0/docs/tools/poly
 Run `polymer help` to get a helpful list of supported commands. Pass it a command name (ex: `polymer help serve`) to get detailed information about that command and the options it supports.
 
 
-### `polymer init`
+### `polymer init [TEMPLATE]`
 
 Initializes a Polymer project from one of several templates. Pre-bundled templates range from just bare-bones to fully featured applications like the [Polymer Starter Kit](https://github.com/PolymerElements/polymer-starter-kit).
 
 You can download and run templates built by our community as well. [Search npm](https://www.npmjs.com/search?q=generator-polymer-init) for a template you'd like to use. Then install it and the CLI will pick it up automatically.
 
-Run `polymer init` to choose a template from a list of all installed templates. Or if you know the template name before hand, you can provide it as a command argument.
+Run `polymer init` to choose a template from a list of all installed templates. Or, if you know the template name before hand, you can provide it as a command argument to select it automatically.
 
 
 ### `polymer install [--variants]`
