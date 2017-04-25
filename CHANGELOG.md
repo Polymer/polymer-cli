@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## v0.18.1 [04-25-2017]
+
+- `init` small template fixes.
 - `serve` now respects the `entrypoint` configured in `polymer.json`.
-- Update Node.js version pre-run check to match current Node.js version support.
-- Remove global command-line behavior to run a locally install version of the CLI if it existed in the current working directory. This unexpected behavior was never documented but some users could be running an incorrect version of the CLI as a result.
+- Remove ability to run a locally installed version of the CLI if it exists in the current working directory. This unexpected behavior was never documented but some users could be running an incorrect version of the CLI as a result.
+- Update Node.js version pre-run check to match latest supported versions.
 
 ## v0.18.0 [04-13-2017]
 
