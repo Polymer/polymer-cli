@@ -22,8 +22,6 @@ import {Transform} from 'stream';
 
 const babelPresetES2015 = require('babel-preset-es2015');
 const babiliPreset = require('babel-preset-babili');
-// const babiliPresetSafe = 
-//     babiliPreset.buildPreset({}, {simplifyComparisons: false});
 const babelPresetES2015NoModules =
     babelPresetES2015.buildPreset({}, {modules: false});
 
