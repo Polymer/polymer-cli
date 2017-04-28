@@ -69,8 +69,8 @@ export async function build(
 
   const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
   if (compiledToES5) {
-    buildStream =
-        buildStream.pipe(polymerProject.addCustomElementsEs5Adapter());
+    buildStream = buildStream.pipe(polymerProject.addCustomElementsEs5Adapter())
+                      .pipe(new InjectBabelHelpers());
   }
 
   buildStream.once('data', () => {

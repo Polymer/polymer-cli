@@ -12,6 +12,28 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import File = require('vinyl');
+
+/**
+ * Returns the string contents of a Vinyl File object, waiting for
+ * all chunks if the File is a stream.
+ */
+export async function getFileContents(file: File): Promise<string> {
+  if (file.isBuffer()) {
+    return file.contents.toString('utf-8');
+  } else {
+    const stream = file.contents as NodeJS.ReadableStream;
+    stream.setEncoding('utf-8');
+    const contents: string[] = [];
+    stream.on('data', (chunk: string) => contents.push(chunk));
+
+    return new Promise<string>((resolve, reject) => {
+      stream.on('end', () => resolve(contents.join('')));
+      stream.on('error', reject);
+    });
+  }
+}
+
 /**
  * Waits for the given ReadableStream
  */

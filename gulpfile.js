@@ -16,6 +16,8 @@ const eslint = require('gulp-eslint');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const mergeStream = require('merge-stream');
+const rename = require('gulp-rename');
+const run = require('gulp-run');
 const mocha = require('gulp-spawn-mocha');
 const path = require('path');
 const runSeq = require('run-sequence');
@@ -90,3 +92,59 @@ gulp.task(
         throw new Error(`Unused dependencies: ${result.dependencies}`);
       }
     }));
+
+/*
+ * There doesn't seem to be documentation on what helpers are available, or which
+ * helpers are required for which transforms. The
+ * source is here: https://github.com/babel/babel/blob/6.x/packages/babel-helpers/src/helpers.js
+ * 
+ * This list is an educated guess at the helpers needed for our transform set
+ * of ES2015 - modules. When we switch to loose mode we should update the list.
+ * 
+ * All helpers are listed here, with some commented out, so it's clear what we've excluded.
+ */
+const babelHelperWhitelist = [
+  'typeof', // Symbol support, for IE11
+  // 'jsx', // we don't support JSX
+  // 'asyncIterator', // async-iterators are not in ES2015
+  // 'asyncGenerator', // async-iterators are not in ES2015
+  // 'asyncGeneratorDelegate', // async-iterators are not in ES2015
+  // 'asyncToGenerator', // async functions are not in ES2015
+  'classCallCheck',
+  'createClass',
+  'defineEnumerableProperties',
+  'defaults', // TODO (justinfagnani): what's this for?
+  'defineProperty',
+  'extends',
+  'get', // not needed? Seems to implement getters
+  'inherits', // TODO (justinfagnani): what's the difference from 'extends'?
+  'instanceof',
+  // 'interopRequireDefault', // for modules support
+  // 'interopRequireWildcard', // for modules support
+  'newArrowCheck', // Can we exclude with loose?
+  'objectDestructuringEmpty',
+  'objectWithoutProperties',
+  'possibleConstructorReturn', // can we exclude with loose?
+  // 'selfGlobal', // not needed? global is not ES2015
+  'set', // not needed? Seems to implement setters
+  'slicedToArray',
+  // 'slicedToArrayLoose', 
+  'taggedTemplateLiteral',
+  // 'taggedTemplateLiteralLoose',
+  'temporalRef', // not needed in loose?
+  'temporalUndefined',
+  'toArray',
+  'toConsumableArray',
+];
+
+gulp.task('gen-babel-helpers', () => {
+  console.log('gen-babel-helpers start');
+  try {
+    return run(`babel-external-helpers -l ${babelHelperWhitelist.join(',')}`).exec()
+      .pipe(rename('babel-helpers.js'))
+      .pipe(gulp.dest('src/build/'));
+  } catch(e) {
+    console.error(e);
+  }
+  console.log('gen-babel-helpers end');
+});
