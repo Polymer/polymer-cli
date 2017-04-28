@@ -5,7 +5,7 @@
 ## v0.18.1 [04-25-2017]
 
 - `init` small template fixes.
-- `serve` now respects the `entrypoint` configured in `polymer.json`.
+- `serve` now respects the `entrypoint` configured in `polymer.json`. Previously, `serve` assumed that your main HTML file (`entrypoint`) was called `index.html`, even when another file name was specified in `polymer.json`, which would cause the app to 404. See the [polymer.json documentation](https://www.polymer-project.org/2.0/docs/tools/polymer-json#entrypoint) for more context.
 - Remove ability to run a locally installed version of the CLI if it exists in the current working directory. This unexpected behavior was never documented but some users could be running an incorrect version of the CLI as a result.
 - Update Node.js version pre-run check to match latest supported versions.
 
