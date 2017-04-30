@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `init`: Propagate `description` from `init` to application templates in `index.html` meta tag.
+
 ## v0.18.1 [04-25-2017]
 
 - `init` small template fixes.
