@@ -52,6 +52,8 @@ suite('polymer lint', function() {
     return result.then((output) => {
       assert.include(
           output, '<style> tags should not be direct children of <dom-module>');
+      assert.include(
+          output, 'Found  1 warnings.');
     });
   });
 
@@ -61,6 +63,8 @@ suite('polymer lint', function() {
     return invertPromise(result).then((output) => {
       assert.include(
           output, 'Invalid polymer expression delimiters.');
+      assert.include(
+          output, 'Found  1 errors.');
     });
   });
 
