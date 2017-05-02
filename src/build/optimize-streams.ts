@@ -18,7 +18,7 @@ import * as gulpif from 'gulp-if';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
-
+import * as fs from 'fs';
 
 const babelPresetES2015 = require('babel-preset-es2015');
 const babiliPreset = require('babel-preset-babili');
@@ -124,7 +124,14 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({presets: [babiliPreset]});
+    try {
+      let options = JSON.parse(String(fs.readFileSync('.babelrc')));
+      logger.info('Using .babelrc configuration');
+      super(options);
+    } catch (err) {
+      logger.warn('Error loading .babelrc configuration: ' + (err.message || ''));
+      super({presets: [babiliPreset]});
+    }
   }
 }
 
