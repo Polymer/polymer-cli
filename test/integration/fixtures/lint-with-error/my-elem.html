@@ -1,13 +1,19 @@
 <dom-module id="my-elem">
-  <style>
-    /* This should be inside the <template> */
-  </style>
   <template>
-    <div>Hello world</div>
+  <style>
+  /* This should be inside the <template> */
+  </style>
+    <div>[[message]</div>
   </template>
   <script>
     Polymer({
-      is: 'my-elem'
+      is: 'my-elem',
+      properties: {
+        message: {
+          type: String,
+          value: 'Hello world'
+        }
+      }
     });
   </script>
 </dom-module>

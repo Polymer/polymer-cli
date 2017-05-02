@@ -84,6 +84,6 @@ export async function lint(options: Options, config: ProjectConfig) {
       message += ` ${infos.length} ${chalk.green('info')} messages`;
     }
     console.log(`\n\nFound ${message}.`);
-    return new CommandResult(errors.length ? 1 : 0);
+    return new CommandResult(errors.length > 0 ? 1 : 0);
   }
 }
