@@ -21,8 +21,8 @@ import File = require('vinyl');
 export async function getFileContents(file: File): Promise<string> {
   if (file.isBuffer()) {
     return file.contents.toString('utf-8');
-  } else {
-    const stream = file.contents as NodeJS.ReadableStream;
+  } else if (file.isStream()) {
+    const stream = file.contents;
     stream.setEncoding('utf-8');
     const contents: string[] = [];
     stream.on('data', (chunk: string) => contents.push(chunk));
@@ -32,6 +32,9 @@ export async function getFileContents(file: File): Promise<string> {
       stream.on('error', reject);
     });
   }
+  throw new Error(
+      `Unable to get contents of file ${file.path}. ` +
+      `It has neither a buffer nor a stream.`);
 }
 
 /**

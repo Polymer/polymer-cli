@@ -23,6 +23,8 @@ const path = require('path');
 const runSeq = require('run-sequence');
 const tslint = require('gulp-tslint');
 const typescript = require('gulp-typescript');
+const streamToPromise = require('stream-to-promise');
+const pump = require('pump');
 
 const tsProject = typescript.createProject('tsconfig.json');
 
@@ -32,12 +34,16 @@ gulp.task('clean', (done) => {
   fs.remove(path.join(__dirname, 'lib'), done);
 });
 
-gulp.task('build', ['clean'], () => {
+gulp.task('build', (done) => {
+  runSeq('clean', ['compile', 'gen-babel-helpers'], done);
+});
+
+gulp.task('compile', () => {
   let tsReporter = typescript.reporter.defaultReporter();
   return mergeStream(
-             tsProject.src().pipe(tsProject(tsReporter)),
-             gulp.src(['src/**/*', '!src/**/*.ts']))
-      .pipe(gulp.dest('lib'));
+    tsProject.src().pipe(tsProject(tsReporter)),
+    gulp.src(['src/**/*', '!src/**/*.ts']))
+    .pipe(gulp.dest('lib'));
 });
 
 gulp.task(
@@ -94,13 +100,13 @@ gulp.task(
     }));
 
 /*
- * There doesn't seem to be documentation on what helpers are available, or which
- * helpers are required for which transforms. The
+ * There doesn't seem to be documentation on what helpers are available, or
+ * which helpers are required for which transforms. The
  * source is here: https://github.com/babel/babel/blob/6.x/packages/babel-helpers/src/helpers.js
- * 
+ *
  * This list is an educated guess at the helpers needed for our transform set
  * of ES2015 - modules. When we switch to loose mode we should update the list.
- * 
+ *
  * All helpers are listed here, with some commented out, so it's clear what we've excluded.
  */
 const babelHelperWhitelist = [
@@ -128,7 +134,7 @@ const babelHelperWhitelist = [
   // 'selfGlobal', // not needed? global is not ES2015
   'set', // not needed? Seems to implement setters
   'slicedToArray',
-  // 'slicedToArrayLoose', 
+  // 'slicedToArrayLoose',
   'taggedTemplateLiteral',
   // 'taggedTemplateLiteralLoose',
   'temporalRef', // not needed in loose?
@@ -138,13 +144,19 @@ const babelHelperWhitelist = [
 ];
 
 gulp.task('gen-babel-helpers', () => {
-  console.log('gen-babel-helpers start');
-  try {
-    return run(`babel-external-helpers -l ${babelHelperWhitelist.join(',')}`).exec()
-      .pipe(rename('babel-helpers.js'))
-      .pipe(gulp.dest('src/build/'));
-  } catch(e) {
-    console.error(e);
-  }
-  console.log('gen-babel-helpers end');
+  return Promise.resolve().then(() => {
+    return streamToPromise(pump(
+      run(
+      `babel-external-helpers --whitelist ${babelHelperWhitelist.join(',')}`,
+      { silent: true })
+      .exec(),
+      rename('babel-helpers.js'),
+      gulp.dest('./lib/build/')
+    ));
+  }).then(() => {
+    return streamToPromise(pump(
+      run('uglifyjs ./lib/build/babel-helpers.js -m', { silent: true }).exec(), rename('babel-helpers.min.js'),
+      gulp.dest('./lib/build')
+    ));
+  });
 });
