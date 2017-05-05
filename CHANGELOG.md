@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- `build` Support build configuration "presets".
+- `build` Performance improvements.
+
 ## v0.18.1 [04-25-2017]
 
 - `init` small template fixes.
