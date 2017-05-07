@@ -108,7 +108,7 @@ class JSBabelTransform extends GenericOptimizeTransform {
 }
 
 /**
- * A convinient stream that wraps JSBabelTransform in our default "compile"
+ * A convenient stream that wraps JSBabelTransform in our default "compile"
  * options.
  */
 export class JSDefaultCompileTransform extends JSBabelTransform {
@@ -118,13 +118,14 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
 }
 
 /**
- * A convinient stream that wraps JSBabelTransform in our default "minify"
+ * A convenient stream that wraps JSBabelTransform in our default "minify"
  * options. Yes, it's strange to use babel for minification, but our minifier
  * babili is actually just a plugin for babel.
+ * simplyComparisons plugin is disabled (https://github.com/Polymer/polymer-cli/issues/689)
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({presets: [babiliPreset]});
+    super({presets: [babiliPreset(null, {'unsafe': {'simplifyComparisons': false }})]});
   }
 }
 
