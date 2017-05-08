@@ -80,24 +80,24 @@ gulp.task(
               .pipe(eslint.format())
               .pipe(eslint.failAfterError()));
 
-gulp.task(
-    'depcheck',
-    () => depcheck(__dirname, {
-            // "@types/*" dependencies are type declarations that are
-            // automatically
-            // loaded by TypeScript during build. depcheck can't detect this
-            // so we ignore them here.
-            ignoreMatches: ['@types/*', 'vinyl']
-          }).then((result) => {
-      let invalidFiles = Object.keys(result.invalidFiles) || [];
-      let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
-      if (invalidJsFiles.length > 0) {
-        throw new Error(`Invalid files: ${invalidJsFiles}`);
-      }
-      if (result.dependencies.length) {
-        throw new Error(`Unused dependencies: ${result.dependencies}`);
-      }
-    }));
+gulp.task('depcheck', () => {
+  return depcheck(__dirname, {
+    // "@types/*" dependencies are type declarations that are automatically
+    // loaded by TypeScript during build. depcheck can't detect this
+    // so we ignore them here. Same with babel plugins.
+    ignoreMatches: [
+      '@types/*', 'vinyl', 'babel-plugin-external-helpers']
+  }).then((result) => {
+    let invalidFiles = Object.keys(result.invalidFiles) || [];
+    let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
+    if (invalidJsFiles.length > 0) {
+      throw new Error(`Invalid files: ${invalidJsFiles}`);
+    }
+    if (result.dependencies.length) {
+      throw new Error(`Unused dependencies: ${result.dependencies}`);
+    }
+  });
+});
 
 /*
  * There doesn't seem to be documentation on what helpers are available, or

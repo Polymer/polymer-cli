@@ -113,7 +113,10 @@ class JSBabelTransform extends GenericOptimizeTransform {
  */
 export class JSDefaultCompileTransform extends JSBabelTransform {
   constructor() {
-    super({presets: [babelPresetES2015NoModules]});
+    super({
+      presets: [babelPresetES2015NoModules],
+      plugins: require('babel-plugin-external-helpers'),
+    });
   }
 }
 
