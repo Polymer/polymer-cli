@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `lint` command fails only when error messages are present
+
 ## v0.18.1 [04-25-2017]
 
 - `init` small template fixes.

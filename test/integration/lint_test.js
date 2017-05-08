@@ -46,12 +46,25 @@ suite('polymer lint', function() {
     return runCommand(binPath, ['lint', '--rules=polymer-2-hybrid'], {cwd});
   });
 
+  test('succeeds when lint warnings are found', () => {
+    const cwd = path.join(fixturePath, 'lint-with-warning');
+    const result = runCommand(binPath, ['lint'], {cwd});
+    return result.then((output) => {
+      assert.include(
+          output, '<style> tags should not be direct children of <dom-module>');
+      assert.include(
+          output, 'Found 1 warning(s).');
+    });
+  });
+
   test('fails when lint errors are found', () => {
     const cwd = path.join(fixturePath, 'lint-with-error');
     const result = runCommand(binPath, ['lint'], {cwd, failureExpected: true});
     return invertPromise(result).then((output) => {
       assert.include(
-          output, '<style> tags should not be direct children of <dom-module>');
+          output, 'Invalid polymer expression delimiters.');
+      assert.include(
+          output, 'Found 1 error(s).');
     });
   });
 

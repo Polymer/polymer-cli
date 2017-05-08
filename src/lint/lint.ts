@@ -75,15 +75,16 @@ export async function lint(options: Options, config: ProjectConfig) {
     const warnings = filtered.filter((w) => w.severity === Severity.WARNING);
     const infos = filtered.filter((w) => w.severity === Severity.INFO);
     if (errors.length > 0) {
-      message += ` ${errors.length} ${chalk.red('errors')}`;
+      message += ` ${errors.length} ${chalk.red('error(s)')}`;
     }
     if (warnings.length > 0) {
-      message += ` ${warnings.length} ${chalk.yellow('warnings')}`;
+      message += ` ${warnings.length} ${chalk.yellow('warning(s)')}`;
     }
     if (infos.length > 0) {
       message += ` ${infos.length} ${chalk.green('info')} messages`;
     }
-    console.log(`\n\nFound ${message}.`);
-    return new CommandResult(1);
+    console.log(`\n\nFound${message}.`);
+    const shouldLintFail = errors.length > 0;
+    return new CommandResult(shouldLintFail ? 1 : 0);
   }
 }
