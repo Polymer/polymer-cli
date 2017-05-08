@@ -5,6 +5,8 @@
 - `build` Support build configuration "presets".
 - `build` Performance improvements.
 - Update polyserve to 0.19.0 which adds HTTP compression and JS compilation for Mobile Safari and Vivaldi browsers.
+- Produce much smaller output when compiling many JS files to ES5 by inserting
+  babel helpers only once, at the toplevel entrypoint.
 
 ## v0.18.1 [04-25-2017]
 
