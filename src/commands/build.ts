@@ -163,20 +163,20 @@ export class BuildCommand implements Command {
     const hasCliArgumentsPassed =
         this.args.some((arg) => typeof options[arg.name] !== 'undefined');
     if (hasCliArgumentsPassed) {
-      return build(commandOptionsToBuildOptions(options), polymerProject);
+      await build(commandOptionsToBuildOptions(options), polymerProject);
+      return;
     }
 
     // If no build flags were passed but 1+ polymer.json build configuration(s)
     // exist, generate a build for each configuration found.
     if (config.builds) {
-      return Promise
-          .all(config.builds.map((buildOptions: ProjectBuildOptions) => {
-            return build(buildOptions, polymerProject);
-          }))
-          .then(() => undefined);
+      await Promise.all(config.builds.map((buildOptions) => {
+        return build(buildOptions, polymerProject);
+      }));
+      return;
     }
 
     // If no builds were defined, just generate a default build.
-    return build({}, polymerProject);
+    await build({}, polymerProject);
   }
 }
