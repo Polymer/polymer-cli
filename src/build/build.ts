@@ -24,6 +24,7 @@ import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
+import {CustomElementsEs5AdapterInjector} from './custom-elements-es5-adapter';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
@@ -81,7 +82,7 @@ export async function build(
   const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
   if (compiledToES5) {
     buildStream =
-        buildStream.pipe(polymerProject.addCustomElementsEs5Adapter());
+        buildStream.pipe(new CustomElementsEs5AdapterInjector());
   }
 
   buildStream.once('data', () => {
