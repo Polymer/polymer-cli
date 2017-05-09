@@ -45,9 +45,8 @@ export async function lint(options: Options, config: ProjectConfig) {
   const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
   const filter = new WarningFilter({
     warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
-    minimumSeverity: Severity.WARNING
+    minimumSeverity: options.minSeverity || lintOptions.minSeverity || Severity.WARNING,
   });
-
 
   const analyzer = new Analyzer({
     urlLoader: new FSUrlLoader(config.root),

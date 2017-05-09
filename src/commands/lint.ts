@@ -29,6 +29,7 @@ import {Command} from './command';
 export interface Options {
   rules?: string[];
   input?: string[];
+  minSeverity?: string;
 }
 
 export class LintCommand implements Command {
@@ -55,7 +56,12 @@ export class LintCommand implements Command {
       multiple: true,
       description: 'The lint rules/rule collections to apply. ' +
           'See `polymer help lint` for a list of rules.',
-    }
+    },
+    {
+      name: 'minSeverity',
+      type: String,
+      description: 'The linter\'s minimum severity.'
+    },
   ];
 
   /**
