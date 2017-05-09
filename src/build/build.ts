@@ -17,10 +17,10 @@ import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
 
 import mergeStream = require('merge-stream');
-import {PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
+import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
-import {ProjectConfig, ProjectBuildOptions} from 'polymer-project-config';
+import {ProjectBuildOptions} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
@@ -33,42 +33,31 @@ export const mainBuildDirectoryName = 'build';
  * Generate a single build based on the given `options` ProjectBuildOptions.
  * Note that this function is only concerned with that single build, and does
  * not care about the collection of builds defined on the config.
- *
- * TODO(fks) 01-26-2017: Generate multiple builds with a single PolymerProject
- * instance. Currently blocked because splitHtml() & rejoinHtml() cannot be run
- * on multiple streams in parallel. See:
- * https://github.com/Polymer/polymer-build/issues/113
  */
 export async function build(
-    options: ProjectBuildOptions, config: ProjectConfig): Promise<void> {
+    options: ProjectBuildOptions,
+    polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
   const optimizeOptions:
       OptimizeOptions = {css: options.css, js: options.js, html: options.html};
-  const polymerProject = new PolymerProject(config);
 
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
   const buildDirectory = path.join(mainBuildDirectoryName, buildName);
   logger.debug(`"${buildDirectory}": Building with options:`, options);
 
-  const sourceSplitter = new HtmlSplitter();
-  const sourcesStream = pipeStreams([
-    polymerProject.sources(),
-    sourceSplitter.split(),
-    getOptimizeStreams(optimizeOptions),
-    sourceSplitter.rejoin()
-  ]);
+  // Fork the two streams to guarentee we are working with clean copies of each
+  // file and not sharing object references with other builds.
+  const sourcesStream = forkStream(polymerProject.sources());
+  const depsStream = forkStream(polymerProject.dependencies());
+  const htmlSplitter = new HtmlSplitter();
 
-  const depsSplitter = new HtmlSplitter();
-  const depsStream = pipeStreams([
-    polymerProject.dependencies(),
-    depsSplitter.split(),
+  let buildStream: NodeJS.ReadableStream = pipeStreams([
+    mergeStream(sourcesStream, depsStream),
+    htmlSplitter.split(),
     getOptimizeStreams(optimizeOptions),
-    depsSplitter.rejoin()
+    htmlSplitter.rejoin()
   ]);
-
-  let buildStream: NodeJS.ReadableStream =
-      mergeStream(sourcesStream, depsStream);
 
   if (options.bundle) {
     buildStream = buildStream.pipe(polymerProject.bundler());
@@ -99,7 +88,8 @@ export async function build(
   // while the build is in progress. Loading the config file during the build
   // saves the user ~300ms vs. loading it afterwards.
   const swPrecacheConfigPath = path.resolve(
-      config.root, options.swPrecacheConfig || 'sw-precache-config.js');
+      polymerProject.config.root,
+      options.swPrecacheConfig || 'sw-precache-config.js');
   let swConfig: SWConfig|null = null;
   if (options.addServiceWorker) {
     swConfig = await loadServiceWorkerConfig(swPrecacheConfigPath);

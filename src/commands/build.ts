@@ -20,7 +20,8 @@
 import * as delTypeOnly from 'del';
 import * as pathTypeOnly from 'path';
 import * as logging from 'plylog';
-import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
+import {PolymerProject} from 'polymer-build';
+import {applyBuildPreset, ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
 import * as buildLibTypeOnly from '../build/build';
 
@@ -28,6 +29,33 @@ import {Command, CommandOptions} from './command';
 
 
 const logger = logging.getLogger('cli.command.build');
+
+/**
+ * Converts command-line build arguments to the `ProjectBuildOptions` format
+ * that our build understands, applying the preset if one was given.
+ */
+function commandOptionsToBuildOptions(options: CommandOptions):
+    ProjectBuildOptions {
+  return applyBuildPreset({
+    name: options['name'],
+    preset: options['preset'],
+    addServiceWorker: !!options['add-service-worker'],
+    addPushManifest: !!options['add-push-manifest'],
+    swPrecacheConfig: options['sw-precache-config'],
+    insertPrefetchLinks: !!options['insert-prefetch-links'],
+    bundle: !!options['bundle'],
+    html: {
+      minify: !!options['html-minify'],
+    },
+    css: {
+      minify: !!options['css-minify'],
+    },
+    js: {
+      minify: !!options['js-minify'],
+      compile: !!options['js-compile'],
+    },
+  });
+}
 
 
 export class BuildCommand implements Command {
@@ -37,25 +65,37 @@ export class BuildCommand implements Command {
 
   args = [
     {
+      name: 'name',
+      type: String,
+      description: 'The build name. Defaults to "default".',
+    },
+    {
+      name: 'preset',
+      type: String,
+      description: 'A preset configuration to base your build on. ' +
+          'User-defined options will override preset options. Optional. ' +
+          'Available presets: "es5-bundled", "es6-bundled", "es6-unbundled". '
+    },
+    {
       name: 'js-compile',
       type: Boolean,
-      description: 'compile ES2015 JavaScript features down to ES5 for ' +
+      description: 'Compile ES2015 JavaScript features down to ES5 for ' +
           'older browsers.'
     },
     {
       name: 'js-minify',
       type: Boolean,
-      description: 'minify inlined and external JavaScript.'
+      description: 'Minify inlined and external JavaScript.'
     },
     {
       name: 'css-minify',
       type: Boolean,
-      description: 'minify inlined and external CSS.'
+      description: 'Minify inlined and external CSS.'
     },
     {
       name: 'html-minify',
       type: Boolean,
-      description: 'minify HTML by removing comments and whitespace.'
+      description: 'Minify HTML by removing comments and whitespace.'
     },
     {
       name: 'bundle',
@@ -116,50 +156,27 @@ export class BuildCommand implements Command {
     logger.info(`Clearing ${mainBuildDirectoryName}${path.sep} directory...`);
     await del([mainBuildDirectoryName]);
 
+    const polymerProject = new PolymerProject(config);
+
     // If any the build command flags were passed as CLI arguments, generate
     // a single build based on those flags alone.
     const hasCliArgumentsPassed =
         this.args.some((arg) => typeof options[arg.name] !== 'undefined');
     if (hasCliArgumentsPassed) {
-      return build(
-          {
-            addServiceWorker: !!options['add-service-worker'],
-            addPushManifest: !!options['add-push-manifest'],
-            swPrecacheConfig: options['sw-precache-config'],
-            insertPrefetchLinks: !!options['insert-prefetch-links'],
-            bundle: !!options['bundle'],
-            html: {
-              minify: !!options['html-minify'],
-            },
-            css: {
-              minify: !!options['css-minify'],
-            },
-            js: {
-              minify: !!options['js-minify'],
-              compile: !!options['js-compile'],
-            },
-          },
-          config);
+      await build(commandOptionsToBuildOptions(options), polymerProject);
+      return;
     }
 
-    // If no build configurations were passed via CLI flags or the polymer.json
-    // file, generate a default build.
-    if (!config.builds) {
-      return build({}, config);
+    // If no build flags were passed but 1+ polymer.json build configuration(s)
+    // exist, generate a build for each configuration found.
+    if (config.builds) {
+      await Promise.all(config.builds.map((buildOptions) => {
+        return build(buildOptions, polymerProject);
+      }));
+      return;
     }
 
-    // If a single build was defined or configured via the project config,
-    // generate a build for that configuration.
-    if (config.builds.length === 1) {
-      return build(config.builds[0], config);
-    }
-
-    // If multiple builds were defined or configured via the project config,
-    // generate a build for each configuration.
-    return Promise
-        .all(config.builds.map((buildOptions: ProjectBuildOptions) => {
-          return build(buildOptions, config);
-        }))
-        .then(() => undefined);
+    // If no builds were defined, just generate a default build.
+    await build({}, polymerProject);
   }
 }

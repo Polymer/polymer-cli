@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `build` Support build configuration "presets".
+- `build` Performance improvements.
 - Update polyserve to 0.19.0 which adds HTTP compression and JS compilation for Mobile Safari and Vivaldi browsers.
 
 ## v0.18.1 [04-25-2017]
