@@ -16,15 +16,13 @@ const eslint = require('gulp-eslint');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const mergeStream = require('merge-stream');
-const rename = require('gulp-rename');
-const run = require('gulp-run');
 const mocha = require('gulp-spawn-mocha');
 const path = require('path');
 const runSeq = require('run-sequence');
 const tslint = require('gulp-tslint');
 const typescript = require('gulp-typescript');
-const streamToPromise = require('stream-to-promise');
-const pump = require('pump');
+const uglify = require('uglify-js');
+const babelCore = require("babel-core");
 
 const tsProject = typescript.createProject('tsconfig.json');
 
@@ -119,20 +117,20 @@ const babelHelperWhitelist = [
   'classCallCheck',
   'createClass',
   'defineEnumerableProperties',
-  'defaults', // TODO (justinfagnani): what's this for?
+  'defaults', // used to make `obj.__proto__ = bar` work
   'defineProperty',
-  'extends',
-  'get', // not needed? Seems to implement getters
-  'inherits', // TODO (justinfagnani): what's the difference from 'extends'?
+  'extends', // used when setting __proto__
+  'get', // needed for class compilation
+  'inherits', // used for es6 class inheritance
   'instanceof',
   // 'interopRequireDefault', // for modules support
   // 'interopRequireWildcard', // for modules support
-  'newArrowCheck', // Can we exclude with loose?
+  'newArrowCheck', // confirms that `this` is correct inside arrow function body
   'objectDestructuringEmpty',
   'objectWithoutProperties',
   'possibleConstructorReturn', // can we exclude with loose?
-  // 'selfGlobal', // not needed? global is not ES2015
-  'set', // not needed? Seems to implement setters
+  // 'selfGlobal', // not needed. `global` is not ES2015
+  'set', // difficult to tell if needed
   'slicedToArray',
   // 'slicedToArrayLoose',
   'taggedTemplateLiteral',
@@ -144,19 +142,9 @@ const babelHelperWhitelist = [
 ];
 
 gulp.task('gen-babel-helpers', () => {
-  return Promise.resolve().then(() => {
-    return streamToPromise(pump(
-      run(
-      `babel-external-helpers --whitelist ${babelHelperWhitelist.join(',')}`,
-      { silent: true })
-      .exec(),
-      rename('babel-helpers.js'),
-      gulp.dest('./lib/build/')
-    ));
-  }).then(() => {
-    return streamToPromise(pump(
-      run('uglifyjs ./lib/build/babel-helpers.js -m', { silent: true }).exec(), rename('babel-helpers.min.js'),
-      gulp.dest('./lib/build')
-    ));
-  });
+  const helpersCode = babelCore.buildExternalHelpers(babelHelperWhitelist);
+  const { code: minified } = uglify.minify(helpersCode, {fromString: true});
+  fs.mkdirpSync('./lib/build');
+  fs.writeFileSync(
+      './lib/build/babel-helpers.min.js', minified, { encoding: 'utf-8' });
 });

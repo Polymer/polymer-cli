@@ -8,6 +8,11 @@ import {getFileContents} from './streams';
 
 import File = require('vinyl');
 
+const p = dom5.predicates;
+
+const scriptOrImport = p.OR(
+    p.hasTagName('script'),
+    p.AND(p.hasTagName('link'), p.hasSpaceSeparatedAttrValue('rel', 'import')));
 
 /**
  * When compiling to ES5 we need to inject Babel's helpers into a global so
@@ -37,11 +42,12 @@ export class InjectBabelHelpers extends stream.Transform {
         babelHelpersFragment.childNodes![0]!,
         fs.readFileSync(path.join(__dirname, 'babel-helpers.min.js'), 'utf-8'));
 
-    const firstScript =
-        dom5.nodeWalk(document, dom5.predicates.hasTagName('script'));
-    if (firstScript) {
+    const firstScriptOrImport = dom5.nodeWalk(document, scriptOrImport);
+    if (firstScriptOrImport) {
       dom5.insertBefore(
-          firstScript.parentNode!, firstScript, babelHelpersFragment);
+          firstScriptOrImport.parentNode!,
+          firstScriptOrImport,
+          babelHelpersFragment);
     } else {
       const head =
           dom5.query(document, dom5.predicates.hasTagName('head')) || document;

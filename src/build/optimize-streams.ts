@@ -24,6 +24,7 @@ const babelPresetES2015 = require('babel-preset-es2015');
 const babiliPreset = require('babel-preset-babili');
 const babelPresetES2015NoModules =
     babelPresetES2015.buildPreset({}, {modules: false});
+const externalHelpersPlugin = require('babel-plugin-external-helpers');
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -115,7 +116,7 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
   constructor() {
     super({
       presets: [babelPresetES2015NoModules],
-      plugins: require('babel-plugin-external-helpers'),
+      plugins: [externalHelpersPlugin],
     });
   }
 }
