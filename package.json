@@ -86,7 +86,7 @@
     "@types/node": "=6.0.65",
     "babili": "^0.0.12",
     "chai": "^3.5.0",
-    "clang-format": "=1.0.48",
+    "clang-format": "=1.0.50",
     "depcheck": "^0.6.3",
     "fs-extra": "^2.0.0",
     "gulp": "^3.9.1",

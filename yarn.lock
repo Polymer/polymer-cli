@@ -1770,9 +1770,9 @@ circular-json@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.3.1.tgz#be8b36aefccde8b3ca7aa2d6afc07a37242c0d2d"
 
-clang-format@=1.0.48:
-  version "1.0.48"
-  resolved "https://registry.yarnpkg.com/clang-format/-/clang-format-1.0.48.tgz#44885525b8493b8ced7e1c59b5738808d6ff1f7a"
+clang-format@=1.0.50:
+  version "1.0.50"
+  resolved "https://registry.yarnpkg.com/clang-format/-/clang-format-1.0.50.tgz#b40926fd5c8573f7d37ed074a32da9a370dbdbcf"
   dependencies:
     async "^1.5.2"
     glob "^7.0.0"
