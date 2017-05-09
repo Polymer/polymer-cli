@@ -24,6 +24,7 @@ import {Command, CommandOptions} from './command';
 
 export class TestCommand implements Command {
   name = 'test';
+  aliases = [];
 
   description = 'Runs web-component-tester';
 

@@ -29,6 +29,7 @@ const logger = logging.getLogger('cli.command.init');
 
 export class InitCommand implements Command {
   name = 'init';
+  aliases = [];
 
   description = 'Initializes a Polymer project';
 

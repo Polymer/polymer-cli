@@ -32,6 +32,7 @@ const logger = logging.getLogger('cli.command.serve');
 
 export class ServeCommand implements Command {
   name = 'serve';
+  aliases = [];
 
   description = 'Runs the polyserve development server';
 
