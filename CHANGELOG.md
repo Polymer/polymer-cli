@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Updated `lint` Command**: `polymer lint` now has finer control over what is output and causes the command to fail.
 - Update polyserve to 0.19.0 which adds HTTP compression and JS compilation for Mobile Safari and Vivaldi browsers.
 
 ## v0.18.1 [04-25-2017]
