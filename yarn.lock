@@ -234,7 +234,7 @@
     "@types/bluebird" "*"
     "@types/node" "*"
 
-"@types/node@*", "@types/node@6.0.*", "@types/node@=6.0.65", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
+"@types/node@*", "@types/node@6.0.*", "@types/node@=6.0.65", "@types/node@^6", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
   version "6.0.65"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
 
@@ -422,12 +422,6 @@
 "@types/spdy@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@types/spdy/-/spdy-3.4.1.tgz#5e87b2c2be841746c283b2b4e1a32c786114e84c"
-
-"@types/split@^0.3.28":
-  version "0.3.28"
-  resolved "https://registry.yarnpkg.com/@types/split/-/split-0.3.28.tgz#66d0361dbd9715b093d6b27a4c9985daadccc9ec"
-  dependencies:
-    "@types/node" "*"
 
 "@types/temp@^0.8.28":
   version "0.8.29"
@@ -2185,7 +2179,17 @@ dom5@^1.3.1:
     clone "^1.0.2"
     parse5 "^1.4.1"
 
-dom5@^2.0.0, dom5@^2.0.1, dom5@^2.1.0:
+dom5@^2.0.0, dom5@^2.2.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/dom5/-/dom5-2.3.0.tgz#f8204975bd0dacbbe5b58a8a93ffc1fed0ffcd2a"
+  dependencies:
+    "@types/clone" "^0.1.29"
+    "@types/node" "^6.0.0"
+    "@types/parse5" "^2.2.32"
+    clone "^2.1.0"
+    parse5 "^2.2.2"
+
+dom5@^2.0.1, dom5@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/dom5/-/dom5-2.1.0.tgz#a7adac6724062b862a410cdbc6ca488d34772831"
   dependencies:
@@ -5143,9 +5147,9 @@ plylog@^0.5.0:
     "@types/winston" "^2.2.0"
     winston "^2.2.0"
 
-polymer-analyzer@2.0.0-alpha.34:
-  version "2.0.0-alpha.34"
-  resolved "https://registry.yarnpkg.com/polymer-analyzer/-/polymer-analyzer-2.0.0-alpha.34.tgz#6e95ea37247c036c53d1ef6c25f12a2763984eab"
+polymer-analyzer@2.0.0-alpha.42:
+  version "2.0.0-alpha.42"
+  resolved "https://registry.yarnpkg.com/polymer-analyzer/-/polymer-analyzer-2.0.0-alpha.42.tgz#0f75022c1dc41acf7c1ff1f37f13fc19ddad80cc"
   dependencies:
     "@types/chai-subset" "^1.3.0"
     "@types/chalk" "^0.4.30"
@@ -5156,7 +5160,6 @@ polymer-analyzer@2.0.0-alpha.34:
     "@types/estree" "^0.0.34"
     "@types/node" "^6.0.0"
     "@types/parse5" "^2.2.34"
-    "@types/split" "^0.3.28"
     chalk "^1.1.3"
     clone "^2.0.0"
     cssbeautify "^0.3.1"
@@ -5168,59 +5171,58 @@ polymer-analyzer@2.0.0-alpha.34:
     jsonschema "^1.1.0"
     parse5 "^2.2.1"
     shady-css-parser "0.0.8"
-    split "^1.0.0"
     strip-indent "^2.0.0"
     typescript "^2.2.0"
 
-polymer-build@1.1.0, polymer-build@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.1.0.tgz#909050868db9bc913a068ab14b96995c5201e0b5"
+polymer-build@1.2.2, polymer-build@^1.1.0:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.2.2.tgz#e1fb8b9f237d336cdefdaf51bf640c1814f1a1a0"
   dependencies:
     "@types/node" "^4.2.3"
     "@types/parse5" "^2.2.32"
     "@types/vinyl" "^2.0.0"
     "@types/vinyl-fs" "0.0.28"
-    dom5 "^2.0.1"
+    dom5 "^2.2.0"
     multipipe "^1.0.2"
     parse5 "^2.2.2"
     plylog "^0.5.0"
-    polymer-analyzer "2.0.0-alpha.34"
-    polymer-bundler "2.0.0-pre.11"
+    polymer-analyzer "2.0.0-alpha.42"
+    polymer-bundler "2.0.0-pre.15"
     polymer-project-config "^2.0.0"
-    sw-precache "^4.2.0"
+    sw-precache "^5.1.1"
     vinyl "^1.1.1"
     vinyl-fs "^2.4.3"
 
-polymer-bundler@2.0.0-pre.11:
-  version "2.0.0-pre.11"
-  resolved "https://registry.yarnpkg.com/polymer-bundler/-/polymer-bundler-2.0.0-pre.11.tgz#c08467d8308502841d1e33e0232c6fc3a9f81b28"
+polymer-bundler@2.0.0-pre.15:
+  version "2.0.0-pre.15"
+  resolved "https://registry.yarnpkg.com/polymer-bundler/-/polymer-bundler-2.0.0-pre.15.tgz#b543d51a31a31a0bcf9620c8eccb4e1d25ca5d42"
   dependencies:
     clone "^2.1.0"
     command-line-args "^3.0.1"
     command-line-usage "^3.0.3"
-    dom5 "^2.0.0"
+    dom5 "^2.2.0"
     es6-promise "^2.1.0"
     espree "^3.4.0"
     mkdirp "^0.5.1"
     nopt "^3.0.1"
     parse5 "^2.2.2"
     path-posix "^1.0.0"
-    polymer-analyzer "2.0.0-alpha.34"
+    polymer-analyzer "2.0.0-alpha.42"
     source-map "^0.5.6"
 
-polymer-linter@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/polymer-linter/-/polymer-linter-1.0.1.tgz#486c65b9a2dcfc7347ccc5cb41d597d375105c94"
+polymer-linter@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/polymer-linter/-/polymer-linter-2.0.1.tgz#a5a5be0c332741743f732cfd91edf87414063162"
   dependencies:
     "@types/estree" "0.0.34"
     "@types/fast-levenshtein" "0.0.1"
-    "@types/node" "4.0.30"
+    "@types/node" "^6"
     "@types/parse5" "^2.2.34"
     dom5 "^2.0.0"
     estraverse "^4.2.0"
     fast-levenshtein "^2.0.6"
     parse5 "^2.2.1"
-    polymer-analyzer "2.0.0-alpha.34"
+    polymer-analyzer "2.0.0-alpha.42"
     strip-indent "^2.0.0"
 
 polymer-project-config@^2.0.0:
@@ -6227,12 +6229,6 @@ spdy@^3.3.3:
     select-hose "^2.0.0"
     spdy-transport "^2.0.15"
 
-split@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/split/-/split-1.0.0.tgz#c4395ce683abcd254bc28fe1dabb6e5c27dcffae"
-  dependencies:
-    through "2"
-
 sprintf-js@^1.0.3, sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
@@ -6389,9 +6385,9 @@ supports-color@^3.1.0:
   dependencies:
     has-flag "^1.0.0"
 
-sw-precache@^4.2.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/sw-precache/-/sw-precache-4.3.0.tgz#576c6c1c23b61c44ef5d84d33870641060d8c2de"
+sw-precache@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/sw-precache/-/sw-precache-5.1.1.tgz#928720957463e55ed56777e177c4699f35ec59b6"
   dependencies:
     dom-urls "^1.1.0"
     es6-promise "^4.0.5"
@@ -6400,8 +6396,9 @@ sw-precache@^4.2.0:
     lodash.template "^4.4.0"
     meow "^3.7.0"
     mkdirp "^0.5.1"
-    pretty-bytes "^3.0.1"
+    pretty-bytes "^4.0.2"
     sw-toolbox "^3.4.0"
+    update-notifier "^1.0.3"
 
 sw-toolbox@^3.4.0:
   version "3.6.0"
@@ -6535,7 +6532,7 @@ through2@^2.0.0, through2@^2.0.1, through2@^2.0.3, through2@~2.0.0, through2@~2.
     readable-stream "^2.1.5"
     xtend "~4.0.1"
 
-through@2, through@^2.3.4, through@^2.3.6, through@~2.3.4, through@~2.3.8:
+through@^2.3.4, through@^2.3.6, through@~2.3.4, through@~2.3.8:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
 
@@ -6804,7 +6801,7 @@ unzip-response@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/unzip-response/-/unzip-response-2.0.1.tgz#d2f0f737d16b0615e72a6935ed04214572d56f97"
 
-update-notifier@^1.0.0:
+update-notifier@^1.0.0, update-notifier@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/update-notifier/-/update-notifier-1.0.3.tgz#8f92c515482bd6831b7c93013e70f87552c7cf5a"
   dependencies:

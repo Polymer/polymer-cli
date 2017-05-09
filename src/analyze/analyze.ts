@@ -34,7 +34,7 @@ export async function analyze(
     const _package = await analyzer.analyzePackage();
     return generateAnalysis(_package, '', isNotTest);
   } else {
-    const documents = await Promise.all(inputs.map((i) => analyzer.analyze(i)));
+    const documents = await analyzer.analyze(inputs);
     return generateAnalysis(documents, '', isNotTest);
   }
 }
