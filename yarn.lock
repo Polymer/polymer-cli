@@ -238,11 +238,11 @@
   version "6.0.65"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
 
-"@types/node@4.0.30", "@types/node@^4.0.30":
+"@types/node@4.0.30":
   version "4.0.30"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.0.30.tgz#553f490ed3030311620f88003e7abfc0edcb301e"
 
-"@types/node@^4.2.3":
+"@types/node@^4.0.30", "@types/node@^4.2.3":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.2.3.tgz#4405d19dcabae1fb0dfc9f267c8de5c114d47ce9"
 
@@ -5223,9 +5223,18 @@ polymer-linter@1.0.1:
     polymer-analyzer "2.0.0-alpha.34"
     strip-indent "^2.0.0"
 
-polymer-project-config@^2.0.0, polymer-project-config@^2.1.0:
+polymer-project-config@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-2.1.0.tgz#8ee3fea5bcb38ca945fa5688e6ccd751e4f942c0"
+  dependencies:
+    "@types/node" "^6.0.41"
+    jsonschema "^1.1.1"
+    minimatch-all "^1.1.0"
+    plylog "^0.5.0"
+
+polymer-project-config@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.0.0.tgz#367edffd95d77353475c672dd6f84881873f3d83"
   dependencies:
     "@types/node" "^6.0.41"
     jsonschema "^1.1.1"
