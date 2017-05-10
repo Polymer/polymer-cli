@@ -43,9 +43,10 @@ export async function lint(options: Options, config: ProjectConfig) {
   }
 
   const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
+  const minimumSeverity = severityStringToValue(options['minSeverity']); // TODO: Add minSeverity to project config and here
   const filter = new WarningFilter({
     warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
-    minimumSeverity: options.minSeverity || lintOptions.minSeverity || Severity.WARNING,
+    minimumSeverity: minimumSeverity || Severity.WARNING,
   });
 
   const analyzer = new Analyzer({
@@ -84,5 +85,15 @@ export async function lint(options: Options, config: ProjectConfig) {
     }
     console.log(`\n\nFound ${message}.`);
     return new CommandResult(1);
+  }
+}
+
+function severityStringToValue(maybeSeverity = ''): Severity|undefined {
+  maybeSeverity = maybeSeverity.trim().toLowerCase();
+  switch (maybeSeverity) {
+    case 'error': return Severity.ERROR;
+    case 'warning': return Severity.WARNING;
+    case 'info': return Severity.INFO;
+    default: return undefined;
   }
 }
