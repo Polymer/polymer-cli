@@ -33,8 +33,6 @@ export interface Options {
 }
 
 export class LintCommand implements Command {
-  // TODO(rictic): rename to 'lint' here and elsewhere, delete
-  // legacy-lint.ts. Also update the README.
   name = 'lint';
 
   description = 'Identifies potential errors in your code.';
@@ -60,7 +58,8 @@ export class LintCommand implements Command {
     {
       name: 'minSeverity',
       type: String,
-      description: 'The linter\'s minimum severity.'
+      description: 'The minimum severity for the linter to output ' +
+          'and trigger failure of the command.'
     },
   ];
 
