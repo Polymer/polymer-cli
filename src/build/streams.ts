@@ -152,11 +152,12 @@ export abstract class AsyncTransformStream<In, Out> extends stream.Transform {
     if (this._initialized === false) {
       this._initialized = true;
       const transformDonePromise = (async () => {
-        for await (const value of this._transformIter(this._inputs)) {
-          // TODO(rictic): if `this.push` returns false, should we wait until
-          //     we get a drain event to keep iterating?
-          this.push(value);
-        }
+        for
+          await(const value of this._transformIter(this._inputs)) {
+            // TODO(rictic): if `this.push` returns false, should we wait until
+            //     we get a drain event to keep iterating?
+            this.push(value);
+          }
       })();
       // TODO(rictic): blindly drain the rest of the inputs if _transformIter
       //     returns early?

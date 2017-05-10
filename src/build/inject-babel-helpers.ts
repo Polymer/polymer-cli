@@ -25,9 +25,10 @@ export class BabelHelpersInjector extends AsyncTransformStream<File, File> {
   }
 
   protected async * _transformIter(files: AsyncIterable<File>) {
-    for await(const file of files) {
-      yield await this.processFile(file);
-    }
+    for
+      await(const file of files) {
+        yield await this.processFile(file);
+      }
   }
 
   private async processFile(file: File): Promise<File> {
@@ -37,7 +38,8 @@ export class BabelHelpersInjector extends AsyncTransformStream<File, File> {
     const contents = await getFileContents(file);
     const document = parse5.parse(contents);
 
-    const babelHelpersFragment = parse5.parseFragment('\n\n<script></script>\n\n');
+    const babelHelpersFragment =
+        parse5.parseFragment('\n\n<script></script>\n\n');
     dom5.setTextContent(
         babelHelpersFragment.childNodes![1]!,
         fs.readFileSync(path.join(__dirname, 'babel-helpers.min.js'), 'utf-8'));

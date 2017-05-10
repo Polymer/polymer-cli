@@ -12,7 +12,7 @@
 
 const assert = require('chai').assert;
 const path = require('path');
-const { fs } = require('mz');
+const {fs} = require('mz');
 const fsExtra = require('fs-extra');
 const tmp = require('tmp');
 
@@ -38,10 +38,10 @@ suite('polymer build', function() {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'build-simple'), tmpDir.name);
 
-    return runCommand(binPath, ['build'], { cwd: tmpDir.name }).then(() => {
+    return runCommand(binPath, ['build'], {cwd: tmpDir.name}).then(() => {
       assertDirsEqual(
-        path.join(tmpDir.name, 'build'),
-        path.join(fixturePath, 'build-simple-expected'));
+          path.join(tmpDir.name, 'build'),
+          path.join(fixturePath, 'build-simple-expected'));
     });
   });
 
@@ -52,10 +52,13 @@ function copyDir(fromDir, toDir) {
   fsExtra.copy(fromDir, toDir);
 }
 
-function assertDirsEqual(actual, expected, basedir=actual) {
+function assertDirsEqual(actual, expected, basedir = actual) {
   const actualNames = fs.readdirSync(actual).sort();
   const expectedNames = fs.readdirSync(expected).sort();
-  assert.deepEqual(actualNames, expectedNames, `expected files in directory ${path.relative(basedir, actual)}`);
+  assert.deepEqual(
+      actualNames,
+      expectedNames,
+      `expected files in directory ${path.relative(basedir, actual)}`);
   for (const fn of actualNames) {
     const subActual = path.join(actual, fn);
     const subExpected = path.join(expected, fn);
@@ -66,8 +69,9 @@ function assertDirsEqual(actual, expected, basedir=actual) {
       const actualContents = fs.readFileSync(subActual, 'utf-8').trim();
       const expectedContents = fs.readFileSync(subExpected, 'utf-8').trim();
       assert.deepEqual(
-        actualContents, expectedContents,
-        `expected contents of ${path.relative(basedir, subActual)}}`);
+          actualContents,
+          expectedContents,
+          `expected contents of ${path.relative(basedir, subActual)}}`);
     }
   }
 }
