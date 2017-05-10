@@ -139,10 +139,12 @@ Polymer CLI supports the [current & active LTS versions](https://github.com/node
 You can compile and run the CLI from source by cloning the repo from Github and then running `npm run build`. But make sure you have already run `npm install` before building.
 
 ```bash
-# clone the repo from github
-yarn install
-yarn run build
-yarn link # link your local copy of the CLI to your terminal path
+# clone the repo from github, then build the CLI
+yarn install && yarn run build
+# link your local copy of the CLI to your terminal path
+yarn link
+# confirm that your local copy was properly linked
+polymer --version
 ```
 
 
