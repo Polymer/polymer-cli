@@ -20,12 +20,6 @@ const runCommand = require('./run-command').runCommand;
 
 const fixturePath = path.join(__dirname, './fixtures/');
 
-function invertPromise(p) {
-  return p.then((v) => {
-    throw new Error(
-        `Expected promise to reject. Instead it resolved with ${v}`);
-  }, (err) => err);
-}
 tmp.setGracefulCleanup();
 
 suite('polymer build', function() {
