@@ -87,7 +87,8 @@ suite('integration tests', function() {
       let dir;
       const ShopGenerator = createGithubGenerator({
         owner: 'Polymer',
-        repo: 'shop', githubToken,
+        repo: 'shop',
+        githubToken,
       });
 
       return runGenerator(ShopGenerator)
@@ -110,7 +111,8 @@ suite('integration tests', function() {
       const PSKGenerator = createGithubGenerator({
         owner: 'PolymerElements',
         repo: 'polymer-starter-kit',
-        semverRange: '^2.0.0', githubToken,
+        semverRange: '^2.0.0',
+        githubToken,
       });
 
       return runGenerator(PSKGenerator)
@@ -132,7 +134,8 @@ suite('integration tests', function() {
       const PSKGenerator = createGithubGenerator({
         owner: 'PolymerElements',
         repo: 'polymer-starter-kit',
-        semverRange: '^3.0.0', githubToken,
+        semverRange: '^3.0.0',
+        githubToken,
       });
 
       return runGenerator(PSKGenerator)
@@ -159,7 +162,8 @@ suite('integration tests', function() {
     suiteSetup(() => {
       const TSPGenerator = createGithubGenerator({
         owner: 'Polymer',
-        repo: 'tools-sample-projects', githubToken,
+        repo: 'tools-sample-projects',
+        githubToken,
       });
 
       return runGenerator(TSPGenerator)

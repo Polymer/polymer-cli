@@ -163,7 +163,8 @@ export class BuildCommand implements Command {
     const hasCliArgumentsPassed =
         this.args.some((arg) => typeof options[arg.name] !== 'undefined');
     if (hasCliArgumentsPassed) {
-      await build(commandOptionsToBuildOptions(options), polymerProject);
+      await build(
+          commandOptionsToBuildOptions(options), polymerProject, config);
       return;
     }
 
@@ -171,12 +172,12 @@ export class BuildCommand implements Command {
     // exist, generate a build for each configuration found.
     if (config.builds) {
       await Promise.all(config.builds.map((buildOptions) => {
-        return build(buildOptions, polymerProject);
+        return build(buildOptions, polymerProject, config);
       }));
       return;
     }
 
     // If no builds were defined, just generate a default build.
-    await build({}, polymerProject);
+    await build({}, polymerProject, config);
   }
 }

@@ -221,31 +221,30 @@ async function createYeomanEnvironment() {
  * the list of available generators by filtering relevent ones out from
  * the environment list.
  */
-function createSelectPrompt(env: YeomanEnvironment):
-    InquirerQuestion {
-      const generators = env.getGeneratorsMeta();
-      const allGeneratorNames = Object.keys(generators).filter((k) => {
-        return k.startsWith('polymer-init') && k !== 'polymer-init:app';
-      });
-      const choices = allGeneratorNames.map((generatorName: string) => {
-        const generator = generators[generatorName];
-        return getGeneratorDescription(generator, generatorName);
-      });
+function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
+  const generators = env.getGeneratorsMeta();
+  const allGeneratorNames = Object.keys(generators).filter((k) => {
+    return k.startsWith('polymer-init') && k !== 'polymer-init:app';
+  });
+  const choices = allGeneratorNames.map((generatorName: string) => {
+    const generator = generators[generatorName];
+    return getGeneratorDescription(generator, generatorName);
+  });
 
-      // Some windows emulators (mingw) don't handle arrows correctly
-      // https://github.com/SBoudrias/Inquirer.js/issues/266
-      // Fall back to rawlist and use number input
-      // Credit to
-      // https://gist.github.com/geddski/c42feb364f3c671d22b6390d82b8af8f
-      const isMinGW = checkIsMinGW();
+  // Some windows emulators (mingw) don't handle arrows correctly
+  // https://github.com/SBoudrias/Inquirer.js/issues/266
+  // Fall back to rawlist and use number input
+  // Credit to
+  // https://gist.github.com/geddski/c42feb364f3c671d22b6390d82b8af8f
+  const isMinGW = checkIsMinGW();
 
-      return {
-        type: isMinGW ? 'rawlist' : 'list',
-        name: 'generatorName',
-        message: 'Which starter template would you like to use?',
-        choices: choices,
-      };
-    }
+  return {
+    type: isMinGW ? 'rawlist' : 'list',
+    name: 'generatorName',
+    message: 'Which starter template would you like to use?',
+    choices: choices,
+  };
+}
 
 /**
  * Run the given generator. If no Yeoman environment is provided, a new one
@@ -253,41 +252,40 @@ function createSelectPrompt(env: YeomanEnvironment):
  * error will be thrown.
  */
 export async function runGenerator(
-    generatorName: string, options: {[name: string]: any}):
-    Promise<void> {
-      options = options || {};
-      const templateName = options['templateName'] || generatorName;
+    generatorName: string, options: {[name: string]: any}): Promise<void> {
+  options = options || {};
+  const templateName = options['templateName'] || generatorName;
 
-      const env: YeomanEnvironment =
-          await(options['env'] || createYeomanEnvironment());
+  const env: YeomanEnvironment =
+      await(options['env'] || createYeomanEnvironment());
 
-      logger.info(`Running template ${templateName}...`);
-      logger.debug(`Running generator ${generatorName}...`);
-      const generators = env.getGeneratorsMeta();
-      const generator = generators[generatorName];
+  logger.info(`Running template ${templateName}...`);
+  logger.debug(`Running generator ${generatorName}...`);
+  const generators = env.getGeneratorsMeta();
+  const generator = generators[generatorName];
 
-      if (!generator) {
-        logger.error(`Template ${templateName} not found`);
-        throw new Error(`Template ${templateName} not found`);
+  if (!generator) {
+    logger.error(`Template ${templateName} not found`);
+    throw new Error(`Template ${templateName} not found`);
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    env.run(generatorName, {}, (error: any) => {
+      if (error) {
+        reject(error);
+        return;
       }
-
-      return new Promise<void>((resolve, reject) => {
-        env.run(generatorName, {}, (error: any) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve();
-        });
-      });
-    }
+      resolve();
+    });
+  });
+}
 
 /**
  * Prompt the user to select a generator. When the user
  * selects a generator, run it.
  */
-export async function promptGeneratorSelection(
-    options?: {[name: string]: any}): Promise<void> {
+export async function promptGeneratorSelection(options?: {[name: string]: any}):
+    Promise<void> {
   options = options || {};
   const env = await(options['env'] || createYeomanEnvironment());
   // TODO(justinfagnani): the typings for inquirer appear wrong

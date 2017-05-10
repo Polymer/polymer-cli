@@ -24,7 +24,7 @@ const logger = logging.getLogger('cli.main');
 // See https://github.com/yeoman/update-notifier#how for info on how this works.
 updateNotifier({pkg: packageJson}).notify();
 
-(async() => {
+(async () => {
   const args = process.argv.slice(2);
   const cli = new PolymerCli(args);
   try {
