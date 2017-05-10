@@ -77,17 +77,38 @@ export function pipeStreams(streams: PipeStream[]): NodeJS.ReadableStream {
       });
 }
 
-class WritableAsyncIterable<V> implements AsyncIterable<V> {
+/**
+ * An asynchronous queue that is read as an async iterable.
+ */
+class AsyncQueue<V> implements AsyncIterable<V> {
   private blockedOn: Deferred<IteratorResult<V>>|undefined = undefined;
   backlog: Array<{value: IteratorResult<V>, deferred: Deferred<void>}> = [];
   private _closed = false;
+
+  /**
+   * Add the given value onto the queue.
+   *
+   * The return value of this method resolves once the value has been removed
+   * from the queue. Useful for flow control.
+   *
+   * Must not be called after the queue has been closed.
+   */
   async write(value: V) {
     if (this._closed) {
       throw new Error('Wrote to closed writable iterable');
     }
-    this._write({value, done: false});
+    return this._write({value, done: false});
   }
 
+  /**
+   * Close the queue, indicating that no more values will be written.
+   *
+   * If this method is not called, a consumer iterating over the values will
+   * wait forever.
+   *
+   * The returned promise resolves once the consumer has been notified of the
+   * end of the queue.
+   */
   async close() {
     this._closed = true;
     return this._write({done: true} as any);
@@ -104,6 +125,11 @@ class WritableAsyncIterable<V> implements AsyncIterable<V> {
     }
   }
 
+  /**
+   * Iterate over values in the queue. Not intended for multiple readers.
+   * In the case where there are multiple readers, some values may be received
+   * by multiple readers, but all values will be seen by at least one reader.
+   */
   async * [Symbol.asyncIterator](): AsyncIterator<V> {
     while (true) {
       let value;
@@ -132,7 +158,7 @@ class WritableAsyncIterable<V> implements AsyncIterable<V> {
  * and
  */
 export abstract class AsyncTransformStream<In, Out> extends stream.Transform {
-  private readonly _inputs = new WritableAsyncIterable<In>();
+  private readonly _inputs = new AsyncQueue<In>();
 
   /**
    * Implement this method!
