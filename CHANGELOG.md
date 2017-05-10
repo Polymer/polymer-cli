@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+<!-- ## Unreleased -->
 
-- **Updated `lint` Command**: `polymer lint` now has finer control over what is output and causes the command to fail.
+<!-- Add new, unreleased changes here. -->
+
+- **Updated `lint` Command**: `polymer lint` now provides a way to control what is output and causes the command to fail. To customize this you can either include the CLI flag `--min-severity` (options include `error`, `warning`, and `info`) or custom polymer.json lint configuration using the `minSeverity` property. (Defaults to `warning`)
 - Update polyserve to 0.19.0 which adds HTTP compression and JS compilation for Mobile Safari and Vivaldi browsers.
 
 ## v0.18.1 [04-25-2017]
