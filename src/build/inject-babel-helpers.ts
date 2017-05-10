@@ -37,9 +37,9 @@ export class BabelHelpersInjector extends AsyncTransformStream<File, File> {
     const contents = await getFileContents(file);
     const document = parse5.parse(contents);
 
-    const babelHelpersFragment = parse5.parseFragment('<script></script>\n');
+    const babelHelpersFragment = parse5.parseFragment('\n\n<script></script>\n\n');
     dom5.setTextContent(
-        babelHelpersFragment.childNodes![0]!,
+        babelHelpersFragment.childNodes![1]!,
         fs.readFileSync(path.join(__dirname, 'babel-helpers.min.js'), 'utf-8'));
 
     const firstScriptOrImport = dom5.nodeWalk(document, scriptOrImport);
