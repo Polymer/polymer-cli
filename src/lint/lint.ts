@@ -43,7 +43,7 @@ export async function lint(options: Options, config: ProjectConfig) {
   }
 
   const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
-  const minimumSeverity = severityStringToValue(options['minSeverity']); // TODO: Add minSeverity to project config and here
+  const minimumSeverity = severityStringToValue(options.minSeverity || lintOptions.minSeverity);
   const filter = new WarningFilter({
     warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
     minimumSeverity: minimumSeverity || Severity.WARNING,
