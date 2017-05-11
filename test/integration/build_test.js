@@ -44,7 +44,7 @@ suite('polymer build', function() {
     copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
 
     return runCommand(binPath, ['build', '--preset', 'es5-bundled'], {
-             cwd: tmpDir.name
+             cwd: tmpDir.name,
            })
         .then(() => {
           assertDirsEqual(
