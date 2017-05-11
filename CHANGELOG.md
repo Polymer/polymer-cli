@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Fix the CLI preset flag.
+- Fix `build` as streams where not working anymore. 
 
 ## v0.18.2 [05-10-2017]
 

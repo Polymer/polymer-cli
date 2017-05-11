@@ -17,7 +17,9 @@ import * as stream from 'stream';
 
 import File = require('vinyl');
 
-(Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol('asyncIterator');
+if (typeof (Symbol as any).asyncIterator  === 'undefined') {
+  (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol('asyncIterator');
+}
 
 /**
  * Returns the string contents of a Vinyl File object, waiting for
