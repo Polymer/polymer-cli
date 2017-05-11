@@ -30,16 +30,28 @@ suite('polymer build', function() {
 
   test('handles a simple correct case', () => {
     const tmpDir = tmp.dirSync();
-    copyDir(path.join(fixturePath, 'build-simple'), tmpDir.name);
+    copyDir(path.join(fixturePath, 'build-simple', 'source'), tmpDir.name);
 
     return runCommand(binPath, ['build'], {cwd: tmpDir.name}).then(() => {
       assertDirsEqual(
           path.join(tmpDir.name, 'build'),
-          path.join(fixturePath, 'build-simple-expected'));
+          path.join(fixturePath, 'build-simple', 'expected'));
     });
   });
 
+  test('handles a CLI preset', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
 
+    return runCommand(binPath, ['build', '--preset', 'es5-bundled'], {
+             cwd: tmpDir.name,
+           })
+        .then(() => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build'),
+              path.join(fixturePath, 'build-with-preset', 'expected'));
+        });
+  });
 });
 
 function copyDir(fromDir, toDir) {

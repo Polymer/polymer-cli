@@ -24,39 +24,9 @@ import {PolymerProject} from 'polymer-build';
 import {applyBuildPreset, ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
 import * as buildLibTypeOnly from '../build/build';
-
 import {Command, CommandOptions} from './command';
 
-
 const logger = logging.getLogger('cli.command.build');
-
-/**
- * Converts command-line build arguments to the `ProjectBuildOptions` format
- * that our build understands, applying the preset if one was given.
- */
-function commandOptionsToBuildOptions(options: CommandOptions):
-    ProjectBuildOptions {
-  return applyBuildPreset({
-    name: options['name'],
-    preset: options['preset'],
-    addServiceWorker: !!options['add-service-worker'],
-    addPushManifest: !!options['add-push-manifest'],
-    swPrecacheConfig: options['sw-precache-config'],
-    insertPrefetchLinks: !!options['insert-prefetch-links'],
-    bundle: !!options['bundle'],
-    html: {
-      minify: !!options['html-minify'],
-    },
-    css: {
-      minify: !!options['css-minify'],
-    },
-    js: {
-      minify: !!options['js-minify'],
-      compile: !!options['js-compile'],
-    },
-  });
-}
-
 
 export class BuildCommand implements Command {
   name = 'build';
@@ -135,6 +105,22 @@ export class BuildCommand implements Command {
     },
   ];
 
+  /**
+   * Converts command-line build arguments to the `ProjectBuildOptions` format
+   * that our build understands, applying the preset if one was given.
+   */
+  private commandOptionsToBuildOptions(options: CommandOptions):
+      ProjectBuildOptions {
+    const buildOptions: ProjectBuildOptions = {};
+    const validBuildOptions = new Set(this.args.map(({name}) => name));
+    for (const buildOption of Object.keys(options)) {
+      if (validBuildOptions.has(buildOption)) {
+        (<any>buildOptions)[buildOption] = options[buildOption];
+      }
+    }
+    return applyBuildPreset(buildOptions);
+  }
+
   async run(options: CommandOptions, config: ProjectConfig) {
     // Defer dependency loading until this specific command is run
     const del = require('del') as typeof delTypeOnly;
@@ -164,7 +150,7 @@ export class BuildCommand implements Command {
         this.args.some((arg) => typeof options[arg.name] !== 'undefined');
     if (hasCliArgumentsPassed) {
       await build(
-          commandOptionsToBuildOptions(options), polymerProject, config);
+          this.commandOptionsToBuildOptions(options), polymerProject, config);
       return;
     }
 
