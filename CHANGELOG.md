@@ -1,6 +1,7 @@
 # Changelog
 
-<!-- ## Unreleased -->
+## Unreleased
+- Fix the CLI preset flag.
 
 ## v0.18.2 [05-10-2017]
 

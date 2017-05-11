@@ -43,11 +43,14 @@ suite('polymer build', function() {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
 
-    return runCommand(binPath, ['build', '--preset', 'es5-bundled'], {cwd: tmpDir.name}).then(() => {
-      assertDirsEqual(
-          path.join(tmpDir.name, 'build'),
-          path.join(fixturePath, 'build-with-preset', 'expected'));
-    });
+    return runCommand(binPath, ['build', '--preset', 'es5-bundled'], {
+             cwd: tmpDir.name
+           })
+        .then(() => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build'),
+              path.join(fixturePath, 'build-with-preset', 'expected'));
+        });
   });
 });
 

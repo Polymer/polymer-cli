@@ -112,11 +112,11 @@ export class BuildCommand implements Command {
   private commandOptionsToBuildOptions(options: CommandOptions):
       ProjectBuildOptions {
     const buildOptions: ProjectBuildOptions = {};
-    const validBuildOptions = this.args.map(({name}) => name);
-    for (const buildOption in options) {
-        if (options.hasOwnProperty(buildOption) && validBuildOptions.indexOf(buildOption) > -1) {
-          (<any>buildOptions)[buildOption] = options[buildOption];
-        }
+    const validBuildOptions = new Set(this.args.map(({name}) => name));
+    for (const buildOption of Object.keys(options)) {
+      if (validBuildOptions.has(buildOption)) {
+        (<any>buildOptions)[buildOption] = options[buildOption];
+      }
     }
     return applyBuildPreset(buildOptions);
   }
