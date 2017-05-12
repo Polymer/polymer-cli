@@ -2,7 +2,7 @@
 
 ## Unreleased
 - Fix the CLI preset flag.
-- Fix `build` as streams where not working anymore. 
+- Fix an issue where compiling JS would crash in versions of node with native async iterators.
 
 ## v0.18.2 [05-10-2017]
 
