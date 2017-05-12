@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+<!-- ## Unreleased -->
+<!-- Add new, unreleased items here. -->
+
+## v0.18.3 [05-12-2017]
 - Fix the CLI preset flag.
 - Fix an issue where compiling JS would crash in versions of node with native async iterators.
+- `bundle` no longer emits any JS or CSS files which have been inlined into bundles.
 
 ## v0.18.2 [05-10-2017]
 
