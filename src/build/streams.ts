@@ -17,7 +17,7 @@ import * as stream from 'stream';
 
 import File = require('vinyl');
 
-if ((Symbol as any).asyncIterator !== 'undefined') {
+if ((Symbol as any).asyncIterator === undefined) {
   (Symbol as any).asyncIterator = Symbol('asyncIterator');
 }
 
