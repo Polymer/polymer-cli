@@ -12,9 +12,8 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {Analyzer} from 'polymer-analyzer';
-import {Analysis} from 'polymer-analyzer/lib/analysis-format';
-import {generateAnalysis} from 'polymer-analyzer/lib/generate-analysis';
+import {generateAnalysis, Analyzer} from 'polymer-analyzer';
+import {Analysis} from 'polymer-analyzer/lib/analysis-format/analysis-format';
 import {Feature} from 'polymer-analyzer/lib/model/model';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';

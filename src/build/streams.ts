@@ -12,7 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {Deferred} from 'polymer-analyzer/lib/utils';
+import {Deferred} from 'polymer-analyzer/lib/core/utils';
 import * as stream from 'stream';
 
 import File = require('vinyl');

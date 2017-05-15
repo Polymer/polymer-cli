@@ -63,10 +63,10 @@ export async function lint(options: Options, config: ProjectConfig) {
     warnings = await linter.lintPackage();
   }
 
-  const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
+  const filtered = warnings.filter((w: any) => !filter.shouldIgnore(w));
 
   const printer = new WarningPrinter(
-      process.stdout, {analyzer: analyzer, verbosity: 'full', color: true});
+      process.stdout, {verbosity: 'full', color: true});
   await printer.printWarnings(filtered);
 
   if (filtered.length > 0) {
