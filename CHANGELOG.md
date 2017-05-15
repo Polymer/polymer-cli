@@ -4,7 +4,7 @@
 <!-- Add new, unreleased items here. -->
 
 ## v0.18.4 [05-15-2017]
-- Update dependencies to support official `polymer-analyzer` 2.0.0 release.
+- Updated dependencies to support official `polymer-analyzer` 2.0.0 and `web-components-tester` 6.0.0 releases.
 
 ## v0.18.3 [05-12-2017]
 - Fix the CLI preset flag.
