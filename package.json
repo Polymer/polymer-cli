@@ -102,7 +102,7 @@
     "tmp": "0.0.31",
     "tslint": "^4.0.2",
     "typescript": "^2.2.0",
-    "uglifyjs": "^2.4.10",
+    "uglify-js": "^2.4.10",
     "vinyl-fs-fake": "^1.1.0",
     "yeoman-assert": "^2.2.1",
     "yeoman-test": "^1.1.0"
