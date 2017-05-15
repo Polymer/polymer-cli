@@ -1775,9 +1775,9 @@ class-extend@^0.1.0, class-extend@^0.1.1:
   dependencies:
     object-assign "^2.0.0"
 
-clean-css@4.0.x:
-  version "4.0.13"
-  resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.0.13.tgz#feb2a176062d72a6c3e624d9213cac6a0c485e80"
+clean-css@4.1.x:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.1.2.tgz#6029aea30b1d9520a968a3caee0dabb1184e353a"
   dependencies:
     source-map "0.5.x"
 
@@ -1905,7 +1905,7 @@ commander@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.6.0.tgz#9df7e52fb2a0cb0fb89058ee80c3104225f37e1d"
 
-commander@2.9.0, commander@2.9.x, commander@^2.8.1, commander@^2.9.0:
+commander@2.9.0, commander@2.9.x, commander@^2.8.1, commander@^2.9.0, commander@~2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
   dependencies:
@@ -2525,8 +2525,8 @@ error@^7.0.2:
     xtend "~4.0.0"
 
 es5-ext@^0.10.14, es5-ext@^0.10.9, es5-ext@~0.10.14:
-  version "0.10.16"
-  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.16.tgz#1ef1b04f3d09db6a5d630226d62202f2e425e45a"
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.18.tgz#dc239d3dce4c22b9c939aa180878837a3c0b5c92"
   dependencies:
     es6-iterator "2"
     es6-symbol "~3.1"
@@ -3694,17 +3694,17 @@ hpack.js@^2.1.6:
     wbuf "^1.1.0"
 
 html-minifier@^3.0.1:
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/html-minifier/-/html-minifier-3.4.4.tgz#616fe3e3ef16da02b393d9a6099eeff468a35df0"
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/html-minifier/-/html-minifier-3.5.0.tgz#98be1b18f87443592722f654e67a1541f22018cb"
   dependencies:
     camel-case "3.0.x"
-    clean-css "4.0.x"
+    clean-css "4.1.x"
     commander "2.9.x"
     he "1.1.x"
     ncname "1.0.x"
     param-case "2.1.x"
     relateurl "0.2.x"
-    uglify-js "~2.8.22"
+    uglify-js "3.0.x"
 
 html-wiring@^1.0.0:
   version "1.2.0"
@@ -4751,8 +4751,8 @@ mkdirp@0.5.1, mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1:
     minimist "0.0.8"
 
 mocha@^3.0, mocha@^3.0.0, mocha@^3.1.2:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/mocha/-/mocha-3.3.0.tgz#d29b7428d3f52c82e2e65df1ecb7064e1aabbfb5"
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/mocha/-/mocha-3.4.1.tgz#a3802b4aa381934cacb38de70cf771621da8f9af"
   dependencies:
     browser-stdout "1.3.0"
     commander "2.9.0"
@@ -5372,9 +5372,36 @@ polymer-analyzer@2.0.0-alpha.42:
     strip-indent "^2.0.0"
     typescript "^2.2.0"
 
-polymer-build@1.2.4, polymer-build@^1.1.0:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.2.4.tgz#731df80b922750a6a4591f7a0f99119914ecd1bc"
+polymer-analyzer@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/polymer-analyzer/-/polymer-analyzer-2.0.0.tgz#70c3071e98ba2bd447885eaf987d23287dd8ef0c"
+  dependencies:
+    "@types/chai-subset" "^1.3.0"
+    "@types/chalk" "^0.4.30"
+    "@types/clone" "^0.1.30"
+    "@types/cssbeautify" "^0.3.1"
+    "@types/doctrine" "^0.0.1"
+    "@types/escodegen" "^0.0.2"
+    "@types/estree" "^0.0.34"
+    "@types/node" "^6.0.0"
+    "@types/parse5" "^2.2.34"
+    chalk "^1.1.3"
+    clone "^2.0.0"
+    cssbeautify "^0.3.1"
+    doctrine "^2.0.0"
+    dom5 "^2.1.0"
+    escodegen "^1.7.0"
+    espree "^3.1.7"
+    estraverse "^4.2.0"
+    jsonschema "^1.1.0"
+    parse5 "^2.2.1"
+    shady-css-parser "0.0.8"
+    strip-indent "^2.0.0"
+    typescript "^2.2.0"
+
+polymer-build@^1.1.0, polymer-build@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.2.5.tgz#0d238429582492250bba8171352b9d96535dc4a7"
   dependencies:
     "@types/node" "^4.2.3"
     "@types/parse5" "^2.2.32"
@@ -5384,16 +5411,16 @@ polymer-build@1.2.4, polymer-build@^1.1.0:
     multipipe "^1.0.2"
     parse5 "^2.2.2"
     plylog "^0.5.0"
-    polymer-analyzer "2.0.0-alpha.42"
-    polymer-bundler "^2.0.0-pre.17"
+    polymer-analyzer "^2.0.0"
+    polymer-bundler "2.0.0-pre.18"
     polymer-project-config "^2.0.0"
     sw-precache "^5.1.1"
     vinyl "^1.1.1"
     vinyl-fs "^2.4.3"
 
-polymer-bundler@^2.0.0-pre.17:
-  version "2.0.0-pre.17"
-  resolved "https://registry.yarnpkg.com/polymer-bundler/-/polymer-bundler-2.0.0-pre.17.tgz#e9e16bb80b1eb68dbc067afa5cea0abdba16d047"
+polymer-bundler@2.0.0-pre.18:
+  version "2.0.0-pre.18"
+  resolved "https://registry.yarnpkg.com/polymer-bundler/-/polymer-bundler-2.0.0-pre.18.tgz#6f90eb08dec143c136afd6c1bba74467afbefce2"
   dependencies:
     clone "^2.1.0"
     command-line-args "^3.0.1"
@@ -5405,7 +5432,7 @@ polymer-bundler@^2.0.0-pre.17:
     nopt "^3.0.1"
     parse5 "^2.2.2"
     path-posix "^1.0.0"
-    polymer-analyzer "2.0.0-alpha.42"
+    polymer-analyzer "^2.0.0"
     source-map "^0.5.6"
 
 polymer-linter@2.0.1:
@@ -5433,67 +5460,13 @@ polymer-project-config@^2.0.0:
     plylog "^0.5.0"
 
 polymer-project-config@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.0.0.tgz#367edffd95d77353475c672dd6f84881873f3d83"
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.1.0.tgz#5a7d87a55834c5841d1f0609b47df65e7e60dd9d"
   dependencies:
     "@types/node" "^6.0.41"
     jsonschema "^1.1.1"
     minimatch-all "^1.1.0"
     plylog "^0.5.0"
-
-polyserve@^0.17:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/polyserve/-/polyserve-0.17.0.tgz#4d199a9145e134620f9c0c61dffa2fac866551b5"
-  dependencies:
-    "@types/babel-core" "^6.7.14"
-    "@types/content-type" "^1.0.33"
-    "@types/express" "^4.0.33"
-    "@types/mime" "0.0.29"
-    "@types/mz" "0.0.29"
-    "@types/node" "4.0.30"
-    "@types/opn" "^3.0.28"
-    "@types/parse5" "^2.2.34"
-    "@types/pem" "^1.8.1"
-    "@types/serve-static" "^1.7.31"
-    "@types/spdy" "^3.4.1"
-    "@types/ua-parser-js" "^0.7.30"
-    babel-core "^6.18.2"
-    babel-plugin-transform-es2015-arrow-functions "^6.8.0"
-    babel-plugin-transform-es2015-block-scoped-functions "^6.8.0"
-    babel-plugin-transform-es2015-block-scoping "^6.18.0"
-    babel-plugin-transform-es2015-classes "^6.18.0"
-    babel-plugin-transform-es2015-computed-properties "^6.8.0"
-    babel-plugin-transform-es2015-destructuring "^6.19.0"
-    babel-plugin-transform-es2015-duplicate-keys "^6.8.0"
-    babel-plugin-transform-es2015-for-of "^6.18.0"
-    babel-plugin-transform-es2015-function-name "^6.9.0"
-    babel-plugin-transform-es2015-literals "^6.8.0"
-    babel-plugin-transform-es2015-object-super "^6.8.0"
-    babel-plugin-transform-es2015-parameters "^6.18.0"
-    babel-plugin-transform-es2015-shorthand-properties "^6.18.0"
-    babel-plugin-transform-es2015-spread "^6.8.0"
-    babel-plugin-transform-es2015-sticky-regex "^6.8.0"
-    babel-plugin-transform-es2015-template-literals "^6.8.0"
-    babel-plugin-transform-es2015-typeof-symbol "^6.18.0"
-    babel-plugin-transform-es2015-unicode-regex "^6.11.0"
-    babel-plugin-transform-regenerator "^6.16.1"
-    command-line-args "^3.0.1"
-    command-line-usage "^3.0.3"
-    content-type "^1.0.2"
-    dom5 "^2.0.1"
-    express "^4.8.5"
-    find-port "^1.0.1"
-    http-proxy-middleware "^0.17.2"
-    lru-cache "^4.0.2"
-    mime "^1.3.4"
-    mz "^2.4.0"
-    opn "^3.0.2"
-    parse5 "^2.2.3"
-    pem "^1.8.3"
-    resolve "^1.0.0"
-    send "^0.14.1"
-    spdy "^3.3.3"
-    ua-parser-js "^0.7.12"
 
 polyserve@^0.19.0:
   version "0.19.0"
@@ -6686,9 +6659,9 @@ ternary-stream@^2.0.1:
     merge-stream "^1.0.0"
     through2 "^2.0.1"
 
-"test-fixture@github:PolymerElements/test-fixture":
+"test-fixture@github:polymerelements/test-fixture":
   version "3.0.0-rc.1"
-  resolved "https://codeload.github.com/PolymerElements/test-fixture/tar.gz/26118ef0467501c33c02316e7016a2837baba10f"
+  resolved "https://codeload.github.com/polymerelements/test-fixture/tar.gz/26118ef0467501c33c02316e7016a2837baba10f"
 
 test-value@^2.1.0:
   version "2.1.0"
@@ -6759,8 +6732,8 @@ tildify@^1.0.0:
     os-homedir "^1.0.0"
 
 time-stamp@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/time-stamp/-/time-stamp-1.0.1.tgz#9f4bd23559c9365966f3302dbba2b07c6b99b151"
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/time-stamp/-/time-stamp-1.1.0.tgz#764a5a11af50561921b133f3b44e618687e0f5c3"
 
 timed-out@^2.0.0:
   version "2.0.0"
@@ -6843,8 +6816,8 @@ tslint@^4.0.0, tslint@^4.0.2:
     update-notifier "^2.0.0"
 
 tsutils@^1.1.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-1.8.0.tgz#bf8118ed8e80cd5c9fc7d75728c7963d44ed2f52"
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-1.9.1.tgz#b9f9ab44e55af9681831d5f28d0aeeaf5c750cb0"
 
 tunnel-agent@^0.6.0:
   version "0.6.0"
@@ -6941,9 +6914,16 @@ ua-parser-js@^0.7.12:
   version "0.7.12"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.12.tgz#04c81a99bdd5dc52263ea29d24c6bf8d4818a4bb"
 
-uglify-js@^2.6, uglify-js@~2.8.22:
-  version "2.8.23"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.23.tgz#8230dd9783371232d62a7821e2cf9a817270a8a0"
+uglify-js@3.0.x:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.0.5.tgz#585f5540a991edce566be734d235b71eed7e7146"
+  dependencies:
+    commander "~2.9.0"
+    source-map "~0.5.1"
+
+uglify-js@^2.6:
+  version "2.8.25"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.25.tgz#11b776e7c3925802853e4c3dd6d0ffad8eb72336"
   dependencies:
     source-map "~0.5.1"
     yargs "~3.10.0"
@@ -7231,7 +7211,7 @@ wbuf@^1.1.0, wbuf@^1.4.0:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-wct-local@^2.0.8:
+wct-local@^2.0.15:
   version "2.0.15"
   resolved "https://registry.yarnpkg.com/wct-local/-/wct-local-2.0.15.tgz#b5e3758e32e5d70c54d129fd6571d7cc14cf31e2"
   dependencies:
@@ -7274,9 +7254,9 @@ wd@^1.0.0:
     underscore.string "3.3.4"
     vargs "0.1.0"
 
-web-component-tester@^6.0.0-prerelease.9:
-  version "6.0.0-prerelease.9"
-  resolved "https://registry.yarnpkg.com/web-component-tester/-/web-component-tester-6.0.0-prerelease.9.tgz#c62fcd9322ce3ab43e46ccb4a3ff30944c409f41"
+web-component-tester@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/web-component-tester/-/web-component-tester-6.0.0.tgz#6abc08eafd7113a9ccf7873c225e9ccffd207523"
   dependencies:
     "@types/body-parser" "0.0.33"
     "@types/chai" "^3.4.34"
@@ -7309,7 +7289,7 @@ web-component-tester@^6.0.0-prerelease.9:
     mocha "^3.1.2"
     multer "^1.1.0"
     nomnom "^1.8.1"
-    polyserve "^0.17"
+    polyserve "^0.19.0"
     promisify-node "^0.4.0"
     resolve "^1.0.0"
     semver "^5.3.0"
@@ -7323,7 +7303,7 @@ web-component-tester@^6.0.0-prerelease.9:
     wd "^1.0.0"
   optionalDependencies:
     update-notifier "^1.0.0"
-    wct-local "^2.0.8"
+    wct-local "^2.0.15"
     wct-sauce "^2.0.0-pre.1"
 
 which-module@^1.0.0:
@@ -7410,8 +7390,8 @@ write-file-atomic@^1.1.2:
     slide "^1.1.5"
 
 write-file-atomic@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/write-file-atomic/-/write-file-atomic-2.0.0.tgz#bb99a5440d0d31dd860a68da392bffeef66251a1"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/write-file-atomic/-/write-file-atomic-2.1.0.tgz#1769f4b551eedce419f0505deae2e26763542d37"
   dependencies:
     graceful-fs "^4.1.11"
     imurmurhash "^0.1.4"
