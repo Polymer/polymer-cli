@@ -244,6 +244,12 @@
     "@types/bluebird" "*"
     "@types/node" "*"
 
+"@types/mz@^0.0.31":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@types/mz/-/mz-0.0.31.tgz#a4d80c082fefe71e40a7c0f07d1e6555bbbc7b52"
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*", "@types/node@6.0.*", "@types/node@=6.0.65", "@types/node@^6", "@types/node@^6.0.0", "@types/node@^6.0.31", "@types/node@^6.0.41":
   version "6.0.65"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
@@ -2356,7 +2362,11 @@ dom5@^2.0.0, dom5@^2.0.1, dom5@^2.1.0, dom5@^2.2.0, dom5@^2.3.0:
     clone "^2.1.0"
     parse5 "^2.2.2"
 
-domelementtype@1, domelementtype@~1.1.1:
+domelementtype@1:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.3.0.tgz#b17aed82e8ab59e52dd9c19b1756e0fc187204c2"
+
+domelementtype@~1.1.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.1.3.tgz#bd28773e2642881aec51544924299c5cd822185b"
 
@@ -4228,8 +4238,8 @@ jsprim@^1.2.2:
     verror "1.3.6"
 
 kind-of@^3.0.2:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.1.tgz#9713fb3aea9ed3ba2fba907f0dfc4eb8224527f2"
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"
   dependencies:
     is-buffer "^1.1.5"
 
@@ -4825,7 +4835,7 @@ mute-stream@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.6.tgz#48962b19e169fd1dfc240b3f1e7317627bbc47db"
 
-mz@^2.4.0:
+mz@^2.4.0, mz@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/mz/-/mz-2.6.0.tgz#c8b8521d958df0a4f2768025db69c719ee4ef1ce"
   dependencies:
@@ -5373,8 +5383,8 @@ polymer-analyzer@^2.0.0, polymer-analyzer@^2.0.1:
     typescript "^2.2.0"
 
 polymer-build@^1.1.0, polymer-build@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.3.0.tgz#3c9a2791e0c879c52147ef3a17970979078880f2"
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/polymer-build/-/polymer-build-1.3.1.tgz#3c5c685fb095ed9228c42eaf63188e10fc760b1a"
   dependencies:
     "@types/node" "^4.2.3"
     "@types/parse5" "^2.2.32"
@@ -5386,7 +5396,7 @@ polymer-build@^1.1.0, polymer-build@^1.3.0:
     plylog "^0.5.0"
     polymer-analyzer "^2.0.1"
     polymer-bundler "2.0.0-pre.18"
-    polymer-project-config "^2.0.0"
+    polymer-project-config "^3.0.0"
     sw-precache "^5.1.1"
     vinyl "^1.1.1"
     vinyl-fs "^2.4.3"
@@ -5423,18 +5433,9 @@ polymer-linter@^2.0.2:
     polymer-analyzer "^2.0.0"
     strip-indent "^2.0.0"
 
-polymer-project-config@^2.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-2.1.1.tgz#cfda2fb2d1d443bc845cf7e6d9a6b78e2769e0ec"
-  dependencies:
-    "@types/node" "^6.0.41"
-    jsonschema "^1.1.1"
-    minimatch-all "^1.1.0"
-    plylog "^0.5.0"
-
-polymer-project-config@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.1.0.tgz#5a7d87a55834c5841d1f0609b47df65e7e60dd9d"
+polymer-project-config@^3.0.0, polymer-project-config@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.2.0.tgz#83ecc57dcc2cf3a740647475bb13404cf175ee16"
   dependencies:
     "@types/node" "^6.0.41"
     jsonschema "^1.1.1"
