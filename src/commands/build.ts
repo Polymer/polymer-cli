@@ -18,6 +18,7 @@
 // output JS and so not result in a require() statement.
 
 import * as delTypeOnly from 'del';
+import * as mzfsTypeOnly from 'mz/fs';
 import * as pathTypeOnly from 'path';
 import * as logging from 'plylog';
 import {PolymerProject} from 'polymer-build';
@@ -142,6 +143,9 @@ export class BuildCommand implements Command {
     logger.info(`Clearing ${mainBuildDirectoryName}${path.sep} directory...`);
     await del([mainBuildDirectoryName]);
 
+    const mzfs = require('mz/fs') as typeof mzfsTypeOnly;
+    await mzfs.mkdir(mainBuildDirectoryName);
+
     const polymerProject = new PolymerProject(config);
 
     // If any the build command flags were passed as CLI arguments, generate
@@ -157,9 +161,11 @@ export class BuildCommand implements Command {
     // If no build flags were passed but 1+ polymer.json build configuration(s)
     // exist, generate a build for each configuration found.
     if (config.builds) {
-      await Promise.all(config.builds.map((buildOptions) => {
-        return build(buildOptions, polymerProject, config);
-      }));
+      const promises = config.builds.map(
+          (buildOptions) => build(buildOptions, polymerProject, config));
+      promises.push(mzfs.writeFile(
+          path.join(mainBuildDirectoryName, 'polymer.json'), config.toJSON()));
+      await Promise.all(promises);
       return;
     }
 
