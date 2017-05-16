@@ -3,6 +3,9 @@
 <!-- ## Unreleased -->
 <!-- Add new, unreleased items here. -->
 
+## v1.0.0 [05-16-2017]
+- Official 1.0.0 release of the Polymer CLI! 🎉
+
 ## v0.18.4 [05-15-2017]
 - Updated dependencies to support official `polymer-analyzer` 2.0.0 and `web-components-tester` 6.0.0 releases.
 
