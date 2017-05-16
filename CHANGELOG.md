@@ -5,6 +5,7 @@
 
 ## v1.0.0 [05-16-2017]
 - Official 1.0.0 release of the Polymer CLI! 🎉
+- `build` Support for new `basePath` build config option that remaps paths to assist in serving at non-root paths, such as when doing differential serving of multiple builds from the same host. Affects service worker generation, push manifest generation, and also updates the entrypoint's `<base>` tag if found.
 
 ## v0.18.4 [05-15-2017]
 - Updated dependencies to support official `polymer-analyzer` 2.0.0 and `web-components-tester` 6.0.0 releases.
