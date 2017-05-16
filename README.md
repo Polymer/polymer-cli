@@ -23,7 +23,7 @@ The command-line tool for Polymer projects and Web Components.
 ## Installation
 
 ```bash
-$ yarn add global polymer-cli
+$ yarn global add polymer-cli
 # or...
 $ npm install -g polymer-cli
 ```
