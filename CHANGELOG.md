@@ -1,6 +1,7 @@
 # Changelog
 
-<!-- ## Unreleased -->
+## Unreleased
+- Update element and application templates to latest stable versions
 <!-- Add new, unreleased items here. -->
 
 ## v1.0.0 [05-16-2017]
