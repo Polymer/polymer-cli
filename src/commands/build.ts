@@ -153,8 +153,7 @@ export class BuildCommand implements Command {
     const hasCliArgumentsPassed =
         this.args.some((arg) => typeof options[arg.name] !== 'undefined');
     if (hasCliArgumentsPassed) {
-      await build(
-          this.commandOptionsToBuildOptions(options), polymerProject, config);
+      await build(this.commandOptionsToBuildOptions(options), polymerProject);
       return;
     }
 
@@ -162,7 +161,7 @@ export class BuildCommand implements Command {
     // exist, generate a build for each configuration found.
     if (config.builds) {
       const promises = config.builds.map(
-          (buildOptions) => build(buildOptions, polymerProject, config));
+          (buildOptions) => build(buildOptions, polymerProject));
       promises.push(mzfs.writeFile(
           path.join(mainBuildDirectoryName, 'polymer.json'), config.toJSON()));
       await Promise.all(promises);
@@ -170,6 +169,6 @@ export class BuildCommand implements Command {
     }
 
     // If no builds were defined, just generate a default build.
-    await build({}, polymerProject, config);
+    await build({}, polymerProject);
   }
 }
