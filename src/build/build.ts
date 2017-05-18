@@ -20,11 +20,10 @@ import mergeStream = require('merge-stream');
 import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
-import {ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
+import {ProjectBuildOptions} from 'polymer-project-config';
 import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
-import {BabelHelpersInjector} from './inject-babel-helpers';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
@@ -37,8 +36,7 @@ export const mainBuildDirectoryName = 'build';
  */
 export async function build(
     options: ProjectBuildOptions,
-    polymerProject: PolymerProject,
-    config: ProjectConfig): Promise<void> {
+    polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
   const optimizeOptions:
       OptimizeOptions = {css: options.css, js: options.js, html: options.html};
@@ -71,7 +69,7 @@ export async function build(
 
   const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
   if (compiledToES5) {
-    buildStream = buildStream.pipe(new BabelHelpersInjector(config.entrypoint))
+    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
                       .pipe(polymerProject.addCustomElementsEs5Adapter());
   }
 
