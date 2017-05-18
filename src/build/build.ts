@@ -21,7 +21,6 @@ import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} fr
 
 import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
 import {ProjectBuildOptions} from 'polymer-project-config';
-import {PrefetchTransform} from './prefetch';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
 
@@ -64,7 +63,7 @@ export async function build(
   }
 
   if (options.insertPrefetchLinks) {
-    buildStream = buildStream.pipe(new PrefetchTransform(polymerProject));
+    buildStream = buildStream.pipe(polymerProject.addPrefetchLinks());
   }
 
   const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);

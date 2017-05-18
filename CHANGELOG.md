@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Update element and application templates to latest stable versions
+- Prefetch links are now compatible with bundler and differential serving w/ base tag hrefs in entrypoint documents.
 <!-- Add new, unreleased items here. -->
 
 ## v1.0.0 [05-16-2017]
