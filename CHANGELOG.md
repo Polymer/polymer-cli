@@ -3,6 +3,9 @@
 <!-- ## Unreleased -->
 <!-- Add new, unreleased items here. -->
 
+## v1.0.2 [05-19-2017]
+- Updates dependencies on latest polymer-build and polymer-bundler to reduce extraneous html tag output when bundling and generating prefetch links.
+
 ## v1.0.1 [05-18-2017]
 - Update element and application templates to latest stable versions
 - Prefetch links are now compatible with bundler and differential serving w/ base tag hrefs in entrypoint documents.
