@@ -250,19 +250,19 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@=6.0.65", "@types/node@^6.0.0":
+"@types/node@*", "@types/node@=6.0.65", "@types/node@^6", "@types/node@^6.0.0":
   version "6.0.65"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.65.tgz#c00faa7ffcfc9842b5dd7bf650872562504d5670"
 
-"@types/node@4.0.30", "@types/node@^4.0.30":
+"@types/node@4.0.30":
   version "4.0.30"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.0.30.tgz#553f490ed3030311620f88003e7abfc0edcb301e"
 
-"@types/node@6.0.*", "@types/node@^6", "@types/node@^6.0.31", "@types/node@^6.0.41", "@types/node@^6.0.73":
+"@types/node@6.0.*", "@types/node@^6.0.31", "@types/node@^6.0.41", "@types/node@^6.0.73":
   version "6.0.73"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.73.tgz#85dc4bb6f125377c75ddd2519a1eeb63f0a4ed70"
 
-"@types/node@^4.2.3":
+"@types/node@^4.0.30", "@types/node@^4.2.3":
   version "4.2.8"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-4.2.8.tgz#26fd8fbc5b5ec7822614d950e237956ee92b88cd"
 
@@ -2361,7 +2361,11 @@ dom5@^2.0.0, dom5@^2.0.1, dom5@^2.1.0, dom5@^2.2.0:
     clone "^2.1.0"
     parse5 "^2.2.2"
 
-domelementtype@1, domelementtype@~1.1.1:
+domelementtype@1:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.3.0.tgz#b17aed82e8ab59e52dd9c19b1756e0fc187204c2"
+
+domelementtype@~1.1.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.1.3.tgz#bd28773e2642881aec51544924299c5cd822185b"
 
@@ -5441,9 +5445,9 @@ polymer-linter@^2.0.2:
     polymer-analyzer "^2.0.0"
     strip-indent "^2.0.0"
 
-polymer-project-config@^3.0.0, polymer-project-config@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.2.0.tgz#83ecc57dcc2cf3a740647475bb13404cf175ee16"
+polymer-project-config@^3.0.0, polymer-project-config@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.2.1.tgz#e880e1a4dba436de9ecd85ed421742f6f3e0d1a2"
   dependencies:
     "@types/node" "^6.0.41"
     jsonschema "^1.1.1"
@@ -6635,9 +6639,9 @@ ternary-stream@^2.0.1:
     merge-stream "^1.0.0"
     through2 "^2.0.1"
 
-test-fixture@PolymerElements/test-fixture:
+"test-fixture@github:polymerelements/test-fixture":
   version "3.0.0-rc.1"
-  resolved "https://codeload.github.com/PolymerElements/test-fixture/tar.gz/26118ef0467501c33c02316e7016a2837baba10f"
+  resolved "https://codeload.github.com/polymerelements/test-fixture/tar.gz/26118ef0467501c33c02316e7016a2837baba10f"
 
 test-value@^2.1.0:
   version "2.1.0"
