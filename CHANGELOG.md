@@ -1,9 +1,11 @@
 # Changelog
 
-## Unreleased
+<!-- ## Unreleased -->
+<!-- Add new, unreleased items here. -->
+
+## v1.0.1 [05-18-2017]
 - Update element and application templates to latest stable versions
 - Prefetch links are now compatible with bundler and differential serving w/ base tag hrefs in entrypoint documents.
-<!-- Add new, unreleased items here. -->
 
 ## v1.0.0 [05-16-2017]
 - Official 1.0.0 release of the Polymer CLI! 🎉
