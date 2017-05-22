@@ -1,6 +1,10 @@
 {
   "index.html": {
-    "baz.html": {
+    "bar.html": {
+      "type": "document",
+      "weight": 1
+    },
+    "shared_bundle_1.html": {
       "type": "document",
       "weight": 1
     }

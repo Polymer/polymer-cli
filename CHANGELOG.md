@@ -1,6 +1,7 @@
 # Changelog
 
-<!-- ## Unreleased -->
+## Unreleased
+- Updated dependency on latest polymer-project-config so that bundled presets include prefetch link generation.
 <!-- Add new, unreleased items here. -->
 
 ## v1.0.2 [05-19-2017]
