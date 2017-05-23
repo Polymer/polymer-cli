@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+<!-- ## Unreleased -->
+<!-- Add new, unreleased items here. -->
+
+## v1.1.0 [05-23-2017]
 - Updated dependency on latest polymer-project-config so that bundled presets include prefetch link generation.
 - `build` Entrypoints will now be properly cached by generated service workers, and assets will be fetched by service workers using relative URLs to support apps mounted at non-root host paths.
 - `build` The `basePath` option no longer adds a prefix to service workers or push manifests. Relative URLs are used instead.
-<!-- Add new, unreleased items here. -->
 
 ## v1.0.2 [05-19-2017]
 - Updates dependencies on latest polymer-build and polymer-bundler to reduce extraneous html tag output when bundling and generating prefetch links.
