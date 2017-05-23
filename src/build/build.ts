@@ -76,22 +76,19 @@ export async function build(
     logger.info(`(${buildName}) Building...`);
   });
 
-  let basePath;
   if (options.basePath) {
-    basePath = options.basePath === true ? buildName : options.basePath;
+    let basePath = options.basePath === true ? buildName : options.basePath;
     if (!basePath.startsWith('/')) {
       basePath = '/' + basePath;
     }
     if (!basePath.endsWith('/')) {
       basePath = basePath + '/';
     }
-
     buildStream = buildStream.pipe(polymerProject.updateBaseTag(basePath));
   }
 
   if (options.addPushManifest) {
-    buildStream =
-        buildStream.pipe(polymerProject.addPushManifest(undefined, basePath));
+    buildStream = buildStream.pipe(polymerProject.addPushManifest());
   }
 
   // Finish the build stream by piping it into the final build directory.
@@ -125,7 +122,6 @@ export async function build(
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
       bundled: options.bundle,
-      basePath: basePath,
     });
   }
 

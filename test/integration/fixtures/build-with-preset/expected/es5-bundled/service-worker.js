@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["/index.html","93a82add08fa41c12e9da9e5c6f84aea"]];
+var precacheConfig = [["index.html","93a82add08fa41c12e9da9e5c6f84aea"]];
 var cacheName = 'sw-precache-v3--' + (self.registration ? self.registration.scope : '');
 
 
@@ -221,7 +221,7 @@ self.addEventListener('fetch', function(event) {
 
     // If shouldRespond is false, check again, this time with 'index.html'
     // (or whatever the directoryIndex option is set to) at the end.
-    var directoryIndex = 'index.html';
+    var directoryIndex = '';
     if (!shouldRespond && directoryIndex) {
       url = addDirectoryIndex(url, directoryIndex);
       shouldRespond = urlsToCacheKeys.has(url);
@@ -229,11 +229,11 @@ self.addEventListener('fetch', function(event) {
 
     // If shouldRespond is still false, check to see if this is a navigation
     // request, and if so, whether the URL matches navigateFallbackWhitelist.
-    var navigateFallback = '';
+    var navigateFallback = 'index.html';
     if (!shouldRespond &&
         navigateFallback &&
         (event.request.mode === 'navigate') &&
-        isPathWhitelisted([], event.request.url)) {
+        isPathWhitelisted(["\\/[^\\/\\.]*(\\?|$)"], event.request.url)) {
       url = new URL(navigateFallback, self.location).toString();
       shouldRespond = urlsToCacheKeys.has(url);
     }
