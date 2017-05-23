@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Updated dependency on latest polymer-project-config so that bundled presets include prefetch link generation.
+- `build` Entrypoints will now be properly cached by generated service workers, and assets will be fetched by service workers using relative URLs to support apps mounted at non-root host paths.
 <!-- Add new, unreleased items here. -->
 
 ## v1.0.2 [05-19-2017]
