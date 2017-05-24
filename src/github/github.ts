@@ -51,6 +51,7 @@ export class GithubResponseError extends Error {
 export interface GithubOpts {
   owner: string;
   repo: string;
+  proxy: string;
   githubToken?: string;
   githubApi?: GitHubApi;
   requestApi?: request
@@ -64,6 +65,7 @@ export class Github {
       .RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private _owner: string;
   private _repo: string;
+  private _proxy: string;
 
   static tokenFromFile(filename: string): string|null {
     try {
@@ -77,8 +79,11 @@ export class Github {
     this._token = opts.githubToken || Github.tokenFromFile('token');
     this._owner = opts.owner;
     this._repo = opts.repo;
+    this._proxy = opts.proxy;
+    // TODO: this is a temporary solution and needs to be fixed once
+    // https://github.com/mikedeboer/node-github/issues/539 gets fixed
+    this._proxy ? process.env.HTTPS_PROXY = this._proxy : null;
     this._github = opts.githubApi || new GitHubApi({
-                     proxy: "http://EV_Foundation:Infy123%2B@10.68.248.34:80",
                      protocol: 'https',
                    });
     if (this._token != null) {
@@ -115,7 +120,7 @@ export class Github {
     return new Promise<void>((resolve, reject) => {
       this._request({
             url: tarballUrl,
-            proxy: "http://EV_Foundation:Infy123%2B@10.68.248.34:80",
+            proxy: this._proxy,
             headers: {
               'User-Agent': 'request',
               'Authorization': (this._token) ? `token ${this._token}` :
