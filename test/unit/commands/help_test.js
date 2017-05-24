@@ -28,11 +28,12 @@ suite('help', () => {
         let cli = new PolymerCli(['help', 'build']);
         let helpCommand = cli.commands.get('help');
         let helpCommandSpy = sinon.spy(helpCommand, 'run');
-        cli.run();
-        assert.isOk(helpCommandSpy.calledOnce);
-        assert.deepEqual(
-            helpCommandSpy.firstCall.args,
-            [{command: 'build'}, expectedDefaultConfig]);
+        return cli.run().then(() => {
+          assert.isOk(helpCommandSpy.calledOnce);
+          assert.deepEqual(
+              helpCommandSpy.firstCall.args,
+              [{command: 'build'}, expectedDefaultConfig]);
+        });
       });
 
   test(
@@ -41,10 +42,12 @@ suite('help', () => {
         let cli = new PolymerCli(['help']);
         let helpCommand = cli.commands.get('help');
         let helpCommandSpy = sinon.spy(helpCommand, 'run');
-        cli.run();
-        assert.isOk(helpCommandSpy.calledOnce);
-        assert.deepEqual(
-            helpCommandSpy.firstCall.args, [{}, expectedDefaultConfig]);
+        return cli.run().then(() => {
+          assert.isOk(helpCommandSpy.calledOnce);
+          assert.deepEqual(
+              helpCommandSpy.firstCall.args, [{}, expectedDefaultConfig]);
+        });
+
       });
 
 });

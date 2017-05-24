@@ -47,7 +47,7 @@ ${b('\\  /\\')}  ${m('/\\  /')}   ${b('/\\  /')}
 
 export class HelpCommand implements Command {
   name = 'help';
-  aliases = ['h'];
+  aliases = [];
 
   description = 'Shows this help message, or help for a specific command';
 
