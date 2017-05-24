@@ -11,7 +11,7 @@
 - `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
 - Derives node version check from the package.json.
 - The polymer.json project config can now specify paths to exclude when minifying files and compiling JavaScript.  See https://github.com/Polymer/polymer-project-config/issues/50 for more.
-- Fixed [issue #722](https://github.com/Polymer/polymer-cli/issues/722) by adding support to proxy calls to api.github.com
+- Fixed [issue #722](https://github.com/Polymer/polymer-cli/issues/722) by adding support to proxy calls to api.github.com.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.7 [10-11-2017]
