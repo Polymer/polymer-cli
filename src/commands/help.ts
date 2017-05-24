@@ -96,7 +96,7 @@ export class HelpCommand implements Command {
       {header: 'Global Options', optionList: globalArguments},
     ];
 
-    if (command.aliases.length) {
+    if (command.aliases.length > 0) {
       usageGroups.splice(1, 0, {header: 'Alias(es)', content: command.aliases});
     }
 

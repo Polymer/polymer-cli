@@ -32,8 +32,6 @@ export interface Options {
 }
 
 export class LintCommand implements Command {
-  // TODO(rictic): rename to 'lint' here and elsewhere, delete
-  // legacy-lint.ts. Also update the README.
   name = 'lint';
   aliases = [];
 
