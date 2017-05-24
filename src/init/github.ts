@@ -30,6 +30,7 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
   const githubToken = githubOptions.githubToken;
   const owner = githubOptions.owner;
   const repo = githubOptions.repo;
+  const proxy = githubOptions.proxy;
   const semverRange = githubOptions.semverRange || '*';
 
   return class GithubGenerator extends Generator {
@@ -37,7 +38,7 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
 
     constructor(args: string|string[], options: any) {
       super(args, options);
-      this._github = new Github({owner, repo, githubToken});
+      this._github = new Github({owner, repo, githubToken, proxy});
     }
 
     // This is necessary to prevent an exception in Yeoman when creating

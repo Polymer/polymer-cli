@@ -58,6 +58,7 @@ export class Github {
       .RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private _owner: string;
   private _repo: string;
+  private _proxy: string;
 
   static tokenFromFile(filename: string): string|null {
     try {
@@ -71,8 +72,9 @@ export class Github {
     this._token = opts.githubToken || Github.tokenFromFile('token');
     this._owner = opts.owner;
     this._repo = opts.repo;
+    this._proxy = opts.proxy;
     this._github = opts.githubApi || new GitHubApi({
-                     proxy: "http://EV_Foundation:Infy123%2B@10.68.248.34:80",
+                     proxy: this._proxy,
                      protocol: 'https',
                    });
     if (this._token != null) {
@@ -109,7 +111,7 @@ export class Github {
     return new Promise<void>((resolve, reject) => {
       this._request({
             url: tarballUrl,
-            proxy: "http://EV_Foundation:Infy123%2B@10.68.248.34:80",
+            proxy: this._proxy,
             headers: {
               'User-Agent': 'request',
               'Authorization': (this._token) ? `token ${this._token}` :
