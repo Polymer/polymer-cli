@@ -1,7 +1,7 @@
 {
   "lint": {
     "rules": [
-      "polymer-2-hybrid"
+      "polymer-2"
     ]
   }
 }
