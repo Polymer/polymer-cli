@@ -29,6 +29,8 @@ const logger = logging.getLogger('init');
 
 const proxy = getProxyConfig();
 
+const proxy = getProxyConfig();
+
 interface GeneratorDescription {
   name: string;
   value: string;
