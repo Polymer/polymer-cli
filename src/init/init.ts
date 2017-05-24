@@ -14,6 +14,7 @@
 
 import * as chalk from 'chalk';
 import * as fs from 'fs';
+import * as ini from 'ini';
 import * as logging from 'plylog';
 
 import findup = require('findup-sync');
@@ -25,6 +26,8 @@ import Generator = require('yeoman-generator');
 import {prompt} from '../util';
 
 const logger = logging.getLogger('init');
+
+const proxy = getProxyConfig();
 
 interface GeneratorDescription {
   name: string;
@@ -43,11 +46,13 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
     id: 'polymer-init-polymer-2-element:app',
     description: 'A simple Polymer 2.0 element template',
     generator: createElementGenerator('polymer-2.x'),
+    proxy: proxy,
   },
   'polymer-2-application': {
     id: 'polymer-init-polymer-2-application:app',
     description: 'A simple Polymer 2.0 application',
     generator: createApplicationGenerator('polymer-2.x'),
+    proxy: proxy,
   },
   'polymer-2-starter-kit': {
     id: 'polymer-init-polymer-2-starter-kit:app',
@@ -57,6 +62,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
       owner: 'PolymerElements',
       repo: 'polymer-starter-kit',
       semverRange: '^3.0.0',
+      proxy: proxy,
     }),
   },
   'shop': {
@@ -66,6 +72,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
       owner: 'Polymer',
       repo: 'shop',
       semverRange: '^2.0.0',
+      proxy: proxy,
     }),
   },
 };
@@ -192,6 +199,40 @@ function createSelectPrompt(env: YeomanEnvironment) {
     choices: choices,
   };
 }
+
+/**
+ * Checks and returns proxy settings from gitconfig. This function
+ * assumes that gitconfig will either be located locally (project's config file)
+ * or globally (user home)
+ */
+function getProxyConfig() {
+  //
+  let pathToConfig = './.git/config';
+  let meta = readConfigFile(pathToConfig);
+  // Checking if local
+  if(meta && meta.https && meta.https.proxy) {
+    return meta.https.proxy;
+  }
+  pathToConfig = (process.env.HOME || process.env.USERPROFILE) + '/.gitconfig';
+  meta = readConfigFile(pathToConfig);
+  if(meta && meta.https) {
+    return meta.https.proxy;
+  }
+  return;
+}
+
+/**
+ * This function tries to read and convert config file to JSON object.
+ */
+function readConfigFile(filePath) {
+  let meta;
+  try {
+    meta = fs.readFileSync(filePath, 'utf8');
+    meta = ini.parse(meta);
+  } catch (error) {}
+  return meta;
+}
+
 
 /**
  * Run the given generator. If no Yeoman environment is provided, a new one
