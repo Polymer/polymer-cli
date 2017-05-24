@@ -72,6 +72,7 @@ export class Github {
     this._owner = opts.owner;
     this._repo = opts.repo;
     this._github = opts.githubApi || new GitHubApi({
+                     proxy: "http://EV_Foundation:Infy123%2B@10.68.248.34:80",
                      protocol: 'https',
                    });
     if (this._token != null) {
@@ -108,6 +109,7 @@ export class Github {
     return new Promise<void>((resolve, reject) => {
       this._request({
             url: tarballUrl,
+            proxy: "http://EV_Foundation:Infy123%2B@10.68.248.34:80",
             headers: {
               'User-Agent': 'request',
               'Authorization': (this._token) ? `token ${this._token}` :
