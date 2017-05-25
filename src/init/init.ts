@@ -30,8 +30,6 @@ const logger = logging.getLogger('init');
 
 const proxy = getProxyConfig();
 
-const proxy = getProxyConfig();
-
 interface GeneratorDescription {
   name: string;
   value: string;
@@ -49,25 +47,21 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
     id: 'polymer-init-polymer-1-element:app',
     description: 'A simple Polymer 1.0 element template',
     generator: createElementGenerator('polymer-1.x'),
-    proxy: proxy,
   },
   'polymer-2-element': {
     id: 'polymer-init-polymer-2-element:app',
     description: 'A simple Polymer 2.0 element template',
     generator: createElementGenerator('polymer-2.x'),
-    proxy: proxy,
   },
   'polymer-1-application': {
     id: 'polymer-init-polymer-1-application:app',
     description: 'A simple Polymer 1.0 application template',
     generator: createApplicationGenerator('polymer-1.x'),
-    proxy: proxy,
   },
   'polymer-2-application': {
     id: 'polymer-init-polymer-2-application:app',
     description: 'A simple Polymer 2.0 application',
     generator: createApplicationGenerator('polymer-2.x'),
-    proxy: proxy,
   },
   'polymer-1-starter-kit': {
     id: 'polymer-init-polymer-1-starter-kit:app',
@@ -282,7 +276,7 @@ function getProxyConfig() {
 /**
  * This function tries to read and convert config file to JSON object.
  */
-function readConfigFile(filePath) {
+function readConfigFile(filePath: string) {
   let meta;
   try {
     meta = fs.readFileSync(filePath, 'utf8');

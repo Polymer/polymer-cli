@@ -45,6 +45,7 @@ export class GithubResponseError extends Error {
 export interface GithubOpts {
   owner: string;
   repo: string;
+  proxy: string;
   githubToken?: string;
   githubApi?: GitHubApi;
   requestApi?: request
@@ -73,9 +74,11 @@ export class Github {
     this._owner = opts.owner;
     this._repo = opts.repo;
     this._proxy = opts.proxy;
+    // TODO: this is a temporary solution and needs to be fixed once
+    // https://github.com/mikedeboer/node-github/issues/539 gets fixed
+    this._proxy ? process.env.HTTPS_PROXY = this._proxy : null;
     this._github = opts.githubApi || new GitHubApi({
-                     proxy: this._proxy,
-                     protocol: 'https',
+                    protocol: 'https',
                    });
     if (this._token != null) {
       this._github.authenticate({
