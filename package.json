@@ -30,6 +30,7 @@
     "@types/findup-sync": "^0.3.29",
     "@types/gulp-if": "0.0.30",
     "@types/html-minifier": "^1.1.30",
+    "@types/ini": "^1.3.29",
     "@types/inquirer": "0.0.32",
     "@types/merge-stream": "^1.0.28",
     "@types/mz": "^0.0.31",
