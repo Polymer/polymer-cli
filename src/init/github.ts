@@ -23,6 +23,7 @@ export interface GithubGeneratorOptions {
   owner: string;
   repo: string;
   semverRange?: string;
+  proxy: string;
 }
 
 export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
