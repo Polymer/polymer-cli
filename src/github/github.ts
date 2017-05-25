@@ -78,7 +78,7 @@ export class Github {
     // https://github.com/mikedeboer/node-github/issues/539 gets fixed
     this._proxy ? process.env.HTTPS_PROXY = this._proxy : null;
     this._github = opts.githubApi || new GitHubApi({
-                    protocol: 'https',
+                     protocol: 'https',
                    });
     if (this._token != null) {
       this._github.authenticate({
