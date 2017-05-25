@@ -10,59 +10,11 @@
  */
 'use strict';
 
-const path = require('path');
-const sinon = require('sinon');
 const assert = require('chai').assert;
-const ProjectConfig = require('polymer-project-config').ProjectConfig;
-const PolymerCli = require('../../../lib/polymer-cli').PolymerCli;
 
 const polymerInstall = require('../../../lib/install/install');
 
 suite('install', () => {
-
-  suite('runs command', () => {
-
-    const expectedDefaultConfig = new ProjectConfig({
-      extraDependencies: [path.resolve('bower_components/webcomponentsjs/*.js')],
-    });
-
-    test('using full command name', () => {
-      let cli = new PolymerCli(['install']);
-      let installCommand = cli.commands.get('install');
-      let installCommandSpy = sinon.stub(installCommand, 'run');
-      return cli.run().then(() => {
-        assert.isOk(installCommandSpy.calledOnce);
-        assert.deepEqual(
-            installCommandSpy.firstCall.args,
-            [{offline: false, variants: false}, expectedDefaultConfig]);
-      });
-    });
-
-    test('using aliased command name', () => {
-      let cli = new PolymerCli(['i']);
-      let installCommand = cli.commands.get('install');
-      let installCommandSpy = sinon.stub(installCommand, 'run');
-      return cli.run().then(() => {
-        assert.isOk(installCommandSpy.calledOnce);
-        assert.deepEqual(
-            installCommandSpy.firstCall.args,
-            [{offline: false, variants: false}, expectedDefaultConfig]);
-      });
-    });
-
-    test('using aliased command name with argument', () => {
-      let cli = new PolymerCli(['i', '--variants']);
-      let installCommand = cli.commands.get('install');
-      let installCommandSpy = sinon.stub(installCommand, 'run');
-      return cli.run().then(() => {
-        assert.isOk(installCommandSpy.calledOnce);
-        assert.deepEqual(
-            installCommandSpy.firstCall.args,
-            [{offline: false, variants: true}, expectedDefaultConfig]);
-      });
-    });
-
-  });
 
   suite('_mergeJson', () => {
 
