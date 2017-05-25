@@ -262,12 +262,12 @@ function getProxyConfig() {
   let pathToConfig = './.git/config';
   let meta = readConfigFile(pathToConfig);
   // Checking if local
-  if(meta && meta.https && meta.https.proxy) {
+  if (meta && meta.https && meta.https.proxy) {
     return meta.https.proxy;
   }
   pathToConfig = (process.env.HOME || process.env.USERPROFILE) + '/.gitconfig';
   meta = readConfigFile(pathToConfig);
-  if(meta && meta.https) {
+  if (meta && meta.https) {
     return meta.https.proxy;
   }
   return;
@@ -281,7 +281,8 @@ function readConfigFile(filePath: string) {
   try {
     meta = fs.readFileSync(filePath, 'utf8');
     meta = ini.parse(meta);
-  } catch (error) {}
+  } catch (error) {
+  }
   return meta;
 }
 
