@@ -67,6 +67,7 @@ export function createGithubGenerator(githubOptions: GithubGeneratorOptions):
       try {
         await this._github.extractReleaseTarball(
             release.tarball_url, this.destinationRoot());
+        this._github.removeUnwantedFiles(this.destinationRoot());
         done();
       } catch (error) {
         logger.error(`Could not download release from ${owner}/${repo}`);
