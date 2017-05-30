@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **New Command Aliases**: Commands now support aliases. `polymer install` has been aliased under `polymer i`.
+
 ## v0.18.1 [04-25-2017]
 
 - `init` small template fixes.
