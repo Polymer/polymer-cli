@@ -19,7 +19,11 @@ const sinon = require('sinon');
 
 suite('help', () => {
   const expectedDefaultConfig = new ProjectConfig({
-    extraDependencies: [path.resolve('bower_components/webcomponentsjs/*.js')],
+    extraDependencies: [
+      path.resolve('bower_components/webcomponentsjs/*.js'),
+      path.resolve('bower_components/webcomponentsjs/*.js.map'),
+      '!' + path.resolve('bower_components/webcomponentsjs/gulpfile.js'),
+    ],
   });
 
   test(
