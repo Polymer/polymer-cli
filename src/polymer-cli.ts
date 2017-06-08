@@ -111,7 +111,7 @@ export class PolymerCli {
     this.defaultConfigOptions = this.defaultConfigOptions || {};
     this.defaultConfigOptions.extraDependencies =
         this.defaultConfigOptions.extraDependencies || [];
-    this.defaultConfigOptions.extraDependencies.push(
+    this.defaultConfigOptions.extraDependencies.unshift(
         `bower_components${pathSeperator}webcomponentsjs${pathSeperator}*.js`);
 
     this.addCommand(new AnalyzeCommand());
