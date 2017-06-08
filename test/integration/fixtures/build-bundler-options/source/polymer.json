@@ -1,0 +1,34 @@
+{
+  "builds": [
+    {
+      "name": "unbundled-uncompiled",
+      "bundle": false,
+      "js": {
+        "compile": false,
+        "minify": false
+      },
+      "css": {
+        "minify": false
+      },
+      "html": {
+        "minify": false
+      }
+    },
+    {
+      "name": "bundled-compiled",
+      "bundle": {
+        "rewriteUrlsInTemplates": true
+      },
+      "js": {
+        "compile": true,
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      }
+    }
+  ]
+}

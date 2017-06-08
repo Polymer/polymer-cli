@@ -52,6 +52,20 @@ suite('polymer build', function() {
               path.join(fixturePath, 'build-with-preset', 'expected'));
         });
   });
+
+  test('handles a bundler config', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-bundler-options', 'source'), tmpDir.name);
+
+    return runCommand(binPath, ['build'], {
+             cwd: tmpDir.name,
+           })
+        .then(() => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build'),
+              path.join(fixturePath, 'build-bundler-options', 'expected'));
+        });
+  });
 });
 
 function copyDir(fromDir, toDir) {

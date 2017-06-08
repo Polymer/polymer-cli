@@ -59,7 +59,7 @@ export async function build(
   ]);
 
   if (options.bundle) {
-    buildStream = buildStream.pipe(polymerProject.bundler());
+    buildStream = buildStream.pipe(polymerProject.bundler(options.bundle));
   }
 
   if (options.insertPrefetchLinks) {
@@ -121,7 +121,7 @@ export async function build(
       buildRoot: buildDirectory,
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
-      bundled: options.bundle,
+      bundled: options.bundle !== undefined,
     });
   }
 
