@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add new, unreleased items here. -->
 - Updated lint rule to `polymer-2` in the `polymer-2-element` template.
+- Drop 1.x init templates. Bump `shop` init template to latest version.
 
 ## v1.1.0 [05-23-2017]
 - Updated dependency on latest polymer-project-config so that bundled presets include prefetch link generation.
