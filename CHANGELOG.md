@@ -2,6 +2,8 @@
 
 ## Unreleased
 <!-- Add new, unreleased items here. -->
+
+## v1.2.0 [06-12-2017]
 - Updated lint rule to `polymer-2` in the `polymer-2-element` template.
 - Drop 1.x init templates. Bump `shop` init template to latest version.
 
