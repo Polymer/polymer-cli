@@ -1,7 +1,8 @@
-# polymer-cli
-
 [![Build Status](https://travis-ci.org/Polymer/polymer-cli.svg?branch=master)](https://travis-ci.org/Polymer/polymer-cli)
 [![Build status](https://ci.appveyor.com/api/projects/status/3xc7rkapu39rw9fs/branch/master?svg=true)](https://ci.appveyor.com/project/justinfagnani/polymer-cli/branch/master)
+[![NPM version](http://img.shields.io/npm/v/polymer-cli.svg)](https://www.npmjs.com/package/polymer-cli)
+
+# Polymer CLI
 
 The command-line tool for Polymer projects and Web Components.
 
