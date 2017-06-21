@@ -58,7 +58,10 @@ export async function build(
     htmlSplitter.rejoin()
   ]);
 
-  if (options.bundle) {
+  const bundled = !!(options.bundle);
+  if (bundled && typeof options.bundle === 'object') {
+    buildStream = buildStream.pipe(polymerProject.bundler(options.bundle));
+  } else if (bundled) {
     buildStream = buildStream.pipe(polymerProject.bundler());
   }
 
@@ -121,7 +124,7 @@ export async function build(
       buildRoot: buildDirectory,
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
-      bundled: options.bundle,
+      bundled: bundled,
     });
   }
 
