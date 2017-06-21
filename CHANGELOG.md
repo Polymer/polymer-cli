@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.
 <!-- Add new, unreleased items here. -->
 
 ## v1.2.0 [06-12-2017]
