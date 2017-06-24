@@ -14,6 +14,7 @@
 import * as chalk from 'chalk';
 import * as path from 'path';
 import Generator = require('yeoman-generator');
+import validateElementName = require('validate-element-name');
 
 /**
  * Returns a Yeoman Generator constructor that can be passed to yeoman to be
@@ -22,7 +23,7 @@ import Generator = require('yeoman-generator');
  * (Ex: "polymer-2.x" to generate the `templates/polymer-2x` template directory)
  */
 export function createApplicationGenerator(templateName: string):
-    (typeof Generator) {
+  (typeof Generator) {
   return class ApplicationGenerator extends Generator {
     props: any;
 
@@ -58,13 +59,11 @@ export function createApplicationGenerator(templateName: string):
           message: `Main element name`,
           default: (answers: any) => `${answers.name}-app`,
           validate: (name: string) => {
-            const nameContainsHyphen = name.includes('-');
-            if (!nameContainsHyphen) {
-              this.log(
-                  '\nUh oh, custom elements must include a hyphen in ' +
-                  'their name. Please try again.');
+            const validation = validateElementName(name);
+            if(!validation.isValid) {
+              this.log(`\nUh oh. ${validation.message} Please try again.`);
             }
-            return nameContainsHyphen;
+            return validation.isValid;
           },
         },
         {
@@ -76,27 +75,27 @@ export function createApplicationGenerator(templateName: string):
 
       this.props = await this.prompt(prompts);
       this.props.elementClassName = this.props.elementName.replace(
-          /(^|-)(\w)/g,
-          (_match: string, _p0: string, p1: string) => p1.toUpperCase());
+        /(^|-)(\w)/g,
+        (_match: string, _p0: string, p1: string) => p1.toUpperCase());
     }
 
     writing() {
       const elementName = this.props.elementName;
 
       this.fs.copyTpl(
-          `${this.templatePath()}/**/?(.)!(_)*`,
-          this.destinationPath(),
-          this.props);
+        `${this.templatePath()}/**/?(.)!(_)*`,
+        this.destinationPath(),
+        this.props);
 
       this.fs.copyTpl(
-          this.templatePath('src/_element/_element.html'),
-          `src/${elementName}/${elementName}.html`,
-          this.props);
+        this.templatePath('src/_element/_element.html'),
+        `src/${elementName}/${elementName}.html`,
+        this.props);
 
       this.fs.copyTpl(
-          this.templatePath('test/_element/_element_test.html'),
-          `test/${elementName}/${elementName}_test.html`,
-          this.props);
+        this.templatePath('test/_element/_element_test.html'),
+        `test/${elementName}/${elementName}_test.html`,
+        this.props);
     }
 
     install() {
@@ -110,7 +109,7 @@ export function createApplicationGenerator(templateName: string):
     end() {
       this.log(chalk.bold('\nSetup Complete!'));
       this.log(
-          'Check out your new project README for information about what to do next.\n');
+        'Check out your new project README for information about what to do next.\n');
     }
   };
 }

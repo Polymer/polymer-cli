@@ -14,6 +14,7 @@
 import * as chalk from 'chalk';
 import * as path from 'path';
 import Generator = require('yeoman-generator');
+import validateElementName = require('validate-element-name');
 
 /**
  * Returns a Yeoman Generator constructor that can be passed to yeoman to be
@@ -53,13 +54,11 @@ export function createElementGenerator(templateName: string):
           default:
               this.appname + (this.appname.includes('-') ? '' : '-element'),
           validate: (name: string) => {
-            const nameContainsHyphen = name.includes('-');
-            if (!nameContainsHyphen) {
-              this.log(
-                  '\nUh oh, custom elements must include a hyphen in ' +
-                  'their name. Please try again.');
+            const validation = validateElementName(name);
+            if(!validation.isValid) {
+              this.log(`\nUh oh. ${validation.message} Please try again.`);
             }
-            return nameContainsHyphen;
+            return validation.isValid;
           },
         },
         {
