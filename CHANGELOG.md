@@ -1,8 +1,12 @@
 # Changelog
 
 ## Unreleased
-- Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.
 <!-- Add new, unreleased items here. -->
+
+## v1.3.0 [06-30-2017]
+- Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.  See the [Polymer Project Config 3.4.0 release notes](https://github.com/Polymer/polymer-project-config/pull/37) for details on new options available in polymer.json.
+- Includes Polymer Build fixes to push-manifest generation and others.  See [Polymer Build 1.6.0 release notes](https://github.com/Polymer/polymer-build/pull/249).
+- Includes Polymer Bundler fixes to shell strategy and others.  See [Polymer Bundler 2.2.0 release notes](https://github.com/Polymer/polymer-bundler/pull/573).
 
 ## v1.2.0 [06-12-2017]
 - Updated lint rule to `polymer-2` in the `polymer-2-element` template.

@@ -5456,7 +5456,7 @@ polymer-linter@^2.0.2:
     polymer-analyzer "^2.0.0"
     strip-indent "^2.0.0"
 
-polymer-project-config@^3.2.1, polymer-project-config@^3.3.0:
+polymer-project-config@^3.2.1, polymer-project-config@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/polymer-project-config/-/polymer-project-config-3.4.0.tgz#3eac1d94072b2acca819c6536eca93f7243d42d2"
   dependencies:
