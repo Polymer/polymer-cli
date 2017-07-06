@@ -57,11 +57,10 @@ suite('polymer build', function() {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
 
-    return runCommand(binPath, ['build', '--verbose', '--js-compile', '--html-minify', '--bundle', '--add-push-manifest', '--add-service-worker'], {
+    return runCommand(binPath, ['build', '--js-compile', '--html-minify', '--bundle', '--add-push-manifest', '--add-service-worker'], {
              cwd: tmpDir.name,
            })
         .then((out) => {
-          console.log(out);
           assertDirsEqual(
               path.join(tmpDir.name, 'build/default'),
               path.join(fixturePath, 'build-with-preset', 'expected/es5-bundled'));
