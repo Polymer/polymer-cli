@@ -22,7 +22,7 @@ const fixturePath = path.join(__dirname, './fixtures/');
 
 tmp.setGracefulCleanup();
 
-suite.only('polymer build', function() {
+suite('polymer build', function() {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
@@ -50,6 +50,21 @@ suite.only('polymer build', function() {
           assertDirsEqual(
               path.join(tmpDir.name, 'build'),
               path.join(fixturePath, 'build-with-preset', 'expected'));
+        });
+  });
+
+  test('handles equivalent of the CLI preset', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
+
+    return runCommand(binPath, ['build', '--verbose', '--js-compile', '--bundle', '--add-push-manifest', '--add-service-worker'], {
+             cwd: tmpDir.name,
+           })
+        .then((out) => {
+          console.log(out);
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build/default'),
+              path.join(fixturePath, 'build-with-preset', 'expected/es5-bundled'));
         });
   });
 });
