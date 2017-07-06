@@ -124,8 +124,7 @@ suite('github/github', () => {
         repo: 'TEST_REPO',
       });
       github.removeUnwantedFiles(tmpDir);
-      assert.deepEqual(
-          fs.readdirSync(tmpDir), ['.gitignore', 'README', 'src']);
+      assert.deepEqual(fs.readdirSync(tmpDir), ['.gitignore', 'README', 'src']);
       assert.deepEqual(fs.readdirSync(path.join(tmpDir, 'src')), ['base.js']);
     });
 

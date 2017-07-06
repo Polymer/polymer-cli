@@ -52,6 +52,33 @@ suite('polymer build', function() {
               path.join(fixturePath, 'build-with-preset', 'expected'));
         });
   });
+
+  test('handles equivalent of the CLI preset', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--add-push-manifest',
+                 '--add-service-worker',
+                 '--bundle',
+                 '--css-minify',
+                 '--html-minify',
+                 '--js-compile',
+                 '--js-minify',
+               ],
+               {
+                 cwd: tmpDir.name,
+               })
+        .then((out) => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build/default'),
+              path.join(
+                  fixturePath, 'build-with-preset', 'expected/es5-bundled'));
+        });
+  });
 });
 
 function copyDir(fromDir, toDir) {

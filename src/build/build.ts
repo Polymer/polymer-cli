@@ -58,6 +58,12 @@ export async function build(
     htmlSplitter.rejoin()
   ]);
 
+  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
+  if (compiledToES5) {
+    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
+                      .pipe(polymerProject.addCustomElementsEs5Adapter());
+  }
+
   const bundled = !!(options.bundle);
   if (bundled && typeof options.bundle === 'object') {
     buildStream = buildStream.pipe(polymerProject.bundler(options.bundle));
@@ -67,12 +73,6 @@ export async function build(
 
   if (options.insertPrefetchLinks) {
     buildStream = buildStream.pipe(polymerProject.addPrefetchLinks());
-  }
-
-  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
-  if (compiledToES5) {
-    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
-                      .pipe(polymerProject.addCustomElementsEs5Adapter());
   }
 
   buildStream.once('data', () => {

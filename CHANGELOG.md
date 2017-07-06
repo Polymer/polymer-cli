@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Fixed [issue #710](https://github.com/Polymer/polymer-cli/issues/710) where the es5 custom elements adapter would not be added when bundling.
+- Fixed [issue #767](https://github.com/Polymer/polymer-cli/issues/767) where hyphenated option names for `build` command were effectively ignored.
 <!-- Add new, unreleased items here. -->
 
 ## v1.3.0 [06-30-2017]
