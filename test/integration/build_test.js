@@ -57,7 +57,7 @@ suite('polymer build', function() {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'build-with-preset', 'source'), tmpDir.name);
 
-    return runCommand(binPath, ['build', '--verbose', '--js-compile', '--bundle', '--add-push-manifest', '--add-service-worker'], {
+    return runCommand(binPath, ['build', '--verbose', '--js-compile', '--html-minify', '--bundle', '--add-push-manifest', '--add-service-worker'], {
              cwd: tmpDir.name,
            })
         .then((out) => {
