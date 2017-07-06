@@ -67,7 +67,7 @@ suite('polymer build', function() {
                  '--css-minify',
                  '--html-minify',
                  '--js-compile',
-                 '--js-minify'
+                 '--js-minify',
                ],
                {
                  cwd: tmpDir.name,
