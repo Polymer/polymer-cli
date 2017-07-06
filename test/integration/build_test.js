@@ -22,7 +22,7 @@ const fixturePath = path.join(__dirname, './fixtures/');
 
 tmp.setGracefulCleanup();
 
-suite('polymer build', function() {
+suite.only('polymer build', function() {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
