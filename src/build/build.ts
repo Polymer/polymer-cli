@@ -58,18 +58,21 @@ export async function build(
     htmlSplitter.rejoin()
   ]);
 
-  if (options.bundle) {
+  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
+  if (compiledToES5) {
+    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
+                      .pipe(polymerProject.addCustomElementsEs5Adapter());
+  }
+
+  const bundled = !!(options.bundle);
+  if (bundled && typeof options.bundle === 'object') {
+    buildStream = buildStream.pipe(polymerProject.bundler(options.bundle));
+  } else if (bundled) {
     buildStream = buildStream.pipe(polymerProject.bundler());
   }
 
   if (options.insertPrefetchLinks) {
     buildStream = buildStream.pipe(polymerProject.addPrefetchLinks());
-  }
-
-  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
-  if (compiledToES5) {
-    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
-                      .pipe(polymerProject.addCustomElementsEs5Adapter());
   }
 
   buildStream.once('data', () => {
@@ -121,7 +124,7 @@ export async function build(
       buildRoot: buildDirectory,
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
-      bundled: options.bundle,
+      bundled: bundled,
     });
   }
 

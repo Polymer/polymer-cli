@@ -106,6 +106,10 @@ export class BuildCommand implements Command {
     },
   ];
 
+  private dashToCamelCase(text: string): string {
+    return text.replace(/-([a-z])/g, (v) => v[1].toUpperCase());
+  }
+
   /**
    * Converts command-line build arguments to the `ProjectBuildOptions` format
    * that our build understands, applying the preset if one was given.
@@ -116,7 +120,13 @@ export class BuildCommand implements Command {
     const validBuildOptions = new Set(this.args.map(({name}) => name));
     for (const buildOption of Object.keys(options)) {
       if (validBuildOptions.has(buildOption)) {
-        (<any>buildOptions)[buildOption] = options[buildOption];
+        const [prefix, option] = buildOption.split('-', 2);
+        if (['css', 'html', 'js'].indexOf(prefix) !== -1) {
+          (<any>buildOptions)[prefix] = (<any>buildOptions)[prefix] || {};
+          (<any>buildOptions)[prefix][option] = options[buildOption];
+        } else {
+          (<any>buildOptions)[this.dashToCamelCase(buildOption)] = options[buildOption];
+        }
       }
     }
     return applyBuildPreset(buildOptions);

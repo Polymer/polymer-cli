@@ -1,0 +1,1 @@
+console.log('webcomponents-loader.js goes here');
