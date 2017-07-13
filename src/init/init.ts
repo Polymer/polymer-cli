@@ -258,6 +258,7 @@ function readConfigFile(filePath: string) {
     meta = fs.readFileSync(filePath, 'utf8');
     meta = ini.parse(meta);
   } catch (error) {
+    // do nothing
   }
   return meta;
 }
