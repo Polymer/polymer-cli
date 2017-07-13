@@ -3,6 +3,7 @@
 ## Unreleased
 - Fix issue where negative `extraDependencies` globs were not working.
 - test: Add CLI option for custom wct sauce config.
+- Updated Polymer 2.0 element test file template to use ES6.
 <!-- Add new, unreleased items here. -->
 
 ## v1.3.1 [07-06-2017]
