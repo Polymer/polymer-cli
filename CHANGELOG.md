@@ -2,7 +2,7 @@
 
 ## Unreleased
 - Fix issue where negative `extraDependencies` globs were not working.
-- test: Add CLI option for custom wct sauce config.
+- test: Add support for WCT `config-file` option.
 <!-- Add new, unreleased items here. -->
 
 ## v1.3.1 [07-06-2017]
