@@ -47,6 +47,7 @@ ${b('\\  /\\')}  ${m('/\\  /')}   ${b('/\\  /')}
 
 export class HelpCommand implements Command {
   name = 'help';
+  aliases = [];
 
   description = 'Shows this help message, or help for a specific command';
 
@@ -70,7 +71,7 @@ export class HelpCommand implements Command {
       },
       {
         header: 'Available Commands',
-        content: Array.from(this.commands.values()).map((command) => {
+        content: Array.from(new Set(this.commands.values())).map((command) => {
           return {name: command.name, summary: command.description};
         }),
       },
@@ -94,6 +95,11 @@ export class HelpCommand implements Command {
       {header: 'Command Options', optionList: command.args},
       {header: 'Global Options', optionList: globalArguments},
     ];
+
+    if (command.aliases.length > 0) {
+      usageGroups.splice(1, 0, {header: 'Alias(es)', content: command.aliases});
+    }
+
     return commandLineUsage(usageGroups.concat(extraUsageGroups));
   }
 

@@ -127,6 +127,11 @@ export class PolymerCli {
   addCommand(command: Command) {
     logger.debug('adding command', command.name);
     this.commands.set(command.name, command);
+
+    command.aliases.forEach((alias) => {
+      logger.debug('adding alias', alias);
+      this.commands.set(alias, command);
+    });
   }
 
   async run() {
