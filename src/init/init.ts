@@ -234,7 +234,6 @@ function createSelectPrompt(env: YeomanEnvironment) {
  * or globally (user home)
  */
 function getProxyConfig() {
-  //
   let pathToConfig = './.git/config';
   let meta = readConfigFile(pathToConfig);
   // Checking if local
