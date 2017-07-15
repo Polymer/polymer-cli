@@ -1,5 +1,6 @@
 # Changelog
 
+<!-- Add new, unreleased items here. -->
 ## Unreleased
 - Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
   - Also supports warnings which can be addressed with less-safe changes via
@@ -8,7 +9,7 @@
 - Added `--watch` (shorthand `-w`) option to `polymer lint`. When passed, we will watch the filesystem for changes and rerun the linter immediately afterwards.
   - Also works with `--fix` to automatically fix and report warnings as you work!
 - `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
-<!-- Add new, unreleased items here. -->
+- Derives node version check from the package.json.
 
 ## v1.5.7 [10-11-2017]
 - Updated css-slam, bower and other dependencies.
