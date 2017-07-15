@@ -55,8 +55,8 @@ export function createElementGenerator(templateName: string):
               this.appname + (this.appname.includes('-') ? '' : '-element'),
           validate: (name: string) => {
             const validation = validateElementName(name);
-            if(!validation.isValid) {
-              this.log(`\nUh oh. ${validation.message} Please try again.`);
+            if (!validation.isValid) {
+              this.log(`${validation.message}\nPlease try again.`);
             }
             return validation.isValid;
           },

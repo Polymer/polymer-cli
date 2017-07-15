@@ -60,8 +60,8 @@ export function createApplicationGenerator(templateName: string):
           default: (answers: any) => `${answers.name}-app`,
           validate: (name: string) => {
             const validation = validateElementName(name);
-            if(!validation.isValid) {
-              this.log(`\nUh oh. ${validation.message} Please try again.`);
+            if (!validation.isValid) {
+              this.log(`${validation.message}\nPlease try again.`);
             }
             return validation.isValid;
           },
