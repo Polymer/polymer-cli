@@ -2,7 +2,7 @@
 
 ## Unreleased
 - Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.
-- improved web component name validation by using Sindre Sorhus' validate-element-name.
+- improved web component name validation by using `validate-element-name`.
 <!-- Add new, unreleased items here. -->
 
 ## v1.2.0 [06-12-2017]
