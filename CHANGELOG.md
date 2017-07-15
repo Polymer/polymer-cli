@@ -1,9 +1,19 @@
 # Changelog
 
 ## Unreleased
-- Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.
+- Fix issue where negative `extraDependencies` globs were not working.
+- test: Add support for WCT `config-file` option.
 - improved web component name validation by using `validate-element-name`.
 <!-- Add new, unreleased items here. -->
+
+## v1.3.1 [07-06-2017]
+- Fixed [issue #710](https://github.com/Polymer/polymer-cli/issues/710) where the es5 custom elements adapter would not be added when bundling.
+- Fixed [issue #767](https://github.com/Polymer/polymer-cli/issues/767) where hyphenated option names for `build` command were effectively ignored.
+
+## v1.3.0 [06-30-2017]
+- Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.  See the [Polymer Project Config 3.4.0 release notes](https://github.com/Polymer/polymer-project-config/pull/37) for details on new options available in polymer.json.
+- Includes Polymer Build fixes to push-manifest generation and others.  See [Polymer Build 1.6.0 release notes](https://github.com/Polymer/polymer-build/pull/249).
+- Includes Polymer Bundler fixes to shell strategy and others.  See [Polymer Bundler 2.2.0 release notes](https://github.com/Polymer/polymer-bundler/pull/573).
 
 ## v1.2.0 [06-12-2017]
 - Updated lint rule to `polymer-2` in the `polymer-2-element` template.
@@ -43,6 +53,8 @@
 - Produce much smaller output when compiling many JS files to ES5 by inserting babel helpers only once, at the toplevel entrypoint.
 
 - `init`: Propagate `description` from `init` to application templates in `index.html` meta tag.
+
+- **New Command Aliases**: Commands now support aliases. `polymer install` has been aliased under `polymer i`.
 
 ## v0.18.1 [04-25-2017]
 
