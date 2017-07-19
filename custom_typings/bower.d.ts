@@ -13,6 +13,7 @@ declare module 'bower' {
   export const commands: {
     install(packages: string[], installOptions: {}, config: Config):
         NodeJS.EventEmitter;
+    list(): NodeJS.EventEmitter;
   };
 
   export const config: Config;
