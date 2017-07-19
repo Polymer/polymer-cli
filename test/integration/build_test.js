@@ -79,6 +79,46 @@ suite('polymer build', function() {
                   fixturePath, 'build-with-preset', 'expected/es5-bundled'));
         });
   });
+
+  test('handles polymer 1.x project bundler defaults', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'polymer-1-project', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--bundle',
+               ],
+               {
+                 cwd: tmpDir.name,
+               })
+        .then((out) => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build/default'),
+              path.join(fixturePath, 'polymer-1-project', 'expected/default'));
+        });
+  });
+  
+  test('handles polymer 2.x project bundler defaults', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'polymer-2-project', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--bundle',
+               ],
+               {
+                 cwd: tmpDir.name,
+               })
+        .then((out) => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build/default'),
+              path.join(fixturePath, 'polymer-2-project', 'expected/default'));
+        });
+  });
 });
 
 function copyDir(fromDir, toDir) {
