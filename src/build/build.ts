@@ -12,6 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import * as bower from 'bower';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
@@ -65,10 +66,42 @@ export async function build(
   }
 
   const bundled = !!(options.bundle);
-  if (bundled && typeof options.bundle === 'object') {
-    buildStream = buildStream.pipe(polymerProject.bundler(options.bundle));
-  } else if (bundled) {
-    buildStream = buildStream.pipe(polymerProject.bundler());
+
+  async function getPolymerVersion(): Promise<string> {
+    return new Promise<string>(
+        (resolve, _reject) =>
+            bower.commands.list()
+                .on('end',
+                    (result: any) => {
+                      if (result && result.dependencies &&
+                          result.dependencies.polymer &&
+                          result.dependencies.polymer.pkgMeta &&
+                          result.dependencies.polymer.pkgMeta.version) {
+                        resolve(result.dependencies.polymer.pkgMeta.version);
+                      } else {
+                        resolve('');
+                      }
+                    })
+                .on('error', (oops: Error) => {
+                  resolve('');
+                  console.warn(oops.message);
+                }));
+  }
+
+  if (bundled) {
+    // Polymer 1.x and Polymer 2.x deal with relative urls in dom-module
+    // templates differently.  Polymer CLI will attempt to provide a sensible
+    // default value for the `rewriteUrlsInTemplates` option passed to
+    // `polymer-bundler` based on the version of Polymer found in the project's
+    // folders.  We will default to Polymer 1.x behavior unless 2.x is found.
+    const polymerVersion = await getPolymerVersion();
+    const bundlerOptions = {
+      rewriteUrlsInTemplates: !polymerVersion.startsWith('2.')
+    };
+    if (typeof options.bundle === 'object') {
+      Object.assign(bundlerOptions, options.bundle);
+    }
+    buildStream = buildStream.pipe(polymerProject.bundler(bundlerOptions));
   }
 
   if (options.insertPrefetchLinks) {
