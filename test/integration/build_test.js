@@ -80,7 +80,7 @@ suite('polymer build', function() {
         });
   });
 
-  test.only('handles polymer 1.x project bundler defaults', () => {
+  test('handles polymer 1.x project bundler defaults', () => {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'polymer-1-project', 'source'), tmpDir.name);
 
@@ -94,14 +94,13 @@ suite('polymer build', function() {
                  cwd: tmpDir.name,
                })
         .then((out) => {
-          console.log(out);
           assertDirsEqual(
               path.join(tmpDir.name, 'build/default'),
               path.join(fixturePath, 'polymer-1-project', 'expected/default'));
         });
   });
   
-  test.only('handles polymer 2.x project bundler defaults', () => {
+  test('handles polymer 2.x project bundler defaults', () => {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'polymer-2-project', 'source'), tmpDir.name);
 
@@ -115,7 +114,6 @@ suite('polymer build', function() {
                  cwd: tmpDir.name,
                })
         .then((out) => {
-          console.log(out);
           assertDirsEqual(
               path.join(tmpDir.name, 'build/default'),
               path.join(fixturePath, 'polymer-2-project', 'expected/default'));
