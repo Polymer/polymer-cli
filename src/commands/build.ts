@@ -105,6 +105,11 @@ export class BuildCommand implements Command {
           '`<link rel="import">` tags into fragments and shell for all ' +
           'dependencies.'
     },
+    {
+      name: 'base-path',
+      type: String,
+      description: 'Updates the <base> tag if found in the entrypoint document.'
+    },
   ];
 
   private dashToCamelCase(text: string): string {
