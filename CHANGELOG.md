@@ -5,6 +5,7 @@
 - When no specific option is set for Bundler's `rewriteUrlsInTemplates` the CLI attempts to get the version of Polymer for the project using `bower`.  When Polymer 2.x is discovered, `rewriteUrlsInTemplates` is defaulted to `false`.  In case of Polymer 1.x or where version can not be identified, it defaults to `true`.  Any user settings override these defaults.
 - Fix issue where negative `extraDependencies` globs were not working.
 - test: Add support for WCT `config-file` option.
+- `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
 <!-- Add new, unreleased items here. -->
 
 ## v1.3.1 [07-06-2017]
