@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Fix issue where the `--fragment` flag was being ignored.
 <!-- Add new, unreleased items here. -->
 
 ## v1.4.0 [08-08-2017]
