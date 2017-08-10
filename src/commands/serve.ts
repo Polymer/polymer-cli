@@ -69,6 +69,7 @@ export class ServeCommand implements Command {
       open: options['open'],
       browser: options['browser'],
       openPath: options['open-path'],
+      npm: options['npm'],
       componentDir: options['component-dir'],
       packageName: options['package-name'],
       protocol: options['protocol'],
