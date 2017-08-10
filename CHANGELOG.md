@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Fixed the `polymer serve --npm` option.
 <!-- Add new, unreleased items here. -->
 
 ## v1.4.0 [08-08-2017]
