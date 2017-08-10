@@ -90,6 +90,9 @@ export function createElementGenerator(templateName: string):
           this.templatePath('test/_element_test.html'),
           `test/${name}_test.html`,
           this.props);
+
+      this.fs.copyTpl(
+          this.templatePath('test/index.html'), `test/index.html`, this.props);
     }
 
     install() {
