@@ -1,8 +1,10 @@
 # Changelog
 
 ## Unreleased
-- Fixed the `polymer serve --npm` option.
 <!-- Add new, unreleased items here. -->
+
+## v1.4.1 [08-10-2017]
+- Fixed the `polymer serve --npm` option.
 
 ## v1.4.0 [08-08-2017]
 - Upgraded to Polymer Build ^2.0.0 which uses Polymer Bundler ^3.0.0.
