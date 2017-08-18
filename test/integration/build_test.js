@@ -80,7 +80,7 @@ suite('polymer build', function() {
         });
   });
 
-  test('handled default bundle all into the entrypoint', () => {
+  test('handled (default) bundle all into the entrypoint', () => {
     const tmpDir = tmp.dirSync();
     copyDir(
         path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
@@ -96,7 +96,7 @@ suite('polymer build', function() {
                     'default')));
   });
 
-  test('handled default bundle all into fragment a', () => {
+  test('handled bundle into fragment a', () => {
     const tmpDir = tmp.dirSync();
     copyDir(
         path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
@@ -114,7 +114,7 @@ suite('polymer build', function() {
                     'default')));
   });
 
-  test('handled default bundle all into fragment b', () => {
+  test('handled bundle into fragment a and b', () => {
     const tmpDir = tmp.dirSync();
     copyDir(
         path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
