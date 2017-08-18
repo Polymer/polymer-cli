@@ -1,0 +1,22 @@
+<div hidden="" by-polymer-bundler=""><dom-module id="element-c">
+  <template>
+    <h1><slot></slot></h1>&gt;
+  </template>
+  <script>
+    Polymer({is: 'element-c'});
+  </script>
+</dom-module><dom-module id="element-b">
+  <template>
+    <element-c><slot></slot></element-c>
+  </template>
+  <script>
+    Polymer({is: 'element-b'});
+  </script>
+</dom-module></div><dom-module id="element-a">
+  <template>
+    <element-b><slot></slot></element-b>
+  </template>
+  <script>
+    Polymer({is: 'element-a'});
+  </script>
+</dom-module>

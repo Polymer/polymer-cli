@@ -80,6 +80,66 @@ suite('polymer build', function() {
         });
   });
 
+  test('handled default bundle all into the entrypoint', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(
+        path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
+
+    return runCommand(binPath, ['build', '--bundle'], {cwd: tmpDir.name})
+        .then(
+            (out) => assertDirsEqual(
+                path.join(tmpDir.name, 'build/default'),
+                path.join(
+                    fixturePath,
+                    'fragment-variations',
+                    'expected-default',
+                    'default')));
+  });
+
+  test('handled default bundle all into fragment a', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(
+        path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
+
+    return runCommand(binPath, ['build', '--bundle', '--fragment', 'a.html'], {
+             cwd: tmpDir.name
+           })
+        .then(
+            (out) => assertDirsEqual(
+                path.join(tmpDir.name, 'build/default'),
+                path.join(
+                    fixturePath,
+                    'fragment-variations',
+                    'expected-fragment-a',
+                    'default')));
+  });
+
+  test('handled default bundle all into fragment b', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(
+        path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--bundle',
+                 '--fragment',
+                 'a.html',
+                 '--fragment',
+                 'b.html'
+               ],
+               {cwd: tmpDir.name})
+        .then(
+            (out) => assertDirsEqual(
+                path.join(tmpDir.name, 'build/default'),
+                path.join(
+                    fixturePath,
+                    'fragment-variations',
+                    'expected-fragment-b',
+                    'default')));
+  });
+
   test('handles polymer 1.x project bundler defaults', () => {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'polymer-1-project', 'source'), tmpDir.name);
@@ -99,7 +159,7 @@ suite('polymer build', function() {
               path.join(fixturePath, 'polymer-1-project', 'expected/default'));
         });
   });
-  
+
   test('handles polymer 2.x project bundler defaults', () => {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'polymer-2-project', 'source'), tmpDir.name);
