@@ -129,7 +129,7 @@ suite('polymer build', function() {
                  '--fragment',
                  'a.html',
                  '--fragment',
-                 'b.html'
+                 'b.html',
                ],
                {
                  cwd: tmpDir.name,
