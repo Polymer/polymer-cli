@@ -61,7 +61,8 @@ function parseCLIArgs(commandOptions: any): {[name: string]: string} {
     parsedOptions.extraDependencies = commandOptions['extra-dependencies'];
   }
   if (commandOptions.fragment) {
-    parsedOptions.fragments = commandOptions.fragment;
+    //Commenting this out in commit to show test failure on CI for PR.
+    //parsedOptions.fragments = commandOptions.fragment;
   }
 
   return parsedOptions;
