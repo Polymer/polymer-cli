@@ -85,9 +85,11 @@ suite('polymer build', function() {
     copyDir(
         path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
 
-    return runCommand(binPath, ['build', '--bundle'], {cwd: tmpDir.name})
+    return runCommand(binPath, ['build', '--bundle'], {
+             cwd: tmpDir.name,
+           })
         .then(
-            (out) => assertDirsEqual(
+            () => assertDirsEqual(
                 path.join(tmpDir.name, 'build/default'),
                 path.join(
                     fixturePath,
@@ -102,10 +104,10 @@ suite('polymer build', function() {
         path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
 
     return runCommand(binPath, ['build', '--bundle', '--fragment', 'a.html'], {
-             cwd: tmpDir.name
+             cwd: tmpDir.name,
            })
         .then(
-            (out) => assertDirsEqual(
+            () => assertDirsEqual(
                 path.join(tmpDir.name, 'build/default'),
                 path.join(
                     fixturePath,
@@ -129,9 +131,11 @@ suite('polymer build', function() {
                  '--fragment',
                  'b.html'
                ],
-               {cwd: tmpDir.name})
+               {
+                 cwd: tmpDir.name,
+               })
         .then(
-            (out) => assertDirsEqual(
+            () => assertDirsEqual(
                 path.join(tmpDir.name, 'build/default'),
                 path.join(
                     fixturePath,
