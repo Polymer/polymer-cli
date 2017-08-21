@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Added support for `polymer test --npm` option.
 <!-- Add new, unreleased items here. -->
 
 ## v1.4.1 [08-10-2017]
