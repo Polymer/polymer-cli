@@ -136,6 +136,11 @@ export class TestCommand implements Command {
       description: 'Config file that needs to be used by wct. ie: wct.config-sauce.js',
       type: String,
     },
+    {
+      name: 'npm',
+      description: 'Tests components which have been installed with npm (instead of bower)',
+      type: Boolean,
+    },
   ];
 
   run(_options: CommandOptions, _config: ProjectConfig): Promise<void> {
