@@ -60,6 +60,9 @@ function parseCLIArgs(commandOptions: any): {[name: string]: string} {
   if (commandOptions['extra-dependencies']) {
     parsedOptions.extraDependencies = commandOptions['extra-dependencies'];
   }
+  if (commandOptions.fragment) {
+    parsedOptions.fragments = commandOptions.fragment;
+  }
 
   return parsedOptions;
 }
