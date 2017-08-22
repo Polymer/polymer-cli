@@ -1,8 +1,10 @@
 # Changelog
 
 ## Unreleased
-- Upgraded web-component-tester to v6.1.2.
 <!-- Add new, unreleased items here. -->
+
+## v1.5.1 [08-22-2017]
+- Upgraded web-component-tester to v6.1.2.
 
 ## v1.5.0 [08-22-2017]
 - Fix issue where the `--fragment` flag was being ignored.
