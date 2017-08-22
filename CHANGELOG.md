@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Upgraded web-component-tester to v6.1.2.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.0 [08-22-2017]
