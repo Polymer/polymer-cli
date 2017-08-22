@@ -6,9 +6,9 @@
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/@polymer/sinonjs/-/sinonjs-1.17.1.tgz#e47d3785b7d0e8c29feb97f7e924b0fc597e2e9b"
 
-"@polymer/test-fixture@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@polymer/test-fixture/-/test-fixture-0.0.3.tgz#4443752697d4d9293bbc412ea0b5e4d341f149d9"
+"@polymer/test-fixture@^3.0.0-pre.1":
+  version "3.0.0-pre.1"
+  resolved "https://registry.yarnpkg.com/@polymer/test-fixture/-/test-fixture-3.0.0-pre.1.tgz#3d8894cfb51f0b4b5e1b9fb0fc8eab8293a61e6d"
 
 "@polymer/tools-common@^1.0.1":
   version "1.0.2"
@@ -7279,12 +7279,12 @@ wd@^1.2.0:
     underscore.string "3.3.4"
     vargs "0.1.0"
 
-web-component-tester@^6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/web-component-tester/-/web-component-tester-6.1.1.tgz#7af312d8a02519659b6da2cfb73bb43363efd099"
+web-component-tester@^6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/web-component-tester/-/web-component-tester-6.1.2.tgz#b2c559f1598f2dbbf5c7adacdf48b3ac06081fdb"
   dependencies:
     "@polymer/sinonjs" "^1.14.1"
-    "@polymer/test-fixture" "^0.0.3"
+    "@polymer/test-fixture" "^3.0.0-pre.1"
     "@webcomponents/webcomponentsjs" "^1.0.7"
     accessibility-developer-tools "^2.12.0"
     async "^1.5.2"
