@@ -1,9 +1,11 @@
 # Changelog
 
 ## Unreleased
+<!-- Add new, unreleased items here. -->
+
+## v1.5.0 [08-22-2017]
 - Fix issue where the `--fragment` flag was being ignored.
 - Added support for `polymer test --npm` option.
-<!-- Add new, unreleased items here. -->
 
 ## v1.4.1 [08-10-2017]
 - Fixed the `polymer serve --npm` option.
