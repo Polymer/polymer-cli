@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Upgraded web-component-tester to v6.1.3 to address yarn installation issues.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.1 [08-22-2017]
