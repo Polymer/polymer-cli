@@ -75,8 +75,8 @@ export function createApplicationGenerator(templateName: string):
 
       this.props = await this.prompt(prompts);
       this.props.elementClassName = this.props.elementName.replace(
-        /(^|-)(\w)/g,
-        (_match: string, _p0: string, p1: string) => p1.toUpperCase());
+          /(^|-)(\w)/g,
+          (_match: string, _p0: string, p1: string) => p1.toUpperCase());
     }
 
     writing() {
