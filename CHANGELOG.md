@@ -1,10 +1,27 @@
 # Changelog
 
 ## Unreleased
-- Fix issue where negative `extraDependencies` globs were not working.
-- test: Add support for WCT `config-file` option.
 - improved web component name validation by using `validate-element-name`.
 <!-- Add new, unreleased items here. -->
+
+## v1.5.2 [08-26-2017]
+- Upgraded web-component-tester to v6.1.3 to address yarn installation issues.
+
+## v1.5.1 [08-22-2017]
+- Upgraded web-component-tester to v6.1.2.
+
+## v1.5.0 [08-22-2017]
+- Fix issue where the `--fragment` flag was being ignored.
+- Added support for `polymer test --npm` option.
+
+## v1.4.1 [08-10-2017]
+- Fixed the `polymer serve --npm` option.
+
+## v1.4.0 [08-08-2017]
+- Upgraded to Polymer Build ^2.0.0 which uses Polymer Bundler ^3.0.0.
+- When no specific option is set for Bundler's `rewriteUrlsInTemplates` the CLI attempts to get the version of Polymer for the project using `bower`.  When Polymer 2.x is discovered, `rewriteUrlsInTemplates` is defaulted to `false`.  In case of Polymer 1.x or where version can not be identified, it defaults to `true`.  Any user settings override these defaults.
+- Fix issue where negative `extraDependencies` globs were not working.
+- test: Add support for WCT `config-file` option.
 
 ## v1.3.1 [07-06-2017]
 - Fixed [issue #710](https://github.com/Polymer/polymer-cli/issues/710) where the es5 custom elements adapter would not be added when bundling.
