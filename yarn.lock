@@ -7290,9 +7290,9 @@ wd@^1.2.0:
     underscore.string "3.3.4"
     vargs "0.1.0"
 
-web-component-tester@^6.1.3:
-  version "6.1.4"
-  resolved "https://registry.yarnpkg.com/web-component-tester/-/web-component-tester-6.1.4.tgz#5404ec4f4e6d2f661547449d47835aa75de15c37"
+web-component-tester@^6.1.5:
+  version "6.1.5"
+  resolved "https://registry.yarnpkg.com/web-component-tester/-/web-component-tester-6.1.5.tgz#d88716d15692442af998ff29a6903dbda5f4e622"
   dependencies:
     "@polymer/sinonjs" "^1.14.1"
     "@polymer/test-fixture" "^0.0.3"
