@@ -3,6 +3,9 @@
 ## Unreleased
 <!-- Add new, unreleased items here. -->
 
+## v1.5.4 [08-31-2017]
+- Upgraded web-component-tester to v6.1.5 to address IE11 issues.
+
 ## v1.5.3 [08-31-2017]
 - Upgraded web-component-tester to v6.1.4 to address IE11 issues.
 
