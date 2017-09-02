@@ -113,12 +113,12 @@ export async function build(
   });
 
   if (options.basePath) {
-    let basePath = options.basePath === true ? buildName : options.basePath;
+    let basePath = options.basePath === true ? `/${buildName}/` : options.basePath;
     if (!basePath.startsWith('/')) {
       basePath = '/' + basePath;
     }
     if (!basePath.endsWith('/')) {
-      basePath = basePath + '/';
+      logger.info(`Ensure configured basePath needs no trailing slash: ${basePath}`);
     }
     buildStream = buildStream.pipe(polymerProject.updateBaseTag(basePath));
   }
