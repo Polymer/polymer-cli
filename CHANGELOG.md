@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-<!-- Add new, unreleased items here. -->
+- Log, rather than autocorrect, a configured basePath string with no trailing
+  slash. See [issue #873](https://github.com/Polymer/polymer-cli/issues/873).
 
 ## v1.5.4 [08-31-2017]
 - Upgraded web-component-tester to v6.1.5 to address IE11 issues.
