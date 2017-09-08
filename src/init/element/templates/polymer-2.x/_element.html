@@ -1,13 +1,4 @@
 <link rel="import" href="../polymer/polymer-element.html">
-<!--<link rel="import" href="../polymer/lib/elements/dom-if.html">-->
-<!--<link rel="import" href="../polymer/lib/elements/dom-repeat.html">-->
-
-<!--
-`<%= name %>`
-<%= description %>
-
-@demo demo/index.html
--->
 
 <dom-module id="<%= name %>">
   <template>
@@ -20,7 +11,14 @@
   </template>
 
   <script>
-    /** @polymerElement */
+    /**
+     * `<%= name %>`
+     * <%= description %>
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
     class <%= elementClassName %> extends Polymer.Element {
       static get is() { return '<%= name %>'; }
       static get properties() {

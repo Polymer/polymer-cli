@@ -1,0 +1,14 @@
+{
+  "index.html": {
+    "shared_bundle_1.html": {
+      "type": "document",
+      "weight": 1
+    }
+  },
+  "bar.html": {
+    "shared_bundle_1.html": {
+      "type": "document",
+      "weight": 1
+    }
+  }
+}

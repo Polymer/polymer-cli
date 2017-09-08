@@ -22,6 +22,7 @@ export type CommandOptions = {
 
 export interface Command {
   name: string;
+  aliases: string[];
   description: string;
   args: ArgDescriptor[];
   run(options: CommandOptions,

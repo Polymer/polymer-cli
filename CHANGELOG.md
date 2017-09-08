@@ -1,6 +1,82 @@
 # Changelog
 
 ## Unreleased
+<!-- Add new, unreleased items here. -->
+
+## v1.5.4 [08-31-2017]
+- Upgraded web-component-tester to v6.1.5 to address IE11 issues.
+
+## v1.5.3 [08-31-2017]
+- Upgraded web-component-tester to v6.1.4 to address IE11 issues.
+
+## v1.5.2 [08-26-2017]
+- Upgraded web-component-tester to v6.1.3 to address yarn installation issues.
+
+## v1.5.1 [08-22-2017]
+- Upgraded web-component-tester to v6.1.2.
+
+## v1.5.0 [08-22-2017]
+- Fix issue where the `--fragment` flag was being ignored.
+- Added support for `polymer test --npm` option.
+
+## v1.4.1 [08-10-2017]
+- Fixed the `polymer serve --npm` option.
+
+## v1.4.0 [08-08-2017]
+- Upgraded to Polymer Build ^2.0.0 which uses Polymer Bundler ^3.0.0.
+- When no specific option is set for Bundler's `rewriteUrlsInTemplates` the CLI attempts to get the version of Polymer for the project using `bower`.  When Polymer 2.x is discovered, `rewriteUrlsInTemplates` is defaulted to `false`.  In case of Polymer 1.x or where version can not be identified, it defaults to `true`.  Any user settings override these defaults.
+- Fix issue where negative `extraDependencies` globs were not working.
+- test: Add support for WCT `config-file` option.
+
+## v1.3.1 [07-06-2017]
+- Fixed [issue #710](https://github.com/Polymer/polymer-cli/issues/710) where the es5 custom elements adapter would not be added when bundling.
+- Fixed [issue #767](https://github.com/Polymer/polymer-cli/issues/767) where hyphenated option names for `build` command were effectively ignored.
+
+## v1.3.0 [06-30-2017]
+- Added support for optional polymer-project-config provision of bundler options instead of only boolean value for the `bundle` property of build definitions.  See the [Polymer Project Config 3.4.0 release notes](https://github.com/Polymer/polymer-project-config/pull/37) for details on new options available in polymer.json.
+- Includes Polymer Build fixes to push-manifest generation and others.  See [Polymer Build 1.6.0 release notes](https://github.com/Polymer/polymer-build/pull/249).
+- Includes Polymer Bundler fixes to shell strategy and others.  See [Polymer Bundler 2.2.0 release notes](https://github.com/Polymer/polymer-bundler/pull/573).
+
+## v1.2.0 [06-12-2017]
+- Updated lint rule to `polymer-2` in the `polymer-2-element` template.
+- Drop 1.x init templates. Bump `shop` init template to latest version.
+
+## v1.1.0 [05-23-2017]
+- Updated dependency on latest polymer-project-config so that bundled presets include prefetch link generation.
+- `build` Entrypoints will now be properly cached by generated service workers, and assets will be fetched by service workers using relative URLs to support apps mounted at non-root host paths.
+- `build` The `basePath` option no longer adds a prefix to service workers or push manifests. Relative URLs are used instead.
+
+## v1.0.2 [05-19-2017]
+- Updates dependencies on latest polymer-build and polymer-bundler to reduce extraneous html tag output when bundling and generating prefetch links.
+
+## v1.0.1 [05-18-2017]
+- Update element and application templates to latest stable versions
+- Prefetch links are now compatible with bundler and differential serving w/ base tag hrefs in entrypoint documents.
+
+## v1.0.0 [05-16-2017]
+- Official 1.0.0 release of the Polymer CLI! 🎉
+- `build` Support for new `basePath` build config option that remaps paths to assist in serving at non-root paths, such as when doing differential serving of multiple builds from the same host. Affects service worker generation, push manifest generation, and also updates the entrypoint's `<base>` tag if found.
+- `build` Building your project will now write a copy of your `polymer.json` to the build directory. This provides a log of the build options used at the time, including expansion of presets.
+
+## v0.18.4 [05-15-2017]
+- Updated dependencies to support official `polymer-analyzer` 2.0.0 and `web-components-tester` 6.0.0 releases.
+
+## v0.18.3 [05-12-2017]
+- Fix the CLI preset flag.
+- Fix an issue where compiling JS would crash in versions of node with native async iterators.
+- `bundle` no longer emits any JS or CSS files which have been inlined into bundles.
+
+## v0.18.2 [05-10-2017]
+
+- `build` Support build configuration "presets".
+- `build` Performance improvements, including reduction of extraneous insertions of html, head and body tags.
+- `bundle` has many bug fixes and support for lazy imports.
+- Update polyserve to 0.19.0 which adds HTTP compression and JS compilation for Mobile Safari and Vivaldi browsers.
+- Produce much smaller output when compiling many JS files to ES5 by inserting babel helpers only once, at the toplevel entrypoint.
+
+- `init`: Propagate `description` from `init` to application templates in `index.html` meta tag.
+
+- **New Command Aliases**: Commands now support aliases. `polymer install` has been aliased under `polymer i`.
 
 ## v0.18.1 [04-25-2017]
 

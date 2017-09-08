@@ -24,6 +24,7 @@ const babelPresetES2015 = require('babel-preset-es2015');
 const babiliPreset = require('babel-preset-babili');
 const babelPresetES2015NoModules =
     babelPresetES2015.buildPreset({}, {modules: false});
+const externalHelpersPlugin = require('babel-plugin-external-helpers');
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -108,23 +109,31 @@ class JSBabelTransform extends GenericOptimizeTransform {
 }
 
 /**
- * A convinient stream that wraps JSBabelTransform in our default "compile"
+ * A convenient stream that wraps JSBabelTransform in our default "compile"
  * options.
  */
 export class JSDefaultCompileTransform extends JSBabelTransform {
   constructor() {
-    super({presets: [babelPresetES2015NoModules]});
+    super({
+      presets: [babelPresetES2015NoModules],
+      plugins: [externalHelpersPlugin],
+    });
   }
 }
 
 /**
- * A convinient stream that wraps JSBabelTransform in our default "minify"
+ * A convenient stream that wraps JSBabelTransform in our default "minify"
  * options. Yes, it's strange to use babel for minification, but our minifier
  * babili is actually just a plugin for babel.
+ * simplyComparisons plugin is disabled
+ * (https://github.com/Polymer/polymer-cli/issues/689)
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({presets: [babiliPreset]});
+    super({
+      presets:
+          [babiliPreset(null, {'unsafe': {'simplifyComparisons': false}})]
+    });
   }
 }
 

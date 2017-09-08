@@ -12,15 +12,13 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {Analyzer} from 'polymer-analyzer';
-import {Analysis} from 'polymer-analyzer/lib/analysis-format';
-import {generateAnalysis} from 'polymer-analyzer/lib/generate-analysis';
+import {AnalysisFormat, generateAnalysis, Analyzer} from 'polymer-analyzer';
 import {Feature} from 'polymer-analyzer/lib/model/model';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
 
 export async function analyze(
-    root: string, inputs: string[]): Promise<Analysis|undefined> {
+    root: string, inputs: string[]): Promise<AnalysisFormat|undefined> {
   const analyzer = new Analyzer({
     urlLoader: new FSUrlLoader(root),
     urlResolver: new PackageUrlResolver(),
@@ -34,7 +32,7 @@ export async function analyze(
     const _package = await analyzer.analyzePackage();
     return generateAnalysis(_package, '', isNotTest);
   } else {
-    const documents = await Promise.all(inputs.map((i) => analyzer.analyze(i)));
-    return generateAnalysis(documents, '', isNotTest);
+    const analysis = await analyzer.analyze(inputs);
+    return generateAnalysis(analysis, '', isNotTest);
   }
 }

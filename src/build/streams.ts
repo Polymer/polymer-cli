@@ -23,14 +23,6 @@ export function waitFor(stream: NodeJS.ReadableStream):
   });
 }
 
-/**
- * Waits for all the given ReadableStreams
- */
-export function waitForAll(streams: NodeJS.ReadableStream[]):
-    Promise<NodeJS.ReadableStream[]> {
-  return Promise.all<NodeJS.ReadableStream>(streams.map((s) => waitFor(s)));
-}
-
 type PipeStream = (NodeJS.ReadableStream|NodeJS.WritableStream|
                    NodeJS.ReadableStream[]|NodeJS.WritableStream[]);
 

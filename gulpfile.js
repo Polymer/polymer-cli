@@ -30,7 +30,11 @@ gulp.task('clean', (done) => {
   fs.remove(path.join(__dirname, 'lib'), done);
 });
 
-gulp.task('build', ['clean'], () => {
+gulp.task('build', (done) => {
+  runSeq('clean', ['compile'], done);
+});
+
+gulp.task('compile', () => {
   let tsReporter = typescript.reporter.defaultReporter();
   return mergeStream(
              tsProject.src().pipe(tsProject(tsReporter)),
@@ -72,21 +76,23 @@ gulp.task(
               .pipe(eslint.format())
               .pipe(eslint.failAfterError()));
 
-gulp.task(
-    'depcheck',
-    () => depcheck(__dirname, {
-            // "@types/*" dependencies are type declarations that are
-            // automatically
-            // loaded by TypeScript during build. depcheck can't detect this
-            // so we ignore them here.
-            ignoreMatches: ['@types/*', 'vinyl']
-          }).then((result) => {
-      let invalidFiles = Object.keys(result.invalidFiles) || [];
-      let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
-      if (invalidJsFiles.length > 0) {
-        throw new Error(`Invalid files: ${invalidJsFiles}`);
-      }
-      if (result.dependencies.length) {
-        throw new Error(`Unused dependencies: ${result.dependencies}`);
-      }
-    }));
+gulp.task('depcheck', () => {
+  return depcheck(__dirname, {
+           // "@types/*" dependencies are type declarations that are
+           // automatically
+           // loaded by TypeScript during build. depcheck can't detect this
+           // so we ignore them here. Same with babel plugins.
+           ignoreMatches:
+               ['@types/*', 'vinyl', 'babel-plugin-external-helpers']
+         })
+      .then((result) => {
+        let invalidFiles = Object.keys(result.invalidFiles) || [];
+        let invalidJsFiles = invalidFiles.filter((f) => f.endsWith('.js'));
+        if (invalidJsFiles.length > 0) {
+          throw new Error(`Invalid files: ${invalidJsFiles}`);
+        }
+        if (result.dependencies.length) {
+          throw new Error(`Unused dependencies: ${result.dependencies}`);
+        }
+      });
+});

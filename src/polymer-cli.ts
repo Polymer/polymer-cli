@@ -60,6 +60,9 @@ function parseCLIArgs(commandOptions: any): {[name: string]: string} {
   if (commandOptions['extra-dependencies']) {
     parsedOptions.extraDependencies = commandOptions['extra-dependencies'];
   }
+  if (commandOptions.fragment) {
+    parsedOptions.fragments = commandOptions.fragment;
+  }
 
   return parsedOptions;
 }
@@ -93,7 +96,7 @@ export class PolymerCli {
           {config: this.defaultConfigOptions});
     } else {
       this.defaultConfigOptions =
-          ProjectConfig.loadOptionsFromFile('polymer.json');
+          ProjectConfig.loadOptionsFromFile('polymer.json')!;
       if (this.defaultConfigOptions) {
         logger.debug(
             'got default config from polymer.json file:',
@@ -111,7 +114,7 @@ export class PolymerCli {
     this.defaultConfigOptions = this.defaultConfigOptions || {};
     this.defaultConfigOptions.extraDependencies =
         this.defaultConfigOptions.extraDependencies || [];
-    this.defaultConfigOptions.extraDependencies.push(
+    this.defaultConfigOptions.extraDependencies.unshift(
         `bower_components${pathSeperator}webcomponentsjs${pathSeperator}*.js`);
 
     this.addCommand(new AnalyzeCommand());
@@ -127,6 +130,11 @@ export class PolymerCli {
   addCommand(command: Command) {
     logger.debug('adding command', command.name);
     this.commands.set(command.name, command);
+
+    command.aliases.forEach((alias) => {
+      logger.debug('adding alias', alias);
+      this.commands.set(alias, command);
+    });
   }
 
   async run() {

@@ -52,6 +52,64 @@ suite('init/application', () => {
       });
 
   test(
+      'index.html description meta tag matches description prompt (1.x)',
+      (done) => {
+        const TestGenerator = createApplicationGenerator('polymer-1.x');
+        const description = 'This is a description entered by the prompt';
+        helpers.run(TestGenerator)
+            .withPrompts({name: 'foobar', description: description})
+            .on('end', (a) => {
+              yoAssert.fileContent(
+                  'index.html',
+                  `<meta name="description" content="${description}">`);
+              done();
+            });
+      });
+
+  test(
+      'index.html description meta tag contains default without prompt (1.x)',
+      (done) => {
+        const TestGenerator = createApplicationGenerator('polymer-1.x');
+        helpers.run(TestGenerator)
+            .withPrompts({name: 'foobar'})
+            .on('end', (a) => {
+              yoAssert.fileContent(
+                  'index.html',
+                  '<meta name="description" content="foobar description">');
+              done();
+            });
+      });
+
+  test(
+      'index.html description meta tag matches description prompt (2.x)',
+      (done) => {
+        const TestGenerator = createApplicationGenerator('polymer-2.x');
+        const description = 'This is a description entered by the prompt';
+        helpers.run(TestGenerator)
+            .withPrompts({name: 'foobar', description: description})
+            .on('end', (a) => {
+              yoAssert.fileContent(
+                  'index.html',
+                  `<meta name="description" content="${description}">`);
+              done();
+            });
+      });
+
+  test(
+      'index.html description meta tag contains default without prompt (2.x)',
+      (done) => {
+        const TestGenerator = createApplicationGenerator('polymer-2.x');
+        helpers.run(TestGenerator)
+            .withPrompts({name: 'foobar'})
+            .on('end', (a) => {
+              yoAssert.fileContent(
+                  'index.html',
+                  '<meta name="description" content="foobar description">');
+              done();
+            });
+      });
+
+  test(
       'ignoring filenames with dangling underscores when generating templates',
       (done) => {
         const TestGenerator = createApplicationGenerator('polymer-1.x');

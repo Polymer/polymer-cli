@@ -18,10 +18,16 @@ import * as logging from 'plylog';
 import * as semver from 'semver';
 
 import request = require('request');
+import rimraf = require('rimraf');
 import GitHubApi = require('github');
 
 const gunzip = require('gunzip-maybe');
 const tar = require('tar-fs');
+const fileFilterList = [
+  '.gitattributes',
+  '.github',
+  '.travis.yml',
+];
 
 const logger = logging.getLogger('cli.github');
 
@@ -132,6 +138,17 @@ export class Github {
             logger.info('Finished writing template files');
             resolve();
           });
+    });
+  }
+
+  /**
+   * Given an extracted or cloned github directory, unlink files that are not
+   * intended to exist in the template and serve other purposes in the gith
+   * repository.
+   */
+  removeUnwantedFiles(outDir: string) {
+    fileFilterList.forEach((filename) => {
+        rimraf.sync(path.join(outDir, filename));
     });
   }
 
