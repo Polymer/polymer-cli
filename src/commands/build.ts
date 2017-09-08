@@ -55,6 +55,13 @@ export class BuildCommand implements Command {
           'older browsers.'
     },
     {
+      name: 'js-ignore',
+      type: String,
+      description: 'When js-minify is `true`. allow to specify RegEx ' +
+        'for files that should be ignored (not minified)' + 
+        'exmple: { "minify": true ,"ignore": "\\.min\\.js$|firebase-database.js"}'
+    },
+    {
       name: 'js-minify',
       type: Boolean,
       description: 'Minify inlined and external JavaScript.'

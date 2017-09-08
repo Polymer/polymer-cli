@@ -40,7 +40,7 @@ export type CSSOptimizeOptions = {
 export interface OptimizeOptions {
   html?: {minify?: boolean};
   css?: {minify?: boolean};
-  js?: {minify?: boolean, compile?: boolean};
+  js?: {minify?: boolean, compile?: boolean, ignore?: string};
 }
 ;
 
@@ -76,6 +76,12 @@ export class GenericOptimizeTransform extends Transform {
       callback(null, file);
       return;
     }
+
+    if (this.optimizerOptions.presets && this.optimizerOptions.presets[0].ignore == true){
+          logger.warn('skip minify for ...' + file.path );
+          callback(null, file);
+          return;
+      }
 
     if (file.contents) {
       try {
@@ -211,7 +217,20 @@ export function getOptimizeStreams(options?: OptimizeOptions):
         /\.html$/, new InlineCSSOptimizeTransform({stripWhitespace: true})));
   }
   if (options.js && options.js.minify) {
-    streams.push(gulpif(/\.js$/, new JSDefaultMinifyTransform()));
+    if (options.js.ignore) {
+      const reg = new RegExp(options.js.ignore)
+      function condition(file: File): boolean {
+        if(reg.test(file.path)) {
+          logger.warn('skipping minify for ' + file.path );
+          return false
+        }
+        return /\.js$/.test(file.path);
+      }
+      streams.push(gulpif(condition, new JSDefaultMinifyTransform()));  
+    }
+    else {
+      streams.push(gulpif(/\.js$/, new JSDefaultMinifyTransform()));
+    }
   }
 
   return streams;
