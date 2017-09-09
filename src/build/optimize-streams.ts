@@ -30,6 +30,7 @@ const externalHelpersPlugin = require('babel-plugin-external-helpers');
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
 // or consider writing a custom declaration in the `custom_typings/` folder.
 import File = require('vinyl');
+import matcher = require('matcher');
 
 const logger = logging.getLogger('cli.build.optimize-streams');
 
@@ -40,7 +41,7 @@ export type CSSOptimizeOptions = {
 export interface OptimizeOptions {
   html?: {minify?: boolean};
   css?: {minify?: boolean};
-  js?: {minify?: boolean, compile?: boolean, ignore?: string};
+  js?: {minify?: boolean, compile?: boolean, ignore?: string[]};
 }
 ;
 
@@ -218,12 +219,16 @@ export function getOptimizeStreams(options?: OptimizeOptions):
   }
   if (options.js && options.js.minify) {
     if (options.js.ignore) {
-      const reg = new RegExp(options.js.ignore)
+      let ignores = options.js.ignore;
+      
       function condition(file: File): boolean {
-        if(reg.test(file.path)) {
-          logger.warn('skipping minify for ' + file.path );
-          return false
+        for (let ignore of ignores) {
+          if(matcher.isMatch(file.path, ignore) || file.basename === ignore)  {
+            logger.warn('skipping minify for ' + file.path );
+            return false;
+          }
         }
+
         return /\.js$/.test(file.path);
       }
       streams.push(gulpif(condition, new JSDefaultMinifyTransform()));  
