@@ -25,6 +25,7 @@ import {Command, CommandOptions} from './command';
 
 export class InstallCommand implements Command {
   name = 'install';
+  aliases = ['i'];
 
   // TODO(justinfagnani): Expand and link to eventual doc on variants.
   description = 'installs Bower dependencies, optionally installing "variants"';

@@ -79,6 +79,110 @@ suite('polymer build', function() {
                   fixturePath, 'build-with-preset', 'expected/es5-bundled'));
         });
   });
+
+  test('handled (default) bundle all into the entrypoint', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(
+        path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
+
+    return runCommand(binPath, ['build', '--bundle'], {
+             cwd: tmpDir.name,
+           })
+        .then(
+            () => assertDirsEqual(
+                path.join(tmpDir.name, 'build/default'),
+                path.join(
+                    fixturePath,
+                    'fragment-variations',
+                    'expected-default',
+                    'default')));
+  });
+
+  test('handled bundle into fragment a', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(
+        path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
+
+    return runCommand(binPath, ['build', '--bundle', '--fragment', 'a.html'], {
+             cwd: tmpDir.name,
+           })
+        .then(
+            () => assertDirsEqual(
+                path.join(tmpDir.name, 'build/default'),
+                path.join(
+                    fixturePath,
+                    'fragment-variations',
+                    'expected-fragment-a',
+                    'default')));
+  });
+
+  test('handled bundle into fragment a and b', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(
+        path.join(fixturePath, 'fragment-variations', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--bundle',
+                 '--fragment',
+                 'a.html',
+                 '--fragment',
+                 'b.html',
+               ],
+               {
+                 cwd: tmpDir.name,
+               })
+        .then(
+            () => assertDirsEqual(
+                path.join(tmpDir.name, 'build/default'),
+                path.join(
+                    fixturePath,
+                    'fragment-variations',
+                    'expected-fragment-b',
+                    'default')));
+  });
+
+  test('handles polymer 1.x project bundler defaults', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'polymer-1-project', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--bundle',
+               ],
+               {
+                 cwd: tmpDir.name,
+               })
+        .then((out) => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build/default'),
+              path.join(fixturePath, 'polymer-1-project', 'expected/default'));
+        });
+  });
+
+  test('handles polymer 2.x project bundler defaults', () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'polymer-2-project', 'source'), tmpDir.name);
+
+    return runCommand(
+               binPath,
+               [
+                 'build',
+                 '--bundle',
+               ],
+               {
+                 cwd: tmpDir.name,
+               })
+        .then((out) => {
+          assertDirsEqual(
+              path.join(tmpDir.name, 'build/default'),
+              path.join(fixturePath, 'polymer-2-project', 'expected/default'));
+        });
+  });
 });
 
 function copyDir(fromDir, toDir) {

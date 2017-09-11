@@ -1,0 +1,20 @@
+{
+  "name": "polymer-1-project",
+  "homepage": "https://github.com/polymer/polymer-cli",
+  "authors": [
+    "Brendan Baldwin <brendan@usergenic.com>"
+  ],
+  "description": "integration test fixture for default polymer-1-project build behavior",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^1.0.0"
+  }
+}

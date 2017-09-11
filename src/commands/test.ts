@@ -24,6 +24,7 @@ import {Command, CommandOptions} from './command';
 
 export class TestCommand implements Command {
   name = 'test';
+  aliases = [];
 
   description = 'Runs web-component-tester';
 
@@ -134,6 +135,11 @@ export class TestCommand implements Command {
       name: 'config-file',
       description: 'Config file that needs to be used by wct. ie: wct.config-sauce.js',
       type: String,
+    },
+    {
+      name: 'npm',
+      description: 'Tests components which have been installed with npm (instead of bower)',
+      type: Boolean,
     },
   ];
 

@@ -30,11 +30,12 @@ suite('init', () => {
     let runGeneratorStub =
         sandbox.stub(polymerInit, 'runGenerator').returns(Promise.resolve());
     let cli = new PolymerCli(['init', 'shop'], null);
-    cli.run();
-    assert.isOk(runGeneratorStub.calledOnce);
-    assert.isOk(runGeneratorStub.calledWith(`polymer-init-shop:app`, {
-      name: 'shop',
-    }));
+    return cli.run().then(() => {
+      assert.isOk(runGeneratorStub.calledOnce);
+      assert.isOk(runGeneratorStub.calledWith(`polymer-init-shop:app`, {
+        name: 'shop',
+      }));
+    });
   });
 
   test(
@@ -44,8 +45,9 @@ suite('init', () => {
             sandbox.stub(polymerInit, 'promptGeneratorSelection')
                 .returns(Promise.resolve());
         let cli = new PolymerCli(['init'], null);
-        cli.run();
-        assert.isOk(promptSelectionStub.calledOnce);
+        return cli.run().then(() => {
+          assert.isOk(promptSelectionStub.calledOnce);
+        });
       });
 
 });
