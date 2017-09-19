@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add new, unreleased items here. -->
+- Upgraded bower to v1.8.2 to prevent installation issues.
 
 ## v1.5.4 [08-31-2017]
 - Upgraded web-component-tester to v6.1.5 to address IE11 issues.
