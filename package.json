@@ -68,7 +68,7 @@
     "polymer-build": "^2.0.0",
     "polymer-linter": "^2.0.2",
     "polymer-project-config": "^3.4.0",
-    "polyserve": "^0.20.0",
+    "polyserve": "^0.22.1",
     "request": "^2.72.0",
     "rimraf": "^2.6.1",
     "semver": "^5.3.0",
@@ -77,7 +77,7 @@
     "update-notifier": "^1.0.0",
     "vinyl": "^1.1.1",
     "vinyl-fs": "^2.4.3",
-    "web-component-tester": "^6.1.5",
+    "web-component-tester": "^6.2.0",
     "yeoman-environment": "^1.5.2",
     "yeoman-generator": "^1.0.1"
   },
