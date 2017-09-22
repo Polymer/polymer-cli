@@ -33,7 +33,7 @@
     "@types/inquirer": "0.0.32",
     "@types/merge-stream": "^1.0.28",
     "@types/mz": "^0.0.31",
-    "@types/request": "0.0.39",
+    "@types/request": "2.0.3",
     "@types/resolve": "0.0.4",
     "@types/rimraf": "^0.0.28",
     "@types/semver": "^5.3.30",
