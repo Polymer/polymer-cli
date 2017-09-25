@@ -132,11 +132,7 @@ export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
     super({
       presets:
-          [minifyPreset(null, {
-            flipComparisons: true,
-            guards: true,
-            typeConstructors: true
-          })]
+          [minifyPreset(null, {simplifyComparisons: false})]
     });
   }
 }
