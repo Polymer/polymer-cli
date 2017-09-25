@@ -44,7 +44,7 @@
     "@types/yeoman-generator": "^1.0.0",
     "babel-core": "^6.24.1",
     "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-babili": "0.0.10",
+    "babel-preset-minify": "0.2.0",
     "babel-preset-es2015": "^6.18.0",
     "bower": "1.8.0",
     "bower-json": "^0.8.1",
