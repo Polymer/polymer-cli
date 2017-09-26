@@ -35,3 +35,7 @@ if (!semver.satisfies(process.version, '>=6')) {
 
 // Ok, safe to load ES2015.
 require('../lib/run');
+
+process.on('SIGINT', function() {
+  process.exit(0);
+});
