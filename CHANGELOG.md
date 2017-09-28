@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Updated Polymer 2.0 element test file template to use ES6.
 <!-- Add new, unreleased items here. -->
 - Update JS minification package babili to the new package-name babel-minify.
 
