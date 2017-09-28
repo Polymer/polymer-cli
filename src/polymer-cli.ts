@@ -116,6 +116,10 @@ export class PolymerCli {
         this.defaultConfigOptions.extraDependencies || [];
     this.defaultConfigOptions.extraDependencies.unshift(
         `bower_components${pathSeperator}webcomponentsjs${pathSeperator}*.js`);
+    this.defaultConfigOptions.extraDependencies.push(
+        `bower_components${pathSeperator}webcomponentsjs${pathSeperator}*.js.map`);
+    this.defaultConfigOptions.extraDependencies.push(
+        `!bower_components${pathSeperator}webcomponentsjs${pathSeperator}gulpfile.js`);
 
     this.addCommand(new AnalyzeCommand());
     this.addCommand(new BuildCommand());
