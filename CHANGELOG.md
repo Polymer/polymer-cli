@@ -1,9 +1,12 @@
 # Changelog
 
 ## Unreleased
-- Updated Polymer 2.0 element test file template to use ES6.
 <!-- Add new, unreleased items here. -->
+
+# v1.5.6 [10-02-2017]
+- Updated Polymer 2.0 element test file template to use ES6.
 - Update JS minification package babili to the new package-name babel-minify.
+- Updated to latest WCT and Polyserve versions to support npm and `<script type=module>` in on-the-fly compilation and tests.
 
 ## v1.5.5 [09-21-2017]
 - Upgraded web-component-tester to v6.2.0 and polyserve 0.22.1 for better ES module support.
