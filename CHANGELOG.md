@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add new, unreleased items here. -->
+- Upgraded bower to v1.8.2 to prevent installation issues.
 
 # v1.5.6 [10-02-2017]
 - Updated Polymer 2.0 element test file template to use ES6.
