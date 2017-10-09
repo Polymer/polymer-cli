@@ -53,7 +53,7 @@
     "command-line-args": "^3.0.0",
     "command-line-commands": "^1.0.3",
     "command-line-usage": "^3.0.1",
-    "css-slam": "^1.1.0",
+    "css-slam": "^2.0.2",
     "del": "^2.2.2",
     "findup-sync": "^0.4.2",
     "github": "^7.2.1",
