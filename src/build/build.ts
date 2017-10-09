@@ -70,7 +70,7 @@ export async function build(
   async function getPolymerVersion(): Promise<string> {
     return new Promise<string>(
         (resolve, _reject) =>
-            bower.commands.list()
+            bower.commands.list({offline: true})
                 .on('end',
                     (result: any) => {
                       if (result && result.dependencies &&
