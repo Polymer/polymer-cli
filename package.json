@@ -26,7 +26,7 @@
   "dependencies": {
     "@types/babel-core": "^6.7.14",
     "@types/chalk": "^0.4.31",
-    "@types/del": "^2.2.31",
+    "@types/del": "^3.0.0",
     "@types/findup-sync": "^0.3.29",
     "@types/gulp-if": "0.0.30",
     "@types/html-minifier": "^1.1.30",
@@ -54,7 +54,7 @@
     "command-line-commands": "^1.0.3",
     "command-line-usage": "^3.0.1",
     "css-slam": "^2.0.2",
-    "del": "^2.2.2",
+    "del": "^3.0.0",
     "findup-sync": "^0.4.2",
     "github": "^7.2.1",
     "gulp-if": "^2.0.0",
