@@ -2,9 +2,11 @@
 
 ## Unreleased
 <!-- Add new, unreleased items here. -->
+
+## v1.5.7 [10-11-2017]
 - Updated css-slam, bower and other dependencies.
 
-# v1.5.6 [10-02-2017]
+## v1.5.6 [10-02-2017]
 - Updated Polymer 2.0 element test file template to use ES6.
 - Update JS minification package babili to the new package-name babel-minify.
 - Updated to latest WCT and Polyserve versions to support npm and `<script type=module>` in on-the-fly compilation and tests.
