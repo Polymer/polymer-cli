@@ -15,6 +15,7 @@
 import * as chalk from 'chalk';
 import {execSync} from 'child_process';
 import * as fs from 'fs';
+import * as ini from 'ini';
 import * as logging from 'plylog';
 
 import findup = require('findup-sync');
@@ -26,6 +27,8 @@ import {createGithubGenerator} from '../init/github';
 import Generator = require('yeoman-generator');
 
 const logger = logging.getLogger('init');
+
+const proxy = getProxyConfig();
 
 interface GeneratorDescription {
   name: string;
@@ -58,6 +61,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
       owner: 'PolymerElements',
       repo: 'polymer-starter-kit',
       semverRange: '^3.0.0',
+      proxy: proxy,
     }),
   },
   'shop': {
@@ -67,6 +71,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
       owner: 'Polymer',
       repo: 'shop',
       semverRange: '^2.0.0',
+      proxy: proxy,
     }),
   },
 };
@@ -223,6 +228,41 @@ function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
     choices: choices,
   };
 }
+
+/**
+ * Checks and returns proxy settings from gitconfig. This function
+ * assumes that gitconfig will either be located locally (project's config file)
+ * or globally (user home)
+ */
+function getProxyConfig() {
+  let pathToConfig = './.git/config';
+  let meta = readConfigFile(pathToConfig);
+  // Checking if local
+  if (meta && meta.https && meta.https.proxy) {
+    return meta.https.proxy;
+  }
+  pathToConfig = (process.env.HOME || process.env.USERPROFILE) + '/.gitconfig';
+  meta = readConfigFile(pathToConfig);
+  if (meta && meta.https) {
+    return meta.https.proxy;
+  }
+  return;
+}
+
+/**
+ * This function tries to read and convert config file to JSON object.
+ */
+function readConfigFile(filePath: string) {
+  let meta;
+  try {
+    meta = fs.readFileSync(filePath, 'utf8');
+    meta = ini.parse(meta);
+  } catch (error) {
+    // do nothing
+  }
+  return meta;
+}
+
 
 /**
  * Run the given generator. If no Yeoman environment is provided, a new one

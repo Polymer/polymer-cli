@@ -65,8 +65,8 @@ export async function lint(options: Options, config: ProjectConfig) {
 
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
-  const printer = new WarningPrinter(
-      process.stdout, {verbosity: 'full', color: true});
+  const printer =
+      new WarningPrinter(process.stdout, {verbosity: 'full', color: true});
   await printer.printWarnings(filtered);
 
   if (filtered.length > 0) {

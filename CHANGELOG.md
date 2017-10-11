@@ -37,6 +37,8 @@
 - Upgraded to Polymer Build ^2.0.0 which uses Polymer Bundler ^3.0.0.
 - When no specific option is set for Bundler's `rewriteUrlsInTemplates` the CLI attempts to get the version of Polymer for the project using `bower`.  When Polymer 2.x is discovered, `rewriteUrlsInTemplates` is defaulted to `false`.  In case of Polymer 1.x or where version can not be identified, it defaults to `true`.  Any user settings override these defaults.
 - Fix issue where negative `extraDependencies` globs were not working.
+- test: Add CLI option for custom wct sauce config.
+- Fixed [issue #722](https://github.com/Polymer/polymer-cli/issues/722) by adding support to proxy calls to api.github.com
 - test: Add support for WCT `config-file` option.
 
 ## v1.3.1 [07-06-2017]
