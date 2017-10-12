@@ -29,6 +29,7 @@ import {Command} from './command';
 export interface Options {
   rules?: string[];
   input?: string[];
+  fix?: boolean;
 }
 
 export class LintCommand implements Command {
@@ -54,6 +55,12 @@ export class LintCommand implements Command {
       multiple: true,
       description: 'The lint rules/rule collections to apply. ' +
           'See `polymer help lint` for a list of rules.',
+    },
+    {
+      name: 'fix',
+      type: Boolean,
+      description: `Automatically fix as many issues as possible by ` +
+          `updating your source on disk.`
     }
   ];
 
@@ -64,7 +71,6 @@ export class LintCommand implements Command {
    *   - add option for input files to polymer.json
    *   - modules to load that can register new rules
    *   - --watch
-   *   - --fix
    */
 
   async run(options: Options, config: ProjectConfig) {
