@@ -16,11 +16,11 @@ import * as chalk from 'chalk';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {Analyzer, Document, FSUrlLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
-import {applyEdits, FixableWarning, Replacement} from 'polymer-linter/lib/warning';
+import {applyEdits, FixableWarning, makeParseLoader, Replacement} from 'polymer-linter/lib/warning';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
@@ -55,20 +55,26 @@ export async function lint(options: Options, config: ProjectConfig) {
     urlLoader: new FSUrlLoader(config.root),
     urlResolver: new PackageUrlResolver(),
   });
-
   const linter = new lintLib.Linter(rules, analyzer);
 
+  // This is awkward, it would be nice to be able to get access to the analysis
+  // of a lint run rather than doing this sort of parallel construction.
+  // We want the analysis that the linter sees so that we can apply fixes
+  // to the same version of the files that the fixes were constructed for.
   let warnings;
+  let analysis;
   if (options.input) {
-    warnings = await linter.lint(options.input);
+    [warnings, analysis] = await Promise.all(
+        [linter.lint(options.input), analyzer.analyze(options.input)]);
   } else {
-    warnings = await linter.lintPackage();
+    [warnings, analysis] =
+        await Promise.all([linter.lintPackage(), analyzer.analyzePackage()]);
   }
 
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
-    return fix(filtered, options, config, analyzer);
+    return fix(filtered, options, config, analyzer, analysis);
   } else {
     return report(filtered);
   }
@@ -103,7 +109,8 @@ async function fix(
     warnings: FixableWarning[],
     options: Options,
     config: ProjectConfig,
-    analyzer: Analyzer) {
+    analyzer: Analyzer,
+    analysis: Analysis) {
   if (options.input) {
     const packageRelativeInputFilenames = new Set(options.input.map(
         (i) => path.relative(config.root, path.resolve('.', i))));
@@ -118,17 +125,8 @@ async function fix(
     return;
   }
 
-  const loader = async (url: string) => {
-    const analysis = await analyzer.analyze([url]);
-    const result = analysis.getDocument(url);
-    if (result && result instanceof Document) {
-      return result.parsedDocument;
-    }
-    throw new Error(`Could not load ${url}`);
-  };
-
   const {appliedEdits, incompatibleEdits, editedFiles} =
-      await applyEdits(fixes, loader);
+      await applyEdits(fixes, makeParseLoader(analyzer, analysis));
 
   for (const [newPath, newContents] of editedFiles) {
     await fs.writeFile(
