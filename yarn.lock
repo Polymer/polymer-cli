@@ -5635,9 +5635,9 @@ polymer-bundler@^3.1.0:
     polymer-analyzer "^2.3.0"
     source-map "^0.5.6"
 
-polymer-linter@^2.0.2:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/polymer-linter/-/polymer-linter-2.0.3.tgz#a2d404dd85fc0fd01e471d1c10dd6accfccd64e6"
+polymer-linter@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/polymer-linter/-/polymer-linter-2.1.0.tgz#70e7ed0f7463b0b0c254f5fd038dce97d8594ee0"
   dependencies:
     "@types/estree" "0.0.34"
     "@types/fast-levenshtein" "0.0.1"
