@@ -26,7 +26,7 @@ function invertPromise(p) {
   }, (err) => err);
 }
 
-suite.only('polymer lint', function () {
+suite('polymer lint', function () {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
