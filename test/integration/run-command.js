@@ -19,6 +19,11 @@ const childProcess = require('child_process');
  *
  * If the command succeeds the promise will be resolved with the stdout+stderr
  * of the command, as a string.
+ *
+ * @param {string} path
+ * @param {Array<string>} args
+ * @param {*} options
+ * @return {Promise<string>}
  */
 function runCommand(path, args, options) {
   let contents;
