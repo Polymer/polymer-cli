@@ -89,8 +89,6 @@ export async function lint(options: Options, config: ProjectConfig) {
 
 /**
  * Report a friendly description of the given warnings to stdout.
- *
- * @param warnings Warnings to report.
  */
 async function report(warnings: Warning[]) {
   const printer =
@@ -121,11 +119,6 @@ async function report(warnings: Warning[]) {
  * Fix all fixable warnings given. Changes files on the filesystem.
  *
  * Reports a summary of the fixes made to stdout.
- *
- * @param warnings Warnings to fix.
- * @param config The Project that we're running against.
- * @param analyzer The Analyzer that the linter ran with.
- * @param analysis The Analysis that the linter ran with.
  */
 async function fix(
     warnings: FixableWarning[],
@@ -171,7 +164,10 @@ async function fix(
   }
 }
 
-function countEditsByFile(edits: Edit[]) {
+/**
+ * Computes a map of file path to the count of changes made to that file.
+ */
+function countEditsByFile(edits: Edit[]): ReadonlyMap<string, number> {
   const changeCountByFile = new Map<string, number>();
   for (const edit of edits) {
     for (const replacement of edit) {
