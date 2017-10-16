@@ -20,7 +20,7 @@ import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity, Warning} 
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
-import {applyEdits, FixableWarning, makeParseLoader, Replacement} from 'polymer-linter/lib/warning';
+import {applyEdits, Edit, FixableWarning, makeParseLoader, Replacement} from 'polymer-linter/lib/warning';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
@@ -61,25 +61,37 @@ export async function lint(options: Options, config: ProjectConfig) {
   // of a lint run rather than doing this sort of parallel construction.
   // We want the analysis that the linter sees so that we can apply fixes
   // to the same version of the files that the fixes were constructed for.
+  // https://github.com/Polymer/polymer-linter/issues/110
   let warnings;
   let analysis;
   if (options.input) {
     [warnings, analysis] = await Promise.all(
         [linter.lint(options.input), analyzer.analyze(options.input)]);
+
+    const packageRelativeInputFilenames = new Set(options.input.map(
+        (i) => path.relative(config.root, path.resolve('.', i))));
+    warnings = warnings.filter(
+        (w) => packageRelativeInputFilenames.has(w.sourceRange.file));
   } else {
     [warnings, analysis] =
         await Promise.all([linter.lintPackage(), analyzer.analyzePackage()]);
   }
 
+
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
-    return fix(filtered, options, config, analyzer, analysis);
+    return fix(filtered, config, analyzer, analysis);
   } else {
     return report(filtered);
   }
 }
 
+/**
+ * Report a friendly description of the given warnings to stdout.
+ *
+ * @param warnings Warnings to report.
+ */
 async function report(warnings: Warning[]) {
   const printer =
       new WarningPrinter(process.stdout, {verbosity: 'full', color: true});
@@ -88,14 +100,14 @@ async function report(warnings: Warning[]) {
   if (warnings.length > 0) {
     let message = '';
     const errors = warnings.filter((w) => w.severity === Severity.ERROR);
-    const warningLevel =
+    const warningLevelWarnings =
         warnings.filter((w) => w.severity === Severity.WARNING);
     const infos = warnings.filter((w) => w.severity === Severity.INFO);
     if (errors.length > 0) {
       message += ` ${errors.length} ${chalk.red('errors')}`;
     }
-    if (warningLevel.length > 0) {
-      message += ` ${warningLevel.length} ${chalk.yellow('warnings')}`;
+    if (warningLevelWarnings.length > 0) {
+      message += ` ${warningLevelWarnings.length} ${chalk.yellow('warnings')}`;
     }
     if (infos.length > 0) {
       message += ` ${infos.length} ${chalk.green('info')} messages`;
@@ -105,23 +117,25 @@ async function report(warnings: Warning[]) {
   }
 }
 
+/**
+ * Fix all fixable warnings given. Changes files on the filesystem.
+ *
+ * Reports a summary of the fixes made to stdout.
+ *
+ * @param warnings Warnings to fix.
+ * @param config The Project that we're running against.
+ * @param analyzer The Analyzer that the linter ran with.
+ * @param analysis The Analysis that the linter ran with.
+ */
 async function fix(
     warnings: FixableWarning[],
-    options: Options,
     config: ProjectConfig,
     analyzer: Analyzer,
     analysis: Analysis) {
-  if (options.input) {
-    const packageRelativeInputFilenames = new Set(options.input.map(
-        (i) => path.relative(config.root, path.resolve('.', i))));
-    warnings = warnings.filter(
-        (w) => packageRelativeInputFilenames.has(w.sourceRange.file));
-  }
-
   const fixes = warnings.map((w) => w.fix).filter((fix) => fix !== undefined) as
       Replacement[][];
   if (fixes.length === 0) {
-    console.log('No fixes to apply.');
+    console.log('No fixable warnings found.');
     return;
   }
 
@@ -133,20 +147,18 @@ async function fix(
         path.join(config.root, newPath), newContents, {encoding: 'utf8'});
   }
 
-  const changeCountByFile = new Map<string, number>();
-  for (const appliedEdit of appliedEdits) {
-    for (const replacement of appliedEdit) {
-      changeCountByFile.set(
-          replacement.range.file,
-          (changeCountByFile.get(replacement.range.file) || 0) + 1);
-    }
-  }
+  const appliedChangeCountByFile = countEditsByFile(appliedEdits);
+  const incompatibleChangeCountByFile = countEditsByFile(incompatibleEdits);
 
-  for (const [file, count] of changeCountByFile) {
+  for (const [file, count] of appliedChangeCountByFile) {
     console.log(`  Made ${count} change${plural(count)} to ${file}`);
   }
 
   if (incompatibleEdits.length > 0) {
+    console.log('\n');
+    for (const [file, count] of incompatibleChangeCountByFile) {
+      console.log(`  ${count} incompatible changes in ${file}`);
+    }
     console.log(
         `\nFixed ${appliedEdits.length} ` +
         `warning${plural(appliedEdits.length)}, ` +
@@ -157,6 +169,18 @@ async function fix(
         `\nFixed ${appliedEdits.length} ` +
         `warning${plural(appliedEdits.length)}.`);
   }
+}
+
+function countEditsByFile(edits: Edit[]) {
+  const changeCountByFile = new Map<string, number>();
+  for (const edit of edits) {
+    for (const replacement of edit) {
+      changeCountByFile.set(
+          replacement.range.file,
+          (changeCountByFile.get(replacement.range.file) || 0) + 1);
+    }
+  }
+  return changeCountByFile;
 }
 
 function plural(n: number): string {
