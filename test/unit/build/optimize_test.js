@@ -115,7 +115,7 @@ suite('optimize-streams', () => {
       if (error) {
         return done(error);
       }
-      assert.equal(f.contents.toString(), '[1,2,3].map(a=>a+1);');
+      assert.equal(f.contents.toString(), '[1,2,3].map((a)=>a+1);');
       done();
     });
   });

@@ -10,6 +10,8 @@
 
 'use strict';
 
+const fs = require('fs');
+const os = require('os');
 const assert = require('chai').assert;
 const path = require('path');
 
@@ -24,7 +26,7 @@ function invertPromise(p) {
   }, (err) => err);
 }
 
-suite('polymer lint', function() {
+suite('polymer lint', function () {
 
   const binPath = path.join(__dirname, '../../bin/polymer.js');
 
@@ -32,27 +34,107 @@ suite('polymer lint', function() {
 
   test('handles a simple correct case', () => {
     const cwd = path.join(fixturePath, 'lint-simple');
-    return runCommand(binPath, ['lint'], {cwd});
+    return runCommand(binPath, ['lint'], { cwd });
   });
 
   test('fails when rules are not specified', () => {
     const cwd = path.join(fixturePath, 'lint-no-polymer-json');
-    const result = runCommand(binPath, ['lint'], {cwd, failureExpected: true});
+    const result =
+      runCommand(binPath, ['lint'], { cwd, failureExpected: true });
     return invertPromise(result);
   });
 
   test('takes rules from the command line', () => {
     const cwd = path.join(fixturePath, 'lint-no-polymer-json');
-    return runCommand(binPath, ['lint', '--rules=polymer-2-hybrid'], {cwd});
+    return runCommand(binPath, ['lint', '--rules=polymer-2-hybrid'], { cwd });
   });
 
   test('fails when lint errors are found', () => {
     const cwd = path.join(fixturePath, 'lint-with-error');
-    const result = runCommand(binPath, ['lint'], {cwd, failureExpected: true});
+    const result =
+        runCommand(binPath, ['lint'], { cwd, failureExpected: true });
     return invertPromise(result).then((output) => {
       assert.include(
-          output, '<style> tags should not be direct children of <dom-module>');
+        output, '<style> tags should not be direct children of <dom-module>');
     });
   });
 
+  test('applies fixes to a package when requested', () => {
+    const fixtureDir = path.join(fixturePath, 'lint-fixes');
+    const cwd = getTempCopy(fixtureDir);
+    const result = runCommand(binPath, ['lint', '--fix'], { cwd });
+    return result.then((output) => {
+      assert.deepEqual(fs.readFileSync(path.join(cwd, 'toplevel-bad.html'), 'utf-8'),
+        `<style>
+  div {
+    @apply --foo;
+  }
+</style>
+`);
+
+      assert.deepEqual(fs.readFileSync(path.join(cwd, 'subdir', 'nested-bad.html'), 'utf-8'), `<style>
+  div {
+    @apply --bar;
+  }
+</style>
+`)
+
+      assert.include(output, 'Made 2 changes to toplevel-bad.html');
+      assert.include(output, 'Made 2 changes to subdir/nested-bad.html');
+      assert.include(output, 'Fixed 2 warnings.');
+    });
+  });
+
+  test('applies fixes to a specific file when requested', () => {
+    const fixtureDir = path.join(fixturePath, 'lint-fixes');
+    const cwd = getTempCopy(fixtureDir);
+    const result = runCommand(binPath, ['lint', '--fix', '-i', 'toplevel-bad.html'], { cwd });
+    return result.then((output) => {
+      assert.deepEqual(fs.readFileSync(path.join(cwd, 'toplevel-bad.html'), 'utf-8'),
+        `<style>
+  div {
+    @apply --foo;
+  }
+</style>
+`);
+
+      assert.deepEqual(fs.readFileSync(path.join(cwd, 'subdir', 'nested-bad.html'), 'utf-8'), `<style>
+  div {
+    @apply(--bar);
+  }
+</style>
+`);
+
+      assert.include(output, 'Made 2 changes to toplevel-bad.html');
+      assert.include(output, 'Fixed 1 warning.');
+    });
+  });
 });
+
+/**
+ * @param {string} fromDir
+ */
+function getTempCopy(fromDir) {
+  const toDir = fs.mkdtempSync(path.join(os.tmpdir(), path.basename(fromDir)));
+  copyDir(fromDir, toDir);
+  return toDir;
+}
+
+/**
+ * @param {string} from
+ * @param {string} to
+ */
+function copyDir(fromDir, toDir) {
+  for (const inner of fs.readdirSync(fromDir)) {
+    const fromInner = path.join(fromDir, inner);
+    const toInner = path.join(toDir, inner);
+    const stat = fs.statSync(fromInner);
+    if (stat.isDirectory()) {
+      fs.mkdirSync(toInner);
+      copyDir(fromInner, toInner);
+    } else {
+
+      fs.writeFileSync(toInner, fs.readFileSync(fromInner));
+    }
+  }
+}

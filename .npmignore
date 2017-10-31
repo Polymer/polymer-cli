@@ -1,0 +1,7 @@
+.clang-format
+.eslintignore
+.github
+.gitignore
+.travis.yml
+appveyor.yml
+node_modules
