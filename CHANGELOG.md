@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
+- `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.7 [10-11-2017]
