@@ -29,6 +29,10 @@ import {Command, CommandOptions} from './command';
 
 const logger = logging.getLogger('cli.command.build');
 
+// This flag is special because it doesn't necessarily trigger a one-off single
+// build.
+const autoBasePath = 'auto-base-path';
+
 export class BuildCommand implements Command {
   name = 'build';
   aliases = [];
@@ -110,6 +114,12 @@ export class BuildCommand implements Command {
       type: String,
       description: 'Updates the <base> tag if found in the entrypoint document.'
     },
+    {
+      name: autoBasePath,
+      type: Boolean,
+      description: 'For all builds, set the entrypoint <base> tag to match ' +
+          'the build name. Does not necessarily trigger a one-off build.',
+    },
   ];
 
   private dashToCamelCase(text: string): string {
@@ -124,6 +134,7 @@ export class BuildCommand implements Command {
       ProjectBuildOptions {
     const buildOptions: ProjectBuildOptions = {};
     const validBuildOptions = new Set(this.args.map(({name}) => name));
+    validBuildOptions.delete(autoBasePath);  // This flag is special.
     for (const buildOption of Object.keys(options)) {
       if (validBuildOptions.has(buildOption)) {
         const [prefix, option] = buildOption.split('-', 2);
@@ -134,6 +145,9 @@ export class BuildCommand implements Command {
           (<any>buildOptions)[this.dashToCamelCase(buildOption)] = options[buildOption];
         }
       }
+    }
+    if (options[autoBasePath]) {
+      buildOptions.basePath = true;
     }
     return applyBuildPreset(buildOptions);
   }
@@ -166,9 +180,11 @@ export class BuildCommand implements Command {
 
     // If any the build command flags were passed as CLI arguments, generate
     // a single build based on those flags alone.
-    const hasCliArgumentsPassed =
-        this.args.some((arg) => typeof options[arg.name] !== 'undefined');
-    if (hasCliArgumentsPassed) {
+    const hasOneOffBuildArgumentPassed = this.args.some((arg) => {
+      return typeof options[arg.name] !== 'undefined' &&
+          arg.name !== autoBasePath;
+    });
+    if (hasOneOffBuildArgumentPassed) {
       await build(this.commandOptionsToBuildOptions(options), polymerProject);
       return;
     }
@@ -176,8 +192,12 @@ export class BuildCommand implements Command {
     // If no build flags were passed but 1+ polymer.json build configuration(s)
     // exist, generate a build for each configuration found.
     if (config.builds) {
-      const promises = config.builds.map(
-          (buildOptions) => build(buildOptions, polymerProject));
+      const promises = config.builds.map((buildOptions) => {
+        if (options[autoBasePath]) {
+          buildOptions.basePath = true;
+        }
+        return build(buildOptions, polymerProject);
+      });
       promises.push(mzfs.writeFile(
           path.join(mainBuildDirectoryName, 'polymer.json'), config.toJSON()));
       await Promise.all(promises);

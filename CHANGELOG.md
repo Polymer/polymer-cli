@@ -2,7 +2,8 @@
 
 ## Unreleased
 - Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
-- `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
+- `build` Added `--base-path` flag. Sets the entrypoint `<base>` of the single one-off build to the specified value.
+- `build` Added `--auto-base-path` flag. Sets the entrypoint `<base>` tag for all builds to match the name of that build. Unlike other flags, does not necessarily trigger a single one-off build.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.7 [10-11-2017]
