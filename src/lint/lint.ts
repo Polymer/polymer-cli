@@ -16,7 +16,7 @@ import * as chalk from 'chalk';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity, UrlResolver, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
@@ -27,6 +27,22 @@ import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
 
 const logger = logging.getLogger('cli.lint');
+
+class MapBasedUrlResolver implements UrlResolver {
+  constructor(private urlSuffixMap: [string, string][]) {
+  }
+  canResolve(_url: string): boolean {
+    return true;
+  }
+  resolve(url: string): string {
+    for (const [suffix, resolvedUrl] of this.urlSuffixMap) {
+      if (url.endsWith(suffix)) {
+        return resolvedUrl;
+      }
+    }
+    return url;
+  }
+}
 
 export async function lint(options: Options, config: ProjectConfig) {
   const lintOptions: Partial<typeof config.lint> = (config.lint || {});
@@ -51,9 +67,20 @@ export async function lint(options: Options, config: ProjectConfig) {
     minimumSeverity: Severity.WARNING
   });
 
+  let urlResolver;
+  if (options._urlMap) {
+    const entries: Array<{suffix: string, path: string}> =
+        JSON.parse(fs.readFileSync(options._urlMap, 'utf-8'));
+    urlResolver = new MapBasedUrlResolver(
+        entries.filter((e) => e.suffix && e.path)
+            .map((e) => [e.suffix, e.path] as [string, string]));
+  } else {
+    urlResolver = new PackageUrlResolver();
+  }
+
   const analyzer = new Analyzer({
     urlLoader: new FSUrlLoader(config.root),
-    urlResolver: new PackageUrlResolver(),
+    urlResolver,
   });
   const linter = new lintLib.Linter(rules, analyzer);
 

@@ -30,6 +30,7 @@ export interface Options {
   rules?: string[];
   input?: string[];
   fix?: boolean;
+  _urlMap?: string;
 }
 
 export class LintCommand implements Command {
@@ -61,6 +62,12 @@ export class LintCommand implements Command {
       type: Boolean,
       description: `Automatically fix as many issues as possible by ` +
           `updating your source on disk.`
+    },
+    {
+      name: '_urlMap',
+      type: String,
+      description: `[Experimental] Path to a JSON file ` +
+          `describing a map between urls and files on disk.`
     }
   ];
 
