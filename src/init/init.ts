@@ -13,17 +13,16 @@
  */
 
 import * as chalk from 'chalk';
-import {execSync} from 'child_process';
 import * as fs from 'fs';
 import * as logging from 'plylog';
 
 import findup = require('findup-sync');
 import * as YeomanEnvironment from 'yeoman-environment';
-import {prompt, Question as InquirerQuestion} from 'inquirer';
 import {createApplicationGenerator} from '../init/application/application';
 import {createElementGenerator} from '../init/element/element';
 import {createGithubGenerator} from '../init/github';
 import Generator = require('yeoman-generator');
+import {prompt} from '../prompt';
 
 const logger = logging.getLogger('init');
 
@@ -71,27 +70,6 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
   },
 };
 
-/**
- * Check if the current shell environment is MinGW. MinGW can't handle some
- * yeoman features, so we can use this check to downgrade gracefully.
- */
-function checkIsMinGW(): boolean {
-  const isWindows = /^win/.test(process.platform);
-  if (!isWindows) {
-    return false;
-  }
-
-  // uname might not exist if using cmd or powershell,
-  // which would throw an exception
-  try {
-    const uname = execSync('uname -s').toString();
-    return !!/^mingw/i.test(uname);
-  } catch (error) {
-    logger.debug(
-        '`uname -s` failed to execute correctly', {err: error.message});
-    return false;
-  }
-}
 
 /**
  * Get a description for the given generator. If this is an external generator,
@@ -199,7 +177,7 @@ async function createYeomanEnvironment() {
  * the list of available generators by filtering relevent ones out from
  * the environment list.
  */
-function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
+function createSelectPrompt(env: YeomanEnvironment) {
   const generators = env.getGeneratorsMeta();
   const allGeneratorNames = Object.keys(generators).filter((k) => {
     return k.startsWith('polymer-init') && k !== 'polymer-init:app';
@@ -209,15 +187,7 @@ function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
     return getGeneratorDescription(generator, generatorName);
   });
 
-  // Some windows emulators (mingw) don't handle arrows correctly
-  // https://github.com/SBoudrias/Inquirer.js/issues/266
-  // Fall back to rawlist and use number input
-  // Credit to
-  // https://gist.github.com/geddski/c42feb364f3c671d22b6390d82b8af8f
-  const isMinGW = checkIsMinGW();
-
   return {
-    type: isMinGW ? 'rawlist' : 'list',
     name: 'generatorName',
     message: 'Which starter template would you like to use?',
     choices: choices,
@@ -266,7 +236,7 @@ export async function promptGeneratorSelection(options?: {[name: string]: any}):
   options = options || {};
   const env = await(options['env'] || createYeomanEnvironment());
   // TODO(justinfagnani): the typings for inquirer appear wrong
-  const answers = await(prompt([createSelectPrompt(env)]) as any);
+  const answers = await(prompt(createSelectPrompt(env)) as any);
   const generatorName = answers['generatorName'];
   await runGenerator(
       generatorName, {templateName: getDisplayName(generatorName), env: env});
