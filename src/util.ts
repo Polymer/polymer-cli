@@ -58,3 +58,9 @@ export async function prompt(
   const answers = await rawPrompt([rawQuestion] as any);
   return answers;
 }
+
+export function indent(str: string, additionalIndentation = '  ') {
+  return str.split('\n')
+      .map((s) => s ? additionalIndentation + s : '')
+      .join('\n');
+}

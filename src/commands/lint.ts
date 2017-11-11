@@ -30,6 +30,8 @@ export interface Options {
   rules?: string[];
   input?: string[];
   fix?: boolean;
+  edits?: string[];
+  noprompt?: boolean;
 }
 
 export class LintCommand implements Command {
@@ -61,6 +63,19 @@ export class LintCommand implements Command {
       type: Boolean,
       description: `Automatically fix as many issues as possible by ` +
           `updating your source on disk.`
+    },
+    {
+      name: 'edits',
+      type: String,
+      alias: 'e',
+      multiple: true,
+      description: `The lint edits to apply. Edits are usually less-safe fixes.`
+    },
+    {
+      name: 'noprompt',
+      type: Boolean,
+      description:
+          `Run in non-interactive mode. Will not display interactive prompts.`
     }
   ];
 
@@ -79,6 +94,11 @@ export class LintCommand implements Command {
     // Defer dependency loading until this specific command is run.
     const lintImplementation: typeof lintImplementationTypeOnly =
         require('../lint/lint');
+    // Don't prompt if the user has requested no prompting, or if stdin isn't
+    // an interactive terminal.
+    if (!options.noprompt) {
+      options.noprompt = !process.stdin.isTTY;
+    }
     return lintImplementation.lint(options, config);
   }
 

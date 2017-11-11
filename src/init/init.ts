@@ -22,7 +22,7 @@ import {createApplicationGenerator} from '../init/application/application';
 import {createElementGenerator} from '../init/element/element';
 import {createGithubGenerator} from '../init/github';
 import Generator = require('yeoman-generator');
-import {prompt} from '../prompt';
+import {prompt} from '../util';
 
 const logger = logging.getLogger('init');
 
