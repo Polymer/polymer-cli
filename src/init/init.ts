@@ -188,7 +188,6 @@ function createSelectPrompt(env: YeomanEnvironment) {
   });
 
   return {
-    name: 'generatorName',
     message: 'Which starter template would you like to use?',
     choices: choices,
   };
@@ -235,9 +234,7 @@ export async function promptGeneratorSelection(options?: {[name: string]: any}):
     Promise<void> {
   options = options || {};
   const env = await(options['env'] || createYeomanEnvironment());
-  // TODO(justinfagnani): the typings for inquirer appear wrong
-  const answers = await(prompt(createSelectPrompt(env)) as any);
-  const generatorName = answers['generatorName'];
+  const generatorName = await prompt(createSelectPrompt(env));
   await runGenerator(
       generatorName, {templateName: getDisplayName(generatorName), env: env});
 }

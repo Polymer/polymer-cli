@@ -223,9 +223,24 @@ async function getEdits(
           continue;
         }
         if (!options.noprompt) {
-          const answers = await prompt({
-            name: 'foo',
-            message: `This warning can be addressed with an edit:
+          type ChoiceValue = 'skip'|'apply'|'apply-all';
+          type Choice = {name: string, value: ChoiceValue};
+          const choices: Choice[] = [
+            {
+              value: 'skip',
+              name: 'Do not apply this edit',
+            },
+            {
+              value: 'apply',
+              name: 'Apply this edit',
+            },
+            {
+              value: 'apply-all',
+              name: `Apply all edits like this [${action.code}]`,
+            }
+          ];
+          const message = `
+This warning can be addressed with an edit:
 ${indent(warning.toString(), '    ')}
 
 The edit is:
@@ -233,20 +248,8 @@ The edit is:
 ${indent(action.description, '    ')}
 
 What should be done?
-`,
-            choices: [
-              {
-                value: 'skip',
-                name: 'Do not apply this edit',
-              },
-              {value: 'apply', name: 'Apply this edit'},
-              {
-                name: `Apply all edits like this [${action.code}]`,
-                value: 'apply-all'
-              }
-            ]
-          });
-          const answer: 'skip'|'apply'|'apply-all' = answers.foo;
+`.trim();
+          const answer = await prompt({message, choices}) as ChoiceValue;
           if (answer === 'skip') {
             continue;
           }

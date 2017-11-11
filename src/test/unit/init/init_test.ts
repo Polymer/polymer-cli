@@ -199,7 +199,6 @@ suite('init', () => {
       }
       assert.isTrue(promptStub.calledOnce);
       assert.equal(promptStub.firstCall.args[0][0].type, 'list');
-      assert.equal(promptStub.firstCall.args[0][0].name, 'generatorName');
       assert.equal(
           promptStub.firstCall.args[0][0].message,
           'Which starter template would you like to use?');
