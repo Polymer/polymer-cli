@@ -216,6 +216,9 @@ async function getEdits(
   const editActionsToAlwaysApply = new Set(options.edits || []);
   const edits: Edit[] = [];
   for (const warning of warnings) {
+    if (warning.fix) {
+      edits.push(warning.fix);
+    }
     for (const action of warning.actions || []) {
       if (action.kind === 'edit') {
         if (editActionsToAlwaysApply.has(action.code)) {
