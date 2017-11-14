@@ -180,7 +180,7 @@ suite('init', () => {
 
     test('works with the default yeoman environment', async () => {
       sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({
-        generatorName: 'TEST',
+        foo: 'TEST',
       }));
       (polymerInit as any).runGenerator = function() {};
       const error = await invertPromise(polymerInit.promptGeneratorSelection());
@@ -191,7 +191,7 @@ suite('init', () => {
         'prompts with a list to get generatorName property from user';
     test(testName, async () => {
       const promptStub = sandbox.stub(inquirer, 'prompt')
-                             .returns(Promise.resolve({generatorName: 'TEST'}));
+                             .returns(Promise.resolve({foo: 'TEST'}));
       try {
         await polymerInit.promptGeneratorSelection({env: yeomanEnvMock});
       } catch (error) {
@@ -206,7 +206,7 @@ suite('init', () => {
 
     test('prompts with a list of all registered generators', async () => {
       const promptStub = sandbox.stub(inquirer, 'prompt')
-                             .returns(Promise.resolve({generatorName: 'TEST'}));
+                             .returns(Promise.resolve({foo: 'TEST'}));
       try {
         await polymerInit.promptGeneratorSelection({env: yeomanEnvMock});
       } catch (error) {
@@ -234,7 +234,7 @@ suite('init', () => {
       const yeomanEnv = new YeomanEnvironment();
       const promptStub =
           sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({
-            generatorName: 'TEST',
+            foo: 'TEST',
           }));
       helpers.registerDependencies(yeomanEnv, [[
                                      helpers.createDummyGenerator(),
@@ -256,7 +256,7 @@ suite('init', () => {
 
     test('prompts the user with a list', async () => {
       const promptStub = sandbox.stub(inquirer, 'prompt')
-                             .returns(Promise.resolve({generatorName: 'TEST'}));
+                             .returns(Promise.resolve({foo: 'TEST'}));
 
       try {
         await polymerInit.promptGeneratorSelection({env: yeomanEnvMock});
@@ -269,10 +269,8 @@ suite('init', () => {
 
     if (isPlatformWin) {
       test('prompts with a rawlist if being used in MinGW shell', async () => {
-        const promptStub =
-            sandbox.stub(inquirer, 'prompt').returns(Promise.resolve({
-              generatorName: 'TEST'
-            }));
+        const promptStub = sandbox.stub(inquirer, 'prompt')
+                               .returns(Promise.resolve({foo: 'TEST'}));
         sandbox.stub(childProcess, 'execSync')
             .withArgs('uname -s')
             .returns('mingw');

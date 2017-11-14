@@ -146,11 +146,12 @@ async function fix(
 
   if (edits.length === 0) {
     const editCount = warnings.filter((w) => !!w.actions).length;
-    if (options.noprompt && editCount) {
+    if (!options.prompt && editCount) {
       console.log(
           `No fixes to apply. ` +
           `${editCount} action${plural(editCount)} may be applied though. ` +
-          `Run in an interactive terminal for more details.`);
+          `Run in an interactive terminal ` +
+          `with --prompt=true for more details.`);
     } else {
       console.log(`No fixes to apply.`);
     }
@@ -178,14 +179,14 @@ async function fix(
       console.log(`  ${count} incompatible changes in ${file}`);
     }
     console.log(
-        `\nApplied ${appliedEdits.length} ` +
-        `change${plural(appliedEdits.length)}, ` +
-        `${incompatibleEdits.length} had conflicts with other fixes. ` +
+        `\nFixed ${appliedEdits.length} ` +
+        `warning${plural(appliedEdits.length)}. ` +
+        `${incompatibleEdits.length} fixes had conflicts with other fixes. ` +
         `Rerunning the command may apply them.`);
   } else {
     console.log(
-        `\nApplied ${appliedEdits.length} ` +
-        `change${plural(appliedEdits.length)}.`);
+        `\nFixed ${appliedEdits.length} ` +
+        `warning${plural(appliedEdits.length)}.`);
   }
 }
 
@@ -225,7 +226,7 @@ async function getEdits(
           edits.push(action.edit);
           continue;
         }
-        if (!options.noprompt) {
+        if (options.prompt) {
           type ChoiceValue = 'skip'|'apply'|'apply-all';
           type Choice = {name: string, value: ChoiceValue};
           const choices: Choice[] = [

@@ -12,7 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {ChoiceType, prompt as rawPrompt} from 'inquirer';
+import * as inquirer from 'inquirer';
 import {execSync} from 'mz/child_process';
 
 /**
@@ -40,7 +40,8 @@ function checkIsMinGW(): boolean {
  * typings, and is intended for asking a single list-based question.
  */
 export async function prompt(
-    question: {message: string, choices: ChoiceType[]}): Promise<string> {
+    question: {message: string, choices: inquirer.ChoiceType[]}):
+    Promise<string> {
   // Some windows emulators (mingw) don't handle arrows correctly
   // https://github.com/SBoudrias/Inquirer.js/issues/266
   // Fall back to rawlist and use number input
@@ -54,7 +55,7 @@ export async function prompt(
   };
 
   // TODO(justinfagnani): the typings for inquirer appear wrong
-  const answers = await rawPrompt([rawQuestion] as any);
+  const answers = await inquirer.prompt([rawQuestion] as any);
   return answers.foo;
 }
 

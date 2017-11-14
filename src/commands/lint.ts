@@ -17,12 +17,9 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
-import * as chalkTypeOnly from 'chalk';
 import {ArgDescriptor} from 'command-line-args';
 import {UsageGroup} from 'command-line-usage';
-import * as lintLibTypeOnly from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
-import * as lintImplementationTypeOnly from '../lint/lint';
 
 import {Command} from './command';
 
@@ -31,7 +28,7 @@ export interface Options {
   input?: string[];
   fix?: boolean;
   edits?: string[];
-  noprompt?: boolean;
+  prompt: boolean;
 }
 
 export class LintCommand implements Command {
@@ -72,10 +69,14 @@ export class LintCommand implements Command {
       description: `The lint edits to apply. Edits are usually less-safe fixes.`
     },
     {
-      name: 'noprompt',
-      type: Boolean,
+      name: 'prompt',
+      type: (value: string) => {
+        return value.toLowerCase().trim() !== 'false';
+      },
+      defaultValue: !!process.stdin.isTTY,
       description:
-          `Run in non-interactive mode. Will not display interactive prompts.`
+          `Whether to allow interactive prompts. Use --prompt=false when` +
+          ` running as part of an automated script without a human at stdin.`
     }
   ];
 
@@ -92,25 +93,20 @@ export class LintCommand implements Command {
     this._loadPlugins(config);
 
     // Defer dependency loading until this specific command is run.
-    const lintImplementation: typeof lintImplementationTypeOnly =
-        require('../lint/lint');
-    // Don't prompt if the user has requested no prompting, or if stdin isn't
-    // an interactive terminal.
-    if (!options.noprompt) {
-      options.noprompt = !process.stdin.isTTY;
-    }
+    const lintImplementation = await import('../lint/lint');
+
     return lintImplementation.lint(options, config);
   }
 
-  extraUsageGroups(config: ProjectConfig): UsageGroup[] {
-    const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
-    const chalk: typeof chalkTypeOnly = require('chalk');
+  async extraUsageGroups(config: ProjectConfig): Promise<UsageGroup[]> {
+    const lintLib = await import('polymer-linter');
+    const chalk = await import('chalk');
     this._loadPlugins(config);
     const collectionsDocs = [];
     for (const collection of lintLib.registry.allRuleCollections) {
-      collectionsDocs.push(`  ${
-                                chalk.bold(collection.code)
-                              }: ${this._indent(collection.description)}`);
+      collectionsDocs.push(
+          `  ${chalk.bold(collection.code)}: ` +
+          `${this._indent(collection.description)}`);
     }
     const rulesDocs = [];
     for (const rule of lintLib.registry.allRules) {
