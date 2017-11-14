@@ -1,5 +1,4 @@
 .clang-format
-.eslintignore
 .github
 .gitignore
 .travis.yml

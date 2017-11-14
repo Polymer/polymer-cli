@@ -240,6 +240,10 @@
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.1.tgz#b683eb60be358304ef146f5775db4c0e3696a550"
 
+"@types/mocha@^2.2.44":
+  version "2.2.44"
+  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.44.tgz#1d4a798e53f35212fd5ad4d04050620171cd5b5e"
+
 "@types/mz@0.0.29":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/mz/-/mz-0.0.29.tgz#bc24728c649973f1c7851e9033f9ce525668c27b"
@@ -412,6 +416,10 @@
     "@types/glob" "*"
     "@types/node" "*"
 
+"@types/sinon@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-4.0.0.tgz#9a93ffa4ee1329e85166278a5ed99f81dc4c8362"
+
 "@types/source-map@*":
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@types/source-map/-/source-map-0.5.1.tgz#7e74db5d06ab373a712356eebfaea2fad0ea2367"
@@ -433,6 +441,10 @@
   resolved "https://registry.yarnpkg.com/@types/through/-/through-0.0.29.tgz#72943aac922e179339c651fa34a4428a4d722f93"
   dependencies:
     "@types/node" "*"
+
+"@types/tmp@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.0.33.tgz#1073c4bc824754ae3d10cfab88ab0237ba964e4d"
 
 "@types/ua-parser-js@^0.7.30", "@types/ua-parser-js@^0.7.31":
   version "0.7.32"
@@ -472,11 +484,23 @@
   dependencies:
     "@types/node" "*"
 
+"@types/yeoman-generator@*":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/yeoman-generator/-/yeoman-generator-2.0.0.tgz#822a692ac947c4c4da1591114b05e1fded483cbf"
+  dependencies:
+    "@types/inquirer" "*"
+
 "@types/yeoman-generator@^1.0.0":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@types/yeoman-generator/-/yeoman-generator-1.0.3.tgz#cb90cd0c3fd9bb18c093a377d756caff13a2b48a"
   dependencies:
     "@types/inquirer" "*"
+
+"@types/yeoman-test@^1.7.3":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@types/yeoman-test/-/yeoman-test-1.7.3.tgz#12e09114b0158361c9e9800458c762e56c7a4c72"
+  dependencies:
+    "@types/yeoman-generator" "*"
 
 "@webcomponents/webcomponentsjs@^1.0.7":
   version "1.0.14"
@@ -3540,7 +3564,7 @@ growl@1.9.2:
   version "1.9.2"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.9.2.tgz#0ea7743715db8d8de2c5ede1775e1b45ac85c02f"
 
-gulp-eslint@^3.0.0, gulp-eslint@^3.0.1:
+gulp-eslint@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/gulp-eslint/-/gulp-eslint-3.0.1.tgz#04e57e3e18c6974267c12cf6855dc717d4a313bd"
   dependencies:
@@ -6483,7 +6507,7 @@ sinon-chai@^2.10.0:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/sinon-chai/-/sinon-chai-2.14.0.tgz#da7dd4cc83cd6a260b67cca0f7a9fdae26a1205d"
 
-sinon@^1.17.1, sinon@^1.17.4:
+sinon@^1.17.1, sinon@^1.17.7:
   version "1.17.7"
   resolved "https://registry.yarnpkg.com/sinon/-/sinon-1.17.7.tgz#4542a4f49ba0c45c05eb2e9dd9d203e2b8efe0bf"
   dependencies:

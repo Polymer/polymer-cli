@@ -153,16 +153,15 @@ suite('github/github', () => {
       } as any);
     });
 
-    test('calls the github API with correct params', () => {
+    test('calls the github API with correct params', async () => {
       getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('*').then(() => {
-        assert.isOk(getReleasesStub.calledWithExactly({
-          owner: 'TEST_OWNER',
-          repo: 'TEST_REPO',
-          per_page: 100,
-        }));
-      });
+      await github.getSemverRelease('*');
+      assert.isOk(getReleasesStub.calledWithExactly({
+        owner: 'TEST_OWNER',
+        repo: 'TEST_REPO',
+        per_page: 100,
+      }));
     });
 
     let testName =

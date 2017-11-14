@@ -57,37 +57,29 @@ suite('init', () => {
 
   suite('runGenerator', () => {
 
-    test('runs the given generator', () => {
+    test('runs the given generator', async () => {
       const GENERATOR_NAME = 'TEST-GENERATOR';
       const yeomanEnv = createFakeEnv();
       yeomanEnv.getGeneratorsMeta.returns({
         [GENERATOR_NAME]: GENERATOR_NAME,
       });
 
-      return polymerInit.runGenerator(GENERATOR_NAME, {env: yeomanEnv})
-          .then(() => {
-            assert.isOk(yeomanEnv.run.calledWith(GENERATOR_NAME));
-          });
+      await polymerInit.runGenerator(GENERATOR_NAME, {env: yeomanEnv});
+      assert.isOk(yeomanEnv.run.calledWith(GENERATOR_NAME));
     });
 
-    test('fails if an unknown generator is requested', () => {
+    test('fails if an unknown generator is requested', async () => {
       const UNKNOWN_GENERATOR_NAME = 'UNKNOWN-GENERATOR';
       const yeomanEnv = createFakeEnv();
       yeomanEnv.getGeneratorsMeta.returns({
         'TEST-GENERATOR': 'TEST-GENERATOR',
       });
 
-      return polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME, {env: yeomanEnv})
-          .then(
-              () => {
-                throw new Error(
-                    'The promise should have been rejected before it got here');
-              },
-              (error) => {
-                assert.equal(
-                    error.message,
-                    `Template ${UNKNOWN_GENERATOR_NAME} not found`);
-              });
+      const error = await invertPromise(
+          polymerInit.runGenerator(UNKNOWN_GENERATOR_NAME, {env: yeomanEnv}));
+
+      assert.equal(
+          error.message, `Template ${UNKNOWN_GENERATOR_NAME} not found`);
     });
 
     test('works with the default yeoman environment', async () => {
