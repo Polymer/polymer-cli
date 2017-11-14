@@ -230,7 +230,7 @@ function createSelectPrompt(env: YeomanEnvironment): InquirerQuestion {
  * error will be thrown.
  */
 export async function runGenerator(
-    generatorName: string, options: {[name: string]: any}): Promise<void> {
+    generatorName: string, options?: {[name: string]: any}): Promise<void> {
   options = options || {};
   const templateName = options['templateName'] || generatorName;
 

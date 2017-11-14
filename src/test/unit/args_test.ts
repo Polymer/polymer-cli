@@ -8,12 +8,12 @@
  * Google as part of the polymer project is also subject to an additional IP
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
-'use strict';
 
-const assert = require('chai').assert;
+import {assert} from 'chai';
+import {ArgDescriptor} from 'command-line-args';
 
-const argsLib = require('../../lib/args');
-const cliLib = require('../../lib/polymer-cli');
+import * as argsLib from '../../args';
+import * as cliLib from '../../polymer-cli';
 
 suite('args', () => {
 
@@ -66,7 +66,7 @@ suite('args', () => {
           description: 'description three',
           group: 'group three',
         },
-      ])
+      ]);
 
     });
 
@@ -77,7 +77,8 @@ suite('args', () => {
     test('global and command arguments do not conflict', () => {
       const cli = new cliLib.PolymerCli([]);
       const commands = cli.commands.values();
-      const globals = new Map(argsLib.globalArguments.map((a) => [a.name, a]));
+      const globals = new Map(argsLib.globalArguments.map(
+          (a) => [a.name, a] as [string, ArgDescriptor]));
 
       for (const command of commands) {
         let defaultOption = null;
@@ -93,8 +94,8 @@ suite('args', () => {
           const globalArg = globals.get(name);
           if (globalArg) {
             for (const prop of Object.keys(arg)) {
-              const commandValue = arg[prop];
-              const globalValue = globalArg[prop];
+              const commandValue = arg[prop as keyof ArgDescriptor];
+              const globalValue = globalArg[prop as keyof ArgDescriptor];
               if (globalValue) {
                 assert.equal(
                     globalValue,

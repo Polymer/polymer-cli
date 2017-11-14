@@ -8,17 +8,13 @@
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-'use strict';
+import {assert} from 'chai';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
-const assert = require('chai').assert;
-const fs = require('fs-extra');
-const path = require('path');
-const yoAssert = require('yeoman-assert');
-const helpers = require('yeoman-test');
-
-const createApplicationGenerator =
-    require('../../../lib/init/application/application')
-        .createApplicationGenerator;
+import * as yoAssert from 'yeoman-assert';
+import * as helpers from 'yeoman-test';
+import {createApplicationGenerator} from '../../../init/application/application';
 
 suite('init/application', () => {
 
@@ -28,7 +24,7 @@ suite('init/application', () => {
         const TestGenerator = createApplicationGenerator('polymer-1.x');
         helpers.run(TestGenerator)
             .withPrompts({name: 'foobar'})
-            .on('end', (a) => {
+            .on('end', () => {
               yoAssert.file(['bower.json']);
               yoAssert.fileContent(
                   'src/foobar-app/foobar-app.html', 'Polymer({');
@@ -42,7 +38,7 @@ suite('init/application', () => {
         const TestGenerator = createApplicationGenerator('polymer-2.x');
         helpers.run(TestGenerator)
             .withPrompts({name: 'foobar'})
-            .on('end', (a) => {
+            .on('end', () => {
               yoAssert.file(['bower.json']);
               yoAssert.fileContent(
                   'src/foobar-app/foobar-app.html',
@@ -58,7 +54,7 @@ suite('init/application', () => {
         const description = 'This is a description entered by the prompt';
         helpers.run(TestGenerator)
             .withPrompts({name: 'foobar', description: description})
-            .on('end', (a) => {
+            .on('end', () => {
               yoAssert.fileContent(
                   'index.html',
                   `<meta name="description" content="${description}">`);
@@ -72,7 +68,7 @@ suite('init/application', () => {
         const TestGenerator = createApplicationGenerator('polymer-1.x');
         helpers.run(TestGenerator)
             .withPrompts({name: 'foobar'})
-            .on('end', (a) => {
+            .on('end', () => {
               yoAssert.fileContent(
                   'index.html',
                   '<meta name="description" content="foobar description">');
@@ -87,7 +83,7 @@ suite('init/application', () => {
         const description = 'This is a description entered by the prompt';
         helpers.run(TestGenerator)
             .withPrompts({name: 'foobar', description: description})
-            .on('end', (a) => {
+            .on('end', () => {
               yoAssert.fileContent(
                   'index.html',
                   `<meta name="description" content="${description}">`);
@@ -101,7 +97,7 @@ suite('init/application', () => {
         const TestGenerator = createApplicationGenerator('polymer-2.x');
         helpers.run(TestGenerator)
             .withPrompts({name: 'foobar'})
-            .on('end', (a) => {
+            .on('end', () => {
               yoAssert.fileContent(
                   'index.html',
                   '<meta name="description" content="foobar description">');
@@ -113,7 +109,7 @@ suite('init/application', () => {
       'ignoring filenames with dangling underscores when generating templates',
       (done) => {
         const TestGenerator = createApplicationGenerator('polymer-1.x');
-        helpers.run(TestGenerator).on('end', (a) => {
+        helpers.run(TestGenerator).on('end', () => {
           yoAssert.noFile(['src/_element/_element.html']);
           done();
         });
@@ -122,15 +118,15 @@ suite('init/application', () => {
   test('works when package.json with no name is present', (done) => {
     const TestGenerator = createApplicationGenerator('polymer-1.x');
     helpers.run(TestGenerator)
-        .inTmpDir((tempDir) => {
+        .inTmpDir((tempDir: string) => {
           fs.writeFileSync(path.join(tempDir, 'package.json'), '{}');
         })
         .on('error',
-            (error) => {
+            (_error: any) => {
               assert.fail();
               done();
             })
-        .on('end', (a) => {
+        .on('end', () => {
           done();
         });
   });

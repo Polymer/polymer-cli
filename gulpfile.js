@@ -45,7 +45,7 @@ gulp.task('compile', () => {
 gulp.task(
     'test',
     ['build'],
-    () => gulp.src('test/unit/**/*_test.js', {read: false}).pipe(mocha({
+    () => gulp.src('lib/test/unit/**/*_test.js', {read: false}).pipe(mocha({
       ui: 'tdd',
       reporter: 'spec',
     })));

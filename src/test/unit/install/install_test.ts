@@ -8,11 +8,10 @@
  * Google as part of the polymer project is also subject to an additional IP
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
-'use strict';
 
-const assert = require('chai').assert;
+import {assert} from 'chai';
 
-const polymerInstall = require('../../../lib/install/install');
+import * as polymerInstall from '../../../install/install';
 
 suite('install', () => {
 
