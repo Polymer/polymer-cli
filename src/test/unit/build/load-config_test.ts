@@ -9,24 +9,18 @@
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-'use strict';
-
-const assert = require('chai').assert;
-const path = require('path');
-
-const loadServiceWorkerConfig =
-    require('../../../lib/build/load-config').loadServiceWorkerConfig;
+import {assert} from 'chai';
+import * as path from 'path';
+import {loadServiceWorkerConfig} from '../../../build/load-config';
 
 suite('load-config', () => {
   suite('loadServiceWorkerConfig()', () => {
-    test('should parse the given js file', (done) => {
+    test('should parse the given js file', async () => {
       const configFile = path.resolve(
           __dirname, '../', 'fixtures', 'service-worker-config.js');
-      loadServiceWorkerConfig(configFile).then((config) => {
-        assert.ok(config);
-        assert.deepEqual(config.staticFileGlobs, ['*']);
-        done();
-      })
+      const config = await loadServiceWorkerConfig(configFile);
+      assert.ok(config);
+      assert.deepEqual(config!.staticFileGlobs, ['*']);
     });
   });
 });

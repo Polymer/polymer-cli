@@ -9,22 +9,22 @@
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-'use strict';
+import {assert} from 'chai';
+import * as vfs from 'vinyl-fs-fake';
 
-const assert = require('chai').assert;
-const vfs = require('vinyl-fs-fake');
-const getOptimizeStreams =
-    require('../../../lib/build/optimize-streams').getOptimizeStreams;
-const pipeStreams = require('../../../lib/build/streams').pipeStreams;
+import {getOptimizeStreams} from '../../../build/optimize-streams';
+import {pipeStreams} from '../../../build/streams';
 
 suite('optimize-streams', () => {
 
-  function testStream(stream, cb) {
-    stream.on('data', (data) => {cb(null, data)});
-    stream.on('error', cb);
+  async function testStream(stream: NodeJS.ReadableStream): Promise<any> {
+    return new Promise((resolve, reject) => {
+      stream.on('data', resolve);
+      stream.on('error', reject);
+    });
   }
 
-  test('compile js', (done) => {
+  test('compile js', async () => {
     const expected = `var apple = 'apple';var banana = 'banana';`;
     const sourceStream = vfs.src([
       {
@@ -34,16 +34,11 @@ suite('optimize-streams', () => {
     ]);
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({js: {compile: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), expected);
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), expected);
   });
 
-  test('does not compile webcomponents.js files (windows)', (done) => {
+  test('does not compile webcomponents.js files (windows)', async () => {
     const es6Contents = `const apple = 'apple';`;
     const sourceStream = vfs.src([
       {
@@ -54,16 +49,11 @@ suite('optimize-streams', () => {
     ]);
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({js: {compile: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), es6Contents);
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), es6Contents);
   });
 
-  test('does not compile webcomponents.js files (unix)', (done) => {
+  test('does not compile webcomponents.js files (unix)', async () => {
     const es6Contents = `const apple = 'apple';`;
     const sourceStream = vfs.src([
       {
@@ -74,17 +64,12 @@ suite('optimize-streams', () => {
     ]);
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({js: {compile: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), es6Contents);
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), es6Contents);
   });
 
 
-  test('minify js', (done) => {
+  test('minify js', async () => {
     const sourceStream = vfs.src([
       {
         path: 'foo.js',
@@ -93,16 +78,11 @@ suite('optimize-streams', () => {
     ]);
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({js: {minify: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), 'var foo=3;');
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), 'var foo=3;');
   });
 
-  test('minify js (es6)', (done) => {
+  test('minify js (es6)', async () => {
     const sourceStream = vfs.src([
       {
         path: 'foo.js',
@@ -111,16 +91,11 @@ suite('optimize-streams', () => {
     ]);
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({js: {minify: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), '[1,2,3].map((a)=>a+1);');
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), '[1,2,3].map((a)=>a+1);');
   });
 
-  test('minify html', (done) => {
+  test('minify html', async () => {
     const expected = `<!doctype html><style>foo {
             background: blue;
           }</style><script>document.registerElement(\'x-foo\', XFoo);</script><x-foo>bar</x-foo>`;
@@ -147,16 +122,11 @@ suite('optimize-streams', () => {
         {cwdbase: true});
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({html: {minify: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), expected);
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), expected);
   });
 
-  test('minify css', (done) => {
+  test('minify css', async () => {
     const sourceStream = vfs.src([
       {
         path: 'foo.css',
@@ -165,16 +135,11 @@ suite('optimize-streams', () => {
     ]);
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({css: {minify: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.equal(f.contents.toString(), 'selector{property:value;}');
-      done();
-    });
+    const f = await testStream(op);
+    assert.equal(f.contents.toString(), 'selector{property:value;}');
   });
 
-  test('minify css (inlined)', (done) => {
+  test('minify css (inlined)', async () => {
     const expected = `<style>foo{background:blue;}</style>`;
     const sourceStream = vfs.src(
         [
@@ -198,13 +163,8 @@ suite('optimize-streams', () => {
         {cwdbase: true});
     const op =
         pipeStreams([sourceStream, getOptimizeStreams({css: {minify: true}})]);
-    testStream(op, (error, f) => {
-      if (error) {
-        return done(error);
-      }
-      assert.include(f.contents.toString(), expected);
-      done();
-    });
+    const f = await testStream(op);
+    assert.include(f.contents.toString(), expected);
   });
 
 });

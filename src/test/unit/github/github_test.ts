@@ -8,18 +8,17 @@
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-'use strict';
+import {assert} from 'chai';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import * as sinon from 'sinon';
+import {PassThrough} from 'stream';
+import * as tempMod from 'temp';
 
-const assert = require('chai').assert;
-const sinon = require('sinon');
-const fs = require('fs-extra');
-const path = require('path');
-const temp = require('temp').track();
-const PassThrough = require('stream').PassThrough;
+import {Github, GithubResponseError} from '../../../github/github';
+import {invertPromise} from '../../util';
 
-const GithubModule = require('../../../lib/github/github');
-const Github = GithubModule.Github;
-const GithubResponseError = GithubModule.GithubResponseError;
+const temp = tempMod.track();
 
 suite('github/github', () => {
 
@@ -38,10 +37,10 @@ suite('github/github', () => {
 
   suite('extractReleaseTarball()', () => {
 
-    test('extracts a tarball from a github tarball url', () => {
+    test('extracts a tarball from a github tarball url', async () => {
       const tarballUrl = 'http://foo.com/bar.tar';
       let requestedUrl;
-      const mockRequestApi = (options) => {
+      const mockRequestApi = (options: any) => {
         requestedUrl = options.url;
         return fs.createReadStream(
             path.join(__dirname, 'github-test-data/test_tarball.tgz'));
@@ -49,17 +48,16 @@ suite('github/github', () => {
       const github = new Github({
         owner: 'TEST_OWNER',
         repo: 'TEST_REPO',
-        requestApi: mockRequestApi,
+        requestApi: mockRequestApi as any,
       });
       const tmpDir = temp.mkdirSync();
-      return github.extractReleaseTarball(tarballUrl, tmpDir).then(() => {
-        assert.equal(requestedUrl, tarballUrl);
-        assert.deepEqual(fs.readdirSync(tmpDir), ['file1.txt']);
-      });
+      await github.extractReleaseTarball(tarballUrl, tmpDir);
+      assert.equal(requestedUrl, tarballUrl);
+      assert.deepEqual(fs.readdirSync(tmpDir), ['file1.txt']);
     });
 
-    test('rejects when Github returns a 404 response status code', () => {
-      const mockRequestApi = (options) => {
+    test('rejects when Github returns a 404 response status code', async () => {
+      const mockRequestApi = (_options: any) => {
         const readStream = new PassThrough();
         setTimeout(() => {
           readStream.emit('response', {
@@ -72,25 +70,21 @@ suite('github/github', () => {
       const github = new Github({
         owner: 'TEST_OWNER',
         repo: 'TEST_REPO',
-        requestApi: mockRequestApi,
+        requestApi: mockRequestApi as any,
       });
       const tmpDir = temp.mkdirSync();
-      return github.extractReleaseTarball('http://foo.com/bar.tar', tmpDir)
-          .then(() => {
-            throw new Error('GithubResponseError expected');
-          })
-          .catch((err) => {
-            assert.instanceOf(err, GithubResponseError);
-            assert.equal(
-                err.message, 'unexpected response: 404 TEST MESSAGE - 404');
-          });
+      const err = await invertPromise(
+          github.extractReleaseTarball('http://foo.com/bar.tar', tmpDir));
+      assert.instanceOf(err, GithubResponseError);
+      assert.equal(err.message, 'unexpected response: 404 TEST MESSAGE - 404');
+
     });
 
   });
 
   suite('removeUnwantedFiles()', () => {
 
-    function makeDirStruct(files) {
+    function makeDirStruct(files: string[]) {
       const tmpDir = temp.mkdirSync();
       files.forEach((file) => {
         const nodes = file.split('/');
@@ -105,7 +99,7 @@ suite('github/github', () => {
           } else {
             fs.mkdirSync(tmpPath);
           }
-        })
+        });
       });
       return tmpDir;
     }
@@ -132,8 +126,8 @@ suite('github/github', () => {
 
   suite('getSemverRelease()', () => {
 
-    let getReleasesStub;
-    let github;
+    let getReleasesStub: sinon.SinonStub;
+    let github: Github;
 
     const basicReleasesResponse = [
       {tag_name: 'v1.0.0'},
@@ -156,62 +150,55 @@ suite('github/github', () => {
             getReleases: getReleasesStub,
           },
         },
-      });
+      } as any);
     });
 
-    test('calls the github API with correct params', () => {
+    test('calls the github API with correct params', async () => {
       getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('*').then(() => {
-        assert.isOk(getReleasesStub.calledWithExactly({
-          owner: 'TEST_OWNER',
-          repo: 'TEST_REPO',
-          per_page: 100,
-        }));
-      });
+      await github.getSemverRelease('*');
+      assert.isOk(getReleasesStub.calledWithExactly({
+        owner: 'TEST_OWNER',
+        repo: 'TEST_REPO',
+        per_page: 100,
+      }));
     });
 
-    test(
-        'resolves with latest semver release that matches the range: *', () => {
-          getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
-
-          return github.getSemverRelease('*').then((release) => {
-            assert.deepEqual(release, {tag_name: 'v2.1.0'});
-          });
-        });
-
-    test(
-        'resolves with latest semver release that matches the range: ^v1.0.0',
-        () => {
-          getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
-
-          return github.getSemverRelease('^v1.0.0').then((release) => {
-            assert.deepEqual(release, {tag_name: 'v1.2.1'});
-          });
-        });
-
-    test(
-        'resolves with latest semver release that matches the range: ^v2.0.0',
-        () => {
-          getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
-
-          return github.getSemverRelease('^v2.0.0').then((release) => {
-            assert.deepEqual(release, {tag_name: 'v2.1.0'});
-          });
-        });
-
-    test('rejects with an error if no matching releases are found', () => {
+    let testName =
+        'resolves with latest semver release that matches the range: *';
+    test(testName, async () => {
       getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
 
-      return github.getSemverRelease('^v3.0.0')
-          .then(() => {
-            throw new Error('Error expected');
-          })
-          .catch((err) => {
-            assert.equal(
-                err.message,
-                'TEST_OWNER/TEST_REPO has no releases matching ^v3.0.0.');
-          });
+      const release = await github.getSemverRelease('*');
+      assert.deepEqual(release, {tag_name: 'v2.1.0'});
+    });
+
+    testName =
+        'resolves with latest semver release that matches the range: ^v1.0.0';
+    test(testName, async () => {
+      getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
+
+      const release = await github.getSemverRelease('^v1.0.0');
+      assert.deepEqual(release, {tag_name: 'v1.2.1'});
+    });
+
+    testName =
+        'resolves with latest semver release that matches the range: ^v2.0.0';
+    test(testName, async () => {
+      getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
+
+      const release = await github.getSemverRelease('^v2.0.0');
+      assert.deepEqual(release, {tag_name: 'v2.1.0'});
+    });
+
+    testName = 'rejects with an error if no matching releases are found';
+    test(testName, async () => {
+      getReleasesStub.returns(Promise.resolve(basicReleasesResponse));
+
+      const err = await invertPromise(github.getSemverRelease('^v3.0.0'));
+      assert.equal(
+          err.message,
+          'TEST_OWNER/TEST_REPO has no releases matching ^v3.0.0.');
     });
   });
 
