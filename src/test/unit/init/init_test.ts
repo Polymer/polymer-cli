@@ -25,6 +25,8 @@ const temp = tempMod.track();
 
 
 const isPlatformWin = /^win/.test(process.platform);
+const uname = childProcess.execSync('uname -s').toString();
+const isMinGw = !!/^mingw/i.test(uname);
 
 function stripAnsi(str: string) {
   const ansiRegex =
@@ -267,7 +269,7 @@ suite('init', () => {
       assert.equal(promptStub.firstCall.args[0][0].type, 'list');
     });
 
-    if (isPlatformWin) {
+    if (isPlatformWin && isMinGw) {
       test('prompts with a rawlist if being used in MinGW shell', async () => {
         const promptStub = sandbox.stub(inquirer, 'prompt')
                                .returns(Promise.resolve({foo: 'TEST'}));
