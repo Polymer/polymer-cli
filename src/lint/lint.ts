@@ -20,7 +20,7 @@ import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity} from 'pol
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
-import {applyEdits, Edit, FixableWarning, makeParseLoader} from 'polymer-linter/lib/warning';
+import {applyEdits, Edit, EditAction, FixableWarning, makeParseLoader} from 'polymer-linter/lib/warning';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
@@ -115,12 +115,10 @@ async function report(warnings: ReadonlyArray<FixableWarning>) {
       message += ` ${infos.length} ${chalk.green('info')} messages`;
     }
     if (fixable > 0) {
+      message += `. ${fixable} can be automatically fixed with --fix`;
       if (editable > 0) {
-        message += `. ${fixable} can be automatically fixed with --fix ` +
-            `and ${editable} ${plural(editable, 'have', 'has')} edit actions`;
-      } else {
-        message += `. ${editable} ${plural(editable, 'have', 'has')} ` +
-            `edit actions, run with --fix for more info`;
+        message +=
+            ` and ${editable} ${plural(editable, 'have', 'has')} edit actions`;
       }
     } else if (editable > 0) {
       message += `. ${editable} ${plural(editable, 'have', 'has')} ` +
@@ -142,7 +140,7 @@ async function fix(
     config: ProjectConfig,
     analyzer: Analyzer,
     analysis: Analysis) {
-  const edits = await getEdits(warnings, options);
+  const edits = await getPermittedEdits(warnings, options);
 
   if (edits.length === 0) {
     const editCount = warnings.filter((w) => !!w.actions).length;
@@ -212,8 +210,13 @@ function plural(n: number, pluralVal = 's', singularVal = ''): string {
   return pluralVal;
 }
 
-async function getEdits(
-    warnings: ReadonlyArray<FixableWarning>, options: Options) {
+/**
+ * Returns edits from fixes and from edit actions with explicit user consent
+ * (including prompting the user if we're connected to an interactive terminal).
+ */
+async function getPermittedEdits(
+    warnings: ReadonlyArray<FixableWarning>,
+    options: Options): Promise<Edit[]> {
   const editActionsToAlwaysApply = new Set(options.edits || []);
   const edits: Edit[] = [];
   for (const warning of warnings) {
@@ -227,23 +230,47 @@ async function getEdits(
           continue;
         }
         if (options.prompt) {
-          type ChoiceValue = 'skip'|'apply'|'apply-all';
-          type Choice = {name: string, value: ChoiceValue};
-          const choices: Choice[] = [
-            {
-              value: 'skip',
-              name: 'Do not apply this edit',
-            },
-            {
-              value: 'apply',
-              name: 'Apply this edit',
-            },
-            {
-              value: 'apply-all',
-              name: `Apply all edits like this [${action.code}]`,
-            }
-          ];
-          const message = `
+          const answer =
+              await askUserForConsentToApplyEditAction(action, warning);
+          switch (answer) {
+            case 'skip':
+              continue;
+            case 'apply-all':
+              editActionsToAlwaysApply.add(action.code);
+            // fall through
+            case 'apply':
+              edits.push(action.edit);
+              break;
+            default:
+              const never: never = answer;
+              throw new Error(`Got unknown user consent result: ${never}`);
+          }
+        }
+      }
+    }
+  }
+  return edits;
+}
+
+type Choice = 'skip'|'apply'|'apply-all';
+async function askUserForConsentToApplyEditAction(
+    action: EditAction, warning: FixableWarning): Promise<Choice> {
+  type ChoiceObject = {name: string, value: Choice};
+  const choices: ChoiceObject[] = [
+    {
+      value: 'skip',
+      name: 'Do not apply this edit',
+    },
+    {
+      value: 'apply',
+      name: 'Apply this edit',
+    },
+    {
+      value: 'apply-all',
+      name: `Apply all edits like this [${action.code}]`,
+    }
+  ];
+  const message = `
 This warning can be addressed with an edit:
 ${indent(warning.toString(), '    ')}
 
@@ -253,17 +280,5 @@ ${indent(action.description, '    ')}
 
 What should be done?
 `.trim();
-          const answer = await prompt({message, choices}) as ChoiceValue;
-          if (answer === 'skip') {
-            continue;
-          }
-          edits.push(action.edit);
-          if (answer === 'apply-all') {
-            editActionsToAlwaysApply.add(action.code);
-          }
-        }
-      }
-    }
-  }
-  return edits;
+  return await prompt({message, choices}) as Choice;
 }

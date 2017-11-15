@@ -66,7 +66,11 @@ export class LintCommand implements Command {
       type: String,
       alias: 'e',
       multiple: true,
-      description: `The lint edits to apply. Edits are usually less-safe fixes.`
+      description: `The lint edits to apply. Used with --fix. ` +
+          `Edits are less-safe fixes. When running in an interactive prompt ` +
+          `we will ask whether to apply an edit, but you can automatically ` +
+          `apply all edits of a type using this flag, like ` +
+          `--edit=content-with-select`
     },
     {
       name: 'prompt',
