@@ -149,38 +149,38 @@ Fixed 2 warnings.
           'lint',
           '--fix',
           '--prompt=false',
-          '--edit=content-with-select',
+          '--edits=content-with-select',
           'file.html'
         ],
         {cwd});
     const output = await result;
-    assert.deepEqual(`  Made 4 changes to file.html
+    assert.deepEqual(`  Made 8 changes to file.html
 
-  Fixed 2 warnings.
-  `, output);
+Fixed 4 warnings.
+`, output);
     // Running --fix with no prompt results in only the basic <content>
     // elements changing.
     assert.deepEqual(
         fs.readFileSync(path.join(cwd, 'file.html'), 'utf-8'),
         `<dom-module id="foo-elem">
-    <template>
-      <slot name="foo" old-content-selector=".foo"></slot>
-      <slot></slot>
-    </template>
-    <script>
-      customElements.define('foo-elem', class extends HTMLElement { });
-    </script>
-  </dom-module>
+  <template>
+    <slot name="foo" old-content-selector=".foo"></slot>
+    <slot></slot>
+  </template>
+  <script>
+    customElements.define('foo-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
 
-  <dom-module id="bar-elem">
-    <template>
-      <slot name="bar" old-content-selector=".bar"></slot>
-      <slot></slot>
-    </template>
-    <script>
-      customElements.define('bar-elem', class extends HTMLElement { });
-    </script>
-  </dom-module>
+<dom-module id="bar-elem">
+  <template>
+    <slot name="bar" old-content-selector=".bar"></slot>
+    <slot></slot>
+  </template>
+  <script>
+    customElements.define('bar-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
 `);
   });
 });
