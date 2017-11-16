@@ -47,7 +47,7 @@ suite('polymer lint', function() {
     const result = runCommand(binPath, ['lint'], {cwd, failureExpected: true});
     const output = await invertPromise(result);
     assert.include(
-        output, '<style> tags should not be direct children of <dom-module>');
+        output, 'Style tags should not be direct children of <dom-module>');
   });
 
   test('applies fixes to a package when requested', async () => {
@@ -103,6 +103,86 @@ suite('polymer lint', function() {
     assert.include(output, 'Made 2 changes to toplevel-bad.html');
     assert.include(output, 'Fixed 1 warning.');
   });
+
+  test('only applies safe fixes when not prompting', async () => {
+    const fixtureDir = path.join(fixturePath, 'lint-edits');
+    const cwd = getTempCopy(fixtureDir);
+    const result = runCommand(
+        binPath, ['lint', '--fix', '--prompt=false', 'file.html'], {cwd});
+    const output = await result;
+    assert.deepEqual(`  Made 4 changes to file.html
+
+Fixed 2 warnings.
+`, output);
+    // Running --fix with no prompt results in only the basic <content>
+    // elements changing.
+    assert.deepEqual(
+        fs.readFileSync(path.join(cwd, 'file.html'), 'utf-8'),
+        `<dom-module id="foo-elem">
+  <template>
+    <content select=".foo"></content>
+    <slot></slot>
+  </template>
+  <script>
+    customElements.define('foo-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
+
+<dom-module id="bar-elem">
+  <template>
+    <content select=".bar"></content>
+    <slot></slot>
+  </template>
+  <script>
+    customElements.define('bar-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
+`);
+  });
+
+  test('applies edit actions when requested by command line', async () => {
+    const fixtureDir = path.join(fixturePath, 'lint-edits');
+    const cwd = getTempCopy(fixtureDir);
+    const result = runCommand(
+        binPath,
+        [
+          'lint',
+          '--fix',
+          '--prompt=false',
+          '--edits=content-with-select',
+          'file.html'
+        ],
+        {cwd});
+    const output = await result;
+    assert.deepEqual(`  Made 8 changes to file.html
+
+Fixed 4 warnings.
+`, output);
+    // Running --fix with no prompt results in only the basic <content>
+    // elements changing.
+    assert.deepEqual(
+        fs.readFileSync(path.join(cwd, 'file.html'), 'utf-8'),
+        `<dom-module id="foo-elem">
+  <template>
+    <slot name="foo" old-content-selector=".foo"></slot>
+    <slot></slot>
+  </template>
+  <script>
+    customElements.define('foo-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
+
+<dom-module id="bar-elem">
+  <template>
+    <slot name="bar" old-content-selector=".bar"></slot>
+    <slot></slot>
+  </template>
+  <script>
+    customElements.define('bar-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
+`);
+  });
 });
 
 function getTempCopy(fromDir: string) {
@@ -123,4 +203,4 @@ function copyDir(fromDir: string, toDir: string) {
       fs.writeFileSync(toInner, fs.readFileSync(fromInner));
     }
   }
-}
+};

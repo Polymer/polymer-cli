@@ -16,15 +16,16 @@ import * as chalk from 'chalk';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
-import {applyEdits, Edit, FixableWarning, makeParseLoader, Replacement} from 'polymer-linter/lib/warning';
+import {applyEdits, Edit, EditAction, FixableWarning, makeParseLoader} from 'polymer-linter/lib/warning';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
+import {indent, prompt} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -77,11 +78,10 @@ export async function lint(options: Options, config: ProjectConfig) {
         await Promise.all([linter.lintPackage(), analyzer.analyzePackage()]);
   }
 
-
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
-    return fix(filtered, config, analyzer, analysis);
+    return fix(filtered, options, config, analyzer, analysis);
   } else {
     return report(filtered);
   }
@@ -90,7 +90,7 @@ export async function lint(options: Options, config: ProjectConfig) {
 /**
  * Report a friendly description of the given warnings to stdout.
  */
-async function report(warnings: Warning[]) {
+async function report(warnings: ReadonlyArray<FixableWarning>) {
   const printer =
       new WarningPrinter(process.stdout, {verbosity: 'full', color: true});
   await printer.printWarnings(warnings);
@@ -101,6 +101,10 @@ async function report(warnings: Warning[]) {
     const warningLevelWarnings =
         warnings.filter((w) => w.severity === Severity.WARNING);
     const infos = warnings.filter((w) => w.severity === Severity.INFO);
+    const fixable = warnings.filter((w) => !!w.fix).length;
+    const hasEditAction = (w: FixableWarning) =>
+        !!(w.actions && w.actions.find((a) => a.kind === 'edit'));
+    const editable = warnings.filter(hasEditAction).length;
     if (errors.length > 0) {
       message += ` ${errors.length} ${chalk.red('errors')}`;
     }
@@ -109,6 +113,16 @@ async function report(warnings: Warning[]) {
     }
     if (infos.length > 0) {
       message += ` ${infos.length} ${chalk.green('info')} messages`;
+    }
+    if (fixable > 0) {
+      message += `. ${fixable} can be automatically fixed with --fix`;
+      if (editable > 0) {
+        message +=
+            ` and ${editable} ${plural(editable, 'have', 'has')} edit actions`;
+      }
+    } else if (editable > 0) {
+      message += `. ${editable} ${plural(editable, 'have', 'has')} ` +
+          `edit actions, run with --fix for more info`;
     }
     console.log(`\n\nFound ${message}.`);
     return new CommandResult(1);
@@ -121,19 +135,29 @@ async function report(warnings: Warning[]) {
  * Reports a summary of the fixes made to stdout.
  */
 async function fix(
-    warnings: FixableWarning[],
+    warnings: ReadonlyArray<FixableWarning>,
+    options: Options,
     config: ProjectConfig,
     analyzer: Analyzer,
     analysis: Analysis) {
-  const fixes = warnings.map((w) => w.fix).filter((fix) => fix !== undefined) as
-      Replacement[][];
-  if (fixes.length === 0) {
-    console.log('No fixable warnings found.');
+  const edits = await getPermittedEdits(warnings, options);
+
+  if (edits.length === 0) {
+    const editCount = warnings.filter((w) => !!w.actions).length;
+    if (!options.prompt && editCount) {
+      console.log(
+          `No fixes to apply. ` +
+          `${editCount} action${plural(editCount)} may be applied though. ` +
+          `Run in an interactive terminal ` +
+          `with --prompt=true for more details.`);
+    } else {
+      console.log(`No fixes to apply.`);
+    }
     return;
   }
 
   const {appliedEdits, incompatibleEdits, editedFiles} =
-      await applyEdits(fixes, makeParseLoader(analyzer, analysis));
+      await applyEdits(edits, makeParseLoader(analyzer, analysis));
 
   for (const [newPath, newContents] of editedFiles) {
     await fs.writeFile(
@@ -154,8 +178,8 @@ async function fix(
     }
     console.log(
         `\nFixed ${appliedEdits.length} ` +
-        `warning${plural(appliedEdits.length)}, ` +
-        `${incompatibleEdits.length} had conflicts with other fixes. ` +
+        `warning${plural(appliedEdits.length)}. ` +
+        `${incompatibleEdits.length} fixes had conflicts with other fixes. ` +
         `Rerunning the command may apply them.`);
   } else {
     console.log(
@@ -179,9 +203,82 @@ function countEditsByFile(edits: Edit[]): ReadonlyMap<string, number> {
   return changeCountByFile;
 }
 
-function plural(n: number): string {
+function plural(n: number, pluralVal = 's', singularVal = ''): string {
   if (n === 1) {
-    return '';
+    return singularVal;
   }
-  return 's';
+  return pluralVal;
+}
+
+/**
+ * Returns edits from fixes and from edit actions with explicit user consent
+ * (including prompting the user if we're connected to an interactive terminal).
+ */
+async function getPermittedEdits(
+    warnings: ReadonlyArray<FixableWarning>,
+    options: Options): Promise<Edit[]> {
+  const editActionsToAlwaysApply = new Set(options.edits || []);
+  const edits: Edit[] = [];
+  for (const warning of warnings) {
+    if (warning.fix) {
+      edits.push(warning.fix);
+    }
+    for (const action of warning.actions || []) {
+      if (action.kind === 'edit') {
+        if (editActionsToAlwaysApply.has(action.code)) {
+          edits.push(action.edit);
+          continue;
+        }
+        if (options.prompt) {
+          const answer =
+              await askUserForConsentToApplyEditAction(action, warning);
+          switch (answer) {
+            case 'skip':
+              continue;
+            case 'apply-all':
+              editActionsToAlwaysApply.add(action.code);
+            // fall through
+            case 'apply':
+              edits.push(action.edit);
+              break;
+            default:
+              const never: never = answer;
+              throw new Error(`Got unknown user consent result: ${never}`);
+          }
+        }
+      }
+    }
+  }
+  return edits;
+}
+
+type Choice = 'skip'|'apply'|'apply-all';
+async function askUserForConsentToApplyEditAction(
+    action: EditAction, warning: FixableWarning): Promise<Choice> {
+  type ChoiceObject = {name: string, value: Choice};
+  const choices: ChoiceObject[] = [
+    {
+      value: 'skip',
+      name: 'Do not apply this edit',
+    },
+    {
+      value: 'apply',
+      name: 'Apply this edit',
+    },
+    {
+      value: 'apply-all',
+      name: `Apply all edits like this [${action.code}]`,
+    }
+  ];
+  const message = `
+This warning can be addressed with an edit:
+${indent(warning.toString(), '    ')}
+
+The edit is:
+
+${indent(action.description, '    ')}
+
+What should be done?
+`.trim();
+  return await prompt({message, choices}) as Choice;
 }
