@@ -67,7 +67,7 @@ gulp.task(
               }))
               .pipe(tslint.report()));
 
-gulp.task('depcheck', () => {
+gulp.task('depcheck', ['build'], () => {
   return depcheck(__dirname, {
            // "@types/*" dependencies are type declarations that are
            // automatically
