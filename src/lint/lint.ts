@@ -13,6 +13,7 @@
  */
 
 import * as chalk from 'chalk';
+import * as chokidar from 'chokidar';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
@@ -57,6 +58,28 @@ export async function lint(options: Options, config: ProjectConfig) {
   });
   const linter = new lintLib.Linter(rules, analyzer);
 
+  if (options.watch) {
+    return watchLoop(analyzer, linter, options, config, filter);
+  } else {
+    return runOnce(analyzer, linter, options, config, filter);
+  }
+}
+
+interface PrivateOptions extends Options {
+  /**
+   * When running in --watch mode we want to report warnings if we're running
+   * with --fix but there weren't any warnings to fix.
+   */
+  reportIfNoFix?: boolean;
+}
+
+async function runOnce(
+    analyzer: Analyzer,
+    linter: lintLib.Linter,
+    options: PrivateOptions,
+    config: ProjectConfig,
+    filter: WarningFilter,
+    editActionsToAlwaysApply = new Set(options.edits || [])) {
   let warnings;
   if (options.input) {
     warnings = await linter.lint(options.input);
@@ -68,9 +91,92 @@ export async function lint(options: Options, config: ProjectConfig) {
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
-    return fix(filtered, options, config, analyzer, analysis);
+    const appliedFixes = await fix(
+        filtered,
+        options,
+        config,
+        analyzer,
+        analysis,
+        editActionsToAlwaysApply);
+    if (!appliedFixes && options.reportIfNoFix) {
+      await report(filtered);
+    }
   } else {
     return report(filtered);
+  }
+}
+
+async function watchLoop(
+    analyzer: Analyzer,
+    linter: lintLib.Linter,
+    options: Options,
+    config: ProjectConfig,
+    filter: WarningFilter) {
+  let analysis;
+  if (options.input) {
+    analysis = await analyzer.analyze(options.input);
+  } else {
+    analysis = await analyzer.analyzePackage();
+  }
+  /** Remember the user's preferences across runs. */
+  const lintActionsToAlwaysApply = new Set(options.edits || []);
+
+  const paths =
+      new Set([...analysis.getFeatures({kind: 'document'})].map((d) => d.url));
+  const watcher = chokidar.watch([...paths], {persistent: true});
+  const changeBatches = new FilesystemChangeStream(watcher);
+  for
+    await(const changeBatch of changeBatches) {
+      await analyzer.filesChanged([...changeBatch]);
+
+      await runOnce(
+          analyzer,
+          linter,
+          {...options, reportIfNoFix: true},
+          config,
+          filter,
+          lintActionsToAlwaysApply);
+
+      console.log('\nLint pass complete, waiting for filesystem changes.\n\n');
+    }
+}
+
+class FilesystemChangeStream implements AsyncIterable<Set<string>> {
+  private nextBatch = new Set<string>();
+  private alertWaiter: (() => void)|undefined = undefined;
+  constructor(watcher: chokidar.FSWatcher) {
+    watcher.on('change', (path: string) => {
+      this.handleChange(path);
+    });
+    watcher.on('unlink', (path: string) => {
+      this.handleChange(path);
+    });
+  }
+  private handleChange(path: string) {
+    this.nextBatch.add(path);
+    if (this.alertWaiter) {
+      this.alertWaiter();
+      this.alertWaiter = undefined;
+    }
+  }
+  async * [Symbol.asyncIterator](): AsyncIterator<Set<string>> {
+    yield new Set();
+    while (true) {
+      /**
+       * If there are changes, yield them. If there are not, wait until
+       * there are.
+       */
+      if (this.nextBatch.size > 0) {
+        const batch = this.nextBatch;
+        this.nextBatch = new Set();
+        yield batch;
+      } else {
+        const waitingPromise = new Promise((resolve) => {
+          this.alertWaiter = resolve;
+        });
+        await waitingPromise;
+      }
+    }
   }
 }
 
@@ -126,8 +232,10 @@ async function fix(
     options: Options,
     config: ProjectConfig,
     analyzer: Analyzer,
-    analysis: Analysis) {
-  const edits = await getPermittedEdits(warnings, options);
+    analysis: Analysis,
+    editActionsToAlwaysApply: Set<string>): Promise<boolean> {
+  const edits =
+      await getPermittedEdits(warnings, options, editActionsToAlwaysApply);
 
   if (edits.length === 0) {
     const editCount = warnings.filter((w) => !!w.actions).length;
@@ -140,7 +248,7 @@ async function fix(
     } else {
       console.log(`No fixes to apply.`);
     }
-    return;
+    return false;
   }
 
   const {appliedEdits, incompatibleEdits, editedFiles} =
@@ -173,6 +281,7 @@ async function fix(
         `\nFixed ${appliedEdits.length} ` +
         `warning${plural(appliedEdits.length)}.`);
   }
+  return true;
 }
 
 /**
@@ -199,11 +308,13 @@ function plural(n: number, pluralVal = 's', singularVal = ''): string {
 
 /**
  * Returns edits from fixes and from edit actions with explicit user consent
- * (including prompting the user if we're connected to an interactive terminal).
+ * (including prompting the user if we're connected to an interactive
+ * terminal).
  */
 async function getPermittedEdits(
-    warnings: ReadonlyArray<Warning>, options: Options): Promise<Edit[]> {
-  const editActionsToAlwaysApply = new Set(options.edits || []);
+    warnings: ReadonlyArray<Warning>,
+    options: Options,
+    editActionsToAlwaysApply: Set<string>): Promise<Edit[]> {
   const edits: Edit[] = [];
   for (const warning of warnings) {
     if (warning.fix) {
