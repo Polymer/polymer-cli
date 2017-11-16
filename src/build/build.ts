@@ -38,8 +38,27 @@ export async function build(
     options: ProjectBuildOptions,
     polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
-  const optimizeOptions:
-      OptimizeOptions = {css: options.css, js: options.js, html: options.html};
+
+  // If a config for the current buildName is present
+  // Merge the projects optimizeOptions with the options
+  // Commandline options will override the projects options
+  const optimizeOptions: OptimizeOptions = { css: options.css, js: options.js, html: options.html };
+
+  // Remove undefined properties to prevent overriding the projects options
+  (!optimizeOptions.css) && delete optimizeOptions.css;
+  (!optimizeOptions.js) && delete optimizeOptions.js;
+  (!optimizeOptions.html) && delete optimizeOptions.html;
+
+  if (polymerProject.config.builds) {
+    const projectOptions = polymerProject.config.builds.find((buildConfig) => buildConfig.name === buildName);
+    if (projectOptions) {
+      const projectOptimizeOptions = { css: projectOptions.css, js: projectOptions.js, html: projectOptions.html };
+      // Assign each property separately, as it's not a deep assign
+      optimizeOptions.css = Object.assign({}, projectOptimizeOptions.css, optimizeOptions.css);
+      optimizeOptions.js = Object.assign({}, projectOptimizeOptions.js, optimizeOptions.js);
+      optimizeOptions.html = Object.assign({}, projectOptimizeOptions.html, optimizeOptions.html);
+    }
+  }
 
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
@@ -62,30 +81,30 @@ export async function build(
   const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
   if (compiledToES5) {
     buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
-                      .pipe(polymerProject.addCustomElementsEs5Adapter());
+      .pipe(polymerProject.addCustomElementsEs5Adapter());
   }
 
   const bundled = !!(options.bundle);
 
   async function getPolymerVersion(): Promise<string> {
     return new Promise<string>(
-        (resolve, _reject) =>
-            bower.commands.list({}, { offline: true })
-                .on('end',
-                    (result: any) => {
-                      if (result && result.dependencies &&
-                          result.dependencies.polymer &&
-                          result.dependencies.polymer.pkgMeta &&
-                          result.dependencies.polymer.pkgMeta.version) {
-                        resolve(result.dependencies.polymer.pkgMeta.version);
-                      } else {
-                        resolve('');
-                      }
-                    })
-                .on('error', (oops: Error) => {
-                  resolve('');
-                  console.warn(oops.message);
-                }));
+      (resolve, _reject) =>
+        bower.commands.list({}, { offline: true })
+          .on('end',
+          (result: any) => {
+            if (result && result.dependencies &&
+              result.dependencies.polymer &&
+              result.dependencies.polymer.pkgMeta &&
+              result.dependencies.polymer.pkgMeta.version) {
+              resolve(result.dependencies.polymer.pkgMeta.version);
+            } else {
+              resolve('');
+            }
+          })
+          .on('error', (oops: Error) => {
+            resolve('');
+            console.warn(oops.message);
+          }));
   }
 
   if (bundled) {
@@ -134,9 +153,9 @@ export async function build(
   // while the build is in progress. Loading the config file during the build
   // saves the user ~300ms vs. loading it afterwards.
   const swPrecacheConfigPath = path.resolve(
-      polymerProject.config.root,
-      options.swPrecacheConfig || 'sw-precache-config.js');
-  let swConfig: SWConfig|null = null;
+    polymerProject.config.root,
+    options.swPrecacheConfig || 'sw-precache-config.js');
+  let swConfig: SWConfig | null = null;
   if (options.addServiceWorker) {
     swConfig = await loadServiceWorkerConfig(swPrecacheConfigPath);
   }
@@ -150,8 +169,8 @@ export async function build(
       logger.debug(`Service worker config found`, swConfig);
     } else {
       logger.debug(
-          `No service worker configuration found at ` +
-          `${swPrecacheConfigPath}, continuing with defaults`);
+        `No service worker configuration found at ` +
+        `${swPrecacheConfigPath}, continuing with defaults`);
     }
     await addServiceWorker({
       buildRoot: buildDirectory,

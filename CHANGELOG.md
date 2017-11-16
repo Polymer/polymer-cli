@@ -6,6 +6,7 @@
     an interactive prompt and the `--edits` flag. See `polymer lint --help` for
     more info.
 - `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
+- `build` When using flag `--name <buildName>`, it will now take the matching named build from `polymer.json` and merge it with the command-line options. This fixes #827.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.7 [10-11-2017]
