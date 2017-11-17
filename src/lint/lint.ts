@@ -16,11 +16,10 @@ import * as chalk from 'chalk';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, FSUrlLoader, PackageUrlResolver, Severity} from 'polymer-analyzer';
+import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
-import {applyEdits, Edit, EditAction, FixableWarning, makeParseLoader} from 'polymer-linter/lib/warning';
 import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
@@ -58,25 +57,13 @@ export async function lint(options: Options, config: ProjectConfig) {
   });
   const linter = new lintLib.Linter(rules, analyzer);
 
-  // This is awkward, it would be nice to be able to get access to the analysis
-  // of a lint run rather than doing this sort of parallel construction.
-  // We want the analysis that the linter sees so that we can apply fixes
-  // to the same version of the files that the fixes were constructed for.
-  // https://github.com/Polymer/polymer-linter/issues/110
   let warnings;
-  let analysis;
   if (options.input) {
-    [warnings, analysis] = await Promise.all(
-        [linter.lint(options.input), analyzer.analyze(options.input)]);
-
-    const packageRelativeInputFilenames = new Set(options.input.map(
-        (i) => path.relative(config.root, path.resolve('.', i))));
-    warnings = warnings.filter(
-        (w) => packageRelativeInputFilenames.has(w.sourceRange.file));
+    warnings = await linter.lint(options.input);
   } else {
-    [warnings, analysis] =
-        await Promise.all([linter.lintPackage(), analyzer.analyzePackage()]);
+    warnings = await linter.lintPackage();
   }
+  const analysis = warnings.analysis;
 
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
@@ -90,7 +77,7 @@ export async function lint(options: Options, config: ProjectConfig) {
 /**
  * Report a friendly description of the given warnings to stdout.
  */
-async function report(warnings: ReadonlyArray<FixableWarning>) {
+async function report(warnings: ReadonlyArray<Warning>) {
   const printer =
       new WarningPrinter(process.stdout, {verbosity: 'full', color: true});
   await printer.printWarnings(warnings);
@@ -102,7 +89,7 @@ async function report(warnings: ReadonlyArray<FixableWarning>) {
         warnings.filter((w) => w.severity === Severity.WARNING);
     const infos = warnings.filter((w) => w.severity === Severity.INFO);
     const fixable = warnings.filter((w) => !!w.fix).length;
-    const hasEditAction = (w: FixableWarning) =>
+    const hasEditAction = (w: Warning) =>
         !!(w.actions && w.actions.find((a) => a.kind === 'edit'));
     const editable = warnings.filter(hasEditAction).length;
     if (errors.length > 0) {
@@ -135,7 +122,7 @@ async function report(warnings: ReadonlyArray<FixableWarning>) {
  * Reports a summary of the fixes made to stdout.
  */
 async function fix(
-    warnings: ReadonlyArray<FixableWarning>,
+    warnings: ReadonlyArray<Warning>,
     options: Options,
     config: ProjectConfig,
     analyzer: Analyzer,
@@ -215,8 +202,7 @@ function plural(n: number, pluralVal = 's', singularVal = ''): string {
  * (including prompting the user if we're connected to an interactive terminal).
  */
 async function getPermittedEdits(
-    warnings: ReadonlyArray<FixableWarning>,
-    options: Options): Promise<Edit[]> {
+    warnings: ReadonlyArray<Warning>, options: Options): Promise<Edit[]> {
   const editActionsToAlwaysApply = new Set(options.edits || []);
   const edits: Edit[] = [];
   for (const warning of warnings) {
@@ -254,7 +240,7 @@ async function getPermittedEdits(
 
 type Choice = 'skip'|'apply'|'apply-all';
 async function askUserForConsentToApplyEditAction(
-    action: EditAction, warning: FixableWarning): Promise<Choice> {
+    action: EditAction, warning: Warning): Promise<Choice> {
   type ChoiceObject = {name: string, value: Choice};
   const choices: ChoiceObject[] = [
     {
