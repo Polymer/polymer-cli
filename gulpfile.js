@@ -52,11 +52,11 @@ gulp.task(
 gulp.task(
     'test:integration',
     ['build'],
-    () =>
-        gulp.src(['lib/test/integration/**/*_test.js'], {read: false}).pipe(mocha({
-          ui: 'tdd',
-          reporter: 'spec',
-        })));
+    () => gulp.src(['lib/test/integration/**/*_test.js'], {read: false})
+              .pipe(mocha({
+                ui: 'tdd',
+                reporter: 'spec',
+              })));
 
 gulp.task(
     'tslint',
