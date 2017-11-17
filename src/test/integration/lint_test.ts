@@ -197,13 +197,10 @@ Fixed 4 warnings.
       const forkedProcess =
           child_process.fork(binPath, ['lint', '--watch'], {cwd, silent: true});
       const reader = new StreamReader(forkedProcess.stdout);
-      // The first pass yields no warnings:
       assert.deepEqual(await reader.readUntil(delimiter), '');
-      // Add an error
       fs.writeFileSync(
           path.join(cwd, 'my-elem.html'),
           '<style>\nfoo {@apply(--bar)}\n</style>');
-      // Expect warning output.
       assert.deepEqual(await reader.readUntil(delimiter), `
 
 foo {@apply(--bar)}
@@ -214,6 +211,8 @@ my-elem.html(1,11) error [at-apply-with-parens] - @apply with parentheses is dep
 
 Found 1 error. 1 can be automatically fixed with --fix.
 `);
+      // Wait for a moment
+      await sleep(300);
       // Fix the error
       fs.writeFileSync(
           path.join(cwd, 'my-elem.html'),

@@ -79,7 +79,8 @@ async function runOnce(
     options: PrivateOptions,
     config: ProjectConfig,
     filter: WarningFilter,
-    editActionsToAlwaysApply = new Set(options.edits || [])) {
+    editActionsToAlwaysApply = new Set(options.edits || []),
+    watcher?: FilesystemChangeStream) {
   let warnings;
   if (options.input) {
     warnings = await linter.lint(options.input);
@@ -91,14 +92,22 @@ async function runOnce(
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
-    const appliedFixes = await fix(
+    const changedFiles = await fix(
         filtered,
         options,
         config,
         analyzer,
         analysis,
         editActionsToAlwaysApply);
-    if (!appliedFixes && options.reportIfNoFix) {
+    if (watcher) {
+      // Some file watcher interfaces won't notice this change immediately after
+      // the one that initiated this lint run. Ensure that we notice these
+      // changes.
+      for (const changedFile of changedFiles) {
+        watcher.ensureChangeIsNoticed(changedFile);
+      }
+    }
+    if (changedFiles.size === 0 && options.reportIfNoFix) {
       await report(filtered);
     }
   } else {
@@ -123,42 +132,72 @@ async function watchLoop(
 
   const paths =
       new Set([...analysis.getFeatures({kind: 'document'})].map((d) => d.url));
-  const watcher = chokidar.watch([...paths], {persistent: true});
-  const changeBatches = new FilesystemChangeStream(watcher);
-  for
-    await(const changeBatch of changeBatches) {
-      await analyzer.filesChanged([...changeBatch]);
+  const watcher = new FilesystemChangeStream(
+      chokidar.watch([...paths], {persistent: true}));
+  for await(const changeBatch of watcher) {
+    await analyzer.filesChanged([...changeBatch]);
 
-      await runOnce(
-          analyzer,
-          linter,
-          {...options, reportIfNoFix: true},
-          config,
-          filter,
-          lintActionsToAlwaysApply);
+    await runOnce(
+        analyzer,
+        linter,
+        {...options, reportIfNoFix: true},
+        config,
+        filter,
+        lintActionsToAlwaysApply,
+        watcher);
 
-      console.log('\nLint pass complete, waiting for filesystem changes.\n\n');
-    }
+    console.log('\nLint pass complete, waiting for filesystem changes.\n\n');
+  }
 }
 
 class FilesystemChangeStream implements AsyncIterable<Set<string>> {
   private nextBatch = new Set<string>();
   private alertWaiter: (() => void)|undefined = undefined;
+  private outOfBandNotices: undefined|Set<string> = undefined;
+
   constructor(watcher: chokidar.FSWatcher) {
     watcher.on('change', (path: string) => {
-      this.handleChange(path);
+      this.noticeChange(path);
     });
     watcher.on('unlink', (path: string) => {
-      this.handleChange(path);
+      this.noticeChange(path);
     });
   }
-  private handleChange(path: string) {
+
+  private noticeChange(path: string) {
     this.nextBatch.add(path);
     if (this.alertWaiter) {
       this.alertWaiter();
       this.alertWaiter = undefined;
     }
+    if (this.outOfBandNotices) {
+      this.outOfBandNotices.delete(path);
+    }
   }
+
+  /**
+   * Ensures that we will notice a change to the given path, without creating
+   * duplicated change notices if the normal filesystem watcher also notices
+   * a change to the same path soon.
+   *
+   * This is a way to notify the watcher when we change a file in response
+   * to another change. The FS event watcher used on linux will ignore our
+   * change, as it gets grouped in with the change that we were responding to.
+   */
+  ensureChangeIsNoticed(path: string) {
+    if (!this.outOfBandNotices) {
+      const notices = new Set();
+      this.outOfBandNotices = notices;
+      setTimeout(() => {
+        for (const path of notices) {
+          this.noticeChange(path);
+        }
+        this.outOfBandNotices = undefined;
+      }, 100);
+    }
+    this.outOfBandNotices.add(path);
+  }
+
   async * [Symbol.asyncIterator](): AsyncIterator<Set<string>> {
     yield new Set();
     while (true) {
@@ -200,11 +239,11 @@ async function report(warnings: ReadonlyArray<Warning>) {
     const editable = warnings.filter(hasEditAction).length;
     if (errors.length > 0) {
       message += ` ${errors.length} ` +
-        `${chalk.red('error' + plural(errors.length))}`;
+          `${chalk.red('error' + plural(errors.length))}`;
     }
     if (warningLevelWarnings.length > 0) {
       message += ` ${warningLevelWarnings.length} ` +
-        `${chalk.yellow('warning' + plural(warnings.length))}`;
+          `${chalk.yellow('warning' + plural(warnings.length))}`;
     }
     if (infos.length > 0) {
       message += ` ${infos.length} ${chalk.green('info')} message` +
@@ -236,7 +275,7 @@ async function fix(
     config: ProjectConfig,
     analyzer: Analyzer,
     analysis: Analysis,
-    editActionsToAlwaysApply: Set<string>): Promise<boolean> {
+    editActionsToAlwaysApply: Set<string>): Promise<Set<string>> {
   const edits =
       await getPermittedEdits(warnings, options, editActionsToAlwaysApply);
 
@@ -251,7 +290,7 @@ async function fix(
     } else {
       console.log(`No fixes to apply.`);
     }
-    return false;
+    return new Set();
   }
 
   const {appliedEdits, incompatibleEdits, editedFiles} =
@@ -284,7 +323,13 @@ async function fix(
         `\nFixed ${appliedEdits.length} ` +
         `warning${plural(appliedEdits.length)}.`);
   }
-  return true;
+  const changedFiles = new Set();
+  for (const edit of appliedEdits) {
+    for (const replacement of edit) {
+      changedFiles.add(replacement.range.file);
+    }
+  }
+  return changedFiles;
 }
 
 /**
