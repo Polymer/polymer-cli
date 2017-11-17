@@ -199,13 +199,16 @@ async function report(warnings: ReadonlyArray<Warning>) {
         !!(w.actions && w.actions.find((a) => a.kind === 'edit'));
     const editable = warnings.filter(hasEditAction).length;
     if (errors.length > 0) {
-      message += ` ${errors.length} ${chalk.red('errors')}`;
+      message += ` ${errors.length} ` +
+        `${chalk.red('error' + plural(errors.length))}`;
     }
     if (warningLevelWarnings.length > 0) {
-      message += ` ${warningLevelWarnings.length} ${chalk.yellow('warnings')}`;
+      message += ` ${warningLevelWarnings.length} ` +
+        `${chalk.yellow('warning' + plural(warnings.length))}`;
     }
     if (infos.length > 0) {
-      message += ` ${infos.length} ${chalk.green('info')} messages`;
+      message += ` ${infos.length} ${chalk.green('info')} message` +
+          plural(infos.length);
     }
     if (fixable > 0) {
       message += `. ${fixable} can be automatically fixed with --fix`;
@@ -217,7 +220,7 @@ async function report(warnings: ReadonlyArray<Warning>) {
       message += `. ${editable} ${plural(editable, 'have', 'has')} ` +
           `edit actions, run with --fix for more info`;
     }
-    console.log(`\n\nFound ${message}.`);
+    console.log(`\n\nFound${message}.`);
     return new CommandResult(1);
   }
 }
