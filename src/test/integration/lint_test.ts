@@ -185,9 +185,9 @@ Fixed 4 warnings.
 `);
   });
 
-  suite('--watch', () => {
+  suite('--watch', function() {
 
-    this.timeout(6 * 1000);
+    this.timeout(12 * 1000);
 
     const delimiter =
         `\nLint pass complete, waiting for filesystem changes.\n\n`;
