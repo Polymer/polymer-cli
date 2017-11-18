@@ -61,7 +61,7 @@ export async function lint(options: Options, config: ProjectConfig) {
   if (options.watch) {
     return watchLoop(analyzer, linter, options, config, filter);
   } else {
-    return runOnce(analyzer, linter, options, config, filter);
+    return run(analyzer, linter, options, config, filter);
   }
 }
 
@@ -73,7 +73,14 @@ interface PrivateOptions extends Options {
   reportIfNoFix?: boolean;
 }
 
-async function runOnce(
+/**
+ * Run a single pass of the linter, and then report the results or fix warnings
+ * as requested by `options`.
+ *
+ * In a normal run this is called once and then it's done. When running with
+ * `--watch` this function is called each time files on disk change.
+ */
+async function run(
     analyzer: Analyzer,
     linter: lintLib.Linter,
     options: PrivateOptions,
@@ -134,22 +141,27 @@ async function watchLoop(
       new Set([...analysis.getFeatures({kind: 'document'})].map((d) => d.url));
   const watcher = new FilesystemChangeStream(
       chokidar.watch([...paths], {persistent: true}));
-  for await(const changeBatch of watcher) {
+  for await (const changeBatch of watcher) {
     await analyzer.filesChanged([...changeBatch]);
 
-    await runOnce(
+    await run(
         analyzer,
         linter,
         {...options, reportIfNoFix: true},
         config,
         filter,
         lintActionsToAlwaysApply,
+        // We pass the watcher to run() so that it can inform the watcher
+        // about files that it changes when fixing wanings.
         watcher);
 
     console.log('\nLint pass complete, waiting for filesystem changes.\n\n');
   }
 }
 
+/**
+ * Converts the event-based FSWatcher into a batched async iterator.
+ */
 class FilesystemChangeStream implements AsyncIterable<Set<string>> {
   private nextBatch = new Set<string>();
   private alertWaiter: (() => void)|undefined = undefined;
@@ -164,6 +176,10 @@ class FilesystemChangeStream implements AsyncIterable<Set<string>> {
     });
   }
 
+  /**
+   * Called when we have noticed a change to the file. Ensures that the file
+   * will be in the next batch of changes.
+   */
   private noticeChange(path: string) {
     this.nextBatch.add(path);
     if (this.alertWaiter) {
@@ -198,6 +214,13 @@ class FilesystemChangeStream implements AsyncIterable<Set<string>> {
     this.outOfBandNotices.add(path);
   }
 
+  /**
+   * Yields batches of filenames.
+   *
+   * Each batch of files are those changes that have changed since the last
+   * batch. Never yields an empty batch, but waits until at least one change is
+   * noticed.
+   */
   async * [Symbol.asyncIterator](): AsyncIterator<Set<string>> {
     yield new Set();
     while (true) {
