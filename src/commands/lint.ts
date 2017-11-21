@@ -74,12 +74,12 @@ export class LintCommand implements Command {
     },
     {
       name: 'prompt',
-      type: (value: string) => {
-        return value.toLowerCase().trim() !== 'false';
-      },
+      type:
+          (value: string) => {
+            return value.toLowerCase().trim() !== 'false';
+          },
       defaultValue: !!process.stdin.isTTY,
-      description:
-          `Whether to allow interactive prompts. Use --prompt=false when` +
+      description: `Whether to allow interactive prompts. Use --prompt=false when` +
           ` running as part of an automated script without a human at stdin.`
     }
   ];

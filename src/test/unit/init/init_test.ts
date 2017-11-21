@@ -155,7 +155,7 @@ suite('init', () => {
     setup(() => {
       const generators: {
         [generatorName: string]:
-            {resolved: string | undefined, namespace: string}
+            {resolved: string|undefined, namespace: string}
       } = {};
 
       for (const generator of GENERATORS) {

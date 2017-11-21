@@ -130,10 +130,7 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({
-      presets:
-          [minifyPreset(null, {simplifyComparisons: false})]
-    });
+    super({presets: [minifyPreset(null, {simplifyComparisons: false})]});
   }
 }
 

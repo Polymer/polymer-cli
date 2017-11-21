@@ -203,7 +203,7 @@ export async function runGenerator(
   const templateName = options['templateName'] || generatorName;
 
   const env: YeomanEnvironment =
-      await(options['env'] || createYeomanEnvironment());
+      await (options['env'] || createYeomanEnvironment());
 
   logger.info(`Running template ${templateName}...`);
   logger.debug(`Running generator ${generatorName}...`);
@@ -233,7 +233,7 @@ export async function runGenerator(
 export async function promptGeneratorSelection(options?: {[name: string]: any}):
     Promise<void> {
   options = options || {};
-  const env = await(options['env'] || createYeomanEnvironment());
+  const env = await (options['env'] || createYeomanEnvironment());
   const generatorName = await prompt(createSelectPrompt(env));
   await runGenerator(
       generatorName, {templateName: getDisplayName(generatorName), env: env});

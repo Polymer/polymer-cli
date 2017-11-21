@@ -15,7 +15,7 @@
     "test": "gulp lint test",
     "test:smoke": "gulp test",
     "test:integration": "gulp test:integration",
-    "format": "find src test gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
+    "format": "find src gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
   },
   "repository": {
     "type": "git",
@@ -91,7 +91,7 @@
     "@types/yeoman-test": "^1.7.3",
     "babili": "^0.0.12",
     "chai": "^3.5.0",
-    "clang-format": "=1.0.50",
+    "clang-format": "=1.1.0",
     "depcheck": "^0.6.3",
     "fs-extra": "^2.0.0",
     "gulp": "^3.9.1",

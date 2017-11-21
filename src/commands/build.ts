@@ -131,7 +131,8 @@ export class BuildCommand implements Command {
           (<any>buildOptions)[prefix] = (<any>buildOptions)[prefix] || {};
           (<any>buildOptions)[prefix][option] = options[buildOption];
         } else {
-          (<any>buildOptions)[this.dashToCamelCase(buildOption)] = options[buildOption];
+          (<any>buildOptions)[this.dashToCamelCase(buildOption)] =
+              options[buildOption];
         }
       }
     }
