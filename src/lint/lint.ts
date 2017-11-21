@@ -13,6 +13,7 @@
  */
 
 import * as chalk from 'chalk';
+import * as chokidar from 'chokidar';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
@@ -57,6 +58,36 @@ export async function lint(options: Options, config: ProjectConfig) {
   });
   const linter = new lintLib.Linter(rules, analyzer);
 
+  if (options.watch) {
+    return watchLoop(analyzer, linter, options, config, filter);
+  } else {
+    return run(analyzer, linter, options, config, filter);
+  }
+}
+
+interface PrivateOptions extends Options {
+  /**
+   * When running in --watch mode we want to report warnings if we're running
+   * with --fix but there weren't any warnings to fix.
+   */
+  reportIfNoFix?: boolean;
+}
+
+/**
+ * Run a single pass of the linter, and then report the results or fix warnings
+ * as requested by `options`.
+ *
+ * In a normal run this is called once and then it's done. When running with
+ * `--watch` this function is called each time files on disk change.
+ */
+async function run(
+    analyzer: Analyzer,
+    linter: lintLib.Linter,
+    options: PrivateOptions,
+    config: ProjectConfig,
+    filter: WarningFilter,
+    editActionsToAlwaysApply = new Set(options.edits || []),
+    watcher?: FilesystemChangeStream) {
   let warnings;
   if (options.input) {
     warnings = await linter.lint(options.input);
@@ -68,9 +99,146 @@ export async function lint(options: Options, config: ProjectConfig) {
   const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
-    return fix(filtered, options, config, analyzer, analysis);
+    const changedFiles = await fix(
+        filtered,
+        options,
+        config,
+        analyzer,
+        analysis,
+        editActionsToAlwaysApply);
+    if (watcher) {
+      // Some file watcher interfaces won't notice this change immediately after
+      // the one that initiated this lint run. Ensure that we notice these
+      // changes.
+      for (const changedFile of changedFiles) {
+        watcher.ensureChangeIsNoticed(changedFile);
+      }
+    }
+    if (changedFiles.size === 0 && options.reportIfNoFix) {
+      await report(filtered);
+    }
   } else {
     return report(filtered);
+  }
+}
+
+async function watchLoop(
+    analyzer: Analyzer,
+    linter: lintLib.Linter,
+    options: Options,
+    config: ProjectConfig,
+    filter: WarningFilter) {
+  let analysis;
+  if (options.input) {
+    analysis = await analyzer.analyze(options.input);
+  } else {
+    analysis = await analyzer.analyzePackage();
+  }
+  /** Remember the user's preferences across runs. */
+  const lintActionsToAlwaysApply = new Set(options.edits || []);
+
+  const paths =
+      new Set([...analysis.getFeatures({kind: 'document'})].map((d) => d.url));
+  const watcher = new FilesystemChangeStream(
+      chokidar.watch([...paths], {persistent: true}));
+  for await (const changeBatch of watcher) {
+    await analyzer.filesChanged([...changeBatch]);
+
+    await run(
+        analyzer,
+        linter,
+        {...options, reportIfNoFix: true},
+        config,
+        filter,
+        lintActionsToAlwaysApply,
+        // We pass the watcher to run() so that it can inform the watcher
+        // about files that it changes when fixing wanings.
+        watcher);
+
+    console.log('\nLint pass complete, waiting for filesystem changes.\n\n');
+  }
+}
+
+/**
+ * Converts the event-based FSWatcher into a batched async iterator.
+ */
+class FilesystemChangeStream implements AsyncIterable<Set<string>> {
+  private nextBatch = new Set<string>();
+  private alertWaiter: (() => void)|undefined = undefined;
+  private outOfBandNotices: undefined|Set<string> = undefined;
+
+  constructor(watcher: chokidar.FSWatcher) {
+    watcher.on('change', (path: string) => {
+      this.noticeChange(path);
+    });
+    watcher.on('unlink', (path: string) => {
+      this.noticeChange(path);
+    });
+  }
+
+  /**
+   * Called when we have noticed a change to the file. Ensures that the file
+   * will be in the next batch of changes.
+   */
+  private noticeChange(path: string) {
+    this.nextBatch.add(path);
+    if (this.alertWaiter) {
+      this.alertWaiter();
+      this.alertWaiter = undefined;
+    }
+    if (this.outOfBandNotices) {
+      this.outOfBandNotices.delete(path);
+    }
+  }
+
+  /**
+   * Ensures that we will notice a change to the given path, without creating
+   * duplicated change notices if the normal filesystem watcher also notices
+   * a change to the same path soon.
+   *
+   * This is a way to notify the watcher when we change a file in response
+   * to another change. The FS event watcher used on linux will ignore our
+   * change, as it gets grouped in with the change that we were responding to.
+   */
+  ensureChangeIsNoticed(path: string) {
+    if (!this.outOfBandNotices) {
+      const notices = new Set();
+      this.outOfBandNotices = notices;
+      setTimeout(() => {
+        for (const path of notices) {
+          this.noticeChange(path);
+        }
+        this.outOfBandNotices = undefined;
+      }, 100);
+    }
+    this.outOfBandNotices.add(path);
+  }
+
+  /**
+   * Yields batches of filenames.
+   *
+   * Each batch of files are those changes that have changed since the last
+   * batch. Never yields an empty batch, but waits until at least one change is
+   * noticed.
+   */
+  async * [Symbol.asyncIterator](): AsyncIterator<Set<string>> {
+    yield new Set();
+    while (true) {
+      /**
+       * If there are changes, yield them. If there are not, wait until
+       * there are.
+       */
+      if (this.nextBatch.size > 0) {
+        const batch = this.nextBatch;
+        this.nextBatch = new Set();
+        yield batch;
+      } else {
+        const waitingPromise = new Promise((resolve) => {
+          this.alertWaiter = resolve;
+        });
+        await waitingPromise;
+      }
+    }
   }
 }
 
@@ -93,13 +261,16 @@ async function report(warnings: ReadonlyArray<Warning>) {
         !!(w.actions && w.actions.find((a) => a.kind === 'edit'));
     const editable = warnings.filter(hasEditAction).length;
     if (errors.length > 0) {
-      message += ` ${errors.length} ${chalk.red('errors')}`;
+      message += ` ${errors.length} ` +
+          `${chalk.red('error' + plural(errors.length))}`;
     }
     if (warningLevelWarnings.length > 0) {
-      message += ` ${warningLevelWarnings.length} ${chalk.yellow('warnings')}`;
+      message += ` ${warningLevelWarnings.length} ` +
+          `${chalk.yellow('warning' + plural(warnings.length))}`;
     }
     if (infos.length > 0) {
-      message += ` ${infos.length} ${chalk.green('info')} messages`;
+      message += ` ${infos.length} ${chalk.green('info')} message` +
+          plural(infos.length);
     }
     if (fixable > 0) {
       message += `. ${fixable} can be automatically fixed with --fix`;
@@ -111,7 +282,7 @@ async function report(warnings: ReadonlyArray<Warning>) {
       message += `. ${editable} ${plural(editable, 'have', 'has')} ` +
           `edit actions, run with --fix for more info`;
     }
-    console.log(`\n\nFound ${message}.`);
+    console.log(`\n\nFound${message}.`);
     return new CommandResult(1);
   }
 }
@@ -126,8 +297,10 @@ async function fix(
     options: Options,
     config: ProjectConfig,
     analyzer: Analyzer,
-    analysis: Analysis) {
-  const edits = await getPermittedEdits(warnings, options);
+    analysis: Analysis,
+    editActionsToAlwaysApply: Set<string>): Promise<Set<string>> {
+  const edits =
+      await getPermittedEdits(warnings, options, editActionsToAlwaysApply);
 
   if (edits.length === 0) {
     const editCount = warnings.filter((w) => !!w.actions).length;
@@ -140,7 +313,7 @@ async function fix(
     } else {
       console.log(`No fixes to apply.`);
     }
-    return;
+    return new Set();
   }
 
   const {appliedEdits, incompatibleEdits, editedFiles} =
@@ -173,6 +346,13 @@ async function fix(
         `\nFixed ${appliedEdits.length} ` +
         `warning${plural(appliedEdits.length)}.`);
   }
+  const changedFiles = new Set();
+  for (const edit of appliedEdits) {
+    for (const replacement of edit) {
+      changedFiles.add(replacement.range.file);
+    }
+  }
+  return changedFiles;
 }
 
 /**
@@ -199,11 +379,13 @@ function plural(n: number, pluralVal = 's', singularVal = ''): string {
 
 /**
  * Returns edits from fixes and from edit actions with explicit user consent
- * (including prompting the user if we're connected to an interactive terminal).
+ * (including prompting the user if we're connected to an interactive
+ * terminal).
  */
 async function getPermittedEdits(
-    warnings: ReadonlyArray<Warning>, options: Options): Promise<Edit[]> {
-  const editActionsToAlwaysApply = new Set(options.edits || []);
+    warnings: ReadonlyArray<Warning>,
+    options: Options,
+    editActionsToAlwaysApply: Set<string>): Promise<Edit[]> {
   const edits: Edit[] = [];
   for (const warning of warnings) {
     if (warning.fix) {

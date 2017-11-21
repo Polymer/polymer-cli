@@ -29,6 +29,7 @@ export interface Options {
   fix?: boolean;
   edits?: string[];
   prompt: boolean;
+  watch?: boolean;
 }
 
 export class LintCommand implements Command {
@@ -81,6 +82,13 @@ export class LintCommand implements Command {
       defaultValue: !!process.stdin.isTTY,
       description: `Whether to allow interactive prompts. Use --prompt=false when` +
           ` running as part of an automated script without a human at stdin.`
+    },
+    {
+      name: 'watch',
+      type: Boolean,
+      alias: 'w',
+      defaultValue: false,
+      description: `Reruns the linter whenever files change on disk.`
     }
   ];
 
@@ -90,7 +98,6 @@ export class LintCommand implements Command {
    *   - whether to use color (also: can we autodetect if color is supported?)
    *   - add option for input files to polymer.json
    *   - modules to load that can register new rules
-   *   - --watch
    */
 
   async run(options: Options, config: ProjectConfig) {

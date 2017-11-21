@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "gulp lint",
     "build": "gulp build",
-    "test": "gulp lint test",
+    "test": "gulp test lint",
     "test:smoke": "gulp test",
     "test:integration": "gulp test:integration",
     "format": "find src gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
@@ -50,6 +50,7 @@
     "bower-json": "^0.8.1",
     "bower-logger": "^0.2.2",
     "chalk": "^1.1.3",
+    "chokidar": "^1.7.0",
     "command-line-args": "^3.0.0",
     "command-line-commands": "^1.0.3",
     "command-line-usage": "^3.0.1",
@@ -83,6 +84,7 @@
   },
   "devDependencies": {
     "@polymer/tools-common": "^1.0.1",
+    "@types/chokidar": "^1.7.3",
     "@types/fs-extra": "0.0.37",
     "@types/mocha": "^2.2.44",
     "@types/node": "=6.0.65",
