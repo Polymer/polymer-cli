@@ -219,10 +219,10 @@ export function getOptimizeStreams(options?: OptimizeOptions):
   }
   if (options.js && options.js.minify) {
     if (options.js.ignore) {
-      let ignores = options.js.ignore;
+      const ignores = options.js.ignore;
       
       function condition(file: File): boolean {
-        for (let ignore of ignores) {
+        for (const ignore of ignores) {
           if(matcher.isMatch(file.path, ignore) || file.basename === ignore)  {
             logger.warn('skipping minify for ' + file.path );
             return false;
