@@ -8,12 +8,13 @@ declare module 'bower' {
     directory?: string;
     interactive?: boolean;
     save?: boolean;
+    offline?: boolean;
   }
 
   export const commands: {
     install(packages: string[], installOptions: {}, config: Config):
         NodeJS.EventEmitter;
-    list(): NodeJS.EventEmitter;
+    list(readOptions: {}, config: Config): NodeJS.EventEmitter;
   };
 
   export const config: Config;

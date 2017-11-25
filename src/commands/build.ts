@@ -105,6 +105,11 @@ export class BuildCommand implements Command {
           '`<link rel="import">` tags into fragments and shell for all ' +
           'dependencies.'
     },
+    {
+      name: 'base-path',
+      type: String,
+      description: 'Updates the <base> tag if found in the entrypoint document.'
+    },
   ];
 
   private dashToCamelCase(text: string): string {
@@ -126,7 +131,8 @@ export class BuildCommand implements Command {
           (<any>buildOptions)[prefix] = (<any>buildOptions)[prefix] || {};
           (<any>buildOptions)[prefix][option] = options[buildOption];
         } else {
-          (<any>buildOptions)[this.dashToCamelCase(buildOption)] = options[buildOption];
+          (<any>buildOptions)[this.dashToCamelCase(buildOption)] =
+              options[buildOption];
         }
       }
     }

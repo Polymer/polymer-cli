@@ -21,7 +21,7 @@ import {Transform} from 'stream';
 
 
 const babelPresetES2015 = require('babel-preset-es2015');
-const babiliPreset = require('babel-preset-babili');
+const minifyPreset = require('babel-preset-minify');
 const babelPresetES2015NoModules =
     babelPresetES2015.buildPreset({}, {modules: false});
 const externalHelpersPlugin = require('babel-plugin-external-helpers');
@@ -130,10 +130,7 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({
-      presets:
-          [babiliPreset(null, {'unsafe': {'simplifyComparisons': false}})]
-    });
+    super({presets: [minifyPreset(null, {simplifyComparisons: false})]});
   }
 }
 

@@ -17,18 +17,19 @@
 // unused code. Any imports that are only used as types will be removed from the
 // output JS and so not result in a require() statement.
 
-import * as chalkTypeOnly from 'chalk';
 import {ArgDescriptor} from 'command-line-args';
 import {UsageGroup} from 'command-line-usage';
-import * as lintLibTypeOnly from 'polymer-linter';
 import {ProjectConfig} from 'polymer-project-config';
-import * as lintImplementationTypeOnly from '../lint/lint';
 
 import {Command} from './command';
 
 export interface Options {
   rules?: string[];
   input?: string[];
+  fix?: boolean;
+  edits?: string[];
+  prompt: boolean;
+  watch?: boolean;
 }
 
 export class LintCommand implements Command {
@@ -54,6 +55,40 @@ export class LintCommand implements Command {
       multiple: true,
       description: 'The lint rules/rule collections to apply. ' +
           'See `polymer help lint` for a list of rules.',
+    },
+    {
+      name: 'fix',
+      type: Boolean,
+      description: `Automatically fix as many issues as possible by ` +
+          `updating your source on disk.`
+    },
+    {
+      name: 'edits',
+      type: String,
+      alias: 'e',
+      multiple: true,
+      description: `The lint edits to apply. Used with --fix. ` +
+          `Edits are less-safe fixes. When running in an interactive prompt ` +
+          `we will ask whether to apply an edit, but you can automatically ` +
+          `apply all edits of a type using this flag, like ` +
+          `--edit=content-with-select`
+    },
+    {
+      name: 'prompt',
+      type:
+          (value: string) => {
+            return value.toLowerCase().trim() !== 'false';
+          },
+      defaultValue: !!process.stdin.isTTY,
+      description: `Whether to allow interactive prompts. Use --prompt=false when` +
+          ` running as part of an automated script without a human at stdin.`
+    },
+    {
+      name: 'watch',
+      type: Boolean,
+      alias: 'w',
+      defaultValue: false,
+      description: `Reruns the linter whenever files change on disk.`
     }
   ];
 
@@ -63,28 +98,26 @@ export class LintCommand implements Command {
    *   - whether to use color (also: can we autodetect if color is supported?)
    *   - add option for input files to polymer.json
    *   - modules to load that can register new rules
-   *   - --watch
-   *   - --fix
    */
 
   async run(options: Options, config: ProjectConfig) {
     this._loadPlugins(config);
 
     // Defer dependency loading until this specific command is run.
-    const lintImplementation: typeof lintImplementationTypeOnly =
-        require('../lint/lint');
+    const lintImplementation = await import('../lint/lint');
+
     return lintImplementation.lint(options, config);
   }
 
-  extraUsageGroups(config: ProjectConfig): UsageGroup[] {
-    const lintLib: typeof lintLibTypeOnly = require('polymer-linter');
-    const chalk: typeof chalkTypeOnly = require('chalk');
+  async extraUsageGroups(config: ProjectConfig): Promise<UsageGroup[]> {
+    const lintLib = await import('polymer-linter');
+    const chalk = await import('chalk');
     this._loadPlugins(config);
     const collectionsDocs = [];
     for (const collection of lintLib.registry.allRuleCollections) {
-      collectionsDocs.push(`  ${
-                                chalk.bold(collection.code)
-                              }: ${this._indent(collection.description)}`);
+      collectionsDocs.push(
+          `  ${chalk.bold(collection.code)}: ` +
+          `${this._indent(collection.description)}`);
     }
     const rulesDocs = [];
     for (const rule of lintLib.registry.allRules) {

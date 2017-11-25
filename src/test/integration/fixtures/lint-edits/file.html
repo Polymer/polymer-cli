@@ -1,0 +1,19 @@
+<dom-module id="foo-elem">
+  <template>
+    <content select=".foo"></content>
+    <content></content>
+  </template>
+  <script>
+    customElements.define('foo-elem', class extends HTMLElement { });
+  </script>
+</dom-module>
+
+<dom-module id="bar-elem">
+  <template>
+    <content select=".bar"></content>
+    <content></content>
+  </template>
+  <script>
+    customElements.define('bar-elem', class extends HTMLElement { });
+  </script>
+</dom-module>

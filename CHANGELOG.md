@@ -1,7 +1,25 @@
 # Changelog
 
 ## Unreleased
+- Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
+  - Also supports warnings which can be addressed with less-safe changes via
+    an interactive prompt and the `--edits` flag. See `polymer lint --help` for
+    more info.
+- Added `--watch` (shorthand `-w`) option to `polymer lint`. When passed, we will watch the filesystem for changes and rerun the linter immediately afterwards.
+  - Also works with `--fix` to automatically fix and report warnings as you work!
+- `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
 <!-- Add new, unreleased items here. -->
+
+## v1.5.7 [10-11-2017]
+- Updated css-slam, bower and other dependencies.
+
+## v1.5.6 [10-02-2017]
+- Updated Polymer 2.0 element test file template to use ES6.
+- Update JS minification package babili to the new package-name babel-minify.
+- Updated to latest WCT and Polyserve versions to support npm and `<script type=module>` in on-the-fly compilation and tests.
+
+## v1.5.5 [09-21-2017]
+- Upgraded web-component-tester to v6.2.0 and polyserve 0.22.1 for better ES module support.
 
 ## v1.5.4 [08-31-2017]
 - Upgraded web-component-tester to v6.1.5 to address IE11 issues.
