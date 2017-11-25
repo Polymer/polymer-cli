@@ -12,18 +12,18 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import { transform as babelTransform, TransformOptions as BabelTransformOptions } from 'babel-core';
+import {transform as babelTransform, TransformOptions as BabelTransformOptions} from 'babel-core';
 import * as cssSlam from 'css-slam';
 import * as gulpif from 'gulp-if';
-import { minify as htmlMinify, Options as HTMLMinifierOptions } from 'html-minifier';
+import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
-import { Transform } from 'stream';
+import {Transform} from 'stream';
 
 
 const babelPresetES2015 = require('babel-preset-es2015');
 const minifyPreset = require('babel-preset-minify');
 const babelPresetES2015NoModules =
-  babelPresetES2015.buildPreset({}, { modules: false });
+    babelPresetES2015.buildPreset({}, {modules: false});
 const externalHelpersPlugin = require('babel-plugin-external-helpers');
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
@@ -34,15 +34,16 @@ import matcher = require('matcher');
 
 const logger = logging.getLogger('cli.build.optimize-streams');
 
-export type FileCB = (error ? : any, file ? : File) => void;
+export type FileCB = (error?: any, file?: File) => void;
 export type CSSOptimizeOptions = {
-  stripWhitespace ? : boolean;
+  stripWhitespace?: boolean;
 };
 export interface OptimizeOptions {
-  html ? : { minify ? : boolean };
-  css ? : { minify ? : boolean };
-  js ? : { minify ? : boolean, compile ? : boolean, ignore ? : string[] };
-};
+  html?: {minify?: boolean};
+  css?: {minify?: boolean};
+  js?: {minify?: boolean, compile?: boolean, ignore?: string[]};
+}
+;
 
 /**
  * GenericOptimizeTransform is a generic optimization stream. It can be extended
@@ -57,10 +58,10 @@ export class GenericOptimizeTransform extends Transform {
   optimizerOptions: any;
 
   constructor(
-    optimizerName: string,
-    optimizer: (content: string, optimizerOptions: any) => string,
-    optimizerOptions: any) {
-    super({ objectMode: true });
+      optimizerName: string,
+      optimizer: (content: string, optimizerOptions: any) => string,
+      optimizerOptions: any) {
+    super({objectMode: true});
     this.optimizer = optimizer;
     this.optimizerName = optimizerName;
     this.optimizerOptions = optimizerOptions || {};
@@ -72,16 +73,16 @@ export class GenericOptimizeTransform extends Transform {
     // an important ES6 shim to make custom elements possible. Remove/refactor
     // when we have a better plan for excluding some files from optimization.
     if (!file.path || file.path.indexOf('webcomponentsjs/') >= 0 ||
-      file.path.indexOf('webcomponentsjs\\') >= 0) {
+        file.path.indexOf('webcomponentsjs\\') >= 0) {
       callback(null, file);
       return;
     }
 
     if (this.optimizerOptions.presets && this.optimizerOptions.presets[0].ignore === true) {
-      logger.warn('skip minify for ...' + file.path);
-      callback(null, file);
-      return;
-    }
+          logger.warn('skip minify for ...' + file.path );
+          callback(null, file);
+          return;
+      }
 
     if (file.contents) {
       try {
@@ -90,7 +91,8 @@ export class GenericOptimizeTransform extends Transform {
         file.contents = new Buffer(contents);
       } catch (error) {
         logger.warn(
-          `${this.optimizerName}: Unable to optimize ${file.path}`, { err: error.message || error });
+            `${this.optimizerName}: Unable to optimize ${file.path}`,
+            {err: error.message || error});
       }
     }
     callback(null, file);
@@ -135,7 +137,7 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({ presets: [minifyPreset(null, { simplifyComparisons: false })] });
+    super({presets: [minifyPreset(null, {simplifyComparisons: false})]});
   }
 }
 
@@ -190,8 +192,8 @@ export class HTMLOptimizeTransform extends GenericOptimizeTransform {
  * Returns an array of optimization streams to use in your build, based on the
  * OptimizeOptions given.
  */
-export function getOptimizeStreams(options ? : OptimizeOptions):
-NodeJS.ReadWriteStream[] {
+export function getOptimizeStreams(options?: OptimizeOptions):
+    NodeJS.ReadWriteStream[] {
   options = options || {};
   const streams = [];
 
@@ -203,16 +205,17 @@ NodeJS.ReadWriteStream[] {
   // minify code (minify should always be the last transform)
   if (options.html && options.html.minify) {
     streams.push(gulpif(
-      /\.html$/,
-      new HTMLOptimizeTransform({ collapseWhitespace: true, removeComments: true })));
+        /\.html$/,
+        new HTMLOptimizeTransform(
+            {collapseWhitespace: true, removeComments: true})));
   }
   if (options.css && options.css.minify) {
     streams.push(
-      gulpif(/\.css$/, new CSSMinifyTransform({ stripWhitespace: true })));
+        gulpif(/\.css$/, new CSSMinifyTransform({stripWhitespace: true})));
     // TODO(fks): Remove this InlineCSSOptimizeTransform stream once CSS
     // is properly being isolated by splitHtml() & rejoinHtml().
     streams.push(gulpif(
-      /\.html$/, new InlineCSSOptimizeTransform({ stripWhitespace: true })));
+        /\.html$/, new InlineCSSOptimizeTransform({stripWhitespace: true})));
   }
   if (options.js && options.js.minify) {
     if (options.js.ignore) {
@@ -220,8 +223,8 @@ NodeJS.ReadWriteStream[] {
 
       function condition(file: File): boolean {
         for (const ignore of ignores) {
-          if (matcher.isMatch(file.path, ignore) || file.basename === ignore) {
-            logger.warn('skipping minify for ' + file.path);
+          if(matcher.isMatch(file.path, ignore) || file.basename === ignore) {
+            logger.warn('skipping minify for ' + file.path );
             return false;
           }
         }
@@ -229,7 +232,8 @@ NodeJS.ReadWriteStream[] {
         return /\.js$/.test(file.path);
       }
       streams.push(gulpif(condition, new JSDefaultMinifyTransform()));
-    } else {
+    }
+    else {
       streams.push(gulpif(/\.js$/, new JSDefaultMinifyTransform()));
     }
   }
