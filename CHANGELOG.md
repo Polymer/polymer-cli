@@ -8,6 +8,7 @@
 - Added `--watch` (shorthand `-w`) option to `polymer lint`. When passed, we will watch the filesystem for changes and rerun the linter immediately afterwards.
   - Also works with `--fix` to automatically fix and report warnings as you work!
 - `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
+- Corrected the redirect URL to the demo page of generated elements.
 <!-- Add new, unreleased items here. -->
 
 ## v1.5.7 [10-11-2017]
