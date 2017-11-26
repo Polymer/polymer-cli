@@ -223,7 +223,7 @@ export function getOptimizeStreams(options?: OptimizeOptions):
 
       function condition(file: File): boolean {
         for (const ignore of ignores) {
-          if(matcher.isMatch(file.path, ignore) || file.basename === ignore) {
+          if (matcher.isMatch(file.path, ignore) || file.basename === ignore) {
             logger.warn('skipping minify for ' + file.path );
             return false;
           }
