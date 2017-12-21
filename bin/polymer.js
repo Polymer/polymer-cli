@@ -22,11 +22,14 @@ process.title = 'polymer';
 
 // NOTE 04-21-2017: Confirmed "semver" supports Node versions as low as 0.10
 var semver = require('semver');
+var version = require('../package.json').engines.node;
 
 // Exit early if the user's node version is too low.
-if (!semver.satisfies(process.version, '>=6')) {
+if (!semver.satisfies(process.version, version)) {
+  // Strip version range characters leaving the raw semantic version for output
+  var rawVersion = version.replace(/[^\d\.]*/, '');
   console.log(
-      'Polymer CLI requires at least Node v6. ' +
+      'Polymer CLI requires at least Node v' + rawVersion + '. ' +
       'You have ' + process.version + '.\n' +
       'See https://www.polymer-project.org/2.0/docs/tools/node-support ' +
       'for details.');
