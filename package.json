@@ -15,7 +15,8 @@
     "test": "gulp test lint",
     "test:smoke": "gulp test",
     "test:integration": "gulp test:integration",
-    "format": "find src gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
+    "format": "find src gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i",
+    "test:watch": "tsc-then -- mocha -c --ui tdd lib/test/integration/*_test.js lib/test/unit/*_test.js lib/test/unit/*/*_test.js"
   },
   "repository": {
     "type": "git",
@@ -106,6 +107,7 @@
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.7",
     "tmp": "0.0.31",
+    "tsc-then": "^1.0.1",
     "tslint": "^4.0.2",
     "typescript": "^2.2.0",
     "vinyl-fs-fake": "^1.1.0",
