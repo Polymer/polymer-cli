@@ -9,6 +9,8 @@
  * rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+import * as logging from 'plylog';
+
 export async function invertPromise(p: Promise<any>): Promise<any> {
   let result;
   try {
@@ -17,4 +19,31 @@ export async function invertPromise(p: Promise<any>): Promise<any> {
     return e;
   }
   throw new Error(`Expected an error, got ${result}`);
+}
+
+/**
+ * Call to begin capturing all output. Call the returned function to
+ * stop capturing output and get the contents as a string.
+ *
+ * Captures output from console methods. Does not capture plylog, which doesn't
+ * seem to be very easy to intercept.
+ */
+export function interceptOutput(): () => string {
+  const originalLog = console.log;
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  const buffer: string[] = [];
+  const capture = (...args: any[]) => {
+    buffer.push(args.join(' '));
+  };
+  console.log = capture;
+  console.error = capture;
+  console.warn = capture;
+  const cleanupAndRestoreBuffer = () => {
+    console.log = originalLog;
+    console.error = originalError;
+    console.warn = originalWarn;
+    return buffer.join('\n');
+  };
+  return cleanupAndRestoreBuffer;
 }

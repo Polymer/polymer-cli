@@ -15,6 +15,7 @@ import * as logging from 'plylog';
 import * as sinon from 'sinon';
 
 import {PolymerCli} from '../../../polymer-cli';
+import {interceptOutput} from '../../util';
 
 const packageJSON = require('../../../../package.json');
 
@@ -24,9 +25,12 @@ suite('The general CLI', () => {
     const cli = new PolymerCli([]);
     const helpCommand = cli.commands.get('help');
     const helpCommandSpy = sinon.spy(helpCommand!, 'run');
+    const getOutput = interceptOutput();
     await cli.run();
+    const output = getOutput();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: null});
+    assert.include(output, 'Usage: `polymer <command>');
   });
 
   let testName =
@@ -35,47 +39,63 @@ suite('The general CLI', () => {
     const cli = new PolymerCli(['--help']);
     const helpCommand = cli.commands.get('help');
     const helpCommandSpy = sinon.spy(helpCommand!, 'run');
+    const getOutput = interceptOutput();
     await cli.run();
+    const output = getOutput();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: null});
+    assert.include(output, 'Usage: `polymer <command>');
   });
 
   test('displays general help when unknown command is called', async () => {
     const cli = new PolymerCli(['THIS_IS_SOME_UNKNOWN_COMMAND']);
     const helpCommand = cli.commands.get('help');
     const helpCommandSpy = sinon.spy(helpCommand!, 'run');
+    const getOutput = interceptOutput();
     await cli.run();
+    const output = getOutput();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(
         helpCommandSpy.firstCall.args[0],
         {command: 'THIS_IS_SOME_UNKNOWN_COMMAND'});
+    assert.include(output, 'Usage: `polymer <command>');
   });
 
   test('displays command help when called with the --help flag', async () => {
     const cli = new PolymerCli(['build', '--help']);
     const helpCommand = cli.commands.get('help');
     const helpCommandSpy = sinon.spy(helpCommand!, 'run');
+    const getOutput = interceptOutput();
     await cli.run();
+    const output = getOutput();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: 'build'});
+    assert.include(output, 'polymer build');
+    assert.include(output, 'Command Options');
+    assert.include(output, '--bundle');
   });
 
   test('displays command help when called with the -h flag', async () => {
     const cli = new PolymerCli(['init', '-h']);
     const helpCommand = cli.commands.get('help');
     const helpCommandSpy = sinon.spy(helpCommand!, 'run');
+    const getOutput = interceptOutput();
     await cli.run();
+    const output = getOutput();
     assert.isOk(helpCommandSpy.calledOnce);
     assert.deepEqual(helpCommandSpy.firstCall.args[0], {command: 'init'});
+    assert.include(output, 'polymer init');
+    assert.include(output, 'Command Options');
+    assert.include(output, '--name');
   });
 
   testName = 'displays version information when called with the --version flag';
   test(testName, async () => {
     const cli = new PolymerCli(['--version']);
-    const consoleLogSpy = sinon.spy(console, 'log');
+    const getOutput = interceptOutput();
     await cli.run();
-    assert.isOk(consoleLogSpy.calledWithExactly(packageJSON.version));
-    consoleLogSpy.restore();
+    const output = getOutput();
+    assert.match(output, /^\d+\.\d+\.\d+$/m);
   });
 
   testName = `sets the appropriate log levels when ` +
