@@ -26,15 +26,9 @@ suite('help', () => {
       'displays help for a specific command when called with that command';
   test(testName, async () => {
     const cli = new PolymerCli(['help', 'build']);
-    const helpCommand = cli.commands.get('help')!;
-    const helpCommandSpy = sinon.spy(helpCommand, 'run');
     const getOutput = interceptOutput();
     await cli.run();
     const output = getOutput();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(
-        helpCommandSpy.firstCall.args,
-        [{command: 'build'}, expectedDefaultConfig]);
     assert.include(output, 'polymer build');
     assert.include(output, 'Command Options');
     assert.include(output, '--bundle');
@@ -44,14 +38,9 @@ suite('help', () => {
       'displays general help when the help command is called with no arguments';
   test(testName, async () => {
     const cli = new PolymerCli(['help']);
-    const helpCommand = cli.commands.get('help')!;
-    const helpCommandSpy = sinon.spy(helpCommand, 'run');
     const getOutput = interceptOutput();
     await cli.run();
     const output = getOutput();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(
-        helpCommandSpy.firstCall.args, [{}, expectedDefaultConfig]);
     assert.include(output, 'Usage: `polymer <command>');
   });
 
