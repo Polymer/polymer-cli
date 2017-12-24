@@ -17,15 +17,13 @@ import * as sinon from 'sinon';
 import {PolymerCli} from '../../../polymer-cli';
 import {interceptOutput} from '../../util';
 
-const packageJSON = require('../../../../package.json');
-
 suite('The general CLI', () => {
 
   test('displays general help when no command is called', async () => {
     const cli = new PolymerCli([]);
-    const getOutput = interceptOutput();
-    await cli.run();
-    const output = getOutput();
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
     assert.include(output, 'Usage: `polymer <command>');
   });
 
@@ -33,25 +31,25 @@ suite('The general CLI', () => {
       'displays general help when no command is called with the --help flag';
   test(testName, async () => {
     const cli = new PolymerCli(['--help']);
-    const getOutput = interceptOutput();
-    await cli.run();
-    const output = getOutput();
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
     assert.include(output, 'Usage: `polymer <command>');
   });
 
   test('displays general help when unknown command is called', async () => {
     const cli = new PolymerCli(['THIS_IS_SOME_UNKNOWN_COMMAND']);
-    const getOutput = interceptOutput();
-    await cli.run();
-    const output = getOutput();
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
     assert.include(output, 'Usage: `polymer <command>');
   });
 
   test('displays command help when called with the --help flag', async () => {
     const cli = new PolymerCli(['build', '--help']);
-    const getOutput = interceptOutput();
-    await cli.run();
-    const output = getOutput();
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
     assert.include(output, 'polymer build');
     assert.include(output, 'Command Options');
     assert.include(output, '--bundle');
@@ -59,9 +57,9 @@ suite('The general CLI', () => {
 
   test('displays command help when called with the -h flag', async () => {
     const cli = new PolymerCli(['init', '-h']);
-    const getOutput = interceptOutput();
-    await cli.run();
-    const output = getOutput();
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
     assert.include(output, 'polymer init');
     assert.include(output, 'Command Options');
     assert.include(output, '--name');
@@ -70,9 +68,9 @@ suite('The general CLI', () => {
   testName = 'displays version information when called with the --version flag';
   test(testName, async () => {
     const cli = new PolymerCli(['--version']);
-    const getOutput = interceptOutput();
-    await cli.run();
-    const output = getOutput();
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
     assert.match(output, /^\d+\.\d+\.\d+$/m);
   });
 
