@@ -10,6 +10,7 @@
   - Also works with `--fix` to automatically fix and report warnings as you work!
 - `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
 - Derives node version check from the package.json.
+- If there are multiple builds, add the `basePath` option to each build for the `prpl-server` support.
 
 ## v1.5.7 [10-11-2017]
 - Updated css-slam, bower and other dependencies.
