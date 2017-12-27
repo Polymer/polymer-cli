@@ -177,8 +177,15 @@ export class BuildCommand implements Command {
     // If no build flags were passed but 1+ polymer.json build configuration(s)
     // exist, generate a build for each configuration found.
     if (config.builds) {
-      const promises = config.builds.map(
-          (buildOptions) => build(buildOptions, polymerProject));
+      const promises = config.builds.map((buildOptions) => {
+        // If there are multiple builds, add the `basePath` option to each build
+        // for the `prpl-server` support
+        if (config.builds.length > 1) {
+          buildOptions.basePath = true;
+        }
+
+        return build(buildOptions, polymerProject);
+      });
       promises.push(mzfs.writeFile(
           path.join(mainBuildDirectoryName, 'polymer.json'), config.toJSON()));
       await Promise.all(promises);
