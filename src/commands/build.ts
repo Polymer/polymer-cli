@@ -55,6 +55,15 @@ export class BuildCommand implements Command {
           'older browsers.'
     },
     {
+      name: 'js-ignore',
+      type: Array,
+      description: 'When js-minify is `true`. allow to specify an array of string ' +
+          'for files that should be ignored (not minified).' +
+          'Specify either the exact file name or a wildcard expression (as in https://www.npmjs.com/package/matcher) ' +
+          'that will be matched against the full path.' +
+          'Example: { "minify": true ,"ignore": "*.min.js","firebase-database.js"}'
+    },
+    {
       name: 'js-minify',
       type: Boolean,
       description: 'Minify inlined and external JavaScript.'
