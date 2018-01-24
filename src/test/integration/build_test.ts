@@ -58,7 +58,6 @@ suite('polymer build', function() {
         binPath,
         [
           'build',
-          '--add-push-manifest',
           '--add-service-worker',
           '--bundle',
           '--css-minify',

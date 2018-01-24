@@ -38,9 +38,9 @@ export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
 };
 export interface OptimizeOptions {
-  html?: {minify?: boolean};
-  css?: {minify?: boolean};
-  js?: {minify?: boolean, compile?: boolean};
+  html?: {minify?: boolean|{excludes?: string[]}};
+  css?: {minify?: boolean|{excludes?: string[]}};
+  js?: {minify?: boolean|{excludes?: string[]}, compile?: boolean|{excludes?: string[]}};
 }
 ;
 
