@@ -213,7 +213,7 @@ export function getOptimizeStreams(options?: OptimizeOptions):
         new InlineCSSOptimizeTransform({stripWhitespace: true})));
   }
   if (options.js && options.js.minify) {
-    streams.push(gulpif(matchesExtAndNotExcluded('.js', options.js.minify), 
+    streams.push(gulpif(matchesExtAndNotExcluded('.js', options.js.minify),
         new JSDefaultMinifyTransform()));
   }
 
@@ -221,10 +221,10 @@ export function getOptimizeStreams(options?: OptimizeOptions):
 };
 
 function matchesExtAndNotExcluded(
-    extension: string, 
+    extension: string,
     option: boolean|{excludes?: string[]}) {
   const excludes = typeof option === 'object' && option.excludes || [];
-  return (fs:vinyl) => {
+  return (fs: vinyl) => {
     return !!fs.path &&
         fs.relative.endsWith(extension) &&
         !excludes.some((pattern: string) => fs.relative.startsWith(pattern));
