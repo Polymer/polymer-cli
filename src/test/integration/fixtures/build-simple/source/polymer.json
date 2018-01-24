@@ -5,7 +5,13 @@
       "bundle": false,
       "js": {
         "compile": false,
-        "minify": false
+        "minify": {
+          "excludes": [
+            "index.html",
+            "foo.html",
+            "bar.js"
+          ]
+        }
       },
       "css": {
         "minify": false
@@ -18,8 +24,16 @@
       "name": "bundled-compiled",
       "bundle": true,
       "js": {
-        "compile": true,
-        "minify": true
+        "compile": {
+          "excludes": [
+            "foo.js"
+          ]
+        },
+        "minify": {
+          "excludes": [
+            "bar.js"
+          ]
+        }
       },
       "css": {
         "minify": true
