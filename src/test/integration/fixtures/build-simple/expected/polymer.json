@@ -16,8 +16,7 @@
         "compile": false,
         "minify": {
           "excludes": [
-            "index.html",
-            "foo.html",
+            "*.html*",
             "bar.js"
           ]
         }

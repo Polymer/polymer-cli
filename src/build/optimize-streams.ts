@@ -19,6 +19,7 @@ import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifie
 import * as logging from 'plylog';
 import {Transform} from 'stream';
 import * as vinyl from 'vinyl';
+import matcher = require('matcher');
 
 
 const babelPresetES2015 = require('babel-preset-es2015');
@@ -227,6 +228,6 @@ function matchesExtAndNotExcluded(
   return (fs: vinyl) => {
     return !!fs.path &&
         fs.relative.endsWith(extension) &&
-        !excludes.some((pattern: string) => fs.relative.startsWith(pattern));
+        !excludes.some((pattern: string) => matcher.isMatch(fs.relative, pattern));
   };
 }
