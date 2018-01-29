@@ -18,6 +18,8 @@ import * as gulpif from 'gulp-if';
 import {minify as htmlMinify, Options as HTMLMinifierOptions} from 'html-minifier';
 import * as logging from 'plylog';
 import {Transform} from 'stream';
+import * as vinyl from 'vinyl';
+import matcher = require('matcher');
 
 
 const babelPresetES2015 = require('babel-preset-es2015');
@@ -38,9 +40,9 @@ export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
 };
 export interface OptimizeOptions {
-  html?: {minify?: boolean};
-  css?: {minify?: boolean};
-  js?: {minify?: boolean, compile?: boolean};
+  html?: {minify?: boolean|{exclude?: string[]}};
+  css?: {minify?: boolean|{exclude?: string[]}};
+  js?: {minify?: boolean|{exclude?: string[]}, compile?: boolean|{exclude?: string[]}};
 }
 ;
 
@@ -192,27 +194,40 @@ export function getOptimizeStreams(options?: OptimizeOptions):
 
   // compile ES6 JavaScript using babel
   if (options.js && options.js.compile) {
-    streams.push(gulpif(/\.js$/, new JSDefaultCompileTransform()));
+    streams.push(gulpif(matchesExtAndNotExcluded('.js', options.js.compile),
+        new JSDefaultCompileTransform()));
   }
 
   // minify code (minify should always be the last transform)
   if (options.html && options.html.minify) {
-    streams.push(gulpif(
-        /\.html$/,
+    streams.push(gulpif(matchesExtAndNotExcluded('.html', options.html.minify),
         new HTMLOptimizeTransform(
             {collapseWhitespace: true, removeComments: true})));
   }
   if (options.css && options.css.minify) {
     streams.push(
-        gulpif(/\.css$/, new CSSMinifyTransform({stripWhitespace: true})));
+        gulpif(matchesExtAndNotExcluded('.css', options.css.minify),
+            new CSSMinifyTransform({stripWhitespace: true})));
     // TODO(fks): Remove this InlineCSSOptimizeTransform stream once CSS
     // is properly being isolated by splitHtml() & rejoinHtml().
-    streams.push(gulpif(
-        /\.html$/, new InlineCSSOptimizeTransform({stripWhitespace: true})));
+    streams.push(gulpif(matchesExtAndNotExcluded('.html', options.css.minify),
+        new InlineCSSOptimizeTransform({stripWhitespace: true})));
   }
   if (options.js && options.js.minify) {
-    streams.push(gulpif(/\.js$/, new JSDefaultMinifyTransform()));
+    streams.push(gulpif(matchesExtAndNotExcluded('.js', options.js.minify),
+        new JSDefaultMinifyTransform()));
   }
 
   return streams;
 };
+
+function matchesExtAndNotExcluded(
+    extension: string,
+    option: boolean|{exclude?: string[]}) {
+  const exclude = typeof option === 'object' && option.exclude || [];
+  return (fs: vinyl) => {
+    return !!fs.path &&
+        fs.relative.endsWith(extension) &&
+        !exclude.some((pattern: string) => matcher.isMatch(fs.relative, pattern));
+  };
+}
