@@ -6,7 +6,7 @@
       "js": {
         "compile": false,
         "minify": {
-          "excludes": [
+          "exclude": [
             "*.html*",
             "bar.js"
           ]
@@ -24,12 +24,12 @@
       "bundle": true,
       "js": {
         "compile": {
-          "excludes": [
+          "exclude": [
             "foo.js"
           ]
         },
         "minify": {
-          "excludes": [
+          "exclude": [
             "bar.js"
           ]
         }

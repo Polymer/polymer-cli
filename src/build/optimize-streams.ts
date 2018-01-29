@@ -40,9 +40,9 @@ export type CSSOptimizeOptions = {
   stripWhitespace?: boolean;
 };
 export interface OptimizeOptions {
-  html?: {minify?: boolean|{excludes?: string[]}};
-  css?: {minify?: boolean|{excludes?: string[]}};
-  js?: {minify?: boolean|{excludes?: string[]}, compile?: boolean|{excludes?: string[]}};
+  html?: {minify?: boolean|{exclude?: string[]}};
+  css?: {minify?: boolean|{exclude?: string[]}};
+  js?: {minify?: boolean|{exclude?: string[]}, compile?: boolean|{exclude?: string[]}};
 }
 ;
 
@@ -223,11 +223,11 @@ export function getOptimizeStreams(options?: OptimizeOptions):
 
 function matchesExtAndNotExcluded(
     extension: string,
-    option: boolean|{excludes?: string[]}) {
-  const excludes = typeof option === 'object' && option.excludes || [];
+    option: boolean|{exclude?: string[]}) {
+  const exclude = typeof option === 'object' && option.exclude || [];
   return (fs: vinyl) => {
     return !!fs.path &&
         fs.relative.endsWith(extension) &&
-        !excludes.some((pattern: string) => matcher.isMatch(fs.relative, pattern));
+        !exclude.some((pattern: string) => matcher.isMatch(fs.relative, pattern));
   };
 }
