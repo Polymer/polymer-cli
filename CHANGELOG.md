@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+<!-- ## Unreleased -->
+<!-- Add new, unreleased items here. -->
+
+## v1.6.0 [2-2-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
 - Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
   - Also supports warnings which can be addressed with less-safe changes via
@@ -11,7 +14,6 @@
 - `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
 - Derives node version check from the package.json.
 - The polymer.json project config can now specify paths to exclude when minifying files and compiling JavaScript.  See https://github.com/Polymer/polymer-project-config/issues/50 for more.
-<!-- Add new, unreleased items here. -->
 
 ## v1.5.7 [10-11-2017]
 - Updated css-slam, bower and other dependencies.
