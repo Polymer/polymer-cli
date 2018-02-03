@@ -42,45 +42,15 @@ interface GeneratorInfo {
 }
 
 const localGenerators: {[name: string]: GeneratorInfo} = {
-<<<<<<< HEAD
-=======
-  'polymer-1-element': {
-    id: 'polymer-init-polymer-1-element:app',
-    description: 'A simple Polymer 1.0 element template',
-    generator: createElementGenerator('polymer-1.x'),
-  },
->>>>>>> fixing #722, adding support for proxy for github api call
   'polymer-2-element': {
     id: 'polymer-init-polymer-2-element:app',
     description: 'A simple Polymer 2.0 element template',
     generator: createElementGenerator('polymer-2.x'),
-<<<<<<< HEAD
-=======
-  },
-  'polymer-1-application': {
-    id: 'polymer-init-polymer-1-application:app',
-    description: 'A simple Polymer 1.0 application template',
-    generator: createApplicationGenerator('polymer-1.x'),
->>>>>>> fixing #722, adding support for proxy for github api call
   },
   'polymer-2-application': {
     id: 'polymer-init-polymer-2-application:app',
     description: 'A simple Polymer 2.0 application',
     generator: createApplicationGenerator('polymer-2.x'),
-<<<<<<< HEAD
-=======
-  },
-  'polymer-1-starter-kit': {
-    id: 'polymer-init-polymer-1-starter-kit:app',
-    description:
-        'A Polymer 1.x starter application template, with navigation and "PRPL pattern" loading',
-    generator: createGithubGenerator({
-      owner: 'PolymerElements',
-      repo: 'polymer-starter-kit',
-      semverRange: '^2.0.0',
-      proxy: proxy,
-    }),
->>>>>>> fixing #722, adding support for proxy for github api call
   },
   'polymer-2-starter-kit': {
     id: 'polymer-init-polymer-2-starter-kit:app',
