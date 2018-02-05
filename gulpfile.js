@@ -37,7 +37,8 @@ gulp.task('compile', () => {
   let tsReporter = typescript.reporter.defaultReporter();
   return mergeStream(
              tsProject.src().pipe(tsProject(tsReporter)),
-             gulp.src(['src/**/*', '!src/**/*.ts']))
+             gulp.src(['src/**/*', '!src/**/*.ts']),
+             gulp.src(['src/**/.gitignore']))
       .pipe(gulp.dest('lib'));
 });
 
