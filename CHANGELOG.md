@@ -1,6 +1,7 @@
 # Changelog
 
 <!-- ## Unreleased -->
+- Automatically generate a `.gitignore` file when execute init command and select `element` or `application`.
 <!-- Add new, unreleased items here. -->
 
 ## v1.6.0 [2-2-2018]
