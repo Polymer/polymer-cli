@@ -30,17 +30,18 @@ gulp.task('clean', (done) => {
 });
 
 gulp.task('build', (done) => {
-  runSeq('clean', ['compile'], done);
+  runSeq('clean', ['compile', 'copy'], done);
 });
 
 gulp.task('compile', () => {
   let tsReporter = typescript.reporter.defaultReporter();
   return mergeStream(
              tsProject.src().pipe(tsProject(tsReporter)),
-             gulp.src(['src/**/*', '!src/**/*.ts']),
-             gulp.src(['src/**/.gitignore']))
+             gulp.src(['src/**/*', '!src/**/*.ts']))
       .pipe(gulp.dest('lib'));
 });
+
+gulp.task('copy', () => gulp.src(['src/**/.gitignore']).pipe(gulp.dest('lib')));
 
 gulp.task(
     'test',
