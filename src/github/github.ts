@@ -51,7 +51,7 @@ export class GithubResponseError extends Error {
 export interface GithubOpts {
   owner: string;
   repo: string;
-  proxy: string;
+  proxy?: string;
   githubToken?: string;
   githubApi?: GitHubApi;
   requestApi?: request
@@ -65,7 +65,7 @@ export class Github {
       .RequestAPI<request.Request, request.CoreOptions, request.RequiredUriUrl>;
   private _owner: string;
   private _repo: string;
-  private _proxy: string;
+  private _proxy?: string;
 
   static tokenFromFile(filename: string): string|null {
     try {

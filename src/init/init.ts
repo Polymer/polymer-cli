@@ -16,6 +16,7 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as ini from 'ini';
 import * as logging from 'plylog';
+import * as path from 'path';
 
 import findup = require('findup-sync');
 import * as YeomanEnvironment from 'yeoman-environment';
@@ -204,14 +205,14 @@ function createSelectPrompt(env: YeomanEnvironment) {
  * or globally (user home)
  */
 function getProxyConfig() {
-  let pathToConfig = './.git/config';
-  let meta = readConfigFile(pathToConfig);
+  const pathToLocalConfig = path.join(__dirname, './.git/config');
+  let meta = readConfigFile(pathToLocalConfig);
   // Checking if local
   if (meta && meta.https && meta.https.proxy) {
     return meta.https.proxy;
   }
-  pathToConfig = (process.env.HOME || process.env.USERPROFILE) + '/.gitconfig';
-  meta = readConfigFile(pathToConfig);
+  const pathToGlobalConfig = (process.env.HOME || process.env.USERPROFILE) + '/.gitconfig';
+  meta = readConfigFile(pathToGlobalConfig);
   if (meta && meta.https) {
     return meta.https.proxy;
   }
