@@ -93,7 +93,7 @@ suite('integration tests', function() {
     // other repo changing
     test.skip('test the Polymer 1.x "starter-kit" template', async () => {
       const PSKGenerator = createGithubGenerator({
-        owner: 'PolymerElements',
+        owner: 'Polymer',
         repo: 'polymer-starter-kit',
         semverRange: '^2.0.0',
         githubToken,
@@ -112,7 +112,7 @@ suite('integration tests', function() {
     // other repo changing
     test.skip('test the Polymer 2.x "starter-kit" template', async () => {
       const PSKGenerator = createGithubGenerator({
-        owner: 'PolymerElements',
+        owner: 'Polymer',
         repo: 'polymer-starter-kit',
         semverRange: '^3.0.0',
         githubToken,

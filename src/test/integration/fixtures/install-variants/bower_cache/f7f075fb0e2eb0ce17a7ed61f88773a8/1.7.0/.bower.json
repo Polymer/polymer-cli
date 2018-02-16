@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "iron-component-page": "polymerElements/iron-component-page#^1.1.6"
+    "iron-component-page": "PolymerElements/iron-component-page#^1.1.6"
   },
   "private": true,
   "homepage": "https://github.com/Polymer/polymer",
