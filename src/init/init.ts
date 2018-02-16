@@ -54,7 +54,7 @@ const localGenerators: {[name: string]: GeneratorInfo} = {
     description:
         'A Polymer 2.x starter application template, with navigation and "PRPL pattern" loading',
     generator: createGithubGenerator({
-      owner: 'PolymerElements',
+      owner: 'Polymer',
       repo: 'polymer-starter-kit',
       semverRange: '^3.0.0',
     }),
