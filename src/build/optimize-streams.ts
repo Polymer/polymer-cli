@@ -20,7 +20,7 @@ import * as logging from 'plylog';
 import {Transform} from 'stream';
 import * as vinyl from 'vinyl';
 import matcher = require('matcher');
-
+import * as uuid from 'uuid/v1';
 
 const babelPresetES2015 = require('babel-preset-es2015');
 const minifyPreset = require('babel-preset-minify');
@@ -104,9 +104,23 @@ export class GenericOptimizeTransform extends Transform {
 class JSBabelTransform extends GenericOptimizeTransform {
   constructor(config: BabelTransformOptions) {
     const transform = (contents: string, options: BabelTransformOptions) => {
-      return babelTransform(contents, options).code!;
+      const es5Code = babelTransform(contents, options).code!;
+      return this._replaceTemplateObjectNames(es5Code);
     };
     super('.js', transform, config);
+  }
+
+  /**
+   * Transforms given Babel-transpiled code so that the variable names
+   * of template literals are each unique
+   * @param code Transpiled code to evaluate
+   * @returns The code with all `_templateObject` variable
+   * names modified to be unique.
+   */
+  _replaceTemplateObjectNames(code: string): string {
+    // e.g., _templateObject -> _templateObject_200817b1154811e887be8b38cea68555
+    const uniqueId = uuid().replace(/-/g, '');
+    return code.replace(/_templateObject(?!_[A-Fa-f0-9]+)/g, `_templateObject_${uniqueId}`);
   }
 }
 
