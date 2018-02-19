@@ -2,6 +2,7 @@
 
 <!-- ## Unreleased -->
 <!-- Add new, unreleased items here. -->
+- Fixed [issue #950](https://github.com/Polymer/polymer-cli/issues/950) where tagged template literals (such as `Polymer.html`) were incorrectly transpiled
 
 ## v1.6.0 [2-2-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
