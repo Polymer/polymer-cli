@@ -120,7 +120,7 @@ class JSBabelTransform extends GenericOptimizeTransform {
   _replaceTemplateObjectNames(code: string): string {
     // e.g., _templateObject -> _templateObject_200817b1154811e887be8b38cea68555
     const uniqueId = uuid().replace(/-/g, '');
-    return code.replace(/_templateObject(?!_[A-Fa-f0-9]+)/g, `_templateObject_${uniqueId}`);
+    return code.replace(/(_templateObject\d*\b)/g, `$1_${uniqueId}`);
   }
 }
 
