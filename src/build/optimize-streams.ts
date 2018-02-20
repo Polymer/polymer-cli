@@ -111,16 +111,40 @@ class JSBabelTransform extends GenericOptimizeTransform {
   }
 
   /**
-   * Transforms given Babel-transpiled code so that the variable names
-   * of template literals are each unique
-   * @param code Transpiled code to evaluate
-   * @returns The code with all `_templateObject` variable
-   * names modified to be unique.
+   * Modifies variables names of tagged template literals (`"_templateObject"`)
+   * from a given string so that they're all unique.
+   *
+   * This is needed to workaround a potential naming collision when
+   * individually transpiled scripts are bundled. See #950.
    */
   _replaceTemplateObjectNames(code: string): string {
-    // e.g., _templateObject -> _templateObject_200817b1154811e887be8b38cea68555
+
+    // Breakdown of regular expression to match "_templateObject" variables
+    //
+    // Pattern                | Meaning
+    // -------------------------------------------------------------------
+    // (                      | Group1
+    // _templateObject        | Match "_templateObject"
+    // \d*                    | Match 0 or more digits
+    // \b                     | Match word boundary
+    // )                      | End Group1
+    const searchValueRegex = /(_templateObject\d*\b)/g;
+
+    // The replacement pattern appends an underscore and UUID to the matches:
+    //
+    // Pattern                | Meaning
+    // -------------------------------------------------------------------
+    // $1                     | Insert matching Group1 (from above)
+    // _                      | Insert "_"
+    // ${uniqueId}            | Insert previously generated UUID
     const uniqueId = uuid().replace(/-/g, '');
-    return code.replace(/(_templateObject\d*\b)/g, `$1_${uniqueId}`);
+    const replaceValue = `$1_${uniqueId}`;
+
+    // Example output:
+    // _templateObject  -> _templateObject_200817b1154811e887be8b38cea68555
+    // _templateObject2 -> _templateObject2_5e44de8015d111e89b203116b5c54903
+
+    return code.replace(searchValueRegex, replaceValue);
   }
 }
 
