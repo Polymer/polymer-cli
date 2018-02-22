@@ -110,6 +110,11 @@ export class BuildCommand implements Command {
       type: String,
       description: 'Updates the <base> tag if found in the entrypoint document.'
     },
+    {
+      name: 'npm',
+      type: Boolean,
+      description: 'Look for dependencies in "node_modules/".'
+    },
   ];
 
   private dashToCamelCase(text: string): string {
