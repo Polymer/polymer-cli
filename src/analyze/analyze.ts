@@ -31,9 +31,9 @@ export async function analyze(
 
   if (inputs == null || inputs.length === 0) {
     const _package = await analyzer.analyzePackage();
-    return generateAnalysis(_package, '', isNotTest);
+    return generateAnalysis(_package, analyzer.urlResolver, isNotTest);
   } else {
     const analysis = await analyzer.analyze(await globby(inputs));
-    return generateAnalysis(analysis, '', isNotTest);
+    return generateAnalysis(analysis, analyzer.urlResolver, isNotTest);
   }
 }

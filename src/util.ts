@@ -14,14 +14,14 @@
 
 import * as inquirer from 'inquirer';
 import {execSync} from 'mz/child_process';
+const URL = require('url-js');
 
 /**
  * Check if the current shell environment is MinGW. MinGW can't handle some
  * yeoman features, so we can use this check to downgrade gracefully.
  */
 function checkIsMinGW(): boolean {
-  const isWindows = /^win/.test(process.platform);
-  if (!isWindows) {
+  if (!isWindows()) {
     return false;
   }
 
@@ -67,4 +67,17 @@ export function indent(str: string, additionalIndentation = '  ') {
 
 export function dashToCamelCase(text: string): string {
   return text.replace(/-([a-z])/g, (v) => v[1].toUpperCase());
+}
+
+export function resolvePath(srcPath: string) {
+  const documentURL = new URL(srcPath);
+  let documentPath = decodeURIComponent(documentURL.pathname);
+  if (isWindows() && documentPath.startsWith('/')) {
+    documentPath = documentPath.substring(1);
+  }
+  return documentPath;
+}
+
+function isWindows() {
+  return /^win/.test(process.platform);
 }
