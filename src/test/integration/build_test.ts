@@ -141,6 +141,22 @@ suite('polymer build', function() {
         path.join(tmpDir.name, 'build/default'),
         path.join(fixturePath, 'polymer-2-project', 'expected/default'));
   });
+
+  test('handles bundle tagged-template literals in ES5', async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-with-tagged-template-literals', 'source'), tmpDir.name);
+
+    await runCommand(binPath, ['build'], {
+      cwd: tmpDir.name,
+    });
+
+    const filename = path.join(tmpDir.name, 'build', 'es5-bundled', 'my-app.html');
+    const contents = fs.readFileSync(filename, 'utf-8');
+    // assert no build output contains _templateObject without a UUID suffix
+    assert.match(contents, /_templateObject\d*_[A-Fa-f0-9]+\s*=/g);
+    // assert _templateObject with UUID suffix exists in build output
+    assert.notMatch(contents, /_templateObject\d*\s*=/g);
+  });
 });
 
 function copyDir(fromDir: string, toDir: string) {
