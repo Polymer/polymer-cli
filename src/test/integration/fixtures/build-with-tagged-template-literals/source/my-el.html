@@ -2,12 +2,12 @@
 <link rel="import" href="./my-highlight-tag.html">
 
 <script>
-    class MyEl extends Polymer.Element {
-      static get template() {
-        return Polymer.html`
-          <div><b>my-el:</b> oh ${window.my.highlight`${"hi"}`}! :)</div>
-        `;
-      }
+  class MyEl extends Polymer.Element {
+    static get template() {
+      return Polymer.html`
+        <div><b>my-el:</b> oh ${window.my.highlight`${"hi"}`}! :)</div>
+      `;
     }
-    window.customElements.define('my-el', MyEl);
+  }
+  window.customElements.define('my-el', MyEl);
 </script>
