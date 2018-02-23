@@ -27,6 +27,7 @@ import {InstallCommand} from './commands/install';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
+import {dashToCamelCase} from './util';
 
 import commandLineCommands = require('command-line-commands');
 import {ParsedCommand} from 'command-line-commands';
@@ -137,6 +138,17 @@ export class PolymerCli {
     });
   }
 
+  /**
+   * Converts command-line arguments to the `ProjectOptions` format.
+   */
+  private objectKeysToCamelCase(input: Object): Object {
+    const output = {};
+    for (const key of Object.keys(input)) {
+      (<any>output)[dashToCamelCase(key)] = (<any>input)[key];
+    }
+    return output;
+  }
+
   async run() {
     const helpCommand = this.commands.get('help')!;
     const commandNames = Array.from(this.commands.keys());
@@ -183,8 +195,11 @@ export class PolymerCli {
     const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
-    const mergedConfigOptions =
-        Object.assign({}, this.defaultConfigOptions, commandOptions);
+    const mergedConfigOptions = Object.assign(
+        {},
+        this.defaultConfigOptions,
+        this.objectKeysToCamelCase(commandOptions));
+    logger.debug(`final config options:`, mergedConfigOptions);
 
     const config = new ProjectConfig(mergedConfigOptions);
     logger.debug(`final project configuration generated:`, config);

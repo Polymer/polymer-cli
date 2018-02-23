@@ -25,6 +25,8 @@ import {PolymerProject} from 'polymer-build';
 import {applyBuildPreset, ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
 import * as buildLibTypeOnly from '../build/build';
+import {dashToCamelCase} from '../util';
+
 import {Command, CommandOptions} from './command';
 
 const logger = logging.getLogger('cli.command.build');
@@ -113,13 +115,15 @@ export class BuildCommand implements Command {
     {
       name: 'npm',
       type: Boolean,
-      description: 'Look for dependencies in "node_modules/".'
+      description: 'Sets npm mode: component directory is "node_modules/" ' +
+          'and the package name is read from package.json.'
+    },
+    {
+      name: 'component-dir',
+      type: String,
+      description: 'Sets the component directory.'
     },
   ];
-
-  private dashToCamelCase(text: string): string {
-    return text.replace(/-([a-z])/g, (v) => v[1].toUpperCase());
-  }
 
   /**
    * Converts command-line build arguments to the `ProjectBuildOptions` format
@@ -136,7 +140,7 @@ export class BuildCommand implements Command {
           (<any>buildOptions)[prefix] = (<any>buildOptions)[prefix] || {};
           (<any>buildOptions)[prefix][option] = options[buildOption];
         } else {
-          (<any>buildOptions)[this.dashToCamelCase(buildOption)] =
+          (<any>buildOptions)[dashToCamelCase(buildOption)] =
               options[buildOption];
         }
       }
