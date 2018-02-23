@@ -69,7 +69,7 @@
     "polymer-analyzer": "^2.6.0",
     "polymer-build": "^2.1.0",
     "polymer-linter": "^2.2.0",
-    "polymer-project-config": "^3.8.1",
+    "polymer-project-config": "^3.9.0",
     "polyserve": "^0.23.0",
     "request": "^2.72.0",
     "rimraf": "^2.6.1",
