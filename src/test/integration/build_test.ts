@@ -152,9 +152,9 @@ suite('polymer build', function() {
 
     const filename = path.join(tmpDir.name, 'build', 'es5-bundled', 'my-app.html');
     const contents = fs.readFileSync(filename, 'utf-8');
-    // assert no build output contains _templateObject without a UUID suffix
+    // assert contents contain _templateObject with UUID suffix
     assert.match(contents, /_templateObject\d*_[A-Fa-f0-9]+\s*=/g);
-    // assert _templateObject with UUID suffix exists in build output
+    // assert contents don't contain unmodified "_templateObject" variable
     assert.notMatch(contents, /_templateObject\d*\s*=/g);
   });
 });
