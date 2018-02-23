@@ -143,19 +143,26 @@ export class TestCommand implements Command {
           'Tests components which have been installed with npm (instead of bower)',
       type: Boolean,
     },
+    {
+      name: 'component-dir',
+      description: 'Sets the component directory.',
+      type: String,
+    },
   ];
 
-  run(_options: CommandOptions, config: ProjectConfig): Promise<void> {
+  run(options: CommandOptions, config: ProjectConfig): Promise<void> {
     // Defer dependency loading until this specific command is run
     const wct = require('web-component-tester') as typeof wctTypeOnly;
 
     const wctArgs = process.argv.slice(3);
 
-    if (config.npm) {
+    if (options['npm'] !== undefined ? options['npm'] : config.npm) {
       wctArgs.push('--npm');
     }
 
-    if (config.componentDir) {
+    if (options['component-dir'] !== undefined) {
+      wctArgs.push('--component-dir', `'${options['component-dir']}'`);
+    } else if (config.componentDir) {
       wctArgs.push('--component-dir', `'${config.componentDir}'`);
     }
 
