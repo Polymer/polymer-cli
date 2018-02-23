@@ -145,10 +145,20 @@ export class TestCommand implements Command {
     },
   ];
 
-  run(_options: CommandOptions, _config: ProjectConfig): Promise<void> {
+  run(_options: CommandOptions, config: ProjectConfig): Promise<void> {
     // Defer dependency loading until this specific command is run
     const wct = require('web-component-tester') as typeof wctTypeOnly;
 
-    return wct.cli.run(process.env, process.argv.slice(3), process.stdout);
+    const wctArgs = process.argv.slice(3);
+
+    if (config.npm) {
+      wctArgs.push('--npm');
+    }
+
+    if (config.componentDir) {
+      wctArgs.push('--component-dir', `'${config.componentDir}'`);
+    }
+
+    return wct.cli.run(process.env, wctArgs, process.stdout);
   }
 }
