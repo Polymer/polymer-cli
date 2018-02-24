@@ -12329,11 +12329,6 @@
       "resolved": "https://registry.npmjs.org/urix/-/urix-0.1.0.tgz",
       "integrity": "sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI="
     },
-    "url-js": {
-      "version": "0.2.1",
-      "resolved": "https://registry.npmjs.org/url-js/-/url-js-0.2.1.tgz",
-      "integrity": "sha1-IUP/B2BMR5g92tI06KmV9ABQ7MA="
-    },
     "url-parse-lax": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/url-parse-lax/-/url-parse-lax-1.0.0.tgz",

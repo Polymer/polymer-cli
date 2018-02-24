@@ -16,7 +16,6 @@ import * as chalk from 'chalk';
 import * as chokidar from 'chokidar';
 import * as globby from 'globby';
 import * as fs from 'mz/fs';
-import * as path from 'path';
 import * as logging from 'plylog';
 import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
@@ -26,7 +25,7 @@ import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
-import {indent, prompt, resolvePath} from '../util';
+import {indent, prompt} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -53,8 +52,9 @@ export async function lint(options: Options, config: ProjectConfig) {
     minimumSeverity: Severity.WARNING
   });
 
+  const urlLoader = new FSUrlLoader(config.root);
   const analyzer = new Analyzer({
-    urlLoader: new FSUrlLoader(config.root),
+    urlLoader,
     urlResolver: new PackageUrlResolver({
       componentDir: config.componentDir,
     }),
@@ -62,9 +62,9 @@ export async function lint(options: Options, config: ProjectConfig) {
   const linter = new lintLib.Linter(rules, analyzer);
 
   if (options.watch) {
-    return watchLoop(analyzer, linter, options, config, filter);
+    return watchLoop(analyzer, linter, options, urlLoader, filter);
   } else {
-    return run(analyzer, linter, options, config, filter);
+    return run(analyzer, linter, options, urlLoader, filter);
   }
 }
 
@@ -87,7 +87,7 @@ async function run(
     analyzer: Analyzer,
     linter: lintLib.Linter,
     options: PrivateOptions,
-    config: ProjectConfig,
+    urlLoader: FSUrlLoader,
     filter: WarningFilter,
     editActionsToAlwaysApply = new Set(options.edits || []),
     watcher?: FilesystemChangeStream) {
@@ -105,7 +105,7 @@ async function run(
     const changedFiles = await fix(
         filtered,
         options,
-        config,
+        urlLoader,
         analyzer,
         analysis,
         editActionsToAlwaysApply);
@@ -129,7 +129,7 @@ async function watchLoop(
     analyzer: Analyzer,
     linter: lintLib.Linter,
     options: Options,
-    config: ProjectConfig,
+    urlLoader: FSUrlLoader,
     filter: WarningFilter) {
   let analysis;
   if (options.input) {
@@ -151,7 +151,7 @@ async function watchLoop(
         analyzer,
         linter,
         {...options, reportIfNoFix: true},
-        config,
+        urlLoader,
         filter,
         lintActionsToAlwaysApply,
         // We pass the watcher to run() so that it can inform the watcher
@@ -298,7 +298,7 @@ async function report(warnings: ReadonlyArray<Warning>) {
 async function fix(
     warnings: ReadonlyArray<Warning>,
     options: Options,
-    config: ProjectConfig,
+    urlLoader: FSUrlLoader,
     analyzer: Analyzer,
     analysis: Analysis,
     editActionsToAlwaysApply: Set<string>): Promise<Set<string>> {
@@ -323,9 +323,12 @@ async function fix(
       await applyEdits(edits, makeParseLoader(analyzer, analysis));
 
   for (const [newPath, newContents] of editedFiles) {
-    const documentPath = resolvePath(newPath);
-    await fs.writeFile(
-        path.join(config.root, documentPath), newContents, {encoding: 'utf8'});
+    const documentPath = urlLoader.getFilePath(newPath);
+    if (documentPath.successful) {
+      await fs.writeFile(documentPath.value, newContents, {encoding: 'utf8'});
+    } else if (documentPath.error) {
+      logger.error(documentPath.error);
+    }
   }
 
   const appliedChangeCountByFile = countEditsByFile(appliedEdits);
