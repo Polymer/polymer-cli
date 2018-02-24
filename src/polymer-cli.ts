@@ -68,6 +68,17 @@ function parseCLIArgs(commandOptions: any): {[name: string]: string} {
   return parsedOptions;
 }
 
+/**
+ * Shallowly copies an object, converting keys from dash-case to camelCase.
+ */
+function objectDashToCamelCase(input: Object): Object {
+  const output = {};
+  for (const key of Object.keys(input)) {
+    (<any>output)[dashToCamelCase(key)] = (<any>input)[key];
+  }
+  return output;
+}
+
 
 export class PolymerCli {
   commands: Map<string, Command> = new Map();
@@ -138,17 +149,6 @@ export class PolymerCli {
     });
   }
 
-  /**
-   * Converts command-line arguments to the `ProjectOptions` format.
-   */
-  private objectKeysToCamelCase(input: Object): Object {
-    const output = {};
-    for (const key of Object.keys(input)) {
-      (<any>output)[dashToCamelCase(key)] = (<any>input)[key];
-    }
-    return output;
-  }
-
   async run() {
     const helpCommand = this.commands.get('help')!;
     const commandNames = Array.from(this.commands.keys());
@@ -198,7 +198,7 @@ export class PolymerCli {
     const mergedConfigOptions = Object.assign(
         {},
         this.defaultConfigOptions,
-        this.objectKeysToCamelCase(commandOptions));
+        objectDashToCamelCase(commandOptions));
     logger.debug(`final config options:`, mergedConfigOptions);
 
     const config = new ProjectConfig(mergedConfigOptions);
