@@ -89,7 +89,18 @@ export class LintCommand implements Command {
       alias: 'w',
       defaultValue: false,
       description: `Reruns the linter whenever files change on disk.`
-    }
+    },
+    {
+      name: 'npm',
+      type: Boolean,
+      description: 'Sets npm mode: component directory is "node_modules/" ' +
+          'and the package name is read from package.json.'
+    },
+    {
+      name: 'component-dir',
+      type: String,
+      description: 'Sets the component directory.'
+    },
   ];
 
   /**
