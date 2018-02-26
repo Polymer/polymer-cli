@@ -89,7 +89,7 @@ export class LintCommand implements Command {
       alias: 'w',
       defaultValue: false,
       description: `Reruns the linter whenever files change on disk.`
-    },
+    }
   ];
 
   /**
