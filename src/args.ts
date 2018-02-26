@@ -68,6 +68,18 @@ export const globalArguments: ArgDescriptor[] = [
     group: 'global',
   },
   {
+    name: 'npm',
+    type: Boolean,
+    description: 'Sets npm mode: component directory is "node_modules" ' +
+        'and the package name is read from package.json',
+  },
+  {
+    name: 'component-dir',
+    type: String,
+    description: 'The component directory to use. Defaults to reading from ' +
+        'the Bower config (usually bower_components/).',
+  },
+  {
     name: 'verbose',
     description: 'turn on debugging output',
     type: Boolean,
