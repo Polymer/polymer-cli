@@ -8934,12 +8934,12 @@
       }
     },
     "polymer-build": {
-      "version": "2.1.1",
-      "resolved": "https://registry.npmjs.org/polymer-build/-/polymer-build-2.1.1.tgz",
-      "integrity": "sha512-SW6gxS0UPz864jECKMXPEdtq3549xzludPAQpxEqeDz6pSAeY/AFDWRG78Gw+z+mS2KES16Wwkc9IdMagBj3FQ==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/polymer-build/-/polymer-build-2.2.0.tgz",
+      "integrity": "sha512-WD0SYJ9fFSb9HxZXVOIFxfXflG5Y0lfqm9QGxiP09bhC+WuMRD1+5G20oMtxpkSJzC/okmDmuN6LwRbnv0+Vww==",
       "requires": {
         "@types/mz": "0.0.31",
-        "@types/node": "6.0.96",
+        "@types/node": "6.0.101",
         "@types/parse5": "2.2.34",
         "@types/vinyl": "2.0.2",
         "@types/vinyl-fs": "0.0.28",
@@ -8957,9 +8957,9 @@
       },
       "dependencies": {
         "@types/node": {
-          "version": "6.0.96",
-          "resolved": "https://registry.npmjs.org/@types/node/-/node-6.0.96.tgz",
-          "integrity": "sha512-fsOOY6tMQ3jCB2wD51XFDmmpgm4wVKkJECdcVRqapbJEa7awJDcr+SaH8toz+4r4KW8YQ3M7ybXMoSDo1QGewA=="
+          "version": "6.0.101",
+          "resolved": "https://registry.npmjs.org/@types/node/-/node-6.0.101.tgz",
+          "integrity": "sha512-IQ7V3D6+kK1DArTqTBrnl3M+YgJZLw8ta8w3Q9xjR79HaJzMAoTbZ8TNzUTztrkCKPTqIstE2exdbs1FzsYLUw=="
         },
         "plylog": {
           "version": "0.5.0",
@@ -9126,7 +9126,7 @@
         "opn": "3.0.3",
         "parse5": "2.2.3",
         "pem": "1.12.3",
-        "polymer-build": "2.1.1",
+        "polymer-build": "2.2.0",
         "requirejs": "2.3.5",
         "resolve": "1.5.0",
         "send": "0.14.2",
