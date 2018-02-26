@@ -392,7 +392,8 @@
     "@types/node": {
       "version": "6.0.65",
       "resolved": "https://registry.npmjs.org/@types/node/-/node-6.0.65.tgz",
-      "integrity": "sha1-wA+qf/z8mEK13Xv2UIclYlBNVnA="
+      "integrity": "sha1-wA+qf/z8mEK13Xv2UIclYlBNVnA=",
+      "dev": true
     },
     "@types/opn": {
       "version": "3.0.28",
@@ -5005,6 +5006,13 @@
             }
           }
         },
+        "string_decoder": {
+          "version": "1.0.1",
+          "bundled": true,
+          "requires": {
+            "safe-buffer": "5.0.1"
+          }
+        },
         "string-width": {
           "version": "1.0.2",
           "bundled": true,
@@ -5012,13 +5020,6 @@
             "code-point-at": "1.1.0",
             "is-fullwidth-code-point": "1.0.0",
             "strip-ansi": "3.0.1"
-          }
-        },
-        "string_decoder": {
-          "version": "1.0.1",
-          "bundled": true,
-          "requires": {
-            "safe-buffer": "5.0.1"
           }
         },
         "stringstream": {
@@ -8934,12 +8935,12 @@
       }
     },
     "polymer-build": {
-      "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/polymer-build/-/polymer-build-2.2.0.tgz",
-      "integrity": "sha512-WD0SYJ9fFSb9HxZXVOIFxfXflG5Y0lfqm9QGxiP09bhC+WuMRD1+5G20oMtxpkSJzC/okmDmuN6LwRbnv0+Vww==",
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/polymer-build/-/polymer-build-2.1.1.tgz",
+      "integrity": "sha512-SW6gxS0UPz864jECKMXPEdtq3549xzludPAQpxEqeDz6pSAeY/AFDWRG78Gw+z+mS2KES16Wwkc9IdMagBj3FQ==",
       "requires": {
         "@types/mz": "0.0.31",
-        "@types/node": "6.0.101",
+        "@types/node": "6.0.96",
         "@types/parse5": "2.2.34",
         "@types/vinyl": "2.0.2",
         "@types/vinyl-fs": "0.0.28",
@@ -8950,16 +8951,16 @@
         "plylog": "0.5.0",
         "polymer-analyzer": "2.7.0",
         "polymer-bundler": "3.1.1",
-        "polymer-project-config": "3.9.0",
+        "polymer-project-config": "3.8.1",
         "sw-precache": "5.2.1",
         "vinyl": "1.2.0",
         "vinyl-fs": "2.4.4"
       },
       "dependencies": {
         "@types/node": {
-          "version": "6.0.101",
-          "resolved": "https://registry.npmjs.org/@types/node/-/node-6.0.101.tgz",
-          "integrity": "sha512-IQ7V3D6+kK1DArTqTBrnl3M+YgJZLw8ta8w3Q9xjR79HaJzMAoTbZ8TNzUTztrkCKPTqIstE2exdbs1FzsYLUw=="
+          "version": "6.0.96",
+          "resolved": "https://registry.npmjs.org/@types/node/-/node-6.0.96.tgz",
+          "integrity": "sha512-fsOOY6tMQ3jCB2wD51XFDmmpgm4wVKkJECdcVRqapbJEa7awJDcr+SaH8toz+4r4KW8YQ3M7ybXMoSDo1QGewA=="
         },
         "plylog": {
           "version": "0.5.0",
@@ -9040,16 +9041,21 @@
       }
     },
     "polymer-project-config": {
-      "version": "3.9.0",
-      "resolved": "https://registry.npmjs.org/polymer-project-config/-/polymer-project-config-3.9.0.tgz",
-      "integrity": "sha512-WPOqlV2W/M4Ni40QIqYSv8PE7H4rjiPm1KEf02QPtjZOGlAC4Rv7e6UJ1Ke1O70WT5bydcsEn3LViFIqYpVOJw==",
+      "version": "3.8.1",
+      "resolved": "https://registry.npmjs.org/polymer-project-config/-/polymer-project-config-3.8.1.tgz",
+      "integrity": "sha512-MLvnM9gexFWg7nynY24eHZG6NLXocmk718sVds/sx2CAJ6iihhC0JMhhOIa6jnad9KQrHyGl/cs3mMRaaub5Fg==",
       "requires": {
-        "@types/node": "6.0.65",
+        "@types/node": "6.0.96",
         "jsonschema": "1.2.2",
         "minimatch-all": "1.1.0",
         "plylog": "0.5.0"
       },
       "dependencies": {
+        "@types/node": {
+          "version": "6.0.96",
+          "resolved": "https://registry.npmjs.org/@types/node/-/node-6.0.96.tgz",
+          "integrity": "sha512-fsOOY6tMQ3jCB2wD51XFDmmpgm4wVKkJECdcVRqapbJEa7awJDcr+SaH8toz+4r4KW8YQ3M7ybXMoSDo1QGewA=="
+        },
         "plylog": {
           "version": "0.5.0",
           "resolved": "https://registry.npmjs.org/plylog/-/plylog-0.5.0.tgz",
@@ -9126,7 +9132,7 @@
         "opn": "3.0.3",
         "parse5": "2.2.3",
         "pem": "1.12.3",
-        "polymer-build": "2.2.0",
+        "polymer-build": "2.1.1",
         "requirejs": "2.3.5",
         "resolve": "1.5.0",
         "send": "0.14.2",
@@ -10777,6 +10783,14 @@
       "resolved": "https://registry.npmjs.org/streamsearch/-/streamsearch-0.1.2.tgz",
       "integrity": "sha1-gIudDlb8Jz2Am6VzOOkpkZoanxo="
     },
+    "string_decoder": {
+      "version": "1.0.3",
+      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.0.3.tgz",
+      "integrity": "sha512-4AH6Z5fzNNBcH+6XDMfA/BTt87skxqJlO0lAh3Dker5zThcAxG6mKz+iGu308UKoPPQ8Dcqx/4JhujzltRa+hQ==",
+      "requires": {
+        "safe-buffer": "5.1.1"
+      }
+    },
     "string-template": {
       "version": "0.2.1",
       "resolved": "https://registry.npmjs.org/string-template/-/string-template-0.2.1.tgz",
@@ -10790,14 +10804,6 @@
         "code-point-at": "1.1.0",
         "is-fullwidth-code-point": "1.0.0",
         "strip-ansi": "3.0.1"
-      }
-    },
-    "string_decoder": {
-      "version": "1.0.3",
-      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.0.3.tgz",
-      "integrity": "sha512-4AH6Z5fzNNBcH+6XDMfA/BTt87skxqJlO0lAh3Dker5zThcAxG6mKz+iGu308UKoPPQ8Dcqx/4JhujzltRa+hQ==",
-      "requires": {
-        "safe-buffer": "5.1.1"
       }
     },
     "stringstream": {
