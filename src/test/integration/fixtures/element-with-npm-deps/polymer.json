@@ -1,4 +1,5 @@
 {
+  "entrypoint": "index.js",
   "lint": {
     "rules": ["polymer-2"]
   }

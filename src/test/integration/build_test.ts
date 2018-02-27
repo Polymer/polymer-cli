@@ -141,6 +141,20 @@ suite('polymer build', function() {
         path.join(tmpDir.name, 'build/default'),
         path.join(fixturePath, 'polymer-2-project', 'expected/default'));
   });
+
+  test('--npm finds dependencies in "node_modules/"', async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'element-with-npm-deps'), tmpDir.name);
+
+    await runCommand(binPath, ['build', '--npm'], {cwd: tmpDir.name});
+  });
+
+  test('--components-dir finds dependencies in the specified directory', async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'element-with-other-deps'), tmpDir.name);
+
+    await runCommand(binPath, ['build', '--component-dir=path/to/deps/'], {cwd: tmpDir.name});
+  });
 });
 
 function copyDir(fromDir: string, toDir: string) {
