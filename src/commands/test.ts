@@ -150,7 +150,7 @@ export class TestCommand implements Command {
     }
 
     if (config.componentDir) {
-      wctArgs.push('--component-dir', `'${config.componentDir}'`);
+      wctArgs.push(`--component-dir='${config.componentDir}'`);
     }
 
     return wct.cli.run(process.env, wctArgs, process.stdout);
