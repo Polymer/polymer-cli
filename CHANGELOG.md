@@ -3,6 +3,10 @@
 <!-- ## Unreleased -->
 <!-- Add new, unreleased items here. -->
 
+## Unreleased
+- Added `--npm` and `--component-dir` global flags, which are passed to the `build`, `lint`, `test`, and `serve` commands.
+- All dash-case command line arguments are now converted to camelCase before overwriting options from polymer.json.
+
 ## v1.6.0 [2-2-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
 - Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
