@@ -185,6 +185,16 @@ Fixed 4 warnings.
 `);
   });
 
+  test('--npm finds dependencies in "node_modules"', async () => {
+    const cwd = path.join(fixturePath, 'element-with-npm-deps');
+    await runCommand(binPath, ['lint', '--npm'], {cwd});
+  });
+
+  test('--component-dir finds dependencies in the specified directory', async () => {
+    const cwd = path.join(fixturePath, 'element-with-other-deps');
+    await runCommand(binPath, ['lint', '--component-dir=path/to/deps/'], {cwd});
+  });
+
   suite('--watch', function() {
 
     this.timeout(12 * 1000);
