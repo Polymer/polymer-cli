@@ -1,0 +1,10 @@
+{
+  "builds": [
+    {
+      "name": "just-compiled",
+      "js": {
+        "compile": true
+      }
+    }
+  ]
+}
