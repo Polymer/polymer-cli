@@ -86,7 +86,7 @@
   "devDependencies": {
     "@polymer/tools-common": "^1.0.1",
     "@types/chokidar": "^1.7.3",
-    "@types/fs-extra": "0.0.37",
+    "@types/fs-extra": "5.0.1",
     "@types/mocha": "^2.2.44",
     "@types/node": "=6.0.65",
     "@types/sinon": "^4.0.0",
@@ -96,7 +96,7 @@
     "chai": "^3.5.0",
     "clang-format": "=1.1.0",
     "depcheck": "^0.6.3",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "^5.0.0",
     "gulp": "^3.9.1",
     "gulp-spawn-mocha": "^3.1.0",
     "gulp-tslint": "^7.0.1",
