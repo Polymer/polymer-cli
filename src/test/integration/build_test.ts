@@ -149,12 +149,16 @@ suite('polymer build', function() {
     await runCommand(binPath, ['build', '--npm'], {cwd: tmpDir.name});
   });
 
-  test('--components-dir finds dependencies in the specified directory', async () => {
-    const tmpDir = tmp.dirSync();
-    copyDir(path.join(fixturePath, 'element-with-other-deps'), tmpDir.name);
+  test(
+      '--components-dir finds dependencies in the specified directory',
+      async () => {
+        const tmpDir = tmp.dirSync();
+        copyDir(path.join(fixturePath, 'element-with-other-deps'), tmpDir.name);
 
-    await runCommand(binPath, ['build', '--component-dir=path/to/deps/'], {cwd: tmpDir.name});
-  });
+        await runCommand(binPath, ['build', '--component-dir=path/to/deps/'], {
+          cwd: tmpDir.name
+        });
+      });
 });
 
 function copyDir(fromDir: string, toDir: string) {

@@ -196,8 +196,8 @@ export class PolymerCli {
     logger.debug(`command options parsed from args:`, commandOptions);
 
     const mergedConfigOptions = {
-        ...this.defaultConfigOptions,
-        ...objectDashToCamelCase(commandOptions),
+      ...this.defaultConfigOptions,
+      ...objectDashToCamelCase(commandOptions),
     };
     logger.debug(`final config options:`, mergedConfigOptions);
 
