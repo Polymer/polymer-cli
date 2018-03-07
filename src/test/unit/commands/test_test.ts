@@ -10,10 +10,10 @@
 
 import {assert} from 'chai';
 import * as sinon from 'sinon';
+import * as wctTypeOnly from 'web-component-tester';
 
 import {PolymerCli} from '../../../polymer-cli';
 
-import * as wctTypeOnly from 'web-component-tester';
 const wct = require('web-component-tester') as typeof wctTypeOnly;
 
 suite('test', () => {
@@ -27,30 +27,33 @@ suite('test', () => {
     sandbox.restore();
   });
 
-  test('--npm flag is passed to WCT and sets the --component-dir flag',
+  test(
+      '--npm flag is passed to WCT and sets the --component-dir flag',
       async () => {
-    const wctCliRunStub =
-        sandbox.stub(wct.cli, 'run').returns(Promise.resolve());
-    const cli = new PolymerCli(['test', '--npm']);
-    await cli.run();
+        const wctCliRunStub =
+            sandbox.stub(wct.cli, 'run').returns(Promise.resolve());
+        const cli = new PolymerCli(['test', '--npm']);
+        await cli.run();
 
-    const wctArgs = wctCliRunStub.args[0][1];
-    assert.includeMembers(wctCliRunStub.args[0][1], ['--npm']);
-    assert.includeMembers(wctArgs, [`--component-dir='node_modules/'`]);
-  });
+        const wctArgs = wctCliRunStub.args[0][1];
+        assert.includeMembers(wctCliRunStub.args[0][1], ['--npm']);
+        assert.includeMembers(wctArgs, [`--component-dir='node_modules/'`]);
+      });
 
-  test('--component-dir flag overrides the default setting caused by the ' +
-      '--npm flag', async () => {
-    const wctCliRunStub =
-        sandbox.stub(wct.cli, 'run').returns(Promise.resolve());
-    const cli = new PolymerCli(
-        ['test', '--npm', '--component-dir=path/to/deps/']);
-    await cli.run();
+  test(
+      '--component-dir flag overrides the default setting caused by the ' +
+          '--npm flag',
+      async () => {
+        const wctCliRunStub =
+            sandbox.stub(wct.cli, 'run').returns(Promise.resolve());
+        const cli =
+            new PolymerCli(['test', '--npm', '--component-dir=path/to/deps/']);
+        await cli.run();
 
-    const wctArgs = wctCliRunStub.args[0][1];
-    assert.includeMembers(wctArgs, ['--npm']);
-    assert.includeMembers(wctArgs, [`--component-dir='path/to/deps/'`]);
-  });
+        const wctArgs = wctCliRunStub.args[0][1];
+        assert.includeMembers(wctArgs, ['--npm']);
+        assert.includeMembers(wctArgs, [`--component-dir='path/to/deps/'`]);
+      });
 
   test('--component-dir flag is passed to WCT', async () => {
     const wctCliRunStub =

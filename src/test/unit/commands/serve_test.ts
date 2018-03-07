@@ -9,11 +9,11 @@
  */
 
 import {assert} from 'chai';
+import * as polyserveTypeOnly from 'polyserve';
 import * as sinon from 'sinon';
 
 import {PolymerCli} from '../../../polymer-cli';
 
-import * as polyserveTypeOnly from 'polyserve';
 const polyserve = require('polyserve') as typeof polyserveTypeOnly;
 
 suite('serve', () => {
@@ -45,26 +45,29 @@ suite('serve', () => {
       sandbox.restore();
     });
 
-    test('--npm flag is passed to polyserve and sets the --component-dir flag',
+    test(
+        '--npm flag is passed to polyserve and sets the --component-dir flag',
         async () => {
-      const cli = new PolymerCli(['serve', '--npm']);
-      await cli.run();
+          const cli = new PolymerCli(['serve', '--npm']);
+          await cli.run();
 
-      const serverOptions = startServersStub.args[0][0];
-      assert.propertyVal(serverOptions, 'npm', true);
-      assert.propertyVal(serverOptions, 'componentDir', 'node_modules/');
-    });
+          const serverOptions = startServersStub.args[0][0];
+          assert.propertyVal(serverOptions, 'npm', true);
+          assert.propertyVal(serverOptions, 'componentDir', 'node_modules/');
+        });
 
-    test('--component-dir flag overrides the default setting caused by the ' +
-        '--npm flag', async () => {
-      const cli = new PolymerCli(
-          ['serve', '--npm', '--component-dir=path/to/deps/']);
-      await cli.run();
+    test(
+        '--component-dir flag overrides the default setting caused by the ' +
+            '--npm flag',
+        async () => {
+          const cli = new PolymerCli(
+              ['serve', '--npm', '--component-dir=path/to/deps/']);
+          await cli.run();
 
-      const serverOptions = startServersStub.args[0][0];
-      assert.propertyVal(serverOptions, 'npm', true);
-      assert.propertyVal(serverOptions, 'componentDir', 'path/to/deps/');
-    });
+          const serverOptions = startServersStub.args[0][0];
+          assert.propertyVal(serverOptions, 'npm', true);
+          assert.propertyVal(serverOptions, 'componentDir', 'path/to/deps/');
+        });
 
     test('--component-dir flag is passed to polyserve', async () => {
       const cli = new PolymerCli(['serve', '--component-dir=path/to/deps/']);
