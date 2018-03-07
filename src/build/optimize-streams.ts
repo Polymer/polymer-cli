@@ -21,12 +21,17 @@ import {Transform} from 'stream';
 import * as vinyl from 'vinyl';
 import matcher = require('matcher');
 
-
 const babelPresetES2015 = require('babel-preset-es2015');
 const minifyPreset = require('babel-preset-minify');
 const babelPresetES2015NoModules =
     babelPresetES2015.buildPreset({}, {modules: false});
 const externalHelpersPlugin = require('babel-plugin-external-helpers');
+const babelObjectRestSpreadPlugin =
+    require('babel-plugin-transform-object-rest-spread');
+const babelPluginSyntaxDynamicImport =
+    require('babel-plugin-syntax-dynamic-import');
+const babelPluginSyntaxObjectRestSpread =
+    require('babel-plugin-syntax-object-rest-spread');
 
 // TODO(fks) 09-22-2016: Latest npm type declaration resolves to a non-module
 // entity. Upgrade to proper JS import once compatible .d.ts file is released,
@@ -118,11 +123,11 @@ export class GenericOptimizeTransform extends Transform {
  * a babel's default "ES6 -> ES5" preset.
  */
 class JSBabelTransform extends GenericOptimizeTransform {
-  constructor(config: BabelTransformOptions) {
+  constructor(optimizerName: string, config: BabelTransformOptions) {
     const transform = (contents: string, options: BabelTransformOptions) => {
       return babelTransform(contents, options).code!;
     };
-    super('.js', transform, config);
+    super(optimizerName, transform, config);
   }
 }
 
@@ -132,9 +137,13 @@ class JSBabelTransform extends GenericOptimizeTransform {
  */
 export class JSDefaultCompileTransform extends JSBabelTransform {
   constructor() {
-    super({
+    super('babel-compile', {
       presets: [babelPresetES2015NoModules],
-      plugins: [externalHelpersPlugin],
+      plugins: [
+        externalHelpersPlugin,
+        babelObjectRestSpreadPlugin,
+        babelPluginSyntaxDynamicImport,
+      ]
     });
   }
 }
@@ -148,7 +157,13 @@ export class JSDefaultCompileTransform extends JSBabelTransform {
  */
 export class JSDefaultMinifyTransform extends JSBabelTransform {
   constructor() {
-    super({presets: [minifyPreset(null, {simplifyComparisons: false})]});
+    super('babel-minifiy', {
+      presets: [minifyPreset(null, {simplifyComparisons: false})],
+      plugins: [
+        babelPluginSyntaxObjectRestSpread,
+        babelPluginSyntaxDynamicImport,
+      ]
+    });
   }
 }
 
