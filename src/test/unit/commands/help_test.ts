@@ -10,40 +10,31 @@
  */
 
 import {assert} from 'chai';
-import * as path from 'path';
-import {ProjectConfig} from 'polymer-project-config';
-import * as sinon from 'sinon';
 
 import {PolymerCli} from '../../../polymer-cli';
+import {interceptOutput} from '../../util';
 
 suite('help', () => {
-  const expectedDefaultConfig = new ProjectConfig({
-    extraDependencies: [path.resolve('bower_components/webcomponentsjs/*.js')],
-  });
-
   let testName =
       'displays help for a specific command when called with that command';
   test(testName, async () => {
     const cli = new PolymerCli(['help', 'build']);
-    const helpCommand = cli.commands.get('help')!;
-    const helpCommandSpy = sinon.spy(helpCommand, 'run');
-    await cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(
-        helpCommandSpy.firstCall.args,
-        [{command: 'build'}, expectedDefaultConfig]);
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
+    assert.include(output, 'polymer build');
+    assert.include(output, 'Command Options');
+    assert.include(output, '--bundle');
   });
 
   testName =
       'displays general help when the help command is called with no arguments';
   test(testName, async () => {
     const cli = new PolymerCli(['help']);
-    const helpCommand = cli.commands.get('help')!;
-    const helpCommandSpy = sinon.spy(helpCommand, 'run');
-    await cli.run();
-    assert.isOk(helpCommandSpy.calledOnce);
-    assert.deepEqual(
-        helpCommandSpy.firstCall.args, [{}, expectedDefaultConfig]);
+    const output = await interceptOutput(async () => {
+      await cli.run();
+    });
+    assert.include(output, 'Usage: `polymer <command>');
   });
 
 });
