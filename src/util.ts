@@ -64,3 +64,7 @@ export function indent(str: string, additionalIndentation = '  ') {
       .map((s) => s ? additionalIndentation + s : '')
       .join('\n');
 }
+
+export function dashToCamelCase(text: string): string {
+  return text.replace(/-([a-z])/g, (v) => v[1].toUpperCase());
+}
