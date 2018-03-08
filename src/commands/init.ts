@@ -30,6 +30,7 @@ const logger = logging.getLogger('cli.command.init');
 export class InitCommand implements Command {
   name = 'init';
   aliases = [];
+  npmScript = 'polymer:init';
 
   description = 'Initializes a Polymer project';
 

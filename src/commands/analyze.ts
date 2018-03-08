@@ -24,6 +24,7 @@ import {Command, CommandOptions} from './command';
 export class AnalyzeCommand implements Command {
   name = 'analyze';
   aliases = [];
+  npmScript = 'polymer:analyze';
 
   description = 'Writes analysis metadata in JSON format to standard out';
 

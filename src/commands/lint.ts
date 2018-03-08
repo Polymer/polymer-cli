@@ -35,6 +35,7 @@ export interface Options {
 export class LintCommand implements Command {
   name = 'lint';
   aliases = [];
+  npmScript = 'polymer:lint';
 
   description = 'Identifies potential errors in your code.';
 

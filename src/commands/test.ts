@@ -25,6 +25,7 @@ import {Command, CommandOptions} from './command';
 export class TestCommand implements Command {
   name = 'test';
   aliases = [];
+  npmScript = 'polymer:test';
 
   description = 'Runs web-component-tester';
 

@@ -33,6 +33,7 @@ const logger = logging.getLogger('cli.command.serve');
 export class ServeCommand implements Command {
   name = 'serve';
   aliases = [];
+  npmScript = 'polymer:serve';
 
   description = 'Runs the polyserve development server';
 

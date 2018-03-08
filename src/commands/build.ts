@@ -34,6 +34,7 @@ const logger = logging.getLogger('cli.command.build');
 export class BuildCommand implements Command {
   name = 'build';
   aliases = [];
+  npmScript = 'polymer:build';
 
   description = 'Builds an application-style project';
 

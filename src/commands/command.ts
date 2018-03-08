@@ -25,6 +25,7 @@ export interface Command {
   aliases: string[];
   description: string;
   args: ArgDescriptor[];
+  npmScript?: string;
   run(options: CommandOptions,
       config: ProjectConfig): Promise<CommandResult|void>;
 

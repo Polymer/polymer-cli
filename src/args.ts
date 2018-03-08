@@ -92,6 +92,13 @@ export const globalArguments: ArgDescriptor[] = [
         'the Bower config (usually bower_components/).',
   },
   {
+    name: 'ignore-custom-command',
+    description: 'Ignores configuration for custom command and uses the ' +
+        'default command',
+    type: Boolean,
+    group: 'global',
+  },
+  {
     name: 'verbose',
     description: 'turn on debugging output',
     type: Boolean,

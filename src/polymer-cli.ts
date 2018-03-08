@@ -13,7 +13,8 @@
  */
 
 import * as commandLineArgs from 'command-line-args';
-import {sep as pathSeperator} from 'path';
+import {sep as pathSeperator, join} from 'path';
+import {readFile} from 'mz/fs';
 import * as logging from 'plylog';
 import {ProjectConfig, ProjectOptions} from 'polymer-project-config';
 
@@ -27,7 +28,7 @@ import {InstallCommand} from './commands/install';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
-import {dashToCamelCase} from './util';
+import {checkIsWindows, exec, dashToCamelCase} from './util';
 
 import commandLineCommands = require('command-line-commands');
 import {ParsedCommand} from 'command-line-commands';
@@ -213,7 +214,22 @@ export class PolymerCli {
       return helpCommand.run({command: commandName}, config);
     }
 
+    let packageJson: any = {};
+    try {
+      const resolvedPath: string = join(process.cwd(), 'package.json');
+      packageJson = JSON.parse(await readFile(resolvedPath, 'utf8'));
+    } catch (ex) {}
+
     logger.debug('Running command...');
+
+    // Use npm script instead of default if present and the ignore flag wasn't
+    // passed.
+    if (!commandOptions['ignore-custom-command'] && command.npmScript &&
+        packageJson.scripts && packageJson.scripts[command.npmScript]) {
+      return exec(
+        `npm${checkIsWindows() ? '.cmd' : ''}`, ['run', command.npmScript]);
+    }
+
     return command.run(commandOptions, config);
   }
 }

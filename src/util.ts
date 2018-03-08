@@ -13,17 +13,28 @@
  */
 
 import * as inquirer from 'inquirer';
+import * as logging from 'plylog';
 import {execSync} from 'mz/child_process';
 import {Analyzer, FsUrlLoader, PackageUrlResolver} from 'polymer-analyzer';
 import {ProjectConfig} from 'polymer-project-config';
+import {execFile, ExecOptions} from 'child_process';
+import {CommandResult} from './commands/command';
+
+const logger = logging.getLogger('cli.main');
+
+/**
+ * Check if the platform is Windows for platform specific fixes
+ */
+export function checkIsWindows(): boolean {
+  return /^win/.test(process.platform);
+}
 
 /**
  * Check if the current shell environment is MinGW. MinGW can't handle some
  * yeoman features, so we can use this check to downgrade gracefully.
  */
 function checkIsMinGW(): boolean {
-  const isWindows = /^win/.test(process.platform);
-  if (!isWindows) {
+  if (!checkIsWindows()) {
     return false;
   }
 
@@ -34,6 +45,32 @@ function checkIsMinGW(): boolean {
     return !!/^mingw/i.test(uname);
   } catch (error) {
     return false;
+  }
+}
+
+/**
+ * A helper function for working with Node's core execFile() method.
+ */
+export async function exec(command: string, args: string[] = [], cwd: string = process.cwd(), options?: ExecOptions) {
+  const commandOptions = {shell: true, ...options, cwd: cwd} as ExecOptions;
+  try {
+    await new Promise((resolve, reject) => {
+      const cmd = execFile(command, args, commandOptions);
+      cmd.stdout.pipe(process.stdout);
+      cmd.stderr.pipe(process.stderr);
+
+      cmd.on('exit', function (code) {
+        logger.debug('child process exited with code ' + code.toString().trim());
+        code !== 0 ? reject(code) : resolve(code);
+      });
+    });
+
+    return new CommandResult(0);
+  } catch (err) {
+    // If an error happens, attach the working directory to the error object
+    err.cwd = cwd;
+    logger.debug(err);
+    throw new CommandResult(1);
   }
 }
 
@@ -56,8 +93,7 @@ export async function prompt(
     choices: question.choices,
   };
 
-  // TODO(justinfagnani): the typings for inquirer appear wrong
-  const answers = await inquirer.prompt([rawQuestion] as any);
+  const answers = await inquirer.prompt([rawQuestion]);
   return answers.foo;
 }
 
