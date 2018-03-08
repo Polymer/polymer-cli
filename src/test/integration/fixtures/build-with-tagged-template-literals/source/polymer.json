@@ -1,0 +1,20 @@
+{
+  "entrypoint": "index.html",
+  "shell": "my-app.html",
+  "fragments": [],
+  "sources": [
+    "index.html",
+    "my-app.html"
+  ],
+  "builds": [
+    {
+      "name": "es5-bundled",
+      "js": {
+        "compile": true
+      },
+      "bundle": true,
+      "addServiceWorker": false,
+      "preset": "es5-bundled"
+    }
+  ]
+}

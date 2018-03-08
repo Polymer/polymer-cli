@@ -5,6 +5,7 @@
 - All dash-case command line arguments are now converted to camelCase before overwriting options from polymer.json.
 * Compile/minify steps can now parse object-rest-spread and dynamic-import.
 <!-- Add new, unreleased items here. -->
+- Fixed [issue #950](https://github.com/Polymer/polymer-cli/issues/950) where tagged template literals (such as `Polymer.html`) were incorrectly transpiled
 
 ## v1.6.0 [02-02-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.

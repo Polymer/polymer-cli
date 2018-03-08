@@ -672,6 +672,14 @@
       "resolved": "https://registry.npmjs.org/@types/update-notifier/-/update-notifier-1.0.3.tgz",
       "integrity": "sha512-BLStNhP2DFF7funARwTcoD6tetRte8NK3Sc59mn7GNALCN975jOlKX3dGvsFxXr/HwQMxxCuRn9IWB3WQ7odHQ=="
     },
+    "@types/uuid": {
+      "version": "3.4.3",
+      "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-3.4.3.tgz",
+      "integrity": "sha512-5fRLCYhLtDb3hMWqQyH10qtF+Ud2JnNCXTCZ+9ktNdCcgslcuXkDTkFcJNk++MT29yDntDnlF1+jD+uVGumsbw==",
+      "requires": {
+        "@types/node": "6.0.65"
+      }
+    },
     "@types/vinyl": {
       "version": "2.0.2",
       "resolved": "https://registry.npmjs.org/@types/vinyl/-/vinyl-2.0.2.tgz",
