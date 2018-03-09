@@ -61,8 +61,8 @@ export function createElementGenerator(templateName: string):
 
             if (!nameValidation.isValid) {
               this.log(`\n${nameValidation.message}\nPlease try again.`);
-            } else if (nameValidation.isValid && nameValidation.message) {
-              this.log('');
+            } else if (nameValidation.message) {
+              this.log(''); // 'empty' log inserts a line break
               logger.warn(nameValidation.message);
             }
 
