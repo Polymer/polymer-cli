@@ -12,6 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import * as globby from 'globby';
 import * as inquirer from 'inquirer';
 import {execSync} from 'mz/child_process';
 
@@ -33,6 +34,15 @@ function checkIsMinGW(): boolean {
   } catch (error) {
     return false;
   }
+}
+
+export async function resolveGlobs(globs: string[]) {
+  let paths: string[] = [];
+  for (const glob of globs) {
+    // TODO(stramel): globby options typing is incorrect
+    paths = [...paths, ...await globby(glob, {gitignore: true} as any)];
+  }
+  return paths;
 }
 
 /**

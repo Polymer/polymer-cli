@@ -25,7 +25,7 @@ import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
-import {indent, prompt} from '../util';
+import {indent, prompt, resolveGlobs} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -92,7 +92,7 @@ async function run(
     watcher?: FilesystemChangeStream) {
   let warnings;
   if (options.input) {
-    warnings = await linter.lint(options.input);
+    warnings = await linter.lint(await resolveGlobs(options.input));
   } else {
     warnings = await linter.lintPackage();
   }
