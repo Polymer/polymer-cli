@@ -141,6 +141,43 @@ suite('polymer build', function() {
         path.join(tmpDir.name, 'build/default'),
         path.join(fixturePath, 'polymer-2-project', 'expected/default'));
   });
+
+  test('handles bundle tagged-template literals in ES5', async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-with-tagged-template-literals', 'source'), tmpDir.name);
+
+    await runCommand(binPath, ['build'], {
+      cwd: tmpDir.name,
+    });
+
+    const filename = path.join(tmpDir.name, 'build', 'es5-bundled', 'my-app.html');
+    const contents = fs.readFileSync(filename, 'utf-8');
+    // assert contents contain _templateObject with UUID suffix
+    assert.match(contents, /_templateObject\d*_[A-Fa-f0-9]+\s*=/g,
+                 'build output does not contain modified _templateObject names');
+    // assert contents don't contain unmodified "_templateObject" variable
+    assert.notMatch(contents, /_templateObject\d*\s*=/g,
+                 'build output contains unmodified _templateObject names');
+  });
+
+  test('--npm finds dependencies in "node_modules/"', async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'element-with-npm-deps'), tmpDir.name);
+
+    await runCommand(binPath, ['build', '--npm'], {cwd: tmpDir.name});
+  });
+
+  test(
+      '--components-dir finds dependencies in the specified directory',
+      async () => {
+        const tmpDir = tmp.dirSync();
+        copyDir(path.join(fixturePath, 'element-with-other-deps'), tmpDir.name);
+
+        await runCommand(binPath, ['build', '--component-dir=path/to/deps/'], {
+          cwd: tmpDir.name
+        });
+      });
+
 });
 
 function copyDir(fromDir: string, toDir: string) {
