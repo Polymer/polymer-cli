@@ -6428,6 +6428,11 @@
       "resolved": "https://registry.npmjs.org/is-posix-bracket/-/is-posix-bracket-0.1.1.tgz",
       "integrity": "sha1-MzTceXdDaOkvAW5vvAqI9c1ua8Q="
     },
+    "is-potential-custom-element-name": {
+      "version": "1.0.0",
+      "resolved": "https://registry.npmjs.org/is-potential-custom-element-name/-/is-potential-custom-element-name-1.0.0.tgz",
+      "integrity": "sha1-DFLlS8yjkbssSUsh6GJtczbG45c="
+    },
     "is-primitive": {
       "version": "2.0.0",
       "resolved": "https://registry.npmjs.org/is-primitive/-/is-primitive-2.0.0.tgz",
@@ -11818,6 +11823,16 @@
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/vali-date/-/vali-date-1.0.0.tgz",
       "integrity": "sha1-G5BKWWCfsyjvB4E4Qgk09rhnCaY="
+    },
+    "validate-element-name": {
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/validate-element-name/-/validate-element-name-2.1.1.tgz",
+      "integrity": "sha1-j/dffaafc+fFEFiDYhMFCLesZE4=",
+      "requires": {
+        "is-potential-custom-element-name": "1.0.0",
+        "log-symbols": "1.0.2",
+        "meow": "3.7.0"
+      }
     },
     "validate-npm-package-license": {
       "version": "3.0.1",

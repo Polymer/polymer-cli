@@ -81,6 +81,7 @@
     "tar-fs": "^1.12.0",
     "temp": "^0.8.3",
     "update-notifier": "^1.0.0",
+    "validate-element-name": "^2.1.1",
     "uuid": "^3.2.1",
     "vinyl": "^1.1.1",
     "vinyl-fs": "^2.4.3",
