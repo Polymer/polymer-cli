@@ -73,9 +73,13 @@ suite('polymer lint', function() {
 </style>
 `);
 
-    assert.include(output, 'Made 2 changes to toplevel-bad.html');
-    assert.include(output, 'Made 2 changes to subdir/nested-bad.html');
-    assert.include(output, 'Fixed 2 warnings.');
+    assert.deepEqual(output.trim(), `
+Made changes to:
+  toplevel-bad.html
+  subdir/nested-bad.html
+
+Fixed 2 warnings.
+`.trim());
   });
 
   test('applies fixes to a specific file when requested', async () => {
@@ -101,8 +105,12 @@ suite('polymer lint', function() {
 </style>
 `);
 
-    assert.include(output, 'Made 2 changes to toplevel-bad.html');
-    assert.include(output, 'Fixed 1 warning.');
+    assert.deepEqual(output.trim(), `
+Made changes to:
+  toplevel-bad.html
+
+Fixed 1 warning.
+`.trim());
   });
 
   test('only applies safe fixes when not prompting', async () => {
@@ -111,10 +119,11 @@ suite('polymer lint', function() {
     const result = runCommand(
         binPath, ['lint', '--fix', '--prompt=false', 'file.html'], {cwd});
     const output = await result;
-    assert.deepEqual(`  Made 4 changes to file.html
+    assert.deepEqual(output.trim(), `
+Made changes to:
+  file.html
 
-Fixed 2 warnings.
-`, output);
+Fixed 2 warnings.`.trim());
     // Running --fix with no prompt results in only the basic <content>
     // elements changing.
     assert.deepEqual(
@@ -155,10 +164,12 @@ Fixed 2 warnings.
         ],
         {cwd});
     const output = await result;
-    assert.deepEqual(`  Made 8 changes to file.html
+    assert.deepEqual(output.trim(), `
+Made changes to:
+  file.html
 
 Fixed 4 warnings.
-`, output);
+`.trim());
     // Running --fix with no prompt results in only the basic <content>
     // elements changing.
     assert.deepEqual(
@@ -204,7 +215,8 @@ Fixed 4 warnings.
 
     const delimiter =
         `\nLint pass complete, waiting for filesystem changes.\n\n`;
-    test('re-reports lint results when the filesystem changes', async () => {
+    let testName = 're-reports lint results when the filesystem changes';
+    test(testName, async () => {
       const fixtureDir = path.join(fixturePath, 'lint-simple');
       const cwd = getTempCopy(fixtureDir);
       const forkedProcess =
@@ -219,7 +231,7 @@ Fixed 4 warnings.
 foo {@apply(--bar)}
            ~~~~~~~
 
-my-elem.html(1,11) error [at-apply-with-parens] - @apply with parentheses is deprecated. Prefer: @apply --foo;
+my-elem.html(2,12) error [at-apply-with-parens] - @apply with parentheses is deprecated. Prefer: @apply --foo;
 
 
 Found 1 error. 1 can be automatically fixed with --fix.
@@ -238,8 +250,7 @@ Found 1 error. 1 can be automatically fixed with --fix.
       forkedProcess.kill();
     });
 
-    const testName =
-        'with --fix, reports and fixes when the filesystem changes';
+    testName = 'with --fix, reports and fixes when the filesystem changes';
     test(testName, async () => {
       const fixtureDir = path.join(fixturePath, 'lint-simple');
       const cwd = getTempCopy(fixtureDir);
@@ -254,11 +265,12 @@ Found 1 error. 1 can be automatically fixed with --fix.
           path.join(cwd, 'my-elem.html'),
           '<style>\nfoo {@apply(--bar)}\n</style>');
       // Expect warning output.
-      assert.deepEqual(
-          await reader.readUntil(delimiter), `  Made 2 changes to my-elem.html
+      assert.deepEqual((await reader.readUntil(delimiter)).trim(), `
+Made changes to:
+  my-elem.html
 
 Fixed 1 warning.
-`);
+`.trim());
       // The automated fix triggers the linter to run again.
       assert.deepEqual(
           await reader.readUntil(delimiter), 'No fixes to apply.\n');

@@ -16,8 +16,9 @@ import * as chalk from 'chalk';
 import * as chokidar from 'chokidar';
 import * as globby from 'globby';
 import * as fs from 'mz/fs';
+import * as path from 'path';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, ResolvedUrl, Severity, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, ResolvedUrl, Severity, UrlResolver, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
@@ -54,18 +55,17 @@ export async function lint(options: Options, config: ProjectConfig) {
   });
 
   const urlLoader = new FSUrlLoader(config.root);
-  const analyzer = new Analyzer({
-    urlLoader,
-    urlResolver: new PackageUrlResolver({
-      componentDir: config.componentDir,
-    }),
-  });
+  const urlResolver = new PackageUrlResolver(
+      {packageDir: config.root, componentDir: config.componentDir});
+  const analyzer = new Analyzer({urlLoader, urlResolver});
   const linter = new lintLib.Linter(rules, analyzer);
 
   if (options.watch) {
-    return watchLoop(analyzer, linter, options, urlLoader, filter);
+    return watchLoop(
+        analyzer, urlLoader, urlResolver, linter, options, config, filter);
   } else {
-    return run(analyzer, linter, options, urlLoader, filter);
+    return run(
+        analyzer, urlLoader, urlResolver, linter, options, config, filter);
   }
 }
 
@@ -86,51 +86,53 @@ interface PrivateOptions extends Options {
  */
 async function run(
     analyzer: Analyzer,
+    urlLoader: FSUrlLoader,
+    urlResolver: UrlResolver,
     linter: lintLib.Linter,
     options: PrivateOptions,
-    urlLoader: FSUrlLoader,
+    config: ProjectConfig,
     filter: WarningFilter,
     editActionsToAlwaysApply = new Set(options.edits || []),
     watcher?: FilesystemChangeStream) {
-  let lintResult;
-  if (options.input) {
-    lintResult = await linter.lint(await globby(options.input));
-  } else {
-    lintResult = await linter.lintPackage();
-  }
-  const analysis = lintResult.analysis;
+  const {warnings, analysis} = options.input === undefined ?
+      await linter.lintPackage() :
+      await linter.lint(await globby(options.input));
 
-  const filtered = lintResult.warnings.filter((w) => !filter.shouldIgnore(w));
+  const filtered = warnings.filter((w) => !filter.shouldIgnore(w));
 
   if (options.fix) {
     const changedFiles = await fix(
         filtered,
         options,
-        urlLoader,
+        config,
         analyzer,
         analysis,
+        urlLoader,
+        urlResolver,
         editActionsToAlwaysApply);
     if (watcher) {
       // Some file watcher interfaces won't notice this change immediately after
       // the one that initiated this lint run. Ensure that we notice these
       // changes.
       for (const changedFile of changedFiles) {
-        watcher.ensureChangeIsNoticed(changedFile);
+        watcher.ensureChangeIsNoticed(path.resolve(config.root, changedFile));
       }
     }
     if (changedFiles.size === 0 && options.reportIfNoFix) {
-      await report(filtered);
+      await report(filtered, urlResolver);
     }
   } else {
-    return report(filtered);
+    return report(filtered, urlResolver);
   }
 }
 
 async function watchLoop(
     analyzer: Analyzer,
+    urlLoader: FSUrlLoader,
+    urlResolver: UrlResolver,
     linter: lintLib.Linter,
     options: Options,
-    urlLoader: FSUrlLoader,
+    config: ProjectConfig,
     filter: WarningFilter) {
   let analysis;
   if (options.input) {
@@ -141,18 +143,29 @@ async function watchLoop(
   /** Remember the user's preferences across runs. */
   const lintActionsToAlwaysApply = new Set(options.edits || []);
 
-  const paths =
+  const urls =
       new Set([...analysis.getFeatures({kind: 'document'})].map((d) => d.url));
-  const watcher = new FilesystemChangeStream(
-      chokidar.watch([...paths], {persistent: true}));
+  const paths = [];
+  for (const url of urls) {
+    const result = urlLoader.getFilePath(url);
+    if (result.successful) {
+      paths.push(result.value);
+    }
+  }
+  const watcher =
+      new FilesystemChangeStream(chokidar.watch(paths, {persistent: true}));
   for await (const changeBatch of watcher) {
-    await analyzer.filesChanged([...changeBatch]);
+    const packageRelative =
+        [...changeBatch].map((absPath) => path.relative(config.root, absPath));
+    await analyzer.filesChanged(packageRelative);
 
     await run(
         analyzer,
+        urlLoader,
+        urlResolver,
         linter,
         {...options, reportIfNoFix: true},
-        urlLoader,
+        config,
         filter,
         lintActionsToAlwaysApply,
         // We pass the watcher to run() so that it can inform the watcher
@@ -249,9 +262,10 @@ class FilesystemChangeStream implements AsyncIterable<Set<string>> {
 /**
  * Report a friendly description of the given warnings to stdout.
  */
-async function report(warnings: ReadonlyArray<Warning>) {
-  const printer =
-      new WarningPrinter(process.stdout, {verbosity: 'full', color: true});
+async function report(
+    warnings: ReadonlyArray<Warning>, urlResolver: UrlResolver) {
+  const printer = new WarningPrinter(
+      process.stdout, {verbosity: 'full', color: true, resolver: urlResolver});
   await printer.printWarnings(warnings);
 
   if (warnings.length > 0) {
@@ -299,12 +313,14 @@ async function report(warnings: ReadonlyArray<Warning>) {
 async function fix(
     warnings: ReadonlyArray<Warning>,
     options: Options,
-    urlLoader: FSUrlLoader,
+    config: ProjectConfig,
     analyzer: Analyzer,
     analysis: Analysis,
+    urlLoader: FSUrlLoader,
+    urlResolver: UrlResolver,
     editActionsToAlwaysApply: Set<string>): Promise<Set<string>> {
-  const edits =
-      await getPermittedEdits(warnings, options, editActionsToAlwaysApply);
+  const edits = await getPermittedEdits(
+      warnings, options, editActionsToAlwaysApply, urlResolver);
 
   if (edits.length === 0) {
     const editCount = warnings.filter((w) => !!w.actions).length;
@@ -323,33 +339,49 @@ async function fix(
   const {appliedEdits, incompatibleEdits, editedFiles} =
       await applyEdits(edits, makeParseLoader(analyzer, analysis));
 
-  for (const [newPath, newContents] of editedFiles) {
-    const documentPath = urlLoader.getFilePath(newPath);
-    if (documentPath.successful) {
-      await fs.writeFile(documentPath.value, newContents, {encoding: 'utf8'});
-    } else if (documentPath.error) {
-      logger.error(documentPath.error);
-    }
-  }
-
-  const appliedChangeCountByFile = countEditsByFile(appliedEdits);
-  const incompatibleChangeCountByFile = countEditsByFile(incompatibleEdits);
-
-  for (const [file, count] of appliedChangeCountByFile) {
-    const filePath = urlLoader.getFilePath(file);
-    if (filePath.successful) {
+  const pathToFileMap = new Map<string, string>();
+  for (const [url, newContents] of editedFiles) {
+    const conversionResult = urlLoader.getFilePath(url);
+    if (conversionResult.successful === false) {
       console.log(
-          `  Made ${count} change${plural(count)} to ${filePath.value}`);
+          `Problem applying fix to url ${url}: ${conversionResult.error}`);
+      return new Set();
+    } else {
+      pathToFileMap.set(conversionResult.value, newContents);
     }
   }
 
-  if (incompatibleEdits.length > 0) {
-    console.log('\n');
-    for (const [file, count] of incompatibleChangeCountByFile) {
-      const filePath = urlLoader.getFilePath(file);
-      if (filePath.successful) {
-        console.log(`  ${count} incompatible changes in ${filePath.value}`);
+  for (const [newPath, newContents] of pathToFileMap) {
+    // need to write a file:// url here.
+    await fs.writeFile(newPath, newContents, {encoding: 'utf8'});
+  }
+
+  function getPaths(edits: ReadonlyArray<Edit>) {
+    const paths = new Set<string>();
+    for (const edit of edits) {
+      for (const replacement of edit) {
+        const url = replacement.range.file;
+        paths.add(getRelativePath(config, urlLoader, url) || url);
       }
+    }
+    return paths;
+  }
+
+  const changedPaths = getPaths(appliedEdits);
+  const incompatibleChangedPaths = getPaths(incompatibleEdits);
+
+  if (changedPaths.size > 0) {
+    console.log(`Made changes to:`);
+    for (const path of changedPaths) {
+      console.log(`  ${path}`);
+    }
+  }
+
+  if (incompatibleChangedPaths.size > 0) {
+    console.log('\n');
+    console.log(`There were incompatible changes to:`);
+    for (const file of incompatibleChangedPaths) {
+      console.log(`  ${file}`);
     }
     console.log(
         `\nFixed ${appliedEdits.length} ` +
@@ -361,28 +393,7 @@ async function fix(
         `\nFixed ${appliedEdits.length} ` +
         `warning${plural(appliedEdits.length)}.`);
   }
-  const changedFiles = new Set();
-  for (const edit of appliedEdits) {
-    for (const replacement of edit) {
-      changedFiles.add(replacement.range.file);
-    }
-  }
-  return changedFiles;
-}
-
-/**
- * Computes a map of file path to the count of changes made to that file.
- */
-function countEditsByFile(edits: Edit[]): ReadonlyMap<ResolvedUrl, number> {
-  const changeCountByFile = new Map<ResolvedUrl, number>();
-  for (const edit of edits) {
-    for (const replacement of edit) {
-      changeCountByFile.set(
-          replacement.range.file,
-          (changeCountByFile.get(replacement.range.file) || 0) + 1);
-    }
-  }
-  return changeCountByFile;
+  return changedPaths;
 }
 
 function plural(n: number, pluralVal = 's', singularVal = ''): string {
@@ -400,7 +411,8 @@ function plural(n: number, pluralVal = 's', singularVal = ''): string {
 async function getPermittedEdits(
     warnings: ReadonlyArray<Warning>,
     options: Options,
-    editActionsToAlwaysApply: Set<string>): Promise<Edit[]> {
+    editActionsToAlwaysApply: Set<string>,
+    urlResolver: UrlResolver): Promise<Edit[]> {
   const edits: Edit[] = [];
   for (const warning of warnings) {
     if (warning.fix) {
@@ -413,8 +425,8 @@ async function getPermittedEdits(
           continue;
         }
         if (options.prompt) {
-          const answer =
-              await askUserForConsentToApplyEditAction(action, warning);
+          const answer = await askUserForConsentToApplyEditAction(
+              action, warning, urlResolver);
           switch (answer) {
             case 'skip':
               continue;
@@ -437,7 +449,8 @@ async function getPermittedEdits(
 
 type Choice = 'skip'|'apply'|'apply-all';
 async function askUserForConsentToApplyEditAction(
-    action: EditAction, warning: Warning): Promise<Choice> {
+    action: EditAction, warning: Warning, urlResolver: UrlResolver):
+    Promise<Choice> {
   type ChoiceObject = {name: string, value: Choice};
   const choices: ChoiceObject[] = [
     {
@@ -455,7 +468,7 @@ async function askUserForConsentToApplyEditAction(
   ];
   const message = `
 This warning can be addressed with an edit:
-${indent(warning.toString(), '    ')}
+${indent(warning.toString({resolver: urlResolver}), '    ')}
 
 The edit is:
 
@@ -464,4 +477,14 @@ ${indent(action.description, '    ')}
 What should be done?
 `.trim();
   return await prompt({message, choices}) as Choice;
+}
+
+function getRelativePath(
+    config: ProjectConfig, urlLoader: FSUrlLoader, url: ResolvedUrl): string|
+    undefined {
+  const result = urlLoader.getFilePath(url);
+  if (result.successful) {
+    return path.relative(config.root, result.value);
+  }
+  return undefined;
 }

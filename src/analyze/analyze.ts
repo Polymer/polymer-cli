@@ -19,10 +19,11 @@ import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
 
 export async function analyze(
-    root: string, inputs: string[]): Promise<AnalysisFormat|undefined> {
+    root: string, componentDir: string|undefined, inputs: string[]):
+    Promise<AnalysisFormat|undefined> {
   const analyzer = new Analyzer({
     urlLoader: new FSUrlLoader(root),
-    urlResolver: new PackageUrlResolver(),
+    urlResolver: new PackageUrlResolver({packageDir: root, componentDir}),
   });
 
   const isInTests = /(\b|\/|\\)(test)(\/|\\)/;
