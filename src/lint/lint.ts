@@ -17,7 +17,7 @@ import * as chokidar from 'chokidar';
 import * as globby from 'globby';
 import * as fs from 'mz/fs';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, Severity, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, ResolvedUrl, Severity, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
@@ -46,10 +46,11 @@ export async function lint(options: Options, config: ProjectConfig) {
     return new CommandResult(1);
   }
 
-  const rules = lintLib.registry.getRules(ruleCodes || lintOptions.rules);
+  const rules = lintLib.registry.getRules(ruleCodes);
   const filter = new WarningFilter({
     warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
-    minimumSeverity: Severity.WARNING
+    minimumSeverity: Severity.WARNING,
+    filesToIgnore: lintOptions.filesToIgnore,
   });
 
   const urlLoader = new FSUrlLoader(config.root);
@@ -335,13 +336,20 @@ async function fix(
   const incompatibleChangeCountByFile = countEditsByFile(incompatibleEdits);
 
   for (const [file, count] of appliedChangeCountByFile) {
-    console.log(`  Made ${count} change${plural(count)} to ${file}`);
+    const filePath = urlLoader.getFilePath(file);
+    if (filePath.successful) {
+      console.log(
+          `  Made ${count} change${plural(count)} to ${filePath.value}`);
+    }
   }
 
   if (incompatibleEdits.length > 0) {
     console.log('\n');
     for (const [file, count] of incompatibleChangeCountByFile) {
-      console.log(`  ${count} incompatible changes in ${file}`);
+      const filePath = urlLoader.getFilePath(file);
+      if (filePath.successful) {
+        console.log(`  ${count} incompatible changes in ${filePath.value}`);
+      }
     }
     console.log(
         `\nFixed ${appliedEdits.length} ` +
@@ -365,8 +373,8 @@ async function fix(
 /**
  * Computes a map of file path to the count of changes made to that file.
  */
-function countEditsByFile(edits: Edit[]): ReadonlyMap<string, number> {
-  const changeCountByFile = new Map<string, number>();
+function countEditsByFile(edits: Edit[]): ReadonlyMap<ResolvedUrl, number> {
+  const changeCountByFile = new Map<ResolvedUrl, number>();
   for (const edit of edits) {
     for (const replacement of edit) {
       changeCountByFile.set(
