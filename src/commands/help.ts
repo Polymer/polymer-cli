@@ -84,9 +84,9 @@ export class HelpCommand implements Command {
     ]);
   }
 
-  generateCommandUsage(command: Command, config: ProjectConfig) {
+  async generateCommandUsage(command: Command, config: ProjectConfig) {
     const extraUsageGroups =
-        command.extraUsageGroups ? command.extraUsageGroups(config) : [];
+        command.extraUsageGroups ? await command.extraUsageGroups(config) : [];
     const usageGroups: commandLineUsage.UsageGroup[] = [
       {
         header: `polymer ${command.name}`,
@@ -120,6 +120,6 @@ export class HelpCommand implements Command {
     }
 
     logger.debug(`printing help for command '${commandName}'...`);
-    console.log(this.generateCommandUsage(command, config));
+    console.log(await this.generateCommandUsage(command, config));
   }
 }

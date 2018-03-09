@@ -59,7 +59,7 @@ Run `polymer help` to get a helpful list of supported commands. Pass it a comman
 
 ### `polymer init [TEMPLATE]`
 
-Initializes a Polymer project from one of several templates. Pre-bundled templates range from just bare-bones to fully featured applications like the [Polymer Starter Kit](https://github.com/PolymerElements/polymer-starter-kit).
+Initializes a Polymer project from one of several templates. Pre-bundled templates range from just bare-bones to fully featured applications like the [Polymer Starter Kit](https://github.com/Polymer/polymer-starter-kit).
 
 You can download and run templates built by our community as well. [Search npm](https://www.npmjs.com/search?q=generator-polymer-init) for a template you'd like to use. Then install it and the CLI will pick it up automatically.
 

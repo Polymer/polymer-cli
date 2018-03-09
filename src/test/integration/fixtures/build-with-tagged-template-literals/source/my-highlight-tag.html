@@ -1,0 +1,11 @@
+<script>
+  (namespace => {
+    namespace.highlight = (strings, ...values) => {
+      let str = '';
+      strings.forEach((string, i) => {
+          str += `${string} <span style="color: blue">${values[i] || ''}</span>`;
+      });
+      return str;
+    };
+  })(window.my = window.my || {});
+</script>

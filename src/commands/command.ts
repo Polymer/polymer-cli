@@ -31,7 +31,7 @@ export interface Command {
   /**
    * Documentation to append onto the output of `polymer help commandName`.
    */
-  extraUsageGroups?(config: ProjectConfig): UsageGroup[];
+  extraUsageGroups?(config: ProjectConfig): Promise<UsageGroup[]>;
 }
 
 /**
