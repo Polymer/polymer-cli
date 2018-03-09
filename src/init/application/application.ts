@@ -97,6 +97,9 @@ export function createApplicationGenerator(templateName: string):
           this.templatePath('test/_element/_element_test.html'),
           `test/${elementName}/${elementName}_test.html`,
           this.props);
+
+      this.fs.copyTpl(
+          this.templatePath('.gitignore'), '.gitignore', this.props);
     }
 
     install() {

@@ -93,7 +93,10 @@ export function createElementGenerator(templateName: string):
 
       this.fs.copyTpl(
           this.templatePath('test/index.html'), `test/index.html`, this.props);
-    }
+
+      this.fs.copyTpl(
+          this.templatePath('.gitignore'), '.gitignore', this.props);
+        }
 
     install() {
       this.log(chalk.bold('\nProject generated!'));
