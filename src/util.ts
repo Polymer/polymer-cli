@@ -36,13 +36,12 @@ function checkIsMinGW(): boolean {
   }
 }
 
+/**
+ * Wrapper around globby that defaults the option to use gitignore
+ */
 export async function resolveGlobs(globs: string[]) {
-  let paths: string[] = [];
-  for (const glob of globs) {
-    // TODO(stramel): globby options typing is incorrect
-    paths = [...paths, ...await globby(glob, {gitignore: true} as any)];
-  }
-  return paths;
+  // TODO(stramel): globby options typing is incorrect
+  return await globby(globs, {gitignore: true} as any);
 }
 
 /**
