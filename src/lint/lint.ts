@@ -14,6 +14,7 @@
 
 import * as chalk from 'chalk';
 import * as chokidar from 'chokidar';
+import * as globby from 'globby';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
@@ -25,7 +26,7 @@ import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
-import {indent, prompt, resolveGlobs} from '../util';
+import {indent, prompt} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -92,7 +93,7 @@ async function run(
     watcher?: FilesystemChangeStream) {
   let warnings;
   if (options.input) {
-    warnings = await linter.lint(await resolveGlobs(options.input));
+    warnings = await linter.lint(await globby(options.input));
   } else {
     warnings = await linter.lintPackage();
   }

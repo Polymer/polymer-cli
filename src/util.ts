@@ -12,7 +12,6 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import * as globby from 'globby';
 import * as inquirer from 'inquirer';
 import {execSync} from 'mz/child_process';
 
@@ -34,14 +33,6 @@ function checkIsMinGW(): boolean {
   } catch (error) {
     return false;
   }
-}
-
-/**
- * Wrapper around globby that defaults the option to use gitignore
- */
-export async function resolveGlobs(globs: string[]) {
-  // TODO(stramel): globby options typing is incorrect
-  return await globby(globs, {gitignore: true} as any);
 }
 
 /**
