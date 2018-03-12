@@ -62,7 +62,7 @@ export function createElementGenerator(templateName: string):
             if (!nameValidation.isValid) {
               this.log(`\n${nameValidation.message}\nPlease try again.`);
             } else if (nameValidation.message) {
-              this.log(''); // 'empty' log inserts a line break
+              this.log('');  // 'empty' log inserts a line break
               logger.warn(nameValidation.message);
             }
 
@@ -103,7 +103,7 @@ export function createElementGenerator(templateName: string):
 
       this.fs.copyTpl(
           this.templatePath('.gitignore'), '.gitignore', this.props);
-        }
+    }
 
     install() {
       this.log(chalk.bold('\nProject generated!'));
