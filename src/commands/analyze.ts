@@ -31,6 +31,7 @@ export class AnalyzeCommand implements Command {
 
   args = [{
     name: 'input',
+    alias: 'i',
     description:
         'The files to analyze, or none to analyze the current directory as a package',
     defaultOption: true,

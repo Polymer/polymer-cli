@@ -12,6 +12,7 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
+import * as globby from 'globby';
 import {AnalysisFormat, Analyzer, generateAnalysis} from 'polymer-analyzer';
 import {Feature} from 'polymer-analyzer/lib/model/model';
 import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
@@ -32,7 +33,7 @@ export async function analyze(
     const _package = await analyzer.analyzePackage();
     return generateAnalysis(_package, '', isNotTest);
   } else {
-    const analysis = await analyzer.analyze(inputs);
+    const analysis = await analyzer.analyze(await globby(inputs));
     return generateAnalysis(analysis, '', isNotTest);
   }
 }

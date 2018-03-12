@@ -140,7 +140,6 @@ class JSBabelTransform extends GenericOptimizeTransform {
    * individually transpiled scripts are bundled. See #950.
    */
   _replaceTemplateObjectNames(code: string): string {
-
     // Breakdown of regular expression to match "_templateObject" variables
     //
     // Pattern                | Meaning
