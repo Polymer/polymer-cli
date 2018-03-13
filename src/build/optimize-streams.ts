@@ -22,10 +22,9 @@ import * as vinyl from 'vinyl';
 import matcher = require('matcher');
 import * as uuid from 'uuid/v1';
 
-const babelPresetES2015 = require('babel-preset-es2015');
+const babelPresetEnv = require('babel-preset-env');
+const babelPresetEnvNoModules = babelPresetEnv.default({}, {modules: false});
 const minifyPreset = require('babel-preset-minify');
-const babelPresetES2015NoModules =
-    babelPresetES2015.buildPreset({}, {modules: false});
 const externalHelpersPlugin = require('babel-plugin-external-helpers');
 const babelObjectRestSpreadPlugin =
     require('babel-plugin-transform-object-rest-spread');
@@ -176,7 +175,7 @@ class JSBabelTransform extends GenericOptimizeTransform {
 export class JSDefaultCompileTransform extends JSBabelTransform {
   constructor() {
     super('babel-compile', {
-      presets: [babelPresetES2015NoModules],
+      presets: [babelPresetEnvNoModules],
       plugins: [
         externalHelpersPlugin,
         babelObjectRestSpreadPlugin,
