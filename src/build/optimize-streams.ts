@@ -23,6 +23,7 @@ import matcher = require('matcher');
 import * as uuid from 'uuid/v1';
 
 const babelPresetEnv = require('babel-preset-env');
+const babelPresetEnvNoModules = babelPresetEnv.default({}, {modules: false});
 const minifyPreset = require('babel-preset-minify');
 const externalHelpersPlugin = require('babel-plugin-external-helpers');
 const babelObjectRestSpreadPlugin =
@@ -174,7 +175,7 @@ class JSBabelTransform extends GenericOptimizeTransform {
 export class JSDefaultCompileTransform extends JSBabelTransform {
   constructor() {
     super('babel-compile', {
-      presets: [babelPresetEnv],
+      presets: [babelPresetEnvNoModules],
       plugins: [
         externalHelpersPlugin,
         babelObjectRestSpreadPlugin,
