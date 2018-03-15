@@ -20,7 +20,7 @@ import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
 import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
-import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
+import {OptimizeOptions, getOptimizeStreams} from 'polymer-build';
 import {ProjectBuildOptions} from 'polymer-project-config';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
@@ -38,8 +38,14 @@ export async function build(
     options: ProjectBuildOptions,
     polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
-  const optimizeOptions:
-      OptimizeOptions = {css: options.css, js: options.js, html: options.html};
+  const optimizeOptions: OptimizeOptions = {
+    css: options.css,
+    js: {
+      ...options.js,
+      moduleResolution: polymerProject.config.moduleResolution,
+    },
+    html: options.html,
+  };
 
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.

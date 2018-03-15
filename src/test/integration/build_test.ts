@@ -23,7 +23,6 @@ const fixturePath =
 tmp.setGracefulCleanup();
 
 suite('polymer build', function() {
-
   const binPath = path.join(__dirname, '../../../bin/polymer.js');
 
   this.timeout(5 * 1000);
@@ -185,6 +184,15 @@ suite('polymer build', function() {
         });
       });
 
+  test('moduleResolution node rewrites module names to paths', async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'build-modules', 'source'), tmpDir.name);
+
+    await runCommand(binPath, ['build'], {cwd: tmpDir.name});
+    assertDirsEqual(
+        path.join(tmpDir.name, 'build'),
+        path.join(fixturePath, 'build-modules', 'expected'));
+  });
 });
 
 function copyDir(fromDir: string, toDir: string) {

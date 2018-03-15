@@ -74,6 +74,14 @@ export const globalArguments: ArgDescriptor[] = [
         'and the package name is read from package.json',
   },
   {
+    name: 'module-resolution',
+    description: 'Algorithm to use for resolving module specifiers in import ' +
+        'and export statements when rewriting them to be web-compatible. ' +
+        'Valid values are "none" and "node". "none" disables module specifier ' +
+        'rewriting. "node" uses Node.js resolution to find modules.',
+    type: String,
+  },
+  {
     name: 'component-dir',
     type: String,
     description: 'The component directory to use. Defaults to reading from ' +

@@ -8,6 +8,8 @@
 - Fixed [issue #950](https://github.com/Polymer/polymer-cli/issues/950) where tagged template literals (such as `Polymer.html`) were incorrectly transpiled
 - Automatically generate a `.gitignore` file when execute init command and select `element` or `application`.
 - Added ability to use globs on `analyze` and `lint` commands
+- JS compile build transformer will now rewrite bare module specifiers to paths.
+- Add `--module-resolution` flag which can be `none` (the default) or `node`.
 
 ## v1.6.0 [02-02-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
