@@ -58,7 +58,7 @@
     "mz": "^2.6.0",
     "plylog": "^0.4.0",
     "polymer-analyzer": "^2.6.0",
-    "polymer-build": "^2.3.3",
+    "polymer-build": "^2.4.0",
     "polymer-linter": "^2.2.0",
     "polymer-project-config": "^3.10.0",
     "polyserve": "^0.23.0",

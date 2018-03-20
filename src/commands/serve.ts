@@ -71,6 +71,7 @@ export class ServeCommand implements Command {
       openPath: options['open-path'],
       npm: config.npm,
       componentDir: config.componentDir,
+      moduleResolution: config.moduleResolution,
       packageName: options['package-name'],
       protocol: options['protocol'],
       keyPath: options['key'],

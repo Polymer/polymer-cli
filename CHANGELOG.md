@@ -1,7 +1,9 @@
 # Changelog
 
 <!-- Add new, unreleased items here. -->
-## Unreleased
+<!-- ## Unreleased -->
+
+## v1.7.0 [03-19-2018]
 - Added `--npm` and `--component-dir` global flags, which are passed to the `build`, `lint`, `test`, and `serve` commands.
 - All dash-case command line arguments are now converted to camelCase before overwriting options from polymer.json.
 - Compile/minify steps can now parse object-rest-spread and dynamic-import.
