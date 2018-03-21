@@ -2,6 +2,8 @@
 
 <!-- Add new, unreleased items here. -->
 ## Unreleased
+
+## v1.7.0-pre.1 [03-21-2018]
 - Added `--npm` and `--component-dir` global flags, which are passed to the `build`, `lint`, `test`, and `serve` commands.
 - All dash-case command line arguments are now converted to camelCase before overwriting options from polymer.json.
 - Compile/minify steps can now parse object-rest-spread and dynamic-import.
@@ -10,6 +12,7 @@
 - Added ability to use globs on `analyze` and `lint` commands
 - JS compile build transformer will now rewrite bare module specifiers to paths.
 - Add `--module-resolution` flag which can be `none` (the default) or `node`.
+- Update web-component-tester to `v6.6.0-pre.1`
 
 ## v1.6.0 [02-02-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
