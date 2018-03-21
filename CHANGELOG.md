@@ -12,7 +12,7 @@
 - Added ability to use globs on `analyze` and `lint` commands
 - JS compile build transformer will now rewrite bare module specifiers to paths.
 - Add `--module-resolution` flag which can be `none` (the default) or `node`.
-- Update web-component-tester to `v6.6.0-pre.1`
+- Update dependencies.
 
 ## v1.6.0 [02-02-2018]
 - Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
