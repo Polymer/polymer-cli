@@ -1,6 +1,9 @@
 {
   "entrypoint": "index.js",
+  "moduleResolution": "node",
   "lint": {
-    "rules": ["polymer-2"]
+    "rules": [
+      "polymer-2"
+    ]
   }
 }

@@ -15,7 +15,8 @@
     "test": "gulp test lint",
     "test:smoke": "gulp test",
     "test:integration": "gulp test:integration",
-    "format": "find src gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i"
+    "format": "find src gulpfile.js \\( -iname '*.ts' -o -iname '*.js' \\) -not -path '*fixtures*' | xargs clang-format --style=file -i",
+    "test:watch": "tsc-then -- mocha -c --ui tdd lib/test/integration/*_test.js lib/test/unit/*_test.js lib/test/unit/*/*_test.js"
   },
   "repository": {
     "type": "git",
@@ -57,9 +58,9 @@
     "merge-stream": "^1.0.1",
     "mz": "^2.6.0",
     "plylog": "^0.4.0",
-    "polymer-analyzer": "^2.6.0",
-    "polymer-build": "^2.5.0",
-    "polymer-linter": "^2.2.0",
+    "polymer-analyzer": "^3.0.0-pre.14",
+    "polymer-build": "^3.0.0-pre.1",
+    "polymer-linter": "^3.0.0-pre.3",
     "polymer-project-config": "^3.10.0",
     "polyserve": "^0.25.2",
     "request": "^2.72.0",
@@ -98,6 +99,7 @@
     "run-sequence": "^1.2.0",
     "sinon": "^1.17.7",
     "tmp": "0.0.31",
+    "tsc-then": "^1.0.1",
     "tslint": "^4.0.2",
     "typescript": "^2.2.0",
     "vinyl-fs-fake": "^1.1.0",
