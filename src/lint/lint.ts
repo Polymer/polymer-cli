@@ -340,14 +340,13 @@ async function fix(
   for (const [url, newContents] of editedFiles) {
     const conversionResult = urlLoader.getFilePath(url);
     if (conversionResult.successful === false) {
-      console.log(
+      logger.error(
           `Problem applying fix to url ${url}: ${conversionResult.error}`);
       return new Set();
     } else {
       pathToFileMap.set(conversionResult.value, newContents);
     }
   }
-
   for (const [newPath, newContents] of pathToFileMap) {
     // need to write a file:// url here.
     await fs.writeFile(newPath, newContents, {encoding: 'utf8'});

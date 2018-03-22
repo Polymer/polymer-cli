@@ -25,7 +25,7 @@ suite('polymer lint', function() {
 
   const binPath = path.join(__dirname, '../../../bin/polymer.js');
 
-  this.timeout(2 * 1000);
+  this.timeout(8 * 1000);
 
   test('handles a simple correct case', async () => {
     const cwd = path.join(fixturePath, 'lint-simple');
