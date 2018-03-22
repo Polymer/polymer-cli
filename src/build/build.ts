@@ -24,6 +24,7 @@ import {OptimizeOptions, getOptimizeStreams} from 'polymer-build';
 import {ProjectBuildOptions} from 'polymer-project-config';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
+import {LocalFsPath} from 'polymer-build/lib/path-transformers';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
@@ -160,7 +161,7 @@ export async function build(
           `${swPrecacheConfigPath}, continuing with defaults`);
     }
     await addServiceWorker({
-      buildRoot: buildDirectory,
+      buildRoot: buildDirectory as LocalFsPath,
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
       bundled: bundled,
