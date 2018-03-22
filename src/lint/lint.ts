@@ -18,7 +18,7 @@ import * as globby from 'globby';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, applyEdits, Edit, EditAction, FsUrlLoader, makeParseLoader, PackageUrlResolver, ResolvedUrl, Severity, UrlResolver, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, applyEdits, Edit, EditAction, FsUrlLoader, makeParseLoader, ResolvedUrl, Severity, UrlResolver, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
@@ -26,7 +26,7 @@ import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
-import {indent, prompt} from '../util';
+import {getConfiguredAnalyzer, indent, prompt} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -54,10 +54,7 @@ export async function lint(options: Options, config: ProjectConfig) {
     filesToIgnore: lintOptions.filesToIgnore,
   });
 
-  const urlLoader = new FsUrlLoader(config.root);
-  const urlResolver = new PackageUrlResolver(
-      {packageDir: config.root, componentDir: config.componentDir});
-  const analyzer = new Analyzer({urlLoader, urlResolver});
+  const {analyzer, urlLoader, urlResolver} = getConfiguredAnalyzer(config);
   const linter = new lintLib.Linter(rules, analyzer);
 
   if (options.watch) {

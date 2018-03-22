@@ -38,8 +38,7 @@ export class AnalyzeCommand implements Command {
 
   async run(options: CommandOptions, config: ProjectConfig) {
     const {analyze} = await import('../analyze/analyze');
-    const metadata =
-        await analyze(config.root, config.componentDir, options['input']);
+    const metadata = await analyze(config, options.input);
     process.stdout.write(JSON.stringify(metadata, null, 2));
     process.stdout.write('\n');
   }

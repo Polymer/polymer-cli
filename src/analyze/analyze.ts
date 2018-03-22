@@ -13,18 +13,14 @@
  */
 
 import * as globby from 'globby';
-import {AnalysisFormat, Analyzer, generateAnalysis} from 'polymer-analyzer';
+import {AnalysisFormat, generateAnalysis} from 'polymer-analyzer';
 import {Feature} from 'polymer-analyzer/lib/model/model';
-import {FsUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
-import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
+import {ProjectConfig} from 'polymer-project-config';
+import {getConfiguredAnalyzer} from '../util';
 
-export async function analyze(
-    root: string, componentDir: string|undefined, inputs: string[]):
+export async function analyze(config: ProjectConfig, inputs: string[]):
     Promise<AnalysisFormat|undefined> {
-  const analyzer = new Analyzer({
-    urlLoader: new FsUrlLoader(root),
-    urlResolver: new PackageUrlResolver({packageDir: root, componentDir}),
-  });
+  const {analyzer} = getConfiguredAnalyzer(config);
 
   const isInTests = /(\b|\/|\\)(test)(\/|\\)/;
   const isNotTest = (f: Feature) =>
