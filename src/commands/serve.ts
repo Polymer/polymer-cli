@@ -70,6 +70,7 @@ export class ServeCommand implements Command {
       browser: options['browser'],
       openPath: options['open-path'],
       npm: config.npm,
+      moduleResolution: config.moduleResolution,
       componentDir: config.componentDir,
       packageName: options['package-name'],
       protocol: options['protocol'],
