@@ -173,16 +173,16 @@ suite('polymer build', function() {
     await runCommand(binPath, ['build', '--npm'], {cwd: tmpDir.name});
   });
 
-  test(
-      '--components-dir finds dependencies in the specified directory',
-      async () => {
-        const tmpDir = tmp.dirSync();
-        copyDir(path.join(fixturePath, 'element-with-other-deps'), tmpDir.name);
+  const testName =
+      '--components-dir finds dependencies in the specified directory';
+  test.skip(testName, async () => {
+    const tmpDir = tmp.dirSync();
+    copyDir(path.join(fixturePath, 'element-with-other-deps'), tmpDir.name);
 
-        await runCommand(binPath, ['build', '--component-dir=path/to/deps/'], {
-          cwd: tmpDir.name
-        });
-      });
+    await runCommand(binPath, ['build', '--component-dir=path/to/deps/'], {
+      cwd: tmpDir.name
+    });
+  });
 
   test('moduleResolution node rewrites module names to paths', async () => {
     const tmpDir = tmp.dirSync();
