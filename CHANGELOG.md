@@ -2,6 +2,7 @@
 
 <!-- Add new, unreleased items here. -->
 ## Unreleased
+- Fixed issue where the `--module-resolution` wasn't being handled for the `serve` command.
 
 ## v1.7.0-pre.1 [03-21-2018]
 - Added `--npm` and `--component-dir` global flags, which are passed to the `build`, `lint`, `test`, and `serve` commands.
