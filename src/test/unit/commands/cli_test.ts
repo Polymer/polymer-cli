@@ -71,7 +71,7 @@ suite('The general CLI', () => {
     const output = await interceptOutput(async () => {
       await cli.run();
     });
-    assert.match(output, /^\d+\.\d+\.\d+$/m);
+    assert.match(output, /^\d+\.\d+\.\d+(?:-[\da-z-.]+)?$/m);
   });
 
   testName = `sets the appropriate log levels when ` +
