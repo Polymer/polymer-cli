@@ -15,14 +15,14 @@
 import * as globby from 'globby';
 import {AnalysisFormat, Analyzer, generateAnalysis} from 'polymer-analyzer';
 import {Feature} from 'polymer-analyzer/lib/model/model';
-import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
+import {FsUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
 import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
 
 export async function analyze(
     root: string, componentDir: string|undefined, inputs: string[]):
     Promise<AnalysisFormat|undefined> {
   const analyzer = new Analyzer({
-    urlLoader: new FSUrlLoader(root),
+    urlLoader: new FsUrlLoader(root),
     urlResolver: new PackageUrlResolver({packageDir: root, componentDir}),
   });
 

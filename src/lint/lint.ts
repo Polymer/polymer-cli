@@ -18,7 +18,7 @@ import * as globby from 'globby';
 import * as fs from 'mz/fs';
 import * as path from 'path';
 import * as logging from 'plylog';
-import {Analysis, Analyzer, applyEdits, Edit, EditAction, FSUrlLoader, makeParseLoader, PackageUrlResolver, ResolvedUrl, Severity, UrlResolver, Warning} from 'polymer-analyzer';
+import {Analysis, Analyzer, applyEdits, Edit, EditAction, FsUrlLoader, makeParseLoader, PackageUrlResolver, ResolvedUrl, Severity, UrlResolver, Warning} from 'polymer-analyzer';
 import {WarningFilter} from 'polymer-analyzer/lib/warning/warning-filter';
 import {WarningPrinter} from 'polymer-analyzer/lib/warning/warning-printer';
 import * as lintLib from 'polymer-linter';
@@ -54,7 +54,7 @@ export async function lint(options: Options, config: ProjectConfig) {
     filesToIgnore: lintOptions.filesToIgnore,
   });
 
-  const urlLoader = new FSUrlLoader(config.root);
+  const urlLoader = new FsUrlLoader(config.root);
   const urlResolver = new PackageUrlResolver(
       {packageDir: config.root, componentDir: config.componentDir});
   const analyzer = new Analyzer({urlLoader, urlResolver});
@@ -86,7 +86,7 @@ interface PrivateOptions extends Options {
  */
 async function run(
     analyzer: Analyzer,
-    urlLoader: FSUrlLoader,
+    urlLoader: FsUrlLoader,
     urlResolver: UrlResolver,
     linter: lintLib.Linter,
     options: PrivateOptions,
@@ -128,7 +128,7 @@ async function run(
 
 async function watchLoop(
     analyzer: Analyzer,
-    urlLoader: FSUrlLoader,
+    urlLoader: FsUrlLoader,
     urlResolver: UrlResolver,
     linter: lintLib.Linter,
     options: Options,
@@ -316,7 +316,7 @@ async function fix(
     config: ProjectConfig,
     analyzer: Analyzer,
     analysis: Analysis,
-    urlLoader: FSUrlLoader,
+    urlLoader: FsUrlLoader,
     urlResolver: UrlResolver,
     editActionsToAlwaysApply: Set<string>): Promise<Set<string>> {
   const edits = await getPermittedEdits(
@@ -480,7 +480,7 @@ What should be done?
 }
 
 function getRelativePath(
-    config: ProjectConfig, urlLoader: FSUrlLoader, url: ResolvedUrl): string|
+    config: ProjectConfig, urlLoader: FsUrlLoader, url: ResolvedUrl): string|
     undefined {
   const result = urlLoader.getFilePath(url);
   if (result.successful) {
