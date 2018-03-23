@@ -1,7 +1,8 @@
 # Changelog
 
 <!-- Add new, unreleased items here. -->
-## Unreleased
+<!-- ## Unreleased -->
+## v1.7.0-pre.3 [03-22-2018]
 - Fix -—module-resolution default from polyserve overriding polymer.json
 
 ## v1.7.0-pre.2 [03-22-2018]
