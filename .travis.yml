@@ -7,10 +7,15 @@ addons:
       - google-chrome
     packages:
       - google-chrome-stable
+cache:
+  directories:
+    - node_modules/
+env:
+  - TEST_SUITE=smoke-lint
+  - TEST_SUITE=integration
 language: node_js
 node_js:
   - "node"
   - "6"
 script:
-  - xvfb-run npm test
-  - xvfb-run npm run test:integration
+  - xvfb-run npm run test:$TEST_SUITE
