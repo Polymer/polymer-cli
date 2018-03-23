@@ -1,7 +1,8 @@
 # Changelog
 
 <!-- Add new, unreleased items here. -->
-<!-- ## Unreleased -->
+## Unreleased
+- Fix -—module-resolution default from polyserve overriding polymer.json
 
 ## v1.7.0-pre.2 [03-22-2018]
 - Fixed issue where the `--module-resolution` wasn't being handled for the `serve` command.

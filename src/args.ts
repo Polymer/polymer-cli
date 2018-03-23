@@ -80,6 +80,10 @@ export const globalArguments: ArgDescriptor[] = [
         'Valid values are "none" and "node". "none" disables module specifier ' +
         'rewriting. "node" uses Node.js resolution to find modules.',
     type: String,
+    // This overrides the default of 'none' in polyserve so that we don't
+    // erroneously override the config file
+    // TODO(justinfagnani): remove the default in polyserve
+    defaultValue: undefined,
   },
   {
     name: 'component-dir',
@@ -114,10 +118,10 @@ export const globalArguments: ArgDescriptor[] = [
  * Performs a simple merge of multiple arguments lists. Does not mutate given
  * arguments lists or arguments.
  *
- * This doesn't perform any validation of duplicate arguments, mutiple defaults,
- * etc., because by the time this function is run, the user can't do anything
- * about it. Validation of command and global arguments should be done in tests,
- * not on users machines.
+ * This doesn't perform any validation of duplicate arguments, multiple
+ * defaults, etc., because by the time this function is run, the user can't do
+ * anything about it. Validation of command and global arguments should be done
+ * in tests, not on users machines.
  */
 export function mergeArguments(argumentLists: ArgDescriptor[][]):
     ArgDescriptor[] {

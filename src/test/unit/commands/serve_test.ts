@@ -78,6 +78,14 @@ suite('serve', () => {
       assert.propertyVal(serverOptions, 'componentDir', 'path/to/deps/');
     });
 
+    test('--module-resolution default does not override config', async () => {
+      const cli = new PolymerCli(['serve'], {moduleResolution: 'node'});
+      await cli.run();
+
+      const serverOptions = startServersStub.args[0][0];
+      assert.propertyVal(serverOptions, 'moduleResolution', 'node');
+    });
+
   });
 
 });
