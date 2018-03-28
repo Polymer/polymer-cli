@@ -48,21 +48,28 @@ export async function lint(options: Options, config: ProjectConfig) {
   }
 
   const rules = lintLib.registry.getRules(ruleCodes);
-  const filter = new WarningFilter({
-    warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
-    minimumSeverity: Severity.WARNING,
-    filesToIgnore: lintOptions.filesToIgnore,
-  });
-
-  const {analyzer, urlLoader, urlResolver} = await config.initializeAnalyzer();
+  const {analyzer, urlLoader, urlResolver, warningFilter} =
+      await config.initializeAnalyzer();
   const linter = new lintLib.Linter(rules, analyzer);
 
   if (options.watch) {
     return watchLoop(
-        analyzer, urlLoader, urlResolver, linter, options, config, filter);
+        analyzer,
+        urlLoader,
+        urlResolver,
+        linter,
+        options,
+        config,
+        warningFilter);
   } else {
     return run(
-        analyzer, urlLoader, urlResolver, linter, options, config, filter);
+        analyzer,
+        urlLoader,
+        urlResolver,
+        linter,
+        options,
+        config,
+        warningFilter);
   }
 }
 
