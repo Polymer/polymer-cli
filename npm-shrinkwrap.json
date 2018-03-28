@@ -10549,9 +10549,9 @@
       }
     },
     "polymer-build": {
-      "version": "3.0.0-pre.3",
-      "resolved": "https://registry.npmjs.org/polymer-build/-/polymer-build-3.0.0-pre.3.tgz",
-      "integrity": "sha512-GriguNwDS9nUFua/TWDfpWWfbTYRaN4JvcxlgcdOMGlGYq8TQn3bBzGNjKK5N87yFxu+V/mVyhuPA3T6BsG8BA==",
+      "version": "3.0.0-pre.4",
+      "resolved": "https://registry.npmjs.org/polymer-build/-/polymer-build-3.0.0-pre.4.tgz",
+      "integrity": "sha512-Lugy05KyPMk2qeV6P14LS41QTjOP2YKrgVmHoW3cXaNAm5CNa2xfghiHmN2xVlujoegrDasfl6z0jyYJhBSaDg==",
       "requires": {
         "@types/babel-core": "6.25.3",
         "@types/babel-traverse": "6.25.3",
@@ -10948,7 +10948,7 @@
         "opn": "3.0.3",
         "parse5": "2.2.3",
         "pem": "1.12.3",
-        "polymer-build": "3.0.0-pre.3",
+        "polymer-build": "3.0.0-pre.4",
         "requirejs": "2.3.5",
         "resolve": "1.6.0",
         "send": "0.14.2",
