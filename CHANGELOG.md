@@ -2,6 +2,10 @@
 
 <!-- Add new, unreleased items here. -->
 <!-- ## Unreleased -->
+
+## v1.7.0-pre.4 [03-28-2018]
+- Upgrade `polymer-build` to get latest `polymer-bundler` now with ES6 module bundling support!
+
 ## v1.7.0-pre.3 [03-22-2018]
 - Fix -—module-resolution default from polyserve overriding polymer.json
 
