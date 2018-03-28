@@ -12,5 +12,8 @@
     {
       "name": "foo"
     }
-  ]
+  ],
+  "npm": true,
+  "componentDir": "node_modules/",
+  "moduleResolution": "node"
 }
