@@ -26,7 +26,7 @@ import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
-import {getConfiguredAnalyzer, indent, prompt} from '../util';
+import {indent, prompt} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -48,21 +48,28 @@ export async function lint(options: Options, config: ProjectConfig) {
   }
 
   const rules = lintLib.registry.getRules(ruleCodes);
-  const filter = new WarningFilter({
-    warningCodesToIgnore: new Set(lintOptions.ignoreWarnings || []),
-    minimumSeverity: Severity.WARNING,
-    filesToIgnore: lintOptions.filesToIgnore,
-  });
-
-  const {analyzer, urlLoader, urlResolver} = getConfiguredAnalyzer(config);
+  const {analyzer, urlLoader, urlResolver, warningFilter} =
+      await config.initializeAnalyzer();
   const linter = new lintLib.Linter(rules, analyzer);
 
   if (options.watch) {
     return watchLoop(
-        analyzer, urlLoader, urlResolver, linter, options, config, filter);
+        analyzer,
+        urlLoader,
+        urlResolver,
+        linter,
+        options,
+        config,
+        warningFilter);
   } else {
     return run(
-        analyzer, urlLoader, urlResolver, linter, options, config, filter);
+        analyzer,
+        urlLoader,
+        urlResolver,
+        linter,
+        options,
+        config,
+        warningFilter);
   }
 }
 

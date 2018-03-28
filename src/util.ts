@@ -14,8 +14,6 @@
 
 import * as inquirer from 'inquirer';
 import {execSync} from 'mz/child_process';
-import {Analyzer, FsUrlLoader, PackageUrlResolver} from 'polymer-analyzer';
-import {ProjectConfig} from 'polymer-project-config';
 
 /**
  * Check if the current shell environment is MinGW. MinGW can't handle some
@@ -69,30 +67,4 @@ export function indent(str: string, additionalIndentation = '  ') {
 
 export function dashToCamelCase(text: string): string {
   return text.replace(/-([a-z])/g, (v) => v[1].toUpperCase());
-}
-
-export function getConfiguredAnalyzer(config: ProjectConfig) {
-  const urlLoader = new FsUrlLoader(config.root);
-  const urlResolver = new PackageUrlResolver(
-      {packageDir: config.root, componentDir: config.componentDir});
-
-  const analyzer = new Analyzer({
-    urlLoader,
-    urlResolver,
-    moduleResolution: convertModuleResolution(config.moduleResolution)
-  });
-  return {urlLoader, urlResolver, analyzer};
-}
-
-function convertModuleResolution(moduleResolution: 'node'|'none'): 'node'|
-    undefined {
-  switch (moduleResolution) {
-    case 'node':
-      return 'node';
-    case 'none':
-      return undefined;
-    default:
-      const never: never = moduleResolution;
-      throw new Error(`Unknown module resolution parameter: ${never}`);
-  }
 }
