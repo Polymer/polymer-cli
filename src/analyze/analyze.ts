@@ -16,11 +16,10 @@ import * as globby from 'globby';
 import {AnalysisFormat, generateAnalysis} from 'polymer-analyzer';
 import {Feature} from 'polymer-analyzer/lib/model/model';
 import {ProjectConfig} from 'polymer-project-config';
-import {getConfiguredAnalyzer} from '../util';
 
 export async function analyze(config: ProjectConfig, inputs: string[]):
     Promise<AnalysisFormat|undefined> {
-  const {analyzer} = getConfiguredAnalyzer(config);
+  const {analyzer} = await config.initializeAnalyzer();
 
   const isInTests = /(\b|\/|\\)(test)(\/|\\)/;
   const isNotTest = (f: Feature) =>

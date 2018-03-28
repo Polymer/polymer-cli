@@ -26,7 +26,7 @@ import {ProjectConfig} from 'polymer-project-config';
 
 import {CommandResult} from '../commands/command';
 import {Options} from '../commands/lint';
-import {getConfiguredAnalyzer, indent, prompt} from '../util';
+import {indent, prompt} from '../util';
 
 const logger = logging.getLogger('cli.lint');
 
@@ -54,7 +54,7 @@ export async function lint(options: Options, config: ProjectConfig) {
     filesToIgnore: lintOptions.filesToIgnore,
   });
 
-  const {analyzer, urlLoader, urlResolver} = getConfiguredAnalyzer(config);
+  const {analyzer, urlLoader, urlResolver} = await config.initializeAnalyzer();
   const linter = new lintLib.Linter(rules, analyzer);
 
   if (options.watch) {
