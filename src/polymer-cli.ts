@@ -27,6 +27,7 @@ import {InstallCommand} from './commands/install';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
+import {dashToCamelCase} from './util';
 
 import commandLineCommands = require('command-line-commands');
 import {ParsedCommand} from 'command-line-commands';
@@ -60,8 +61,22 @@ function parseCLIArgs(commandOptions: any): {[name: string]: string} {
   if (commandOptions['extra-dependencies']) {
     parsedOptions.extraDependencies = commandOptions['extra-dependencies'];
   }
+  if (commandOptions.fragment) {
+    parsedOptions.fragments = commandOptions.fragment;
+  }
 
   return parsedOptions;
+}
+
+/**
+ * Shallowly copies an object, converting keys from dash-case to camelCase.
+ */
+function objectDashToCamelCase(input: any): any {
+  const output: any = {};
+  for (const key of Object.keys(input)) {
+    output[dashToCamelCase(key)] = input[key];
+  }
+  return output;
 }
 
 
@@ -180,8 +195,11 @@ export class PolymerCli {
     const commandOptions = parseCLIArgs(commandOptionsRaw);
     logger.debug(`command options parsed from args:`, commandOptions);
 
-    const mergedConfigOptions =
-        Object.assign({}, this.defaultConfigOptions, commandOptions);
+    const mergedConfigOptions = {
+      ...this.defaultConfigOptions,
+      ...objectDashToCamelCase(commandOptions),
+    };
+    logger.debug(`final config options:`, mergedConfigOptions);
 
     const config = new ProjectConfig(mergedConfigOptions);
     logger.debug(`final project configuration generated:`, config);

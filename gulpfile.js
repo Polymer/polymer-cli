@@ -12,7 +12,6 @@
 'use strict';
 
 const depcheck = require('depcheck');
-const eslint = require('gulp-eslint');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const mergeStream = require('merge-stream');
@@ -24,14 +23,14 @@ const typescript = require('gulp-typescript');
 
 const tsProject = typescript.createProject('tsconfig.json');
 
-gulp.task('lint', ['tslint', 'eslint', 'depcheck']);
+gulp.task('lint', ['tslint', 'depcheck']);
 
 gulp.task('clean', (done) => {
   fs.remove(path.join(__dirname, 'lib'), done);
 });
 
 gulp.task('build', (done) => {
-  runSeq('clean', ['compile'], done);
+  runSeq('clean', ['compile', 'copy'], done);
 });
 
 gulp.task('compile', () => {
@@ -42,10 +41,12 @@ gulp.task('compile', () => {
       .pipe(gulp.dest('lib'));
 });
 
+gulp.task('copy', () => gulp.src(['src/**/.gitignore']).pipe(gulp.dest('lib')));
+
 gulp.task(
     'test',
     ['build'],
-    () => gulp.src('test/unit/**/*_test.js', {read: false}).pipe(mocha({
+    () => gulp.src('lib/test/unit/**/*_test.js', {read: false}).pipe(mocha({
       ui: 'tdd',
       reporter: 'spec',
     })));
@@ -53,12 +54,11 @@ gulp.task(
 gulp.task(
     'test:integration',
     ['build'],
-    () =>
-        gulp.src(['test/integration/**/*_test.js'], {read: false}).pipe(mocha({
-          ui: 'tdd',
-          reporter: 'spec',
-        })));
-
+    () => gulp.src(['lib/test/integration/**/*_test.js'], {read: false})
+              .pipe(mocha({
+                ui: 'tdd',
+                reporter: 'spec',
+              })));
 
 gulp.task(
     'tslint',
@@ -69,14 +69,7 @@ gulp.task(
               }))
               .pipe(tslint.report()));
 
-gulp.task(
-    'eslint',
-    () => gulp.src('test/**/*_test.js')
-              .pipe(eslint())
-              .pipe(eslint.format())
-              .pipe(eslint.failAfterError()));
-
-gulp.task('depcheck', () => {
+gulp.task('depcheck', ['build'], () => {
   return depcheck(__dirname, {
            // "@types/*" dependencies are type declarations that are
            // automatically

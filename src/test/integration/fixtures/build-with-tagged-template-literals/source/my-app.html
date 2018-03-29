@@ -1,0 +1,15 @@
+<link rel="import" href="./bower_components/polymer/lib/utils/html-tag.html">
+<link rel="import" href="./my-highlight-tag.html">
+<link rel="import" href="./my-el.html">
+
+<script>
+  class MyApp extends Polymer.Element {
+    static get template() {
+      return Polymer.html`
+        <div><b>my-app:</b> ${window.my.highlight`Hello ${"world"}`}!</div>
+        <my-el></my-el>
+      `;
+    }
+  }
+  window.customElements.define('my-app', MyApp);
+</script>

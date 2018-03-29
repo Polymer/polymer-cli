@@ -25,6 +25,8 @@ import {PolymerProject} from 'polymer-build';
 import {applyBuildPreset, ProjectBuildOptions, ProjectConfig} from 'polymer-project-config';
 
 import * as buildLibTypeOnly from '../build/build';
+import {dashToCamelCase} from '../util';
+
 import {Command, CommandOptions} from './command';
 
 const logger = logging.getLogger('cli.command.build');
@@ -105,11 +107,12 @@ export class BuildCommand implements Command {
           '`<link rel="import">` tags into fragments and shell for all ' +
           'dependencies.'
     },
+    {
+      name: 'base-path',
+      type: String,
+      description: 'Updates the <base> tag if found in the entrypoint document.'
+    },
   ];
-
-  private dashToCamelCase(text: string): string {
-    return text.replace(/-([a-z])/g, (v) => v[1].toUpperCase());
-  }
 
   /**
    * Converts command-line build arguments to the `ProjectBuildOptions` format
@@ -126,7 +129,8 @@ export class BuildCommand implements Command {
           (<any>buildOptions)[prefix] = (<any>buildOptions)[prefix] || {};
           (<any>buildOptions)[prefix][option] = options[buildOption];
         } else {
-          (<any>buildOptions)[this.dashToCamelCase(buildOption)] = options[buildOption];
+          (<any>buildOptions)[dashToCamelCase(buildOption)] =
+              options[buildOption];
         }
       }
     }

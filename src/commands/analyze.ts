@@ -19,8 +19,6 @@
 
 import {ProjectConfig} from 'polymer-project-config';
 
-import {analyze as analyzeTypeOnly} from '../analyze/analyze';
-
 import {Command, CommandOptions} from './command';
 
 export class AnalyzeCommand implements Command {
@@ -31,6 +29,7 @@ export class AnalyzeCommand implements Command {
 
   args = [{
     name: 'input',
+    alias: 'i',
     description:
         'The files to analyze, or none to analyze the current directory as a package',
     defaultOption: true,
@@ -38,9 +37,8 @@ export class AnalyzeCommand implements Command {
   }];
 
   async run(options: CommandOptions, config: ProjectConfig) {
-    const analyze =
-        require('../analyze/analyze').analyze as typeof analyzeTypeOnly;
-    const metadata = await analyze(config.root, options['input']);
+    const {analyze} = await import('../analyze/analyze');
+    const metadata = await analyze(config, options.input);
     process.stdout.write(JSON.stringify(metadata, null, 2));
     process.stdout.write('\n');
   }

@@ -68,6 +68,30 @@ export const globalArguments: ArgDescriptor[] = [
     group: 'global',
   },
   {
+    name: 'npm',
+    type: Boolean,
+    description: 'Sets npm mode: component directory is "node_modules" ' +
+        'and the package name is read from package.json',
+  },
+  {
+    name: 'module-resolution',
+    description: 'Algorithm to use for resolving module specifiers in import ' +
+        'and export statements when rewriting them to be web-compatible. ' +
+        'Valid values are "none" and "node". "none" disables module specifier ' +
+        'rewriting. "node" uses Node.js resolution to find modules.',
+    type: String,
+    // This overrides the default of 'none' in polyserve so that we don't
+    // erroneously override the config file
+    // TODO(justinfagnani): remove the default in polyserve
+    defaultValue: undefined,
+  },
+  {
+    name: 'component-dir',
+    type: String,
+    description: 'The component directory to use. Defaults to reading from ' +
+        'the Bower config (usually bower_components/).',
+  },
+  {
     name: 'verbose',
     description: 'turn on debugging output',
     type: Boolean,
@@ -94,10 +118,10 @@ export const globalArguments: ArgDescriptor[] = [
  * Performs a simple merge of multiple arguments lists. Does not mutate given
  * arguments lists or arguments.
  *
- * This doesn't perform any validation of duplicate arguments, mutiple defaults,
- * etc., because by the time this function is run, the user can't do anything
- * about it. Validation of command and global arguments should be done in tests,
- * not on users machines.
+ * This doesn't perform any validation of duplicate arguments, multiple
+ * defaults, etc., because by the time this function is run, the user can't do
+ * anything about it. Validation of command and global arguments should be done
+ * in tests, not on users machines.
  */
 export function mergeArguments(argumentLists: ArgDescriptor[][]):
     ArgDescriptor[] {

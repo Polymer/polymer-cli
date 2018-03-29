@@ -1,9 +1,14 @@
 # Changelog
 
+<<<<<<< HEAD
 ## Unreleased
 - Upgrade `polymer-build` to get latest `polymer-bundler` now with ES6 module bundling support!
 <!-- Add new, unreleased items here. -->
 
+=======
+<!-- Add new, unreleased items here. -->
+<!-- ## Unreleased -->
+>>>>>>> origin/master
 ## v1.7.0-pre.3 [03-22-2018]
 - Fix -—module-resolution default from polyserve overriding polymer.json
 
@@ -64,12 +69,14 @@
 - Fixed the `polymer serve --npm` option.
 
 ## v1.4.0 [08-08-2017]
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> origin/master
 - Upgraded to Polymer Build ^2.0.0 which uses Polymer Bundler ^3.0.0.
 - When no specific option is set for Bundler's `rewriteUrlsInTemplates` the CLI attempts to get the version of Polymer for the project using `bower`.  When Polymer 2.x is discovered, `rewriteUrlsInTemplates` is defaulted to `false`.  In case of Polymer 1.x or where version can not be identified, it defaults to `true`.  Any user settings override these defaults.
 - Fix issue where negative `extraDependencies` globs were not working.
 - test: Add support for WCT `config-file` option.
-<!-- Add new, unreleased items here. -->
 
 ## v1.3.1 [07-06-2017]
 - Fixed [issue #710](https://github.com/Polymer/polymer-cli/issues/710) where the es5 custom elements adapter would not be added when bundling.

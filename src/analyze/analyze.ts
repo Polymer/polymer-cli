@@ -12,17 +12,15 @@
  * http://polymer.github.io/PATENTS.txt
  */
 
-import {AnalysisFormat, generateAnalysis, Analyzer} from 'polymer-analyzer';
+import * as globby from 'globby';
+import {AnalysisFormat, generateAnalysis} from 'polymer-analyzer';
 import {Feature} from 'polymer-analyzer/lib/model/model';
-import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
-import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
+import {ProjectConfig} from 'polymer-project-config';
+import {getConfiguredAnalyzer} from '../util';
 
-export async function analyze(
-    root: string, inputs: string[]): Promise<AnalysisFormat|undefined> {
-  const analyzer = new Analyzer({
-    urlLoader: new FSUrlLoader(root),
-    urlResolver: new PackageUrlResolver(),
-  });
+export async function analyze(config: ProjectConfig, inputs: string[]):
+    Promise<AnalysisFormat|undefined> {
+  const {analyzer} = getConfiguredAnalyzer(config);
 
   const isInTests = /(\b|\/|\\)(test)(\/|\\)/;
   const isNotTest = (f: Feature) =>
@@ -30,9 +28,9 @@ export async function analyze(
 
   if (inputs == null || inputs.length === 0) {
     const _package = await analyzer.analyzePackage();
-    return generateAnalysis(_package, '', isNotTest);
+    return generateAnalysis(_package, analyzer.urlResolver, isNotTest);
   } else {
-    const analysis = await analyzer.analyze(inputs);
-    return generateAnalysis(analysis, '', isNotTest);
+    const analysis = await analyzer.analyze(await globby(inputs));
+    return generateAnalysis(analysis, analyzer.urlResolver, isNotTest);
   }
 }

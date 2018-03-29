@@ -20,10 +20,11 @@ import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
 import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
-import {OptimizeOptions, getOptimizeStreams} from './optimize-streams';
+import {OptimizeOptions, getOptimizeStreams} from 'polymer-build';
 import {ProjectBuildOptions} from 'polymer-project-config';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
+import {LocalFsPath} from 'polymer-build/lib/path-transformers';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
@@ -38,8 +39,14 @@ export async function build(
     options: ProjectBuildOptions,
     polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
-  const optimizeOptions:
-      OptimizeOptions = {css: options.css, js: options.js, html: options.html};
+  const optimizeOptions: OptimizeOptions = {
+    css: options.css,
+    js: {
+      ...options.js,
+      moduleResolution: polymerProject.config.moduleResolution,
+    },
+    html: options.html,
+  };
 
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
@@ -70,7 +77,7 @@ export async function build(
   async function getPolymerVersion(): Promise<string> {
     return new Promise<string>(
         (resolve, _reject) =>
-            bower.commands.list()
+            bower.commands.list({}, {offline: true})
                 .on('end',
                     (result: any) => {
                       if (result && result.dependencies &&
@@ -154,7 +161,7 @@ export async function build(
           `${swPrecacheConfigPath}, continuing with defaults`);
     }
     await addServiceWorker({
-      buildRoot: buildDirectory,
+      buildRoot: buildDirectory as LocalFsPath,
       project: polymerProject,
       swPrecacheConfig: swConfig || undefined,
       bundled: bundled,
