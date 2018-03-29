@@ -1,6 +1,70 @@
 # Changelog
 
 ## Unreleased
+- Upgrade `polymer-build` to get latest `polymer-bundler` now with ES6 module bundling support!
+<!-- Add new, unreleased items here. -->
+
+## v1.7.0-pre.3 [03-22-2018]
+- Fix -—module-resolution default from polyserve overriding polymer.json
+
+## v1.7.0-pre.2 [03-22-2018]
+- Fixed issue where the `--module-resolution` wasn't being handled for the `serve` command.
+
+## v1.7.0-pre.1 [03-21-2018]
+- Added `--npm` and `--component-dir` global flags, which are passed to the `build`, `lint`, `test`, and `serve` commands.
+- All dash-case command line arguments are now converted to camelCase before overwriting options from polymer.json.
+- Compile/minify steps can now parse object-rest-spread and dynamic-import.
+- Fixed [issue #950](https://github.com/Polymer/polymer-cli/issues/950) where tagged template literals (such as `Polymer.html`) were incorrectly transpiled
+- Automatically generate a `.gitignore` file when execute init command and select `element` or `application`.
+- Added ability to use globs on `analyze` and `lint` commands
+- JS compile build transformer will now rewrite bare module specifiers to paths.
+- Add `--module-resolution` flag which can be `none` (the default) or `node`.
+- Update dependencies.
+
+## v1.6.0 [02-02-2018]
+- Added support for `exclude` option in `polymer.json` for the build command's `minify` and `compile` options for `css`, `js` and `html` files.
+- Added `--fix` option to `polymer lint`. When passed, some warnings with simple mechanical solutions will be fixed.
+  - Also supports warnings which can be addressed with less-safe changes via
+    an interactive prompt and the `--edits` flag. See `polymer lint --help` for
+    more info.
+- Added `--watch` (shorthand `-w`) option to `polymer lint`. When passed, we will watch the filesystem for changes and rerun the linter immediately afterwards.
+  - Also works with `--fix` to automatically fix and report warnings as you work!
+- `build` Added a CLI argument for setting the `basePath` option: `--base-path`.
+- Derives node version check from the package.json.
+- The polymer.json project config can now specify paths to exclude when minifying files and compiling JavaScript.  See https://github.com/Polymer/polymer-project-config/issues/50 for more.
+
+## v1.5.7 [10-11-2017]
+- Updated css-slam, bower and other dependencies.
+
+## v1.5.6 [10-02-2017]
+- Updated Polymer 2.0 element test file template to use ES6.
+- Update JS minification package babili to the new package-name babel-minify.
+- Updated to latest WCT and Polyserve versions to support npm and `<script type=module>` in on-the-fly compilation and tests.
+
+## v1.5.5 [09-21-2017]
+- Upgraded web-component-tester to v6.2.0 and polyserve 0.22.1 for better ES module support.
+
+## v1.5.4 [08-31-2017]
+- Upgraded web-component-tester to v6.1.5 to address IE11 issues.
+
+## v1.5.3 [08-31-2017]
+- Upgraded web-component-tester to v6.1.4 to address IE11 issues.
+
+## v1.5.2 [08-26-2017]
+- Upgraded web-component-tester to v6.1.3 to address yarn installation issues.
+
+## v1.5.1 [08-22-2017]
+- Upgraded web-component-tester to v6.1.2.
+
+## v1.5.0 [08-22-2017]
+- Fix issue where the `--fragment` flag was being ignored.
+- Added support for `polymer test --npm` option.
+
+## v1.4.1 [08-10-2017]
+- Fixed the `polymer serve --npm` option.
+
+## v1.4.0 [08-08-2017]
+>>>>>>> Stashed changes
 - Upgraded to Polymer Build ^2.0.0 which uses Polymer Bundler ^3.0.0.
 - When no specific option is set for Bundler's `rewriteUrlsInTemplates` the CLI attempts to get the version of Polymer for the project using `bower`.  When Polymer 2.x is discovered, `rewriteUrlsInTemplates` is defaulted to `false`.  In case of Polymer 1.x or where version can not be identified, it defaults to `true`.  Any user settings override these defaults.
 - Fix issue where negative `extraDependencies` globs were not working.
