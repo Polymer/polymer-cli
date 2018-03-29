@@ -1,14 +1,9 @@
 # Changelog
 
-<<<<<<< HEAD
 ## Unreleased
 - Upgrade `polymer-build` to get latest `polymer-bundler` now with ES6 module bundling support!
 <!-- Add new, unreleased items here. -->
 
-=======
-<!-- Add new, unreleased items here. -->
-<!-- ## Unreleased -->
->>>>>>> origin/master
 ## v1.7.0-pre.3 [03-22-2018]
 - Fix -—module-resolution default from polyserve overriding polymer.json
 
