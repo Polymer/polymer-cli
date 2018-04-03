@@ -25,7 +25,7 @@ export interface Options extends childProcess.ForkOptions {
 export async function runCommand(
     path: string, args: string[], options: Options): Promise<string> {
   let commandError: Error|undefined = undefined;
-  options.silent = true;
+  options.silent = false;
   const forkedProcess = childProcess.fork(path, args, options);
   const outputPromise =
       pipesToString(forkedProcess.stdout, forkedProcess.stderr);
@@ -71,6 +71,9 @@ async function pipesToString(
   let str = '';
   const promises = [];
   for (const stream of [stdout, stderr]) {
+    if (!stream) {
+      continue;
+    }
     stream.setEncoding('utf8');
     stream.on('data', function(chunk: string) {
       str += chunk;

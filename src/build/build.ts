@@ -13,6 +13,7 @@
  */
 
 import * as bower from 'bower';
+import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
@@ -20,7 +21,8 @@ import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
 import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
-import {OptimizeOptions, getOptimizeStreams} from 'polymer-build';
+import {getOptimizeStreams} from 'polymer-build';
+import {JsTransform, HtmlTransform, matchesExt} from 'polymer-build/lib/optimize-streams';
 import {ProjectBuildOptions} from 'polymer-project-config';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
@@ -28,7 +30,6 @@ import {LocalFsPath} from 'polymer-build/lib/path-transformers';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
-
 
 /**
  * Generate a single build based on the given `options` ProjectBuildOptions.
@@ -39,15 +40,6 @@ export async function build(
     options: ProjectBuildOptions,
     polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
-  const optimizeOptions: OptimizeOptions = {
-    css: options.css,
-    js: {
-      ...options.js,
-      moduleResolution: polymerProject.config.moduleResolution,
-    },
-    html: options.html,
-  };
-
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
   const buildDirectory = path.join(mainBuildDirectoryName, buildName);
@@ -57,22 +49,38 @@ export async function build(
   // file and not sharing object references with other builds.
   const sourcesStream = forkStream(polymerProject.sources());
   const depsStream = forkStream(polymerProject.dependencies());
+
   const htmlSplitter = new HtmlSplitter();
+
+  const bundled = !!(options.bundle);
+  const transformEsModulesToAmd =
+      options.js && options.js.transformEsModulesToAmd;
 
   let buildStream: NodeJS.ReadableStream = pipeStreams([
     mergeStream(sourcesStream, depsStream),
     htmlSplitter.split(),
-    getOptimizeStreams(optimizeOptions),
+
+    getOptimizeStreams({
+      html: options.html,
+      css: options.css,
+      js: {
+        ...options.js,
+        moduleResolution: polymerProject.config.moduleResolution,
+        // The AMD module transform must not happen before bundling, or else
+        // analyzer/bundler won't be able to do anything.
+        transformEsModulesToAmd: transformEsModulesToAmd && !bundled,
+      },
+      entrypointPath: polymerProject.config.entrypoint,
+    }),
+
     htmlSplitter.rejoin()
   ]);
 
-  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
+  const compiledToES5 = !!(options.js && options.js.compile);
   if (compiledToES5) {
-    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
-                      .pipe(polymerProject.addCustomElementsEs5Adapter());
+    buildStream =
+        buildStream.pipe(polymerProject.addCustomElementsEs5Adapter());
   }
-
-  const bundled = !!(options.bundle);
 
   async function getPolymerVersion(): Promise<string> {
     return new Promise<string>(
@@ -109,6 +117,21 @@ export async function build(
       Object.assign(bundlerOptions, options.bundle);
     }
     buildStream = buildStream.pipe(polymerProject.bundler(bundlerOptions));
+
+    if (transformEsModulesToAmd) {
+      buildStream = pipeStreams([
+        buildStream,
+
+        gulpif(
+            matchesExt('.js'),
+            new JsTransform({transformEsModulesToAmd: true})),
+
+        gulpif(matchesExt('.html'), new HtmlTransform({
+                 entrypointPath: polymerProject.config.entrypoint,
+                 js: {transformEsModulesToAmd: true},
+               })),
+      ]);
+    }
   }
 
   if (options.insertPrefetchLinks) {

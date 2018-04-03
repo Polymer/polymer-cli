@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Upgrade `polymer-build` to get latest `polymer-bundler` now with ES6 module bundling support!
+- External ES module script tags will now be updated to reference bundles.
 <!-- Add new, unreleased items here. -->
 
 ## v1.7.0-pre.3 [03-22-2018]

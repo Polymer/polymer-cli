@@ -57,6 +57,11 @@ export class BuildCommand implements Command {
           'older browsers.'
     },
     {
+      name: 'js-transform-es-modules-to-amd',
+      type: Boolean,
+      description: 'Transform ES modules to AMD modules.',
+    },
+    {
       name: 'js-minify',
       type: Boolean,
       description: 'Minify inlined and external JavaScript.'
@@ -124,10 +129,12 @@ export class BuildCommand implements Command {
     const validBuildOptions = new Set(this.args.map(({name}) => name));
     for (const buildOption of Object.keys(options)) {
       if (validBuildOptions.has(buildOption)) {
-        const [prefix, option] = buildOption.split('-', 2);
+        const [prefix, ...rest] = buildOption.split('-');
         if (['css', 'html', 'js'].indexOf(prefix) !== -1) {
+          const option = dashToCamelCase(rest.join('-'));
           (<any>buildOptions)[prefix] = (<any>buildOptions)[prefix] || {};
-          (<any>buildOptions)[prefix][option] = options[buildOption];
+          (<any>buildOptions)[prefix][dashToCamelCase(option)] =
+              options[buildOption];
         } else {
           (<any>buildOptions)[dashToCamelCase(buildOption)] =
               options[buildOption];

@@ -3,7 +3,30 @@
   "moduleResolution": "node",
   "builds": [
     {
-      "name": "foo"
+      "name": "unbundled-es",
+      "bundle": false
+    },
+    {
+      "name": "unbundled-amd",
+      "bundle": false,
+      "js": {
+        "transformEsModulesToAmd": true
+      }
+    },
+    {
+      "name": "bundled-es",
+      "bundle": {
+        "inlineScripts": false
+      }
+    },
+    {
+      "name": "bundled-amd",
+      "bundle": {
+        "inlineScripts": false
+      },
+      "js": {
+        "transformEsModulesToAmd": true
+      }
     }
   ]
 }
