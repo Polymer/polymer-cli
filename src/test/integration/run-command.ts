@@ -71,6 +71,9 @@ async function pipesToString(
   let str = '';
   const promises = [];
   for (const stream of [stdout, stderr]) {
+    if (!stream) {
+      continue;
+    }
     stream.setEncoding('utf8');
     stream.on('data', function(chunk: string) {
       str += chunk;

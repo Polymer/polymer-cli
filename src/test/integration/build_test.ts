@@ -184,7 +184,7 @@ suite('polymer build', function() {
     });
   });
 
-  test('moduleResolution node rewrites module names to paths', async () => {
+  test('module-based project builds with various configs', async () => {
     const tmpDir = tmp.dirSync();
     copyDir(path.join(fixturePath, 'build-modules', 'source'), tmpDir.name);
 
@@ -200,6 +200,10 @@ function copyDir(fromDir: string, toDir: string) {
 }
 
 function assertDirsEqual(actual: string, expected: string, basedir = actual) {
+  // uncomment to update the golden:
+  // fsExtra.emptyDirSync(expected);
+  // fsExtra.copySync(actual, expected);
+
   const actualNames = fs.readdirSync(actual).sort();
   const expectedNames = fs.readdirSync(expected).sort();
   assert.deepEqual(
