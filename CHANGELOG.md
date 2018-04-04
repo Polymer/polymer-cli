@@ -1,7 +1,9 @@
 # Changelog
 
 ## Unreleased
-- Upgrade `polymer-build` to get latest `polymer-bundler` now with ES6 module bundling support!
+- Upgrade `polymer-build` to get latest `polymer-bundler`:
+  - ES6 module bundling support.
+  - AMD module transformation.
 - External ES module script tags will now be updated to reference bundles.
 <!-- Add new, unreleased items here. -->
 
