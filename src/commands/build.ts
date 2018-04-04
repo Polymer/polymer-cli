@@ -62,6 +62,12 @@ export class BuildCommand implements Command {
       description: 'Transform ES modules to AMD modules.',
     },
     {
+      name: 'js-transform-import-meta',
+      type: Boolean,
+      description:
+          'Rewrite import.meta expressions to objects with inline URLs.',
+    },
+    {
       name: 'js-minify',
       type: Boolean,
       description: 'Minify inlined and external JavaScript.'
