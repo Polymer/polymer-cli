@@ -10,7 +10,7 @@
       "name": "unbundled-amd",
       "bundle": false,
       "js": {
-        "transformEsModulesToAmd": true
+        "transformModulesToAmd": true
       }
     },
     {
@@ -25,7 +25,7 @@
         "inlineScripts": false
       },
       "js": {
-        "transformEsModulesToAmd": true
+        "transformModulesToAmd": true
       }
     }
   ]
