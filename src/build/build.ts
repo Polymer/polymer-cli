@@ -53,8 +53,7 @@ export async function build(
   const htmlSplitter = new HtmlSplitter();
 
   const bundled = !!(options.bundle);
-  const transformEsModulesToAmd =
-      options.js && options.js.transformEsModulesToAmd;
+  const transformModulesToAmd = options.js && options.js.transformModulesToAmd;
 
   let buildStream: NodeJS.ReadableStream = pipeStreams([
     mergeStream(sourcesStream, depsStream),
@@ -68,9 +67,10 @@ export async function build(
         moduleResolution: polymerProject.config.moduleResolution,
         // The AMD module transform must not happen before bundling, or else
         // analyzer/bundler won't be able to do anything.
-        transformEsModulesToAmd: transformEsModulesToAmd && !bundled,
+        transformModulesToAmd: transformModulesToAmd && !bundled,
       },
       entrypointPath: polymerProject.config.entrypoint,
+      rootDir: polymerProject.config.root,
     }),
 
     htmlSplitter.rejoin()
@@ -118,17 +118,19 @@ export async function build(
     }
     buildStream = buildStream.pipe(polymerProject.bundler(bundlerOptions));
 
-    if (transformEsModulesToAmd) {
+    if (transformModulesToAmd) {
       buildStream = pipeStreams([
         buildStream,
 
-        gulpif(
-            matchesExt('.js'),
-            new JsTransform({transformEsModulesToAmd: true})),
+        gulpif(matchesExt('.js'), new JsTransform({
+                 js: {transformModulesToAmd: true},
+                 rootDir: polymerProject.config.root,
+               })),
 
         gulpif(matchesExt('.html'), new HtmlTransform({
                  entrypointPath: polymerProject.config.entrypoint,
-                 js: {transformEsModulesToAmd: true},
+                 js: {transformModulesToAmd: true},
+                 rootDir: polymerProject.config.root,
                })),
       ]);
     }

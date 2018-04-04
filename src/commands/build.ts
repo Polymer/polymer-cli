@@ -57,7 +57,7 @@ export class BuildCommand implements Command {
           'older browsers.'
     },
     {
-      name: 'js-transform-es-modules-to-amd',
+      name: 'js-transform-modules-to-amd',
       type: Boolean,
       description: 'Transform ES modules to AMD modules.',
     },
