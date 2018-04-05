@@ -1,0 +1,1 @@
+define(["exports"],function(a){"use strict";Object.defineProperty(a,"__esModule",{value:!0}),a.dep1=a.mod2=a.mod1=a.$dep1=a.$mod2=a.$mod1=void 0;a.dep1="dep1";a.$dep1={dep1:"dep1"};a.mod2="mod2";a.$mod2={mod2:"mod2"};a.mod1="mod1";a.$mod1={mod1:"mod1"}});

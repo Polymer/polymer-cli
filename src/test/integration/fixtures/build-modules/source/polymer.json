@@ -27,6 +27,19 @@
       "js": {
         "transformModulesToAmd": true
       }
+    },
+    {
+      "name": "bundled-amd-minified",
+      "bundle": {
+        "inlineScripts": false
+      },
+      "js": {
+        "transformModulesToAmd": true,
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      }
     }
   ]
 }
