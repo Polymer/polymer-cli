@@ -13,7 +13,6 @@
  */
 
 import * as bower from 'bower';
-import * as gulpif from 'gulp-if';
 import * as path from 'path';
 import * as logging from 'plylog';
 import {dest} from 'vinyl-fs';
@@ -22,7 +21,6 @@ import mergeStream = require('merge-stream');
 import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
 import {getOptimizeStreams} from 'polymer-build';
-import {JsTransform, HtmlTransform, matchesExt} from 'polymer-build/lib/optimize-streams';
 import {ProjectBuildOptions} from 'polymer-project-config';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
@@ -50,31 +48,10 @@ export async function build(
   const sourcesStream = forkStream(polymerProject.sources());
   const depsStream = forkStream(polymerProject.dependencies());
 
-  const htmlSplitter = new HtmlSplitter();
-
   const bundled = !!(options.bundle);
-  const transformModulesToAmd = options.js && options.js.transformModulesToAmd;
 
-  let buildStream: NodeJS.ReadableStream = pipeStreams([
-    mergeStream(sourcesStream, depsStream),
-    htmlSplitter.split(),
-
-    getOptimizeStreams({
-      html: options.html,
-      css: options.css,
-      js: {
-        ...options.js,
-        moduleResolution: polymerProject.config.moduleResolution,
-        // The AMD module transform must not happen before bundling, or else
-        // analyzer/bundler won't be able to do anything.
-        transformModulesToAmd: transformModulesToAmd && !bundled,
-      },
-      entrypointPath: polymerProject.config.entrypoint,
-      rootDir: polymerProject.config.root,
-    }),
-
-    htmlSplitter.rejoin()
-  ]);
+  let buildStream: NodeJS.ReadableStream =
+      mergeStream(sourcesStream, depsStream);
 
   const compiledToES5 = !!(options.js && options.js.compile);
   if (compiledToES5) {
@@ -117,24 +94,27 @@ export async function build(
       Object.assign(bundlerOptions, options.bundle);
     }
     buildStream = buildStream.pipe(polymerProject.bundler(bundlerOptions));
-
-    if (transformModulesToAmd) {
-      buildStream = pipeStreams([
-        buildStream,
-
-        gulpif(matchesExt('.js'), new JsTransform({
-                 js: {transformModulesToAmd: true},
-                 rootDir: polymerProject.config.root,
-               })),
-
-        gulpif(matchesExt('.html'), new HtmlTransform({
-                 entrypointPath: polymerProject.config.entrypoint,
-                 js: {transformModulesToAmd: true},
-                 rootDir: polymerProject.config.root,
-               })),
-      ]);
-    }
   }
+
+  const htmlSplitter = new HtmlSplitter();
+
+  buildStream = pipeStreams([
+    buildStream,
+    htmlSplitter.split(),
+
+    getOptimizeStreams({
+      html: options.html,
+      css: options.css,
+      js: {
+        ...options.js,
+        moduleResolution: polymerProject.config.moduleResolution,
+      },
+      entrypointPath: polymerProject.config.entrypoint,
+      rootDir: polymerProject.config.root,
+    }),
+
+    htmlSplitter.rejoin()
+  ]);
 
   if (options.insertPrefetchLinks) {
     buildStream = buildStream.pipe(polymerProject.addPrefetchLinks());

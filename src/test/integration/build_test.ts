@@ -201,8 +201,13 @@ function copyDir(fromDir: string, toDir: string) {
 
 function assertDirsEqual(actual: string, expected: string, basedir = actual) {
   // uncomment to update the golden:
-  // fsExtra.emptyDirSync(expected);
-  // fsExtra.copySync(actual, expected);
+  /**
+  fsExtra.emptyDirSync(expected);
+  fsExtra.copySync(actual, expected);
+  if (1 + 1 === 2) {
+    throw new Error('Goldens updated, test failing for your saftey.');
+  }
+  */
 
   const actualNames = fs.readdirSync(actual).sort();
   const expectedNames = fs.readdirSync(expected).sort();
