@@ -207,7 +207,7 @@ function assertDirsEqual(actual: string, expected: string, basedir = actual) {
   if (1 + 1 === 2) {
     throw new Error('Goldens updated, test failing for your saftey.');
   }
-   */
+  */
 
   const actualNames = fs.readdirSync(actual).sort();
   const expectedNames = fs.readdirSync(expected).sort();

@@ -116,7 +116,6 @@ export async function build(
     htmlSplitter.rejoin()
   ]);
 
-
   if (options.insertPrefetchLinks) {
     buildStream = buildStream.pipe(polymerProject.addPrefetchLinks());
   }
