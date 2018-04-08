@@ -13,6 +13,7 @@
  */
 
 import * as inquirer from 'inquirer';
+import * as isWindows from 'is-windows';
 import * as logging from 'plylog';
 import {execSync} from 'mz/child_process';
 import {Analyzer, FsUrlLoader, PackageUrlResolver} from 'polymer-analyzer';
@@ -23,18 +24,11 @@ import {CommandResult} from './commands/command';
 const logger = logging.getLogger('cli.main');
 
 /**
- * Check if the platform is Windows for platform specific fixes
- */
-export function checkIsWindows(): boolean {
-  return /^win/.test(process.platform);
-}
-
-/**
  * Check if the current shell environment is MinGW. MinGW can't handle some
  * yeoman features, so we can use this check to downgrade gracefully.
  */
 function checkIsMinGW(): boolean {
-  if (!checkIsWindows()) {
+  if (!isWindows()) {
     return false;
   }
 

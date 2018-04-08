@@ -13,6 +13,7 @@
  */
 
 import * as commandLineArgs from 'command-line-args';
+import * as isWindows from 'is-windows';
 import {sep as pathSeperator, join} from 'path';
 import {readFile} from 'mz/fs';
 import * as logging from 'plylog';
@@ -28,7 +29,7 @@ import {InstallCommand} from './commands/install';
 import {LintCommand} from './commands/lint';
 import {ServeCommand} from './commands/serve';
 import {TestCommand} from './commands/test';
-import {checkIsWindows, exec, dashToCamelCase} from './util';
+import {exec, dashToCamelCase} from './util';
 
 import commandLineCommands = require('command-line-commands');
 import {ParsedCommand} from 'command-line-commands';
@@ -227,7 +228,7 @@ export class PolymerCli {
     if (!commandOptions['ignore-custom-command'] && command.npmScript &&
         packageJson.scripts && packageJson.scripts[command.npmScript]) {
       return exec(
-        `npm${checkIsWindows() ? '.cmd' : ''}`, ['run', command.npmScript]);
+        `npm${isWindows() ? '.cmd' : ''}`, ['run', command.npmScript]);
     }
 
     return command.run(commandOptions, config);
