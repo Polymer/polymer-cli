@@ -3958,43 +3958,6 @@
       "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz",
       "integrity": "sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ="
     },
-    "escodegen": {
-      "version": "1.8.1",
-      "resolved": "https://registry.npmjs.org/escodegen/-/escodegen-1.8.1.tgz",
-      "integrity": "sha1-WltTr0aTEQvrsIZ6o0MN07cKEBg=",
-      "dev": true,
-      "requires": {
-        "esprima": "2.7.3",
-        "estraverse": "1.9.3",
-        "esutils": "2.0.2",
-        "optionator": "0.8.2",
-        "source-map": "0.2.0"
-      },
-      "dependencies": {
-        "esprima": {
-          "version": "2.7.3",
-          "resolved": "https://registry.npmjs.org/esprima/-/esprima-2.7.3.tgz",
-          "integrity": "sha1-luO3DVd59q1JzQMmc9HDEnZ7pYE=",
-          "dev": true
-        },
-        "estraverse": {
-          "version": "1.9.3",
-          "resolved": "https://registry.npmjs.org/estraverse/-/estraverse-1.9.3.tgz",
-          "integrity": "sha1-r2fy3JIlgkFZUJJgkaQAXSnJu0Q=",
-          "dev": true
-        },
-        "source-map": {
-          "version": "0.2.0",
-          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.2.0.tgz",
-          "integrity": "sha1-2rc/vPwrqBm03gO9b26qSBZLP50=",
-          "dev": true,
-          "optional": true,
-          "requires": {
-            "amdefine": "1.0.1"
-          }
-        }
-      }
-    },
     "escope": {
       "version": "3.6.0",
       "resolved": "https://registry.npmjs.org/escope/-/escope-3.6.0.tgz",
