@@ -1,7 +1,14 @@
 # Changelog
 
-<!-- Add new, unreleased items here. -->
 <!-- ## Unreleased -->
+<!-- Add new, unreleased items here. -->
+
+## v1.7.0-pre.4 [04-05-2018]
+- `build`
+  - ES modules are now be bundled.
+  - ES modules can now be transformed to AMD modules.
+  - Minification and other transforms now happen after bundling instead of before.
+
 ## v1.7.0-pre.3 [03-22-2018]
 - Fix -—module-resolution default from polyserve overriding polymer.json
 

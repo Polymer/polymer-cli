@@ -20,7 +20,7 @@ import {dest} from 'vinyl-fs';
 import mergeStream = require('merge-stream');
 import {forkStream, PolymerProject, addServiceWorker, SWConfig, HtmlSplitter} from 'polymer-build';
 
-import {OptimizeOptions, getOptimizeStreams} from 'polymer-build';
+import {getOptimizeStreams} from 'polymer-build';
 import {ProjectBuildOptions} from 'polymer-project-config';
 import {waitFor, pipeStreams} from './streams';
 import {loadServiceWorkerConfig} from './load-config';
@@ -28,7 +28,6 @@ import {LocalFsPath} from 'polymer-build/lib/path-transformers';
 
 const logger = logging.getLogger('cli.build.build');
 export const mainBuildDirectoryName = 'build';
-
 
 /**
  * Generate a single build based on the given `options` ProjectBuildOptions.
@@ -39,15 +38,6 @@ export async function build(
     options: ProjectBuildOptions,
     polymerProject: PolymerProject): Promise<void> {
   const buildName = options.name || 'default';
-  const optimizeOptions: OptimizeOptions = {
-    css: options.css,
-    js: {
-      ...options.js,
-      moduleResolution: polymerProject.config.moduleResolution,
-    },
-    html: options.html,
-  };
-
   // If no name is provided, write directly to the build/ directory.
   // If a build name is provided, write to that subdirectory.
   const buildDirectory = path.join(mainBuildDirectoryName, buildName);
@@ -57,22 +47,17 @@ export async function build(
   // file and not sharing object references with other builds.
   const sourcesStream = forkStream(polymerProject.sources());
   const depsStream = forkStream(polymerProject.dependencies());
-  const htmlSplitter = new HtmlSplitter();
-
-  let buildStream: NodeJS.ReadableStream = pipeStreams([
-    mergeStream(sourcesStream, depsStream),
-    htmlSplitter.split(),
-    getOptimizeStreams(optimizeOptions),
-    htmlSplitter.rejoin()
-  ]);
-
-  const compiledToES5 = !!(optimizeOptions.js && optimizeOptions.js.compile);
-  if (compiledToES5) {
-    buildStream = buildStream.pipe(polymerProject.addBabelHelpersInEntrypoint())
-                      .pipe(polymerProject.addCustomElementsEs5Adapter());
-  }
 
   const bundled = !!(options.bundle);
+
+  let buildStream: NodeJS.ReadableStream =
+      mergeStream(sourcesStream, depsStream);
+
+  const compiledToES5 = !!(options.js && options.js.compile);
+  if (compiledToES5) {
+    buildStream =
+        buildStream.pipe(polymerProject.addCustomElementsEs5Adapter());
+  }
 
   async function getPolymerVersion(): Promise<string> {
     return new Promise<string>(
@@ -110,6 +95,26 @@ export async function build(
     }
     buildStream = buildStream.pipe(polymerProject.bundler(bundlerOptions));
   }
+
+  const htmlSplitter = new HtmlSplitter();
+
+  buildStream = pipeStreams([
+    buildStream,
+    htmlSplitter.split(),
+
+    getOptimizeStreams({
+      html: options.html,
+      css: options.css,
+      js: {
+        ...options.js,
+        moduleResolution: polymerProject.config.moduleResolution,
+      },
+      entrypointPath: polymerProject.config.entrypoint,
+      rootDir: polymerProject.config.root,
+    }),
+
+    htmlSplitter.rejoin()
+  ]);
 
   if (options.insertPrefetchLinks) {
     buildStream = buildStream.pipe(polymerProject.addPrefetchLinks());

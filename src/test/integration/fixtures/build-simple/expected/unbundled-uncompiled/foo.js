@@ -1,1 +1,1 @@
-function foo(){alert('foo')}
+function foo(){alert("foo")}

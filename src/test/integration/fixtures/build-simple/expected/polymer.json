@@ -50,5 +50,6 @@
         "minify": true
       }
     }
-  ]
+  ],
+  "moduleResolution": "none"
 }
